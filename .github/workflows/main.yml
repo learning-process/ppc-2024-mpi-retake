@@ -1106,6 +1106,7 @@ jobs:
         uses: codecov/codecov-action@v5.3.1
         with:
           files: coverage.xml
+          token: c3485f7f-d5ae-4c65-ae5b-24a098157ded
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v4
         with:
