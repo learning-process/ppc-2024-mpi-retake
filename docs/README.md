@@ -4,7 +4,7 @@
 
 1. Navigate to the documentation directory:
 ```bash
-cd parallel_programming_course/docs
+cd ppc-2024-mpi-retake/docs
 ```
 
 2. (Optional) Create a virtual environment:
