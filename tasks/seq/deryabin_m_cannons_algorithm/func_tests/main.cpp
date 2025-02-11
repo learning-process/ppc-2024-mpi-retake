@@ -26,10 +26,10 @@ TEST(deryabin_m_cannons_algorithm_seq, test_simple_matrix) {
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
-  cannons_algorithm_TaskSequential.pre_processing();
-  cannons_algorithm_TaskSequential.run();
-  cannons_algorithm_TaskSequential.post_processing();
+  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
+  cannons_algorithm_TaskSequential.PreProcessing();
+  cannons_algorithm_TaskSequential.Run();
+  cannons_algorithm_TaskSequential.PostProcessing();
   ASSERT_EQ(true_solution, out_matrix_C[0]);
 }
 
@@ -55,10 +55,10 @@ TEST(deryabin_m_cannons_algorithm_seq, test_triangular_matrix) {
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
-  cannons_algorithm_TaskSequential.pre_processing();
-  cannons_algorithm_TaskSequential.run();
-  cannons_algorithm_TaskSequential.post_processing();
+  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
+  cannons_algorithm_TaskSequential.PreProcessing();
+  cannons_algorithm_TaskSequential.Run();
+  cannons_algorithm_TaskSequential.PostProcessing();
   ASSERT_EQ(true_solution, out_matrix_C[0]);
 }
 
@@ -83,10 +83,10 @@ TEST(deryabin_m_cannons_algorithm_seq, test_null_matrix) {
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
-  cannons_algorithm_TaskSequential.pre_processing();
-  cannons_algorithm_TaskSequential.run();
-  cannons_algorithm_TaskSequential.post_processing();
+  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
+  cannons_algorithm_TaskSequential.PreProcessing();
+  cannons_algorithm_TaskSequential.Run();
+  cannons_algorithm_TaskSequential.PostProcessing();
   ASSERT_EQ(in_matrix_B[0], out_matrix_C[0]);
 }
 
@@ -111,10 +111,10 @@ TEST(deryabin_m_cannons_algorithm_seq, test_identity_matrix) {
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
-  cannons_algorithm_TaskSequential.pre_processing();
-  cannons_algorithm_TaskSequential.run();
-  cannons_algorithm_TaskSequential.post_processing();
+  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
+  cannons_algorithm_TaskSequential.PreProcessing();
+  cannons_algorithm_TaskSequential.Run();
+  cannons_algorithm_TaskSequential.PostProcessing();
   ASSERT_EQ(in_matrix_B[0], out_matrix_C[0]);
 }
 
@@ -139,7 +139,7 @@ TEST(deryabin_m_cannons_algorithm_seq, test_matrices_of_different_dimensions) {
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), false);
+  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), false);
 }
 
 TEST(deryabin_m_cannons_algorithm_seq, test_non_square_matrices) {
@@ -163,5 +163,5 @@ TEST(deryabin_m_cannons_algorithm_seq, test_non_square_matrices) {
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), false);
+  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), false);
 }
