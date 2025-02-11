@@ -182,27 +182,27 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
     }
     unsigned short p = 1;
     while (p != block_rows_columns) {
-      if (block_rows_columns != 0 && world.rank() % block_rows_columns == 0) {
+      if (block_rows_columns != 0 && world_.rank() % block_rows_columns == 0) {
         world_.send(world_.rank() + block_rows_columns - 1, 2, local_input_matrix_A_.data(),
                    block_dimension * block_dimension);
       } else {
         world_.send(world_.rank() - 1, 3, local_input_matrix_A_.data(), block_dimension * block_dimension);
       }
       if (world_.rank() < block_rows_columns) {
-        world_.send(world_.rank() + block_rows_columns * (block_rows_columns - 1), 4, local_input_matrix_B_.data(),
+        world_.send(world_.rank() + (block_rows_columns * (block_rows_columns - 1)), 4, local_input_matrix_B_.data(),
                    block_dimension * block_dimension);
       } else {
         world_.send(world_.rank() - block_rows_columns, 5, local_input_matrix_B_.data(),
                    block_dimension * block_dimension);
       }
-      if (block_rows_columns != 0 && (world.rank() + 1) % block_rows_columns == 0) {
+      if (block_rows_columns != 0 && (world_.rank() + 1) % block_rows_columns == 0) {
         world_.recv(world_.rank() - block_rows_columns + 1, 2, local_input_matrix_A_.data(),
                    block_dimension * block_dimension);
       } else {
         world_.recv(world_.rank() + 1, 3, local_input_matrix_A_.data(), block_dimension * block_dimension);
       }
-      if (world.rank() >= block_rows_columns * (block_rows_columns - 1)) {
-        world_.recv(world_.rank() - block_rows_columns * (block_rows_columns - 1), 4, local_input_matrix_B_.data(),
+      if (world_.rank() >= block_rows_columns * (block_rows_columns - 1)) {
+        world_.recv(world_.rank() - (block_rows_columns * (block_rows_columns - 1)), 4, local_input_matrix_B_.data(),
                    block_dimension * block_dimension);
       } else {
         world_.recv(world_.rank() + block_rows_columns, 5, local_input_matrix_B_.data(),
