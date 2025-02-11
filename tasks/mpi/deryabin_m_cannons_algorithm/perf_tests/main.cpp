@@ -3,6 +3,7 @@
 #include <boost/mpi/timer.hpp>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
@@ -15,18 +16,18 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
     input_matrix_B[dimension * 101] = 1;
   }
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_A.data()));
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_B.data()));
-    taskDataPar->inputs_count.emplace_back(input_matrix_A.size());
-    taskDataPar->inputs_count.emplace_back(input_matrix_B.size());
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-    taskDataPar->outputs_count.emplace_back(out_matrix_C.size());
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_A.data()));
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_B.data()));
+    task_data_mpi->inputs_count.emplace_back(input_matrix_A.size());
+    task_data_mpi->inputs_count.emplace_back(input_matrix_B.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+    task_data_mpi->outputs_count.emplace_back(out_matrix_C.size());
   }
 
   auto testMpiTaskParallel =
-      std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(taskDataPar);
+      std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
   ASSERT_EQ(testMpiTaskParallel->validation(), true);
   testMpiTaskParallel->pre_processing();
   testMpiTaskParallel->run();
@@ -57,18 +58,18 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
     input_matrix_B[dimension * 101] = 1;
   }
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_A.data()));
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_B.data()));
-    taskDataPar->inputs_count.emplace_back(input_matrix_A.size());
-    taskDataPar->inputs_count.emplace_back(input_matrix_B.size());
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-    taskDataPar->outputs_count.emplace_back(out_matrix_C.size());
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_A.data()));
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_B.data()));
+    task_data_mpi->inputs_count.emplace_back(input_matrix_A.size());
+    task_data_mpi->inputs_count.emplace_back(input_matrix_B.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+    task_data_mpi->outputs_count.emplace_back(out_matrix_C.size());
   }
 
   auto testMpiTaskParallel =
-      std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(taskDataPar);
+      std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
   ASSERT_EQ(testMpiTaskParallel->validation(), true);
   testMpiTaskParallel->pre_processing();
   testMpiTaskParallel->run();
