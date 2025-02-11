@@ -1,5 +1,7 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
+#include <boost/mpi.hpp>
 
+#include <utility>
 #include <cmath>
 #include <vector>
 
@@ -75,7 +77,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
   if (world_.size() == 1 || world_.size() != pow(sqrt(static_cast<unsigned short>(world_.size())), 2) ||
       (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) % (unsigned short)sqrt(static_cast<unsigned short>(world_.size())) != 0) {
     if (world_.rank() == 0) {
-      dimension = sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
+      dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
       output_matrix_C_ = std::vector<double>(dimension * dimension);
       while (i != dimension) {
         j = 0;
@@ -94,7 +96,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
     unsigned short block_dimension = 0;
     unsigned short block_rows_columns = 0;
     if (world_.rank() == 0) {
-      dimension = (unsigned short)sqrt(input_matrix_A_.size());
+      dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
       block_rows_columns = (unsigned short)sqrt(world_.size());
       block_dimension = dimension / block_rows_columns;
     }
