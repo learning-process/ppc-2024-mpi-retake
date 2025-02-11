@@ -15,12 +15,12 @@ namespace deryabin_m_cannons_algorithm_mpi {
 
 class CannonsAlgorithmMPITaskSequential : public ppc::core::Task {
  public:
-  explicit CannonsAlgorithmMPITaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_)
-      : Task(std::move(taskData_)) {}
-  bool pre_processing() override;
-  bool validation() override;
-  bool run() override;
-  bool post_processing() override;
+  explicit CannonsAlgorithmMPITaskSequential(ppc::core::TaskDataPtr task_data)
+      : Task(std::move(task_data)) {}
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
 
  private:
   std::vector<double> input_matrix_A;
@@ -29,12 +29,12 @@ class CannonsAlgorithmMPITaskSequential : public ppc::core::Task {
 };
 class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
  public:
-  explicit CannonsAlgorithmMPITaskParallel(std::shared_ptr<ppc::core::TaskData> taskData_)
-      : Task(std::move(taskData_)) {}
-  bool pre_processing() override;
-  bool validation() override;
-  bool run() override;
-  bool post_processing() override;
+  explicit CannonsAlgorithmMPITaskParallel(ppc::core::TaskDataPtr task_data)
+      : Task(std::move(task_data)) {}
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
 
  private:
   std::vector<double> input_matrix_A, local_input_matrix_A;
