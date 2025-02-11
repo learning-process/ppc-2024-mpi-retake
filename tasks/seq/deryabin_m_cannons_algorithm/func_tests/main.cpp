@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
 #include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
 
 TEST(deryabin_m_cannons_algorithm_seq, test_simple_matrix) {
@@ -14,16 +16,16 @@ TEST(deryabin_m_cannons_algorithm_seq, test_simple_matrix) {
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  taskDataSeq->inputs_count.emplace_back(input_matrix_A.size());
-  taskDataSeq->inputs_count.emplace_back(input_matrix_B.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  taskDataSeq->outputs_count.emplace_back(out_matrix_C.size());
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(taskDataSeq);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
   ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
   cannons_algorithm_TaskSequential.pre_processing();
   cannons_algorithm_TaskSequential.run();
@@ -43,16 +45,16 @@ TEST(deryabin_m_cannons_algorithm_seq, test_triangular_matrix) {
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  taskDataSeq->inputs_count.emplace_back(input_matrix_A.size());
-  taskDataSeq->inputs_count.emplace_back(input_matrix_B.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  taskDataSeq->outputs_count.emplace_back(out_matrix_C.size());
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(taskDataSeq);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
   ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
   cannons_algorithm_TaskSequential.pre_processing();
   cannons_algorithm_TaskSequential.run();
@@ -71,16 +73,16 @@ TEST(deryabin_m_cannons_algorithm_seq, test_null_matrix) {
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  taskDataSeq->inputs_count.emplace_back(input_matrix_A.size());
-  taskDataSeq->inputs_count.emplace_back(input_matrix_B.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  taskDataSeq->outputs_count.emplace_back(out_matrix_C.size());
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(taskDataSeq);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
   ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
   cannons_algorithm_TaskSequential.pre_processing();
   cannons_algorithm_TaskSequential.run();
@@ -99,16 +101,16 @@ TEST(deryabin_m_cannons_algorithm_seq, test_identity_matrix) {
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  taskDataSeq->inputs_count.emplace_back(input_matrix_A.size());
-  taskDataSeq->inputs_count.emplace_back(input_matrix_B.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  taskDataSeq->outputs_count.emplace_back(out_matrix_C.size());
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(taskDataSeq);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
   ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), true);
   cannons_algorithm_TaskSequential.pre_processing();
   cannons_algorithm_TaskSequential.run();
@@ -127,16 +129,16 @@ TEST(deryabin_m_cannons_algorithm_seq, test_matrices_of_different_dimensions) {
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  taskDataSeq->inputs_count.emplace_back(input_matrix_A.size());
-  taskDataSeq->inputs_count.emplace_back(input_matrix_B.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  taskDataSeq->outputs_count.emplace_back(out_matrix_C.size());
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(taskDataSeq);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
   ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), false);
 }
 
@@ -151,15 +153,15 @@ TEST(deryabin_m_cannons_algorithm_seq, test_non_square_matrices) {
   std::vector<std::vector<double>> out_matrix_C(1, output_matrix_C);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  taskDataSeq->inputs_count.emplace_back(input_matrix_A.size());
-  taskDataSeq->inputs_count.emplace_back(input_matrix_B.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  taskDataSeq->outputs_count.emplace_back(out_matrix_C.size());
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(taskDataSeq);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
   ASSERT_EQ(cannons_algorithm_TaskSequential.validation(), false);
 }
