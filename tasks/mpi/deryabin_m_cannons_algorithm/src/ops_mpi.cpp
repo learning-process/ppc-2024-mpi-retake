@@ -1,7 +1,7 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 #include <cmath>
-#include <utility>
+#include <cstddef>
 #include <vector>
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::PreProcessingImpl() {
