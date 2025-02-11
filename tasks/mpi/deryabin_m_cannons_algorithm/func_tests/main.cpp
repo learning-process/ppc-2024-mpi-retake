@@ -24,10 +24,10 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
   }
 
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel testMpiTaskParallel(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.validation(), true);
-  testMpiTaskParallel.pre_processing();
-  testMpiTaskParallel.run();
-  testMpiTaskParallel.post_processing();
+  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  testMpiTaskParallel.PreProcessing();
+  testMpiTaskParallel.Run();
+  testMpiTaskParallel.PostProcessing();
 
   if (world.rank() == 0) {
     std::vector<std::vector<double>> reference_out_matrix_C(1, output_matrix_C);
@@ -41,10 +41,10 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
     task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential testMpiTaskSequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), true);
-    testMpiTaskSequential.pre_processing();
-    testMpiTaskSequential.run();
-    testMpiTaskSequential.post_processing();
+    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
+    testMpiTaskSequential.PreProcessing();
+    testMpiTaskSequential.Run();
+    testMpiTaskSequential.PostProcessing();
 
     ASSERT_EQ(reference_out_matrix_C[0], out_matrix_C[0]);
   }
@@ -71,10 +71,10 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   }
 
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel testMpiTaskParallel(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.validation(), true);
-  testMpiTaskParallel.pre_processing();
-  testMpiTaskParallel.run();
-  testMpiTaskParallel.post_processing();
+  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  testMpiTaskParallel.PreProcessing();
+  testMpiTaskParallel.Run();
+  testMpiTaskParallel.PostProcessing();
 
   if (world.rank() == 0) {
     std::vector<std::vector<double>> reference_out_matrix_C(1, output_matrix_C);
@@ -88,10 +88,10 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
     task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential testMpiTaskSequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), true);
-    testMpiTaskSequential.pre_processing();
-    testMpiTaskSequential.run();
-    testMpiTaskSequential.post_processing();
+    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
+    testMpiTaskSequential.PreProcessing();
+    testMpiTaskSequential.Run();
+    testMpiTaskSequential.PostProcessing();
 
     ASSERT_EQ(reference_out_matrix_C[0], out_matrix_C[0]);
   }
@@ -118,10 +118,10 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
   }
 
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel testMpiTaskParallel(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.validation(), true);
-  testMpiTaskParallel.pre_processing();
-  testMpiTaskParallel.run();
-  testMpiTaskParallel.post_processing();
+  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  testMpiTaskParallel.PreProcessing();
+  testMpiTaskParallel.Run();
+  testMpiTaskParallel.PostProcessing();
 
   if (world.rank() == 0) {
     std::vector<std::vector<double>> reference_out_matrix_C(1, output_matrix_C);
@@ -135,10 +135,10 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
     task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential testMpiTaskSequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), true);
-    testMpiTaskSequential.pre_processing();
-    testMpiTaskSequential.run();
-    testMpiTaskSequential.post_processing();
+    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
+    testMpiTaskSequential.PreProcessing();
+    testMpiTaskSequential.Run();
+    testMpiTaskSequential.PostProcessing();
 
     ASSERT_EQ(reference_out_matrix_C[0], out_matrix_C[0]);
   }
@@ -168,7 +168,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_matrices_of_different_dimensions) {
     task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
 
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential testMpiTaskSequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), false);
+    ASSERT_EQ(testMpiTaskSequential.Validation(), false);
   }
 }
 
@@ -196,6 +196,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_non_square_matrices) {
     task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
 
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential testMpiTaskSequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), false);
+    ASSERT_EQ(testMpiTaskSequential.Validation(), false);
   }
 }
