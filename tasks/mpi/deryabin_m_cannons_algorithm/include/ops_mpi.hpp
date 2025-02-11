@@ -1,12 +1,9 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <memory>
-#include <numeric>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -23,9 +20,9 @@ class CannonsAlgorithmMPITaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> input_matrix_A;
-  std::vector<double> input_matrix_B;
-  std::vector<double> output_matrix_C;
+  std::vector<double> input_matrix_A_;
+  std::vector<double> input_matrix_B_;
+  std::vector<double> output_matrix_C_;
 };
 class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
  public:
@@ -37,9 +34,9 @@ class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> input_matrix_A, local_input_matrix_A;
-  std::vector<double> input_matrix_B, local_input_matrix_B;
-  std::vector<double> output_matrix_C, local_output_matrix_C;
-  boost::mpi::communicator world;
+  std::vector<double> input_matrix_A_, local_input_matrix_A_;
+  std::vector<double> input_matrix_B_, local_input_matrix_B_;
+  std::vector<double> output_matrix_C_, local_output_matrix_C_;
+  boost::mpi::communicator world_;
 };
 }  // namespace deryabin_m_cannons_algorithm_mpi
