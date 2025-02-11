@@ -3,7 +3,6 @@
 #include <thread>
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::pre_processing() {
-  internal_order_test();
   input_matrix_A = std::vector<double>(taskData->inputs_count[0]);
   input_matrix_B = std::vector<double>(taskData->inputs_count[1]);
   auto* tmp_ptr_A = reinterpret_cast<double*>(taskData->inputs[0]);
@@ -15,14 +14,12 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::pre_pr
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::validation() {
-  internal_order_test();
   return taskData->inputs_count[0] == taskData->inputs_count[1] &&
          taskData->inputs_count[1] == pow((unsigned short)sqrt(taskData->inputs_count[0]), 2) &&
          taskData->outputs_count[0] == 1;
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::run() {
-  internal_order_test();
   unsigned short i = 0;
   unsigned short j;
   unsigned short count;
@@ -44,13 +41,11 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::run() 
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::post_processing() {
-  internal_order_test();
   reinterpret_cast<std::vector<double>*>(taskData->outputs[0])[0] = output_matrix_C;
   return true;
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::pre_processing() {
-  internal_order_test();
   if (world.rank() == 0) {
     input_matrix_A = std::vector<double>(taskData->inputs_count[0]);
     input_matrix_B = std::vector<double>(taskData->inputs_count[1]);
@@ -63,7 +58,6 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::pre_proc
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::validation() {
-  internal_order_test();
   if (world.rank() == 0) {
     return taskData->inputs_count[0] == taskData->inputs_count[1] &&
            taskData->inputs_count[1] == pow((unsigned short)sqrt(taskData->inputs_count[0]), 2) &&
@@ -73,7 +67,6 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::validati
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::run() {
-  internal_order_test();
   unsigned short i = 0;
   unsigned short j;
   unsigned short k;
@@ -253,7 +246,6 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::run() {
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::post_processing() {
-  internal_order_test();
   if (world.rank() == 0) {
     reinterpret_cast<std::vector<double>*>(taskData->outputs[0])[0] = output_matrix_C;
   }
