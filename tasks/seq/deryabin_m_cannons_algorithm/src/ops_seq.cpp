@@ -2,20 +2,20 @@
 
 #include <thread>
 
-bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::pre_processing() {
+bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::PreProcessingImpl() {
   input_matrix_A = reinterpret_cast<std::vector<double> *>(taskData->inputs[0])[0];
   input_matrix_B = reinterpret_cast<std::vector<double> *>(taskData->inputs[1])[0];
   output_matrix_C = std::vector<double>(input_matrix_A.size());
   return true;
 }
 
-bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::validation() {
+bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::ValidationImpl() {
   return taskData->inputs_count[0] == taskData->inputs_count[1] &&
          taskData->inputs_count[1] == pow((unsigned short)sqrt(taskData->inputs_count[0]), 2) &&
          taskData->outputs_count[0] == 1;
 }
 
-bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::run() {
+bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::RunImpl() {
   unsigned short i = 0;
   unsigned short j;
   unsigned short count;
@@ -36,7 +36,7 @@ bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::run() {
   return true;
 }
 
-bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::post_processing() {
+bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::PostProcessingImpl() {
   reinterpret_cast<std::vector<double> *>(taskData->outputs[0])[0] = output_matrix_C;
   return true;
 }
