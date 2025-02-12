@@ -35,7 +35,7 @@ class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
 
  private:
   // --- Приватные методы для декомпозиции ---
-  bool IsTrivialCase() const;
+  [[nodiscard]] bool IsTrivialCase() const;
   void HandleTrivialCase();
   void PerformCannonAlgorithm();
 
