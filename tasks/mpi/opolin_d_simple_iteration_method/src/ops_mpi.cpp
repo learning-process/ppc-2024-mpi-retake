@@ -10,60 +10,56 @@
 bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PreProcessingImpl() {
   InternalOrderTest();
   // init data
-  if (world_.rank() == 0) {
-    auto* ptr = reinterpret_cast<double*>(task_data->inputs[1]);
-    b_.assign(ptr, ptr + n_);
-    epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
-    C_.resize(n_ * n_, 0.0);
-    d_.resize(n_, 0.0);
-    Xold_.resize(n_, 0.0);
-    Xnew_.resize(n_, 0.0);
-    max_iters_ = *reinterpret_cast<int*>(task_data->inputs[3]);
-    std::vector<double> augmen_matrix = A_;
-    for (size_t i = 0; i < n_; ++i) {
-      augmen_matrix.push_back(b_[i]);
-    }
-    // generate C matrix and d vector
-    for (size_t i = 0; i < n_; ++i) {
-      for (size_t j = 0; j < n_; ++j) {
-        if (i != j) {
-          C_[i * n_ + j] = -A_[i * n_ + j] / A_[i * n_ + i];
-        }
+  auto* ptr = reinterpret_cast<double*>(task_data->inputs[1]);
+  b_.assign(ptr, ptr + n_);
+  epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
+  C_.resize(n_ * n_, 0.0);
+  d_.resize(n_, 0.0);
+  Xold_.resize(n_, 0.0);
+  Xnew_.resize(n_, 0.0);
+  max_iters_ = *reinterpret_cast<int*>(task_data->inputs[3]);
+  std::vector<double> augmen_matrix = A_;
+  for (size_t i = 0; i < n_; ++i) {
+    augmen_matrix.push_back(b_[i]);
+  }
+  // generate C matrix and d vector
+  for (size_t i = 0; i < n_; ++i) {
+    for (size_t j = 0; j < n_; ++j) {
+      if (i != j) {
+        C_[i * n_ + j] = -A_[i * n_ + j] / A_[i * n_ + i];
       }
-      d_[i] = b_[i] / A_[i * n_ + i];
     }
+    d_[i] = b_[i] / A_[i * n_ + i];
   }
   return true;
 }
 
 bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::ValidationImpl() {
   InternalOrderTest();
-  if (world_.rank() == 0) {
-    // check input and output
-    if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
-    if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
-        task_data->outputs.empty())
-      return false;
+  // check input and output
+  if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
+  if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
+      task_data->outputs.empty())
+    return false;
 
-    n_ = task_data->inputs_count[0];
-    if (n_ <= 0) return false;
-    auto* ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-    A_.assign(ptr, ptr + n_ * n_);
+  n_ = task_data->inputs_count[0];
+  if (n_ <= 0) return false;
+  auto* ptr = reinterpret_cast<double*>(task_data->inputs[0]);
+  A_.assign(ptr, ptr + n_ * n_);
 
-    // check ranks
-    size_t rankA = rank(A_, n_);
-    if (rankA != n_) {
+  // check ranks
+  size_t rankA = rank(A_, n_);
+  if (rankA != n_) {
+    return false;
+  }
+  // check main diagonal
+  for (size_t i = 0; i < n_; ++i) {
+    if (std::abs(A_[i * n_ + i]) < std::numeric_limits<double>::epsilon()) {
       return false;
     }
-    // check main diagonal
-    for (size_t i = 0; i < n_; ++i) {
-      if (std::abs(A_[i * n_ + i]) < std::numeric_limits<double>::epsilon()) {
-        return false;
-      }
-    }
-    if (!isDiagonalDominance(A_, n_)) {
-      return false;
-    }
+  }
+  if (!isDiagonalDominance(A_, n_)) {
+    return false;
   }
   return true;
 }

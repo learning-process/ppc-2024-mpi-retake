@@ -9,6 +9,8 @@
 #include "core/task/include/task.hpp"
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
+namespace opolin_d_simple_iteration_method_seq {
+
 void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -35,6 +37,8 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
     }
   }
 }
+
+}  // namespace opolin_d_simple_iteration_method_seq
 
 TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   int size = 500;

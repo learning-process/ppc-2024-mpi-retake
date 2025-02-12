@@ -9,6 +9,8 @@
 #include "core/task/include/task.hpp"
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 
+namespace opolin_d_simple_iteration_method_mpi {
+
 void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -36,6 +38,8 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
   }
 }
 
+}  // namespace opolin_d_simple_iteration_method_mpi
+
 TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   int size = 500;
@@ -47,7 +51,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   // Create data
-  generateTestData(size, X, A, b);
+  opolin_d_simple_iteration_method_mpi::generateTestData(size, X, A, b);
   std::vector<double> out(size, 0.0);
   // Create TaskData
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
@@ -89,7 +93,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   std::vector<double> b;
   std::vector<double> X;
   // Create data
-  generateTestData(size, X, A, b);
+  opolin_d_simple_iteration_method_mpi::generateTestData(size, X, A, b);
   std::vector<double> out(size, 0.0);
 
   // Create TaskData
