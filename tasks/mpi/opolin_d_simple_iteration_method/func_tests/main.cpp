@@ -103,8 +103,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_correct_input) {
   int maxIters = 10000;
 
   std::vector<double> x_ref, A, b;
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-  std::vector<double> x_out(size, 0.0);
+  A = {4.0, 1.0, 2.0, 1.0, 5.0, 1.0, 2.0, 1.0, 5.0};
+  b = {7.0, 7.0, 8.0};
+  x_ref = {1.0, 1.0, 1.0};  std::vector<double> x_out(size, 0.0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));

@@ -18,13 +18,13 @@ size_t rank(std::vector<double> matrix, size_t n);
 bool isDiagonalDominance(std::vector<double> mat, size_t dim);
 
 class TestTaskMPI : public ppc::core::Task {
-  public:
-   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
-   bool PreProcessingImpl() override;
-   bool ValidationImpl() override;
-   bool RunImpl() override;
-   bool PostProcessingImpl() override;
-  private:
+ public:
+  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
+ private:
   std::vector<double> A_;
   std::vector<double> C_;
   std::vector<double> b_;

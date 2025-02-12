@@ -34,7 +34,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
   // check input and output
   if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
   if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
-  task_data->outputs.empty())
+      task_data->outputs.empty())
     return false;
 
   n_ = task_data->inputs_count[0];
@@ -94,7 +94,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PostProcessingImpl() {
   internal_order_test();
   for (size_t i = 0; i < Xnew_.size(); i++) {
-    reinterpret_cast<int *>(task_data->outputs[0])[i] = Xnew_[i];
+    reinterpret_cast<int*>(task_data->outputs[0])[i] = Xnew_[i];
   }
   return true;
 }
