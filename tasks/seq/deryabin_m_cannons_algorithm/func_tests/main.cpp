@@ -3,6 +3,10 @@
 #include "core/task/include/task.hpp"
 #include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 TEST(deryabin_m_cannons_algorithm_seq, test_simple_matrix) {
   // Create data
   std::vector<double> input_matrix_a{1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -24,11 +28,11 @@ TEST(deryabin_m_cannons_algorithm_seq, test_simple_matrix) {
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
-  cannons_algorithm_TaskSequential.PreProcessing();
-  cannons_algorithm_TaskSequential.Run();
-  cannons_algorithm_TaskSequential.PostProcessing();
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
+  ASSERT_EQ(cannons_algorithm_task_sequential.Validation(), true);
+  cannons_algorithm_task_sequential.PreProcessing();
+  cannons_algorithm_task_sequential.Run();
+  cannons_algorithm_task_sequential.PostProcessing();
   ASSERT_EQ(true_solution, out_matrix_c[0]);
 }
 
@@ -53,11 +57,11 @@ TEST(deryabin_m_cannons_algorithm_seq, test_triangular_matrix) {
   task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
-  cannons_algorithm_TaskSequential.PreProcessing();
-  cannons_algorithm_TaskSequential.Run();
-  cannons_algorithm_TaskSequential.PostProcessing();
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
+  ASSERT_EQ(cannons_algorithm_task_sequential.Validation(), true);
+  cannons_algorithm_task_sequential.PreProcessing();
+  cannons_algorithm_task_sequential.Run();
+  cannons_algorithm_task_sequential.PostProcessing();
   ASSERT_EQ(true_solution, out_matrix_C[0]);
 }
 
@@ -81,11 +85,11 @@ TEST(deryabin_m_cannons_algorithm_seq, test_null_matrix) {
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
-  cannons_algorithm_TaskSequential.PreProcessing();
-  cannons_algorithm_TaskSequential.Run();
-  cannons_algorithm_TaskSequential.PostProcessing();
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
+  ASSERT_EQ(cannons_algorithm_task_sequential.Validation(), true);
+  cannons_algorithm_task_sequential.PreProcessing();
+  cannons_algorithm_task_sequential.Run();
+  cannons_algorithm_task_sequential.PostProcessing();
   ASSERT_EQ(in_matrix_b[0], out_matrix_c[0]);
 }
 
@@ -109,11 +113,11 @@ TEST(deryabin_m_cannons_algorithm_seq, test_identity_matrix) {
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), true);
-  cannons_algorithm_TaskSequential.PreProcessing();
-  cannons_algorithm_TaskSequential.Run();
-  cannons_algorithm_TaskSequential.PostProcessing();
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
+  ASSERT_EQ(cannons_algorithm_task_sequential.Validation(), true);
+  cannons_algorithm_task_sequential.PreProcessing();
+  cannons_algorithm_task_sequential.Run();
+  cannons_algorithm_task_sequential.PostProcessing();
   ASSERT_EQ(in_matrix_b[0], out_matrix_c[0]);
 }
 
@@ -137,8 +141,8 @@ TEST(deryabin_m_cannons_algorithm_seq, test_matrices_of_different_dimensions) {
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), false);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
+  ASSERT_EQ(cannons_algorithm_task_sequential.Validation(), false);
 }
 
 TEST(deryabin_m_cannons_algorithm_seq, test_non_square_matrices) {
@@ -161,6 +165,6 @@ TEST(deryabin_m_cannons_algorithm_seq, test_non_square_matrices) {
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
   // Create Task
-  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_TaskSequential(task_data_seq);
-  ASSERT_EQ(cannons_algorithm_TaskSequential.Validation(), false);
+  deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
+  ASSERT_EQ(cannons_algorithm_task_sequential.Validation(), false);
 }
