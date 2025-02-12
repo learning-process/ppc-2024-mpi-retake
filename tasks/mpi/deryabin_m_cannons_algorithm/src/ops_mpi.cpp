@@ -27,7 +27,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::RunImp
   unsigned short i = 0;
   unsigned short j = 0;
   unsigned short count = 0;
-  auto dimension = sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
+  unsigned short dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
   while (i != dimension) {
     j = 0;
     while (j != dimension) {
