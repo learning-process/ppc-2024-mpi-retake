@@ -4,6 +4,11 @@
 #include "core/task/include/task.hpp"
 #include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
 
+#include <chrono>
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
@@ -24,23 +29,23 @@ TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
-  auto cannons_algorithm_TaskSequential =
+  auto cannons_algorithm_task_sequential =
       std::make_shared<deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential>(task_data_seq);
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
-  perfAttr->current_timer = [&] {
+  perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(cannons_algorithm_TaskSequential);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
-  ppc::core::Perf::print_perf_statistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(cannons_algorithm_task_sequential);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  ppc::core::Perf::print_perf_statistic(perf_results);
   ASSERT_EQ(in_matrix_a[0], out_matrix_c[0]);
 }
 
@@ -64,22 +69,22 @@ TEST(deryabin_m_cannons_algorithm_seq, test_task_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
   task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
-  auto cannons_algorithm_TaskSequential =
+  auto cannons_algorithm_task_sequential =
       std::make_shared<deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential>(task_data_seq);
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
-  perfAttr->current_timer = [&] {
+  perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(cannons_algorithm_TaskSequential);
-  perfAnalyzer->task_run(perfAttr, perfResults);
-  ppc::core::Perf::print_perf_statistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(cannons_algorithm_task_sequential);
+  perf_analyzer->task_run(perf_attr, perf_results);
+  ppc::core::Perf::print_perf_statistic(perf_results);
   ASSERT_EQ(in_matrix_a[0], out_matrix_c[0]);
 }
