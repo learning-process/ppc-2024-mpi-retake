@@ -17,16 +17,16 @@ bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::Validatio
 
 bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::RunImpl() {
   unsigned short i = 0;
-  unsigned short j;
-  unsigned short count;
+  unsigned short j = 0;
+  unsigned short count = 0;
   auto dimension = (unsigned short)sqrt(input_matrix_A_.size());
   while (i != dimension) {
     j = 0;
     while (j != dimension) {
       count = 0;
       while (count != dimension) {
-        output_matrix_C_[i * dimension + j] +=
-            input_matrix_A_[i * dimension + count] * input_matrix_B_[count * dimension + j];
+        output_matrix_C_[(i * dimension) + j] +=
+            input_matrix_A_[(i * dimension) + count] * input_matrix_B_[(count * dimension) + j];
         count++;
       }
       j++;
