@@ -8,9 +8,9 @@
 #include <vector>
 
 bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PreProcessingImpl() {
-  internal_order_test();
+  InternalOrderTest();
   // init data
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     auto* ptr = reinterpret_cast<double*>(task_data->inputs[1]);
     b_.assign(ptr, ptr + n_);
     epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
@@ -37,8 +37,8 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::ValidationImpl() {
-  internal_order_test();
-  if (world.rank() == 0) {
+  InternalOrderTest();
+  if (world_.rank() == 0) {
     // check input and output
     if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
     if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
@@ -69,37 +69,37 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::RunImpl() {
-  internal_order_test();
+  InternalOrderTest();
 
-  broadcast(world, n_, 0);
-  broadcast(world, epsilon_, 0);
-  broadcast(world, max_iters_, 0);
+  broadcast(world_, n_, 0);
+  broadcast(world_, epsilon_, 0);
+  broadcast(world_, max_iters_, 0);
   Xnew_.resize(n_);
   Xold_.resize(n_);
 
-  int32_t base_rows = n_ / world.size();
-  int32_t remainder = n_ % world.size();
+  int32_t base_rows = n_ / world_.size();
+  int32_t remainder = n_ % world_.size();
 
-  std::vector<int32_t> rows_per_worker(world.size());
-  std::vector<int32_t> elements_per_worker(world.size());
-  for (int rank = 0; rank < world.size(); ++rank) {
+  std::vector<int32_t> rows_per_worker(world_.size());
+  std::vector<int32_t> elements_per_worker(world_.size());
+  for (int rank = 0; rank < world_.size(); ++rank) {
     rows_per_worker[rank] = base_rows + (rank < remainder ? 1 : 0);
     elements_per_worker[rank] = rows_per_worker[rank] * n_;
   }
 
-  std::vector<double> local_C(elements_per_worker[world.rank()]);
-  std::vector<double> local_d(rows_per_worker[world.rank()]);
-  std::vector<double> local_X(rows_per_worker[world.rank()]);
+  std::vector<double> local_C(elements_per_worker[world_.rank()]);
+  std::vector<double> local_d(rows_per_worker[world_.rank()]);
+  std::vector<double> local_X(rows_per_worker[world_.rank()]);
 
-  scatterv(world, C_, elements_per_worker, local_C.data(), 0);
-  scatterv(world, d_, rows_per_worker, local_d.data(), 0);
+  scatterv(world_, C_, elements_per_worker, local_C.data(), 0);
+  scatterv(world_, d_, rows_per_worker, local_d.data(), 0);
 
   double global_error = 0.0;
   int iteration = 0;
   do {
-    broadcast(world, Xold_, 0);
+    broadcast(world_, Xold_, 0);
 
-    for (int i = 0; i < rows_per_worker[world.rank()]; ++i) {
+    for (int i = 0; i < rows_per_worker[world_.rank()]; ++i) {
       double sum = local_d[i];
       for (size_t j = 0; j < Xold_.size(); ++j) {
         sum += local_C[i * n_ + j] * Xold_[j];
@@ -107,9 +107,9 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::RunImpl() {
       local_X[i] = sum;
     }
 
-    gatherv(world, local_X, Xnew_.data(), rows_per_worker, 0);
+    gatherv(world_, local_X, Xnew_.data(), rows_per_worker, 0);
 
-    if (world.rank() == 0) {
+    if (world_.rank() == 0) {
       global_error = 0.0;
       for (size_t i = 0; i < n_; ++i) {
         double error = std::abs(Xnew_[i] - Xold_[i]);
@@ -117,17 +117,17 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::RunImpl() {
       }
     }
 
-    broadcast(world, global_error, 0);
-    if (world.rank() == 0) Xold_ = Xnew_;
+    broadcast(world_, global_error, 0);
+    if (world_.rank() == 0) Xold_ = Xnew_;
     ++iteration;
-    broadcast(world, iteration, 0);
+    broadcast(world_, iteration, 0);
   } while (iteration < max_iters_ && global_error > epsilon_);
   return true;
 }
 
-bool opolin_d_simple_iteration_method_mpi::TestMPITaskParallel::TestTaskMPI::PostProcessingImpl() {
-  internal_order_test();
-  if (world.rank() == 0) {
+bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PostProcessingImpl() {
+  InternalOrderTest();
+  if (world_.rank() == 0) {
     for (size_t i = 0; i < Xnew_.size(); i++) {
       reinterpret_cast<int*>(task_data->outputs[0])[i] = Xnew_[i];
     }

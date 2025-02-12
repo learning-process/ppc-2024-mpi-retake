@@ -7,7 +7,7 @@
 using namespace std::chrono_literals;
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PreProcessingImpl() {
-  internal_order_test();
+  InternalOrderTest();
   // init data
   auto* ptr = reinterpret_cast<double*>(task_data->inputs[1]);
   b_.assign(ptr, ptr + n_);
@@ -30,7 +30,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PreProcessingImpl
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() {
-  internal_order_test();
+  InternalOrderTest();
   // check input and output
   if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
   if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
@@ -58,7 +58,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
-  internal_order_test();
+  InternalOrderTest();
   // simple iteration method
   int iteration = 0;
   while (iteration < max_iter_) {
@@ -92,7 +92,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PostProcessingImpl() {
-  internal_order_test();
+  InternalOrderTest();
   for (size_t i = 0; i < Xnew_.size(); i++) {
     reinterpret_cast<int*>(task_data->outputs[0])[i] = Xnew_[i];
   }

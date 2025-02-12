@@ -35,7 +35,7 @@ class TestTaskMPI : public ppc::core::Task {
   uint32_t n_;
   double epsilon_;
   int max_iters_;
-  boost::mpi::communicator world;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace opolin_d_simple_iteration_method_mpi
