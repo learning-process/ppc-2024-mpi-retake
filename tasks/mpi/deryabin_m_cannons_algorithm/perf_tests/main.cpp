@@ -6,9 +6,9 @@
 #include <vector>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/timer.hpp>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
+#include <boost/mpi/timer.hpp>
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
