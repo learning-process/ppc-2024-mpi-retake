@@ -144,6 +144,12 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Initiali
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataIfRoot()
 {
+    PrepareLocalMatrices();
+    DistributeDataAcrossProcesses();
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PrepareLocalMatrices()
+{
     for (unsigned short k = 0; k < block_dimension_; ++k) {
         std::copy(
             input_matrix_A_.data() + (k * dimension_),
@@ -156,6 +162,10 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Distribu
             local_input_matrix_B_.begin() + (k * block_dimension_)
         );
     }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataAcrossProcesses()
+{
     for (unsigned short i = 0; i < block_rows_columns_; ++i) {
         for (unsigned short j = 0; j < block_rows_columns_; ++j) {
             if (i == 0 && j == 0) {
@@ -163,57 +173,67 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Distribu
             }
             for (unsigned short k = 0; k < block_dimension_; ++k) {
                 int destination_proc = (i * block_rows_columns_) + j;
-                if (i == 0) {
-                    world_.send(
-                        destination_proc,
-                        0,
-                        input_matrix_A_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
-                        block_dimension_
-                    );
-                } else {
-                    if (static_cast<int>((i * block_rows_columns_) + j - i) < static_cast<int>(i * block_rows_columns_)) {
-                        world_.send(
-                            destination_proc + block_rows_columns_ - i,
-                            0,
-                            input_matrix_A_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
-                            block_dimension_
-                        );
-                    } else {
-                        world_.send(
-                            destination_proc - i,
-                            0,
-                            input_matrix_A_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
-                            block_dimension_
-                        );
-                    }
-                }
-                if (j == 0) {
-                    world_.send(
-                        destination_proc,
-                        1,
-                        input_matrix_B_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
-                        block_dimension_
-                    );
-                } else {
-                    if ((static_cast<int>((i - j) * block_rows_columns_) + j) < 0) {
-                        world_.send(
-                            ((i + block_rows_columns_ - j) * block_rows_columns_) + j,
-                            1,
-                            input_matrix_B_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
-                            block_dimension_
-                        );
-                    } else {
-                        world_.send(
-                            ((i - j) * block_rows_columns_) + j,
-                            1,
-                            input_matrix_B_.data() + (((i * block_dimension_) + k) * dimension_) + (j * block_dimension_),
-                            block_dimension_
-                        );
-                    }
-                }
+                SendMatrixAData(i, j, k, destination_proc);
+                SendMatrixBData(i, j, k, destination_proc);
             } 
         }
-    } 
+    }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatrixAData(unsigned short i, unsigned short j, unsigned short k, int destination_proc)
+{
+    if (i == 0) {
+        world_.send(
+            destination_proc,
+            0,
+            input_matrix_A_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
+            block_dimension_
+        );
+    } else {
+        if (static_cast<int>((i * block_rows_columns_) + j - i) < static_cast<int>(i * block_rows_columns_)) {
+            world_.send(
+                destination_proc + block_rows_columns_ - i,
+                0,
+                input_matrix_A_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
+                block_dimension_
+            );
+        } else {
+            world_.send(
+                destination_proc - i,
+                0,
+                input_matrix_A_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
+                block_dimension_
+            );
+        }
+    }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatrixBData(unsigned short i, unsigned short j, unsigned short k, int destination_proc)
+{
+    if (j == 0) {
+        world_.send(
+            destination_proc,
+            1,
+            input_matrix_B_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
+            block_dimension_
+        );
+    } else {
+        if ((static_cast<int>((i - j) * block_rows_columns_) + j) < 0) {
+            world_.send(
+                ((i + block_rows_columns_ - j) * block_rows_columns_) + j,
+                1,
+                input_matrix_B_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
+                block_dimension_
+            );
+        } else {
+            world_.send(
+                ((i - j) * block_rows_columns_) + j,
+                1,
+                input_matrix_B_.data() + (((i * block_dimension_) + k) * dimension_) + (j * block_dimension_),
+                block_dimension_
+            );
+        }
+    }
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::ReceiveDataIfNotRoot()
