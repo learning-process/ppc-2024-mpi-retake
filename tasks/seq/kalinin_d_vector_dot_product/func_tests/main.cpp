@@ -66,7 +66,7 @@ TEST(kalinin_d_vector_dot_product_seq, can_scalar_multiply_vec_size_100) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  kalinin_d_vector_dot_product_seq::TestTaskSequential  test_task_sequential(task_data_seq);
+  kalinin_d_vector_dot_product_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -96,7 +96,7 @@ TEST(kalinin_d_vector_dot_product_seq, check_none_equal_size_of_vec) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  kalinin_d_vector_dot_product_seq::TestTaskSequential  test_task_sequential(task_data_seq);
+  kalinin_d_vector_dot_product_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), false);
 }
 
@@ -121,7 +121,7 @@ TEST(kalinin_d_vector_dot_product_seq, check_equal_size_of_vec) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  kalinin_d_vector_dot_product_seq::TestTaskSequential  test_task_sequential(task_data_seq);
+  kalinin_d_vector_dot_product_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
 }
 
@@ -154,7 +154,7 @@ TEST(kalinin_d_vector_dot_product_seq, check_empty_vec_product_Run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  kalinin_d_vector_dot_product_seq::TestTaskSequential  test_task_sequential(task_data_seq);
+  kalinin_d_vector_dot_product_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -184,7 +184,7 @@ TEST(kalinin_d_vector_dot_product_seq, v1_dot_product_v2_equal_v2_dot_product_v1
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  kalinin_d_vector_dot_product_seq::TestTaskSequential  test_task_sequential(task_data_seq);
+  kalinin_d_vector_dot_product_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -212,7 +212,7 @@ TEST(kalinin_d_vector_dot_product_seq, check_Run_right) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  kalinin_d_vector_dot_product_seq::TestTaskSequential  test_task_sequential(task_data_seq);
+  kalinin_d_vector_dot_product_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
