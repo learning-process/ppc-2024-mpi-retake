@@ -1,128 +1,73 @@
 #include <gtest/gtest.h>
 
-#include <random>
+#include <cstddef>
+#include <cstdint>
+#include <fstream>
+#include <memory>
+#include <string>
 #include <vector>
 
-#include "seq/shuravina_o_contrast/include/ops_seq.hpp"
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
+#include "seq/example/include/ops_seq.hpp"
 
-namespace shuravina_o_contrast {
+TEST(nesterov_a_test_task_seq, test_matmul_50) {
+  constexpr size_t kCount = 50;
 
-std::vector<uint8_t> generateRandomImage(size_t size) {
-  std::vector<uint8_t> image(size);
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> distrib(0, 255);
+  // Create data
+  std::vector<int> in(kCount * kCount, 0);
+  std::vector<int> out(kCount * kCount, 0);
 
-  for (size_t i = 0; i < size; ++i) {
-    image[i] = static_cast<uint8_t>(distrib(gen));
+  for (size_t i = 0; i < kCount; i++) {
+    in[(i * kCount) + i] = 1;
   }
 
-  return image;
+  // Create task_data
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs_count.emplace_back(out.size());
+
+  // Create Task
+  nesterov_a_test_task_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_EQ(test_task_sequential.Validation(), true);
+  test_task_sequential.PreProcessing();
+  test_task_sequential.Run();
+  test_task_sequential.PostProcessing();
+  EXPECT_EQ(in, out);
 }
 
-}  // namespace shuravina_o_contrast
+TEST(nesterov_a_test_task_seq, test_matmul_100_from_file) {
+  std::string line;
+  std::ifstream test_file(ppc::util::GetAbsolutePath("seq/example/data/test.txt"));
+  if (test_file.is_open()) {
+    getline(test_file, line);
+  }
+  test_file.close();
 
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_Empty_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  const size_t count = std::stoi(line);
 
-  std::vector<uint8_t> input = {};
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
+  // Create data
+  std::vector<int> in(count * count, 0);
+  std::vector<int> out(count * count, 0);
 
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
+  for (size_t i = 0; i < count; i++) {
+    in[(i * count) + i] = 1;
+  }
 
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
-}
+  // Create task_data
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs_count.emplace_back(out.size());
 
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_Single_Element_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  std::vector<uint8_t> input = {50};
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
-
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
-
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
-}
-
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_Max_Values_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  std::vector<uint8_t> input = {255, 255, 255, 255, 255};
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
-
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
-
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
-}
-
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_Min_Values_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  std::vector<uint8_t> input = {0, 0, 0, 0, 0};
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
-
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
-
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
-}
-
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_100x32_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  std::vector<uint8_t> input = shuravina_o_contrast::generateRandomImage(100 * 32);
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
-
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
-
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
-}
-
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_64x23_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  std::vector<uint8_t> input = shuravina_o_contrast::generateRandomImage(64 * 23);
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
-
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
-
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
-}
-
-TEST(shuravina_o_contrast, Test_Contrast_Enhancement_27x128_Input) {
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  std::vector<uint8_t> input = shuravina_o_contrast::generateRandomImage(27 * 128);
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  taskDataSeq->inputs_count.emplace_back(input.size());
-
-  std::vector<uint8_t> output(input.size());
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
-  taskDataSeq->outputs_count.emplace_back(output.size());
-
-  shuravina_o_contrast::ContrastTaskSequential contrastTaskSequential(taskDataSeq);
-  ASSERT_TRUE(contrastTaskSequential.validation());
+  // Create Task
+  nesterov_a_test_task_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_EQ(test_task_sequential.Validation(), true);
+  test_task_sequential.PreProcessing();
+  test_task_sequential.Run();
+  test_task_sequential.PostProcessing();
+  EXPECT_EQ(in, out);
 }

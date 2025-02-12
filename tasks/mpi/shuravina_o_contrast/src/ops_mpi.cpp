@@ -1,80 +1,54 @@
-#include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
+#include "mpi/example/include/ops_mpi.hpp"
 
-#include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <limits>
+#include <cmath>
+#include <cstddef>
+#include <vector>
 
-namespace shuravina_o_contrast {
+bool nesterov_a_test_task_mpi::TestTaskMPI::PreProcessingImpl() {
+  // Init value for input and output
+  unsigned int input_size = task_data->inputs_count[0];
+  auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+  input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
-bool ContrastTaskParallel::pre_processing() {
-  if (taskData->inputs_count.empty() || taskData->outputs_count.empty()) {
-    return false;
-  }
+  unsigned int output_size = task_data->outputs_count[0];
+  output_ = std::vector<int>(output_size, 0);
 
-  input_ = std::vector<uint8_t>(taskData->inputs_count[0]);
-  auto* tmp_ptr = reinterpret_cast<uint8_t*>(taskData->inputs[0]);
-  for (unsigned i = 0; i < taskData->inputs_count[0]; i++) {
-    input_[i] = tmp_ptr[i];
-  }
-
+  rc_size_ = static_cast<int>(std::sqrt(input_size));
   return true;
 }
 
-bool ContrastTaskParallel::validation() {
-  if (world.rank() == 0) {
-    return taskData->outputs_count[0] == taskData->inputs_count[0];
+bool nesterov_a_test_task_mpi::TestTaskMPI::ValidationImpl() {
+  // Check equality of counts elements
+  return task_data->inputs_count[0] == task_data->outputs_count[0];
+}
+
+bool nesterov_a_test_task_mpi::TestTaskMPI::RunImpl() {
+  if (world_.rank() == 0) {
+    // Multiply matrices
+    for (int i = 0; i < rc_size_; ++i) {
+      for (int j = 0; j < rc_size_; ++j) {
+        for (int k = 0; k < rc_size_; ++k) {
+          output_[(i * rc_size_) + j] += input_[(i * rc_size_) + k] * input_[(k * rc_size_) + j];
+        }
+      }
+    }
+  } else {
+    // Multiply matrices
+    for (int j = 0; j < rc_size_; ++j) {
+      for (int k = 0; k < rc_size_; ++k) {
+        for (int i = 0; i < rc_size_; ++i) {
+          output_[(i * rc_size_) + j] += input_[(i * rc_size_) + k] * input_[(k * rc_size_) + j];
+        }
+      }
+    }
   }
+  world_.barrier();
   return true;
 }
 
-bool ContrastTaskParallel::run() {
-  unsigned int delta = taskData->inputs_count[0] / world.size();
-  broadcast(world, delta, 0);
-
-  local_input_ = std::vector<uint8_t>(delta);
-  if (world.rank() == 0) {
-    for (int proc = 1; proc < world.size(); proc++) {
-      world.send(proc, 0, input_.data() + proc * delta, delta);
-    }
-    local_input_ = std::vector<uint8_t>(input_.begin(), input_.begin() + delta);
-  } else {
-    world.recv(0, 0, local_input_.data(), delta);
+bool nesterov_a_test_task_mpi::TestTaskMPI::PostProcessingImpl() {
+  for (size_t i = 0; i < output_.size(); i++) {
+    reinterpret_cast<int *>(task_data->outputs[0])[i] = output_[i];
   }
-
-  min_val_ = *std::min_element(local_input_.begin(), local_input_.end());
-  max_val_ = *std::max_element(local_input_.begin(), local_input_.end());
-
-  uint8_t global_min;
-  uint8_t global_max;
-  reduce(world, min_val_, global_min, boost::mpi::minimum<uint8_t>(), 0);
-  reduce(world, max_val_, global_max, boost::mpi::maximum<uint8_t>(), 0);
-  min_val_ = global_min;
-  max_val_ = global_max;
-
-  output_ = std::vector<uint8_t>(delta);
-  if (max_val_ == min_val_) {
-    std::fill(output_.begin(), output_.end(), 128);
-  } else {
-    for (size_t i = 0; i < local_input_.size(); ++i) {
-      output_[i] = static_cast<uint8_t>((local_input_[i] - min_val_) * 255.0 / (max_val_ - min_val_));
-    }
-  }
-
-  if (world.rank() == 0) {
-    auto* tmp_ptr = reinterpret_cast<uint8_t*>(taskData->outputs[0]);
-    for (unsigned i = 0; i < delta; i++) {
-      tmp_ptr[i] = output_[i];
-    }
-    for (int proc = 1; proc < world.size(); proc++) {
-      world.recv(proc, 0, tmp_ptr + proc * delta, delta);
-    }
-  } else {
-    world.send(0, 0, output_.data(), delta);
-  }
-
   return true;
 }
-
-bool ContrastTaskParallel::post_processing() { return true; }
-
-}  // namespace shuravina_o_contrast

@@ -1,33 +1,42 @@
-#include "seq/shuravina_o_contrast/include/ops_seq.hpp"
+#include "seq/example/include/ops_seq.hpp"
 
-#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <vector>
 
-namespace shuravina_o_contrast {
+bool nesterov_a_test_task_seq::TestTaskSequential::PreProcessingImpl() {
+  // Init value for input and output
+  unsigned int input_size = task_data->inputs_count[0];
+  auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+  input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
-bool ContrastTaskSequential::pre_processing() {
-  input_ = std::vector<uint8_t>(taskData->inputs_count[0]);
-  auto* tmp_ptr = reinterpret_cast<uint8_t*>(taskData->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + taskData->inputs_count[0], input_.begin());
-  output_ = std::vector<uint8_t>(taskData->inputs_count[0]);
+  unsigned int output_size = task_data->outputs_count[0];
+  output_ = std::vector<int>(output_size, 0);
+
+  rc_size_ = static_cast<int>(std::sqrt(input_size));
   return true;
 }
 
-bool ContrastTaskSequential::validation() { return taskData->outputs_count[0] == taskData->inputs_count[0]; }
+bool nesterov_a_test_task_seq::TestTaskSequential::ValidationImpl() {
+  // Check equality of counts elements
+  return task_data->inputs_count[0] == task_data->outputs_count[0];
+}
 
-bool ContrastTaskSequential::run() {
-  uint8_t min_val = *std::min_element(input_.begin(), input_.end());
-  uint8_t max_val = *std::max_element(input_.begin(), input_.end());
-
-  for (size_t i = 0; i < input_.size(); ++i) {
-    output_[i] = static_cast<uint8_t>((input_[i] - min_val) * 255.0 / (max_val - min_val));
+bool nesterov_a_test_task_seq::TestTaskSequential::RunImpl() {
+  // Multiply matrices
+  for (int i = 0; i < rc_size_; ++i) {
+    for (int j = 0; j < rc_size_; ++j) {
+      for (int k = 0; k < rc_size_; ++k) {
+        output_[(i * rc_size_) + j] += input_[(i * rc_size_) + k] * input_[(k * rc_size_) + j];
+      }
+    }
   }
   return true;
 }
 
-bool ContrastTaskSequential::post_processing() {
-  auto* tmp_ptr = reinterpret_cast<uint8_t*>(taskData->outputs[0]);
-  std::copy(output_.begin(), output_.end(), tmp_ptr);
+bool nesterov_a_test_task_seq::TestTaskSequential::PostProcessingImpl() {
+  for (size_t i = 0; i < output_.size(); i++) {
+    reinterpret_cast<int *>(task_data->outputs[0])[i] = output_[i];
+  }
   return true;
 }
-
-}  // namespace shuravina_o_contrast
