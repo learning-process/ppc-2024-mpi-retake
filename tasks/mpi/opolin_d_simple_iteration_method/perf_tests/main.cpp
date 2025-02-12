@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <random>
+#include <string>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"

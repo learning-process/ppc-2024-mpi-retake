@@ -45,7 +45,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
-  generateTestData(size, X, A, b);
+  opolin_d_simple_iteration_method_seq::generateTestData(size, X, A, b);
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;
   int maxIters = 10000;
@@ -85,7 +85,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
-  generateTestData(size, X, A, b);
+  opolin_d_simple_iteration_method_seq::generateTestData(size, X, A, b);
 
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;

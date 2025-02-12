@@ -4,6 +4,7 @@
 #include <climits>
 #include <memory>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
