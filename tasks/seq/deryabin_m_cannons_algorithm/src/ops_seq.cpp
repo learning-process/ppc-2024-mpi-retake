@@ -1,4 +1,5 @@
 #include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
+#include <cmath>
 #include <vector>
 
 bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::PreProcessingImpl() {
