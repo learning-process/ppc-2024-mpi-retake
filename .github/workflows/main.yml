@@ -705,7 +705,7 @@ jobs:
         with:
           timeout_minutes: 60
           max_attempts: 3
-          command: choco install openssl --execution-timeout 3600
+          command: choco install openssl.light --execution-timeout 3600
       - name: Setup ccache
         uses: Chocobo1/setup-ccache-action@v1
         with:
@@ -754,12 +754,6 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: msmpi
-      - name: Download dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: choco install openssl --execution-timeout 3600
       - name: Download installed package
         uses: actions/download-artifact@v4
         with:
@@ -820,12 +814,6 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: msmpi
-      - name: Download dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: choco install openssl --execution-timeout 3600
       - name: Download installed package
         uses: actions/download-artifact@v4
         with:
@@ -881,6 +869,12 @@ jobs:
         uses: microsoft/setup-msbuild@v2
         with:
           vs-version: 'latest'
+      - name: Download dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          command: choco install openssl.light --execution-timeout 3600
       - name: Setup ninja
         uses: seanmiddleditch/gha-setup-ninja@v6
       - name: Setup MSVC for Ninja again
@@ -928,12 +922,6 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: msmpi
-      - name: Download dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: choco install openssl --execution-timeout 3600
       - name: Download installed package
         uses: actions/download-artifact@v4
         with:
@@ -978,12 +966,6 @@ jobs:
         uses: mpi4py/setup-mpi@v1
         with:
           mpi: msmpi
-      - name: Download dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 60
-          max_attempts: 3
-          command: choco install openssl --execution-timeout 3600
       - name: Download installed package
         uses: actions/download-artifact@v4
         with:
