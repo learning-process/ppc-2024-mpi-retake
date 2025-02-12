@@ -1,9 +1,6 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cmath>
 #include <vector>
 
