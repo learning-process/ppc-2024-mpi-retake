@@ -49,12 +49,12 @@ TEST(deryabin_m_cannons_algorithm_seq, test_triangular_matrix) {
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_A.data()));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_B.data()));
-  task_data_seq->inputs_count.emplace_back(input_matrix_A.size());
-  task_data_seq->inputs_count.emplace_back(input_matrix_B.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_C.data()));
-  task_data_seq->outputs_count.emplace_back(out_matrix_C.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_a.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in_matrix_b.data()));
+  task_data_seq->inputs_count.emplace_back(input_matrix_a.size());
+  task_data_seq->inputs_count.emplace_back(input_matrix_b.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
+  task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
 
   // Create Task
   deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential cannons_algorithm_task_sequential(task_data_seq);
@@ -62,7 +62,7 @@ TEST(deryabin_m_cannons_algorithm_seq, test_triangular_matrix) {
   cannons_algorithm_task_sequential.PreProcessing();
   cannons_algorithm_task_sequential.Run();
   cannons_algorithm_task_sequential.PostProcessing();
-  ASSERT_EQ(true_solution, out_matrix_C[0]);
+  ASSERT_EQ(true_solution, out_matrix_c[0]);
 }
 
 TEST(deryabin_m_cannons_algorithm_seq, test_null_matrix) {
