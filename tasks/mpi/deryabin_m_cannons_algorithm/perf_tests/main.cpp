@@ -1,7 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <vector>
 
+#include <boost/mpi/timer.hpp>
+#include <boost/mpi/communicator.hpp>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
@@ -26,24 +31,24 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
     task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
   }
 
-  auto testMpiTaskParallel =
+  auto test_mpi_task_parallel =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel->validation(), true);
-  testMpiTaskParallel->pre_processing();
-  testMpiTaskParallel->run();
-  testMpiTaskParallel->post_processing();
+  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
+  test_mpi_task_parallel->PreProcessing();
+  test_mpi_task_parallel->Run();
+  test_mpi_task_parallel->PostProcessing();
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
+  perf_analyzer->pipeline_run(perfAttr, perf_results);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
+    ppc::core::Perf::print_perf_statistic(perf_results);
     ASSERT_EQ(input_matrix_a, out_matrix_c[0]);
   }
 }
@@ -68,24 +73,24 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
     task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
   }
 
-  auto testMpiTaskParallel =
+  auto test_mpi_task_parallel =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel->validation(), true);
-  testMpiTaskParallel->pre_processing();
-  testMpiTaskParallel->run();
-  testMpiTaskParallel->post_processing();
+  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
+  test_mpi_task_parallel->PreProcessing();
+  test_mpi_task_parallel->Run();
+  test_mpi_task_parallel->PostProcessing();
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->task_run(perfAttr, perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
+  perf_analyzer->task_run(perf_attr, perf_results);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
+    ppc::core::Perf::print_perf_statistic(perf_results);
     ASSERT_EQ(input_matrix_a, out_matrix_c[0]);
   }
 }
