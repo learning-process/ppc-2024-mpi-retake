@@ -34,9 +34,25 @@ class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
+  // --- Приватные методы для декомпозиции ---
+  bool IsTrivialCase() const;
+  void HandleTrivialCase();
+  void PerformCannonAlgorithm();
+
+  // вспомогательные под-этапы алгоритма Каннона
+  void InitializeAndBroadcastParams();
+  void DistributeDataIfRoot();
+  void ReceiveDataIfNotRoot();
+  void MultiplyLocalBlocks();
+  void PerformCannonShifts();
+  void GatherResults();
+
   std::vector<double> input_matrix_A_, local_input_matrix_A_;
   std::vector<double> input_matrix_B_, local_input_matrix_B_;
   std::vector<double> output_matrix_C_, local_output_matrix_C_;
+  unsigned short dimension_ = 0;
+  unsigned short block_dimension_ = 0;
+  unsigned short block_rows_columns_ = 0;
   boost::mpi::communicator world_;
 };
 }  // namespace deryabin_m_cannons_algorithm_mpi
