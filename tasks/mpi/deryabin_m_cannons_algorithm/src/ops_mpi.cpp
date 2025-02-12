@@ -1,19 +1,8 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>         
 #include <boost/mpi/collectives.hpp>
-
-#include <boost/iostreams/stream.hpp> 
-#include <boost/iostreams/stream_buffer.hpp>
-#include <boost/serialization/array.hpp> 
-#include <boost/serialization/string.hpp> 
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/xml_oarchive.hpp> 
-#include <boost/archive/xml_iarchive.hpp> 
-#include <boost/serialization/export.hpp> 
-#include <iostream> 
-#include <fstream>
-
 #include <cmath>
 #include <vector>
 
