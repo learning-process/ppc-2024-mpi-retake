@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 #include <boost/mpi/communicator.hpp>
 
@@ -59,8 +58,8 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> _distribution_(-100, 100);
-  std::vector<double> input_matrix_a(16, _distribution_(gen));
-  std::vector<double> input_matrix_b(16, _distribution_(gen));
+  std::vector<double> input_matrix_a(16, distribution(gen));
+  std::vector<double> input_matrix_b(16, distribution(gen));
   std::vector<double> output_matrix_c(16, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
 
@@ -106,8 +105,8 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> _distribution_(-1000, 1000);
-  std::vector<double> input_matrix_a(1600, _distribution_(gen));
-  std::vector<double> input_matrix_b(1600, _distribution_(gen));
+  std::vector<double> input_matrix_a(1600, distribution(gen));
+  std::vector<double> input_matrix_b(1600, distribution(gen));
   std::vector<double> output_matrix_c(1600, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
 
@@ -158,11 +157,11 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_matrices_of_different_dimensions) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
   if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_A.data()));
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_B.data()));
-    task_data_mpi->inputs_count.emplace_back(input_matrix_A.size());
-    task_data_mpi->inputs_count.emplace_back(input_matrix_B.size());
-    ASSERT_EQ(test_mpi_task_parallel.validation(), false);
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
+    task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
+    task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
+    ASSERT_EQ(test_mpi_task_parallel.Validation(), false);
   }
   if (world.rank() == 0) {
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -190,7 +189,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_non_square_matrices) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
     task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
-    ASSERT_EQ(test_mpi_task_parallel.validation(), false);
+    ASSERT_EQ(test_mpi_task_parallel.Validation(), false);
   }
   if (world.rank() == 0) {
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
