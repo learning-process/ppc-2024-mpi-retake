@@ -57,7 +57,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   boost::mpi::communicator world;
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<> _distribution_(-100, 100);
+  std::uniform_real_distribution<> distribution(-100, 100);
   std::vector<double> input_matrix_a(16, distribution(gen));
   std::vector<double> input_matrix_b(16, distribution(gen));
   std::vector<double> output_matrix_c(16, 0);
@@ -104,7 +104,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
   boost::mpi::communicator world;
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution<> _distribution_(-1000, 1000);
+  std::uniform_real_distribution<> distribution(-1000, 1000);
   std::vector<double> input_matrix_a(1600, distribution(gen));
   std::vector<double> input_matrix_b(1600, distribution(gen));
   std::vector<double> output_matrix_c(1600, 0);
