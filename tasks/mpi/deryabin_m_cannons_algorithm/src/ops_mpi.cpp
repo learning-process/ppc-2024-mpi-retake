@@ -1,7 +1,5 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
-#include <boost/mpi.hpp>
 
-#include <utility>
 #include <cmath>
 #include <vector>
 
