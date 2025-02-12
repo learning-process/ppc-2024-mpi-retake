@@ -3,8 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <cstddef>
-#include <utility>
 #include <vector>
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::PreProcessingImpl() {
