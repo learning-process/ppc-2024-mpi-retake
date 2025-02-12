@@ -1,6 +1,13 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
-#include <cstddef>
+#include <stddef.h>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <cmath>
+#include <utility>
+#include <vector>
+
+#include "core/task/include/task.hpp"
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::PreProcessingImpl() {
   input_matrix_A_ = std::vector<double>(task_data->inputs_count[0]);
