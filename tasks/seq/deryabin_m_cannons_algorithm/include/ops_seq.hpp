@@ -18,9 +18,9 @@ class CannonsAlgorithmTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> input_matrix_A;
-  std::vector<double> input_matrix_B;
-  std::vector<double> output_matrix_C;
+  std::vector<double> input_matrix_A_;
+  std::vector<double> input_matrix_B_;
+  std::vector<double> output_matrix_C_;
 };
 
 }  // namespace deryabin_m_cannons_algorithm_seq
