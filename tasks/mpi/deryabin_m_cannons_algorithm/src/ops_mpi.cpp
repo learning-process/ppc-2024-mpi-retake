@@ -80,7 +80,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
     return true; 
 }
 
-bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const
+[[nodiscard]] bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const
 {
     return (
         world_.size() == 1 ||
@@ -93,7 +93,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivia
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase()
 {
     if (world_.rank() == 0) {
-        unsigned short dimension = static_cast<unsigned short>(
+        auto dimension = static_cast<unsigned short>(
             std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))
         );
         output_matrix_C_.resize(dimension * dimension, 0.0);
@@ -195,16 +195,16 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Distribu
                         block_dimension_
                     );
                 } else {
-                    if (static_cast<int>((i - j) * block_rows_columns_ + j) < 0) {
+                    if ((static_cast<int>((i - j) * block_rows_columns_) + j) < 0) {
                         world_.send(
-                            (i + block_rows_columns_ - j) * block_rows_columns_ + j,
+                            ((i + block_rows_columns_ - j) * block_rows_columns_) + j,
                             1,
                             input_matrix_B_.data() + ((i * block_dimension_ + k) * dimension_) + (j * block_dimension_),
                             block_dimension_
                         );
                     } else {
                         world_.send(
-                            (i - j) * block_rows_columns_ + j,
+                            ((i - j) * block_rows_columns_) + j,
                             1,
                             input_matrix_B_.data() + (((i * block_dimension_) + k) * dimension_) + (j * block_dimension_),
                             block_dimension_
