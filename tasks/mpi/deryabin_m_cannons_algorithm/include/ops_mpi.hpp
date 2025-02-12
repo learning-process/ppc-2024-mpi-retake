@@ -42,6 +42,10 @@ class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
   // вспомогательные под-этапы алгоритма Каннона
   void InitializeAndBroadcastParams();
   void DistributeDataIfRoot();
+  void PrepareLocalMatrices();
+  void DistributeDataAcrossProcesses();
+  void SendMatrixAData(unsigned short i, unsigned short j, unsigned short k, int destination_proc);
+  void SendMatrixBData(unsigned short i, unsigned short j, unsigned short k, int destination_proc);
   void ReceiveDataIfNotRoot();
   void MultiplyLocalBlocks();
   void PerformCannonShifts();
