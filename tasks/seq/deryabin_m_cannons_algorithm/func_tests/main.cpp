@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include "core/task/include/task.hpp"
-#include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <vector>
+
+#include "core/task/include/task.hpp"
+#include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
 
 TEST(deryabin_m_cannons_algorithm_seq, test_simple_matrix) {
   // Create data
