@@ -29,7 +29,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
   ASSERT_EQ(test_mpi_task_parallel.Validation(), true);
   test_mpi_task_parallel.PreProcessing();
-  // test_mpi_task_parallel.Run();
+  test_mpi_task_parallel.Run();
   test_mpi_task_parallel.PostProcessing();
 
   if (world.rank() == 0) {
@@ -49,7 +49,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
     test_mpi_task_sequential.Run();
     test_mpi_task_sequential.PostProcessing();
 
-    // ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
+    ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
   }
 }
 
@@ -76,7 +76,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
   ASSERT_EQ(test_mpi_task_parallel.Validation(), true);
   test_mpi_task_parallel.PreProcessing();
-  // test_mpi_task_parallel.Run();
+  test_mpi_task_parallel.Run();
   test_mpi_task_parallel.PostProcessing();
 
   if (world.rank() == 0) {
@@ -96,7 +96,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
     test_mpi_task_sequential.Run();
     test_mpi_task_sequential.PostProcessing();
 
-    // ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
+    ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
   }
 }
 
@@ -123,7 +123,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
   ASSERT_EQ(test_mpi_task_parallel.Validation(), true);
   test_mpi_task_parallel.PreProcessing();
-  // test_mpi_task_parallel.Run();
+  test_mpi_task_parallel.Run();
   test_mpi_task_parallel.PostProcessing();
 
   if (world.rank() == 0) {
@@ -143,7 +143,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
     test_mpi_task_sequential.Run();
     test_mpi_task_sequential.PostProcessing();
 
-    // ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
+    ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
   }
 }
 
