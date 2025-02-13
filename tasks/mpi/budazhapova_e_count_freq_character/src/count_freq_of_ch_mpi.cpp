@@ -19,36 +19,36 @@ int budazhapova_e_count_freq_character_mpi::counting_freq(std::string str, char 
 }
 
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::pre_processing() {
-  internal_order_test();
-  input_ = std::string(reinterpret_cast<char*>(taskData->inputs[0]), taskData->inputs_count[0]);
-  symb = *reinterpret_cast<char*>(taskData->inputs[1]);
+  InternalOrderTest();
+  input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), task_data->inputs_count[0]);
+  symb = *reinterpret_cast<char*>(task_data->inputs[1]);
   res = 0;
   return true;
 }
 
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::validation() {
-  internal_order_test();
-  return taskData->outputs_count[0] == 1;
+  InternalOrderTest();
+  return task_data->outputs_count[0] == 1;
 }
 
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::run() {
-  internal_order_test();
+  InternalOrderTest();
   res = counting_freq(input_, symb);
   return true;
 }
 
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::post_processing() {
-  internal_order_test();
-  reinterpret_cast<int*>(taskData->outputs[0])[0] = res;
+  InternalOrderTest();
+  reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
   return true;
 }
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::pre_processing() {
-  internal_order_test();
+  InternalOrderTest();
   int world_rank = world.rank();
 
   if (world_rank == 0) {
-    input_ = std::string(reinterpret_cast<char*>(taskData->inputs[0]), taskData->inputs_count[0]);
-    symb = *reinterpret_cast<char*>(taskData->inputs[1]);
+    input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), task_data->inputs_count[0]);
+    symb = *reinterpret_cast<char*>(task_data->inputs[1]);
   }
   return true;
 }
@@ -56,7 +56,7 @@ bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::pre_processing
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::validation() {
   internal_order_test();
   if (world.rank() == 0) {
-    return taskData->outputs_count[0] == 1;
+    return task_data->outputs_count[0] == 1;
   }
   return true;
 }
@@ -66,8 +66,8 @@ bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::run() {
   int world_rank = world.rank();
   int delta = 0;
   if (world_rank == 0) {
-    delta = taskData->inputs_count[0] % world.size() == 0 ? taskData->inputs_count[0] / world.size()
-                                                          : taskData->inputs_count[0] / world.size() + 1;
+    delta = task_data->inputs_count[0] % world.size() == 0 ? task_data->inputs_count[0] / world.size()
+                                                           : task_data->inputs_count[0] / world.size() + 1;
   }
 
   boost::mpi::broadcast(world, delta, 0);
@@ -92,7 +92,7 @@ bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::run() {
 bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::post_processing() {
   internal_order_test();
   if (world.rank() == 0) {
-    reinterpret_cast<int*>(taskData->outputs[0])[0] = res;
+    reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
   }
   return true;
 }

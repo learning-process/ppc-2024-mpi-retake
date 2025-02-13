@@ -16,7 +16,6 @@ TEST(budazhapova_e_count_freq_character_seq, test_pipeline_run) {
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   taskDataSeq->outputs_count.emplace_back(out.size());
 
-  // Create Task
   auto testTaskSequential = std::make_shared<budazhapova_e_count_freq_character_seq::TestTaskSequential>(taskDataSeq);
 
   // Create Perf attributes
