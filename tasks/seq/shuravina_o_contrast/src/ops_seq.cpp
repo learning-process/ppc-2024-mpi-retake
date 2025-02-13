@@ -19,19 +19,26 @@ bool shuravina_o_contrast::ContrastTaskSequential::ValidationImpl() {
   return task_data->inputs_count[0] == task_data->outputs_count[0];
 }
 
-bool shuravina_o_contrast::ContrastTaskSequential::RunImpl() {
-  uint8_t min_intensity = *std::min_element(input_.begin(), input_.end());
-  uint8_t max_intensity = *std::max_element(input_.begin(), input_.end());
+void shuravina_o_contrast::ContrastTaskSequential::IncreaseContrast() {
+  uint8_t min_val = *std::min_element(input_.begin(), input_.end());
+  uint8_t max_val = *std::max_element(input_.begin(), input_.end());
+
+  if (min_val == max_val) {
+    std::copy(input_.begin(), input_.end(), output_.begin());
+    return;
+  }
 
   for (size_t i = 0; i < input_.size(); ++i) {
-    output_[i] = static_cast<uint8_t>((input_[i] - min_intensity) * 255 / (max_intensity - min_intensity));
+    output_[i] = static_cast<uint8_t>((input_[i] - min_val) * 255 / (max_val - min_val));
   }
+}
+
+bool shuravina_o_contrast::ContrastTaskSequential::RunImpl() {
+  IncreaseContrast();
   return true;
 }
 
 bool shuravina_o_contrast::ContrastTaskSequential::PostProcessingImpl() {
-  for (size_t i = 0; i < output_.size(); i++) {
-    reinterpret_cast<uint8_t *>(task_data->outputs[0])[i] = output_[i];
-  }
+  std::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t *>(task_data->outputs[0]));
   return true;
 }
