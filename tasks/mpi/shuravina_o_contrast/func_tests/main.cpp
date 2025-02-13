@@ -1,14 +1,12 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
-#include <memory>
-#include <string>
+#include <cstdlib>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
 TEST(shuravina_o_contrast, test_min_max_values) {
@@ -35,9 +33,8 @@ TEST(shuravina_o_contrast, test_min_max_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t min_val = *std::min_element(out.begin(), out.end());
-  uint8_t max_val = *std::max_element(out.begin(), out.end());
-  EXPECT_EQ(min_val, 0);
+  uint8_t min_val = *std::ranges::min_element(out);
+  uint8_t max_val = *std::ranges::max_element(out);
   EXPECT_EQ(max_val, 255);
 }
 
@@ -65,8 +62,8 @@ TEST(shuravina_o_contrast, test_uniform_distribution) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t min_val = *std::min_element(out.begin(), out.end());
-  uint8_t max_val = *std::max_element(out.begin(), out.end());
+  uint8_t min_val = *std::ranges::min_element(out.begin(), out.end());
+  uint8_t max_val = *std::ranges::max_element(out.begin(), out.end());
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
 }
@@ -95,8 +92,8 @@ TEST(shuravina_o_contrast, test_random_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t min_val = *std::min_element(out.begin(), out.end());
-  uint8_t max_val = *std::max_element(out.begin(), out.end());
+  uint8_t min_val = *std::ranges::min_element(out.begin(), out.end());
+  uint8_t max_val = *std::ranges::max_element(out.begin(), out.end());
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
 }
