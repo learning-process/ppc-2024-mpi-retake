@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -7,7 +8,6 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
-#include <boost/mpi/communicator.hpp>
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
   boost::mpi::communicator world;
