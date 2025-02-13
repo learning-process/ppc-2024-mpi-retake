@@ -1,8 +1,10 @@
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <vector>
 
@@ -26,11 +28,11 @@ bool shuravina_o_contrast::TestTaskMPI::ValidationImpl() {
 }
 
 void shuravina_o_contrast::TestTaskMPI::IncreaseContrast() {
-  const uint8_t min_val = *std::min_element(input_.begin(), input_.end());
-  const uint8_t max_val = *std::max_element(input_.begin(), input_.end());
+  const uint8_t min_val = *std::ranges::min_element(input_);
+  const uint8_t max_val = *std::ranges::max_element(input_);
 
   if (min_val == max_val) {
-    std::fill(output_.begin(), output_.end(), 255);
+    std::ranges::fill(output_, 255);
     return;
   }
 
@@ -44,11 +46,11 @@ bool shuravina_o_contrast::TestTaskMPI::RunImpl() {
     IncreaseContrast();
   }
   world_.barrier();
-  boost::mpi::broadcast(world_, output_.data(), output_.size(), 0);
+  boost::mpi::broadcast(world_, output_.data(), static_cast<int>(output_.size()), 0);
   return true;
 }
 
 bool shuravina_o_contrast::TestTaskMPI::PostProcessingImpl() {
-  std::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t *>(task_data->outputs[0]));
+  std::ranges::copy(output_, reinterpret_cast<uint8_t *>(task_data->outputs[0]));
   return true;
 }
