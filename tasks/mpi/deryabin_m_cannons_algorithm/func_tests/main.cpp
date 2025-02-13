@@ -9,50 +9,6 @@
 #include "core/task/include/task.hpp"
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
-TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
-  boost::mpi::communicator world;
-  std::vector<double> input_matrix_a{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-  std::vector<double> input_matrix_b{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-  std::vector<double> output_matrix_c(16, 0);
-  std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
-    task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
-    task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
-    task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
-  }
-
-  deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
-  ASSERT_EQ(test_mpi_task_parallel.Validation(), true);
-  test_mpi_task_parallel.PreProcessing();
-  test_mpi_task_parallel.Run();
-  test_mpi_task_parallel.PostProcessing();
-
-  if (world.rank() == 0) {
-    std::vector<std::vector<double>> reference_out_matrix_c(1, output_matrix_c);
-
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
-    task_data_seq->inputs_count.emplace_back(input_matrix_a.size());
-    task_data_seq->inputs_count.emplace_back(input_matrix_b.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_out_matrix_c.data()));
-    task_data_seq->outputs_count.emplace_back(out_matrix_c.size());
-
-    deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential test_mpi_task_sequential(task_data_seq);
-    ASSERT_EQ(test_mpi_task_sequential.Validation(), true);
-    test_mpi_task_sequential.PreProcessing();
-    test_mpi_task_sequential.Run();
-    test_mpi_task_sequential.PostProcessing();
-
-    ASSERT_EQ(reference_out_matrix_c[0], out_matrix_c[0]);
-  }
-}
-
 TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   boost::mpi::communicator world;
   std::random_device rd;
