@@ -25,6 +25,11 @@ void shuravina_o_contrast::TestTaskMPI::IncreaseContrast() {
   uint8_t min_val = *std::min_element(input_.begin(), input_.end());
   uint8_t max_val = *std::max_element(input_.begin(), input_.end());
 
+  if (min_val == max_val) {
+    std::fill(output_.begin(), output_.end(), 255);
+    return;
+  }
+
   for (size_t i = 0; i < input_.size(); ++i) {
     output_[i] = static_cast<uint8_t>((input_[i] - min_val) * 255 / (max_val - min_val));
   }
@@ -35,12 +40,11 @@ bool shuravina_o_contrast::TestTaskMPI::RunImpl() {
     IncreaseContrast();
   }
   world_.barrier();
+  boost::mpi::broadcast(world_, output_.data(), output_.size(), 0);
   return true;
 }
 
 bool shuravina_o_contrast::TestTaskMPI::PostProcessingImpl() {
-  for (size_t i = 0; i < output_.size(); i++) {
-    reinterpret_cast<uint8_t *>(task_data->outputs[0])[i] = output_[i];
-  }
+  std::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t *>(task_data->outputs[0]));
   return true;
 }
