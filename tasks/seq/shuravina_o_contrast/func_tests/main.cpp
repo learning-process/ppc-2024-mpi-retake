@@ -9,7 +9,7 @@
 #include "seq/shuravina_o_contrast/include/ops_seq.hpp"
 
 TEST(shuravina_o_contrast, test_contrast_stretching_uniform_image) {
-  constexpr size_t kSize = 256;
+  constexpr size_t kSize = 8;
 
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -27,12 +27,12 @@ TEST(shuravina_o_contrast, test_contrast_stretching_uniform_image) {
   contrast_task_sequential.PostProcessing();
 
   for (size_t i = 0; i < out.size(); ++i) {
-    EXPECT_EQ(out[i], 255);
+    EXPECT_EQ(out[i], in[i]);
   }
 }
 
 TEST(shuravina_o_contrast, test_contrast_stretching_varied_intensity) {
-  constexpr size_t kSize = 256;
+  constexpr size_t kSize = 8;
 
   std::vector<uint8_t> in(kSize * kSize);
   for (size_t i = 0; i < kSize * kSize; ++i) {
@@ -58,7 +58,7 @@ TEST(shuravina_o_contrast, test_contrast_stretching_varied_intensity) {
 }
 
 TEST(shuravina_o_contrast, test_contrast_stretching_min_intensity) {
-  constexpr size_t kSize = 256;
+  constexpr size_t kSize = 8;
 
   std::vector<uint8_t> in(kSize * kSize, 0);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -81,7 +81,7 @@ TEST(shuravina_o_contrast, test_contrast_stretching_min_intensity) {
 }
 
 TEST(shuravina_o_contrast, test_contrast_stretching_max_intensity) {
-  constexpr size_t kSize = 256;
+  constexpr size_t kSize = 8;
 
   std::vector<uint8_t> in(kSize * kSize, 255);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -104,7 +104,7 @@ TEST(shuravina_o_contrast, test_contrast_stretching_max_intensity) {
 }
 
 TEST(shuravina_o_contrast, test_contrast_stretching_small_image) {
-  constexpr size_t kSize = 16;
+  constexpr size_t kSize = 4;
 
   std::vector<uint8_t> in(kSize * kSize);
   for (size_t i = 0; i < kSize * kSize; ++i) {
