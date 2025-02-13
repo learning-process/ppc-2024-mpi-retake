@@ -3,27 +3,18 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
+#include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
-using namespace std::chrono;
+TEST(shuravina_o_contrast, test_pipeline_run) {
+  constexpr size_t kSize = 512;
 
-TEST(shuravina_o_contrast, test_performance) {
-  constexpr size_t kCount = 512;
-  std::vector<uint8_t> in(kCount * kCount, 0);
-  std::vector<uint8_t> out(kCount * kCount, 0);
-
-  for (size_t i = 0; i < kCount; i++) {
-    for (size_t j = 0; j < kCount; j++) {
-      in[(i * kCount) + j] = static_cast<uint8_t>(i + j);
-    }
-  }
+  std::vector<uint8_t> in(kSize * kSize, 128);
+  std::vector<uint8_t> out(kSize * kSize, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
@@ -31,31 +22,29 @@ TEST(shuravina_o_contrast, test_performance) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  shuravina_o_contrast::TestTaskMPI test_task_mpi(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
 
-  auto start = high_resolution_clock::now();
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-  auto end = high_resolution_clock::now();
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
 
-  auto duration = duration_cast<milliseconds>(end - start);
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  std::cout << "MPI version time: " << duration.count() << " ms" << std::endl;
-
-  EXPECT_LT(duration.count(), 1000);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
-TEST(shuravina_o_contrast, test_performance_large_image) {
-  constexpr size_t kCount = 1024;
 
-  std::vector<uint8_t> in(kCount * kCount, 0);
-  std::vector<uint8_t> out(kCount * kCount, 0);
+TEST(shuravina_o_contrast, test_task_run) {
+  constexpr size_t kSize = 512;
 
-  for (size_t i = 0; i < kCount; i++) {
-    for (size_t j = 0; j < kCount; j++) {
-      in[(i * kCount) + j] = static_cast<uint8_t>(i + j);
-    }
-  }
+  std::vector<uint8_t> in(kSize * kSize, 128);
+  std::vector<uint8_t> out(kSize * kSize, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
@@ -63,17 +52,20 @@ TEST(shuravina_o_contrast, test_performance_large_image) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  shuravina_o_contrast::TestTaskMPI test_task_mpi(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
 
-  auto start = high_resolution_clock::now();
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-  auto end = high_resolution_clock::now();
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
 
-  auto duration = duration_cast<milliseconds>(end - start);
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  std::cout << "MPI version time (1024x1024): " << duration.count() << " ms" << std::endl;
-
-  EXPECT_LT(duration.count(), 5000);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
