@@ -45,7 +45,7 @@ TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run) {
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(cannons_algorithm_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
-  ppc::core::Perf::print_perf_statistic(perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
   ASSERT_EQ(in_matrix_a[0], out_matrix_c[0]);
 }
 
@@ -84,7 +84,7 @@ TEST(deryabin_m_cannons_algorithm_seq, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(cannons_algorithm_task_sequential);
-  perf_analyzer->task_run(perf_attr, perf_results);
-  ppc::core::Perf::print_perf_statistic(perf_results);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
   ASSERT_EQ(in_matrix_a[0], out_matrix_c[0]);
 }
