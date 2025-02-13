@@ -19,7 +19,7 @@ bool deryabin_m_cannons_algorithm_seq::CannonsAlgorithmTaskSequential::RunImpl()
   unsigned short i = 0;
   unsigned short j = 0;
   unsigned short count = 0;
-  auto dimension = (unsigned short)sqrt(input_matrix_A_.size());
+  auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
   while (i != dimension) {
     j = 0;
     while (j != dimension) {
