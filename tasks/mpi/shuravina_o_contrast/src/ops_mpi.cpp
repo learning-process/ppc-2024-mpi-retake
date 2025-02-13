@@ -3,14 +3,18 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <stdexcept>
 #include <vector>
 
 bool shuravina_o_contrast::TestTaskMPI::PreProcessingImpl() {
-  unsigned int input_size = task_data->inputs_count[0];
+  const unsigned int input_size = task_data->inputs_count[0];
   auto *in_ptr = reinterpret_cast<uint8_t *>(task_data->inputs[0]);
+  if (in_ptr == nullptr) {
+    throw std::runtime_error("Input pointer is null");
+  }
   input_ = std::vector<uint8_t>(in_ptr, in_ptr + input_size);
 
-  unsigned int output_size = task_data->outputs_count[0];
+  const unsigned int output_size = task_data->outputs_count[0];
   output_ = std::vector<uint8_t>(output_size, 0);
 
   rc_size_ = static_cast<int>(std::sqrt(input_size));
@@ -22,8 +26,8 @@ bool shuravina_o_contrast::TestTaskMPI::ValidationImpl() {
 }
 
 void shuravina_o_contrast::TestTaskMPI::IncreaseContrast() {
-  uint8_t min_val = *std::min_element(input_.begin(), input_.end());
-  uint8_t max_val = *std::max_element(input_.begin(), input_.end());
+  const uint8_t min_val = *std::min_element(input_.begin(), input_.end());
+  const uint8_t max_val = *std::max_element(input_.begin(), input_.end());
 
   if (min_val == max_val) {
     std::fill(output_.begin(), output_.end(), 255);
