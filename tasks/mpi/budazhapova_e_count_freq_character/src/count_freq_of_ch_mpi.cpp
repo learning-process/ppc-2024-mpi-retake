@@ -18,7 +18,7 @@ int budazhapova_e_count_freq_character_mpi::counting_freq(std::string str, char 
   return resalt;
 }
 
-bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::PreProcessingImpl()() {
+bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::PreProcessingImpl() {
   InternalOrderTest();
   input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), task_data->inputs_count[0]);
   symb = *reinterpret_cast<char*>(task_data->inputs[1]);
@@ -43,7 +43,7 @@ bool budazhapova_e_count_freq_character_mpi::TestMPITaskSequential::PostProcessi
   return true;
 }
 
-bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::PreProcessingImpl()() {
+bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::PreProcessingImpl() {
   InternalOrderTest();
   int world_rank = world.rank();
 
@@ -90,7 +90,7 @@ bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::RunImpl() {
   return true;
 }
 
-bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::PostProcessingImpl()() {
+bool budazhapova_e_count_freq_character_mpi::TestMPITaskParallel::PostProcessingImpl() {
   InternalOrderTest();
   if (world.rank() == 0) {
     reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
