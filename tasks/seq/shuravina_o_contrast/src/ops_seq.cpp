@@ -3,15 +3,20 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <stdexcept>
 #include <vector>
 
 bool shuravina_o_contrast::ContrastTaskSequential::PreProcessingImpl() {
   auto *in_ptr = reinterpret_cast<uint8_t *>(task_data->inputs[0]);
+  if (in_ptr == nullptr) {
+    throw std::runtime_error("Input pointer is null");
+  }
   input_ = std::vector<uint8_t>(in_ptr, in_ptr + task_data->inputs_count[0]);
 
   output_ = std::vector<uint8_t>(task_data->outputs_count[0], 0);
 
-  width_ = height_ = static_cast<int>(std::sqrt(task_data->inputs_count[0]));
+  const int size = static_cast<int>(std::sqrt(task_data->inputs_count[0]));
+  width_ = height_ = size;
   return true;
 }
 
@@ -20,11 +25,11 @@ bool shuravina_o_contrast::ContrastTaskSequential::ValidationImpl() {
 }
 
 void shuravina_o_contrast::ContrastTaskSequential::IncreaseContrast() {
-  uint8_t min_val = *std::min_element(input_.begin(), input_.end());
-  uint8_t max_val = *std::max_element(input_.begin(), input_.end());
+  const uint8_t min_val = *std::ranges::min_element(input_);
+  const uint8_t max_val = *std::ranges::max_element(input_);
 
   if (min_val == max_val) {
-    std::copy(input_.begin(), input_.end(), output_.begin());
+    std::ranges::copy(input_.begin(), input_.end(), output_.begin());
     return;
   }
 
@@ -39,6 +44,6 @@ bool shuravina_o_contrast::ContrastTaskSequential::RunImpl() {
 }
 
 bool shuravina_o_contrast::ContrastTaskSequential::PostProcessingImpl() {
-  std::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t *>(task_data->outputs[0]));
+  std::ranges::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t *>(task_data->outputs[0]));
   return true;
 }
