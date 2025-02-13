@@ -12,8 +12,7 @@ namespace deryabin_m_cannons_algorithm_mpi {
 
 class CannonsAlgorithmMPITaskSequential : public ppc::core::Task {
  public:
-  explicit CannonsAlgorithmMPITaskSequential(ppc::core::TaskDataPtr task_data)
-      : Task(std::move(task_data)) {}
+  explicit CannonsAlgorithmMPITaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -26,8 +25,7 @@ class CannonsAlgorithmMPITaskSequential : public ppc::core::Task {
 };
 class CannonsAlgorithmMPITaskParallel : public ppc::core::Task {
  public:
-  explicit CannonsAlgorithmMPITaskParallel(ppc::core::TaskDataPtr task_data)
-      : Task(std::move(task_data)) {}
+  explicit CannonsAlgorithmMPITaskParallel(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
