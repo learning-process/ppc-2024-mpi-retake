@@ -59,10 +59,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
 
     // Create Task
     budazhapova_e_count_freq_character_mpi::TestMPITaskSequential test_task_seq(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
-    testMpiTaskSequential.PreProcessing();
-    testMpiTaskSequential.Run();
-    testMpiTaskSequential.PostProcessing();
+    ASSERT_EQ(test_task_seq.Validation(), true);
+    test_task_seq.PreProcessing();
+    test_task_seq.Run();
+    test_task_seq.PostProcessing();
     ASSERT_EQ(reference_out[0], global_out[0]);
   }
 }
