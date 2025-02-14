@@ -96,8 +96,8 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
       }
       i++;
     }
-   }
- }
+  }
+}
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::InitializeAndBroadcastParams() {
   if (world_.rank() == 0) {
