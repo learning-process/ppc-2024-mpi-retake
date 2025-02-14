@@ -70,15 +70,6 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
   return true;
 }
 
-bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl() {
-  if (IsTrivialCase()) {
-    HandleTrivialCase();
-  } else {
-    PerformCannonAlgorithm();
-  }
-  return true;
-}
-
 [[nodiscard]] bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const {
   return (world_.size() == 1 ||
           world_.size() != static_cast<int>(std::pow(std::sqrt(static_cast<unsigned short>(world_.size())), 2)) ||
@@ -101,22 +92,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
   }
 }
 
-void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
-  InitializeAndBroadcastParams();
-  output_matrix_C_.resize(dimension_ * dimension_, 0.0);
-  local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
-  local_input_matrix_B_.resize(block_dimension_ * block_dimension_, 0.0);
-  local_output_matrix_C_.resize(block_dimension_ * block_dimension_, 0.0);
-  if (world_.rank() == 0) {
-    DistributeDataIfRoot();
-  } else {
-    ReceiveDataIfNotRoot();
-  }
-  MultiplyLocalBlocks();
-  PerformCannonShifts();
-  GatherResults();
-}
-
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::InitializeAndBroadcastParams() {
   if (world_.rank() == 0) {
     dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
@@ -126,35 +101,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Initiali
   boost::mpi::broadcast(world_, dimension_, 0);
   boost::mpi::broadcast(world_, block_dimension_, 0);
   boost::mpi::broadcast(world_, block_rows_columns_, 0);
-}
-
-void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataIfRoot() {
-  PrepareLocalMatrices();
-  DistributeDataAcrossProcesses();
-}
-
-void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PrepareLocalMatrices() {
-  for (unsigned short k = 0; k < block_dimension_; ++k) {
-    std::copy(input_matrix_A_.data() + (k * dimension_), input_matrix_A_.data() + (k * dimension_) + block_dimension_,
-              local_input_matrix_A_.begin() + (k * block_dimension_));
-    std::copy(input_matrix_B_.data() + (k * dimension_), input_matrix_B_.data() + (k * dimension_) + block_dimension_,
-              local_input_matrix_B_.begin() + (k * block_dimension_));
-  }
-}
-
-void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataAcrossProcesses() {
-  for (unsigned short i = 0; i < block_rows_columns_; ++i) {
-    for (unsigned short j = 0; j < block_rows_columns_; ++j) {
-      if (i == 0 && j == 0) {
-        continue;
-      }
-      for (unsigned short k = 0; k < block_dimension_; ++k) {
-        int destination_proc = (i * block_rows_columns_) + j;
-        SendMatrixAData(i, j, k, destination_proc);
-        SendMatrixBData(i, j, k, destination_proc);
-      }
-    }
-  }
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatrixAData(unsigned short i,
@@ -197,6 +143,35 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatr
                   block_dimension_);
     }
   }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataAcrossProcesses() {
+  for (unsigned short i = 0; i < block_rows_columns_; ++i) {
+    for (unsigned short j = 0; j < block_rows_columns_; ++j) {
+      if (i == 0 && j == 0) {
+        continue;
+      }
+      for (unsigned short k = 0; k < block_dimension_; ++k) {
+        int destination_proc = (i * block_rows_columns_) + j;
+        SendMatrixAData(i, j, k, destination_proc);
+        SendMatrixBData(i, j, k, destination_proc);
+      }
+    }
+  }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PrepareLocalMatrices() {
+  for (unsigned short k = 0; k < block_dimension_; ++k) {
+    std::copy(input_matrix_A_.data() + (k * dimension_), input_matrix_A_.data() + (k * dimension_) + block_dimension_,
+              local_input_matrix_A_.begin() + (k * block_dimension_));
+    std::copy(input_matrix_B_.data() + (k * dimension_), input_matrix_B_.data() + (k * dimension_) + block_dimension_,
+              local_input_matrix_B_.begin() + (k * block_dimension_));
+  }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataIfRoot() {
+  PrepareLocalMatrices();
+  DistributeDataAcrossProcesses();
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::ReceiveDataIfNotRoot() {
@@ -279,6 +254,31 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
       }
     }
   }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
+  InitializeAndBroadcastParams();
+  output_matrix_C_.resize(dimension_ * dimension_, 0.0);
+  local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
+  local_input_matrix_B_.resize(block_dimension_ * block_dimension_, 0.0);
+  local_output_matrix_C_.resize(block_dimension_ * block_dimension_, 0.0);
+  if (world_.rank() == 0) {
+    DistributeDataIfRoot();
+  } else {
+    ReceiveDataIfNotRoot();
+  }
+  MultiplyLocalBlocks();
+  PerformCannonShifts();
+  GatherResults();
+}
+
+bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl() {
+  if (IsTrivialCase()) {
+    HandleTrivialCase();
+  } else {
+    PerformCannonAlgorithm();
+  }
+  return true;
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PostProcessingImpl() {
