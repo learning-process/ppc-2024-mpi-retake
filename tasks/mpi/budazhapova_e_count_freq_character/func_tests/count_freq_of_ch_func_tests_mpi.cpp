@@ -62,7 +62,7 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
     ASSERT_EQ(testMpiTaskSequential.Validation(), true);
     testMpiTaskSequential.PreProcessing();
     testMpiTaskSequential.Run();
-    testMpiTaskSequential.Post_processing();
+    testMpiTaskSequential.PostProcessing();
     ASSERT_EQ(reference_out[0], global_out[0]);
   }
 }
