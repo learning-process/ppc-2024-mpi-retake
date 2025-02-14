@@ -83,6 +83,7 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
     unsigned short j = 0;
     unsigned short count = 0;
     auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
+    output_matrix_C_.resize(dimension * dimension, 0.0);
     while (i != dimension) {
       j = 0;
       while (j != dimension) {
