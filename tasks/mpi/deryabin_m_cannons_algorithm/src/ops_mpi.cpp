@@ -79,16 +79,23 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase() {
   if (world_.rank() == 0) {
-    auto dimension = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
-    output_matrix_C_.resize(dimension * dimension, 0.0);
-    for (unsigned short i = 0; i < dimension; ++i) {
-      for (unsigned short j = 0; j < dimension; ++j) {
-        for (unsigned short k = 0; k < dimension; ++k) {
-          output_matrix_C_[(i * dimension) + j] +=
-              input_matrix_A_[(i * dimension) + k] * input_matrix_B_[(k * dimension) + j];
-        }
+  unsigned short i = 0;
+  unsigned short j = 0;
+  unsigned short count = 0;
+  auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
+  while (i != dimension) {
+    j = 0;
+    while (j != dimension) {
+      count = 0;
+      while (count != dimension) {
+        output_matrix_C_[(i * dimension) + j] +=
+            input_matrix_A_[(i * dimension) + count] * input_matrix_B_[(count * dimension) + j];
+        count++;
       }
+      j++;
     }
+    i++;
+  }
   }
 }
 
