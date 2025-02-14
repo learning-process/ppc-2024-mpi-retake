@@ -1,4 +1,5 @@
 #pragma once
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -9,7 +10,7 @@ namespace budazhapova_e_count_freq_character_seq {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

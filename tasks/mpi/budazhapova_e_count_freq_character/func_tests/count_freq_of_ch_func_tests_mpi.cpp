@@ -29,8 +29,8 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
   const int size_string = 10;
   global_str = budazhapova_e_count_freq_character_mpi::getRandomString(size_string);
 
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  // Create task_data
+  auto taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
@@ -40,11 +40,11 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
     taskDataPar->outputs_count.emplace_back(global_out.size());
   }
-  budazhapova_e_count_freq_character_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
-  testMpiTaskParallel.PreProcessing();
-  testMpiTaskParallel.Run();
-  testMpiTaskParallel.PostProcessing();
+  budazhapova_e_count_freq_character_mpi::TestMPITaskParallel test_task_mpi(taskDataPar);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
@@ -58,7 +58,7 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
     taskDataSeq->outputs_count.emplace_back(reference_out.size());
 
     // Create Task
-    budazhapova_e_count_freq_character_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
+    budazhapova_e_count_freq_character_mpi::TestMPITaskSequential test_task_seq(taskDataSeq);
     ASSERT_EQ(testMpiTaskSequential.Validation(), true);
     testMpiTaskSequential.PreProcessing();
     testMpiTaskSequential.Run();
