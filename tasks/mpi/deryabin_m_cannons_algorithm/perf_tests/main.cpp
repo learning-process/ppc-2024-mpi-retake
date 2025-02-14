@@ -19,15 +19,14 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
     input_matrix_a[dim * 101] = 1;
     input_matrix_b[dim * 101] = 1;
   }
-  std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
     task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
-    task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_matrix_c.data()));
+    task_data_mpi->outputs_count.emplace_back(output_matrix_c.size());
   }
 
   auto test_mpi_task_parallel =
@@ -52,7 +51,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(input_matrix_a, out_matrix_c[0]);
+    ASSERT_EQ(input_matrix_a, output_matrix_c);
   }
 }
 
@@ -65,15 +64,14 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
     input_matrix_a[dim * 101] = 1;
     input_matrix_b[dim * 101] = 1;
   }
-  std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
     task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
-    task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_matrix_c.data()));
+    task_data_mpi->outputs_count.emplace_back(output_matrix_c.size());
   }
 
   auto test_mpi_task_parallel =
@@ -98,6 +96,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(input_matrix_a, out_matrix_c[0]);
+    ASSERT_EQ(input_matrix_a, output_matrix_c);
   }
 }
