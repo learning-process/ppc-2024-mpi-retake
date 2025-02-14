@@ -6,7 +6,8 @@
 
 TEST(budazhapova_e_count_freq_character_seq, test_pipeline_run) {
   // Create data
-  std::string line = "dsdasdasdsadsadsadsxzcacsdvfdggregfgdgwdvfsdfdvvbvbvbvbvbvbvbvbdsfdsfdsfsdfbcbfbvbvbv";
+
+  std::string line(100000, 'h');
   std::vector<int> out(1, 0);
   std::vector<std::string> in(1, line);
 

@@ -8,7 +8,7 @@
 #include "seq/budazhapova_e_count_freq_character/include/count_freq_character_header.h"
 
 TEST(budazhapova_e_count_freq_character_seq, ordinary_test) {
-  std::string line (100000, 'h');
+  std::string line = "dsdasdasdsadsadsadsxzcacsdvfdggregfgdgwdvfsdfdvvbvbvbvbvbvbvbvbdsfdsfdsfsdfbcbfbvbvbv";
   std::vector<std::string> in(1, line);
   std::vector<int> out(1, 0);
 
@@ -24,11 +24,11 @@ TEST(budazhapova_e_count_freq_character_seq, ordinary_test) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  ASSERT_EQ(out[0], 11);
+  ASSERT_EQ(out[0], 17);
 }
 
 TEST(budazhapova_e_count_freq_character_seq, test_if_character_is_not_in_line) {
-  std::string line(100000, 'h');
+  std::string line = "aaaaaaa pochemu tak neponyatno ya hochu spat!!!!";
   std::vector<std::string> in(1, line);
   std::vector<int> out(1, 0);
 
@@ -64,5 +64,5 @@ TEST(budazhapova_e_count_freq_character_seq, test_if_character_is_one) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  ASSERT_EQ(out[0], 1);
+  ASSERT_EQ(out[0], 4);
 }
