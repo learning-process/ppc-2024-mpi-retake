@@ -16,7 +16,6 @@ std::string getRandomString(int length) {
 
   srand(time(nullptr));
   for (int i = 0; i < length; i++) result[i] = charset[rand() % charset.length()];
-
   return result;
 }
 }  // namespace budazhapova_e_count_freq_character_mpi
@@ -24,7 +23,7 @@ std::string getRandomString(int length) {
 TEST(budazhapova_e_count_freq_character_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::string global_str;
-  const int size_string = 123456789;
+  int size_string = 123456789;
   global_str = budazhapova_e_count_freq_character_mpi::getRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
@@ -62,7 +61,7 @@ TEST(budazhapova_e_count_freq_character_mpi, test_pipeline_run) {
 TEST(budazhapova_e_count_freq_character_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::string global_str;
-  const int size_string = 123456789;
+  int size_string = 123456789;
   global_str = budazhapova_e_count_freq_character_mpi::getRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';

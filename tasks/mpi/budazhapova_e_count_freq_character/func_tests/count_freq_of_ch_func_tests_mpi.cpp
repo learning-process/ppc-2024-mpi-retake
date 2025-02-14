@@ -144,7 +144,7 @@ TEST(budazhapova_e_count_freq_character_mpi, big_string) {
     // Create Task
     budazhapova_e_count_freq_character_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
     ASSERT_EQ(testMpiTaskSequential.Validation(), true);
-    testMpiTaskSequential.Pre_processing();
+    testMpiTaskSequential.PreProcessing();
     testMpiTaskSequential.Run();
     testMpiTaskSequential.PostProcessing();
     ASSERT_EQ(reference_out[0], global_out[0]);
