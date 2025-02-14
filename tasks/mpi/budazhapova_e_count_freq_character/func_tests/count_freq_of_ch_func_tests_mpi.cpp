@@ -17,7 +17,6 @@ std::string getRandomString(int length) {
 
   srand(time(nullptr));
   for (int i = 0; i < length; i++) result[i] = charset[rand() % charset.length()];
-
   return result;
 }
 }  // namespace budazhapova_e_count_freq_character_mpi
@@ -42,10 +41,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
     taskDataPar->outputs_count.emplace_back(global_out.size());
   }
   budazhapova_e_count_freq_character_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.validation(), true);
-  testMpiTaskParallel.pre_processing();
-  testMpiTaskParallel.run();
-  testMpiTaskParallel.post_processing();
+  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  testMpiTaskParallel.PreProcessing();
+  testMpiTaskParallel.Run();
+  testMpiTaskParallel.PostProcessing();
   if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
@@ -60,10 +59,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_random_string) {
 
     // Create Task
     budazhapova_e_count_freq_character_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), true);
-    testMpiTaskSequential.pre_processing();
-    testMpiTaskSequential.run();
-    testMpiTaskSequential.post_processing();
+    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
+    testMpiTaskSequential.PreProcessing();
+    testMpiTaskSequential.Run();
+    testMpiTaskSequential.Post_processing();
     ASSERT_EQ(reference_out[0], global_out[0]);
   }
 }
@@ -84,10 +83,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_one_symb) {
     taskDataPar->outputs_count.emplace_back(global_out.size());
   }
   budazhapova_e_count_freq_character_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.validation(), true);
-  testMpiTaskParallel.pre_processing();
-  testMpiTaskParallel.run();
-  testMpiTaskParallel.post_processing();
+  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  testMpiTaskParallel.PreProcessing();
+  testMpiTaskParallel.Run();
+  testMpiTaskParallel.PostProcessing();
   if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
@@ -102,10 +101,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_with_one_symb) {
 
     // Create Task
     budazhapova_e_count_freq_character_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), true);
-    testMpiTaskSequential.pre_processing();
-    testMpiTaskSequential.run();
-    testMpiTaskSequential.post_processing();
+    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
+    testMpiTaskSequential.PreProcessing();
+    testMpiTaskSequential.Run();
+    testMpiTaskSequential.PostProcessing();
     ASSERT_EQ(reference_out[0], global_out[0]);
   }
 }
@@ -126,10 +125,10 @@ TEST(budazhapova_e_count_freq_character_mpi, big_string) {
     taskDataPar->outputs_count.emplace_back(global_out.size());
   }
   budazhapova_e_count_freq_character_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.validation(), true);
-  testMpiTaskParallel.pre_processing();
-  testMpiTaskParallel.run();
-  testMpiTaskParallel.post_processing();
+  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  testMpiTaskParallel.PreProcessing();
+  testMpiTaskParallel.Run();
+  testMpiTaskParallel.PostProcessing();
   if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
@@ -144,10 +143,10 @@ TEST(budazhapova_e_count_freq_character_mpi, big_string) {
 
     // Create Task
     budazhapova_e_count_freq_character_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.validation(), true);
-    testMpiTaskSequential.pre_processing();
-    testMpiTaskSequential.run();
-    testMpiTaskSequential.post_processing();
+    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
+    testMpiTaskSequential.Pre_processing();
+    testMpiTaskSequential.Run();
+    testMpiTaskSequential.PostProcessing();
     ASSERT_EQ(reference_out[0], global_out[0]);
   }
 }

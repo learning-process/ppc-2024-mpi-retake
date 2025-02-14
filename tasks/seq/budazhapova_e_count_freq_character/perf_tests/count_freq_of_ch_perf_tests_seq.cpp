@@ -33,8 +33,8 @@ TEST(budazhapova_e_count_freq_character_seq, test_pipeline_run) {
 
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
-  ppc::core::Perf::print_perf_statistic(perfResults);
+  perfAnalyzer->PipelineRun(perfAttr, perfResults);
+  ppc::core::Perf::PrintPerfStatistic(perfResults);
   ASSERT_EQ(17, out[0]);
 }
 
@@ -68,7 +68,7 @@ TEST(budazhapova_e_count_freq_character_seq, test_task_run) {
 
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
-  perfAnalyzer->task_run(perfAttr, perfResults);
-  ppc::core::Perf::print_perf_statistic(perfResults);
+  perfAnalyzer->TaskRun(perfAttr, perfResults);
+  ppc::core::Perf::PrintPerfStatistic(perfResults);
   ASSERT_EQ(4, out[0]);
 }

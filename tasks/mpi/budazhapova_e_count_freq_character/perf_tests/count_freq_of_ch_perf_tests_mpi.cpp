@@ -40,10 +40,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_pipeline_run) {
     taskDataPar->outputs_count.emplace_back(global_out.size());
   }
   auto testMpiTaskParallel = std::make_shared<budazhapova_e_count_freq_character_mpi::TestMPITaskParallel>(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel->validation(), true);
-  testMpiTaskParallel->pre_processing();
-  testMpiTaskParallel->run();
-  testMpiTaskParallel->post_processing();
+  ASSERT_EQ(testMpiTaskParallel->Validation(), true);
+  testMpiTaskParallel->PreProcessing();
+  testMpiTaskParallel->Run();
+  testMpiTaskParallel->PostProcessing();
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -53,9 +53,9 @@ TEST(budazhapova_e_count_freq_character_mpi, test_pipeline_run) {
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
+  perfAnalyzer->PipelineRun(perfAttr, perfResults);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
+    ppc::core::Perf::PrintPerfStatistic(perfResults);
     // ASSERT_EQ(, global_out[0]);
   }
 }
@@ -78,10 +78,10 @@ TEST(budazhapova_e_count_freq_character_mpi, test_task_run) {
     taskDataPar->outputs_count.emplace_back(global_out.size());
   }
   auto testMpiTaskParallel = std::make_shared<budazhapova_e_count_freq_character_mpi::TestMPITaskParallel>(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel->validation(), true);
-  testMpiTaskParallel->pre_processing();
-  testMpiTaskParallel->run();
-  testMpiTaskParallel->post_processing();
+  ASSERT_EQ(testMpiTaskParallel->Validation(), true);
+  testMpiTaskParallel->PreProcessing();
+  testMpiTaskParallel->Run();
+  testMpiTaskParallel->PostProcessing();
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -91,9 +91,9 @@ TEST(budazhapova_e_count_freq_character_mpi, test_task_run) {
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->task_run(perfAttr, perfResults);
+  perfAnalyzer->TaskRun(perfAttr, perfResults);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
+    ppc::core::Perf::PrintPerfStatistic(perfResults);
     ASSERT_EQ(123456789, global_out[0]);
   }
 }

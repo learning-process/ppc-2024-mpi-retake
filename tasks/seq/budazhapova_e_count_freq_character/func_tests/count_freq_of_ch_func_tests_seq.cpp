@@ -16,10 +16,10 @@ TEST(budazhapova_e_count_freq_character_seq, ordinary_test) {
 
   // Create Task
   budazhapova_e_count_freq_character_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_EQ(testTaskSequential.validation(), true);
-  testTaskSequential.pre_processing();
-  testTaskSequential.run();
-  testTaskSequential.post_processing();
+  ASSERT_EQ(testTaskSequential.Validation(), true);
+  testTaskSequential.PreProcessing();
+  testTaskSequential.Run();
+  testTaskSequential.PostProcessing();
   ASSERT_EQ(out[0], 11);
 }
 
@@ -37,10 +37,10 @@ TEST(budazhapova_e_count_freq_character_seq, test_if_character_is_not_in_line) {
 
   // Create Task
   budazhapova_e_count_freq_character_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_EQ(testTaskSequential.validation(), true);
-  testTaskSequential.pre_processing();
-  testTaskSequential.run();
-  testTaskSequential.post_processing();
+  ASSERT_EQ(testTaskSequential.Validation(), true);
+  testTaskSequential.PreProcessing();
+  testTaskSequential.Run();
+  testTaskSequential.PostProcessing();
   ASSERT_EQ(out[0], 1);
 }
 
@@ -58,9 +58,9 @@ TEST(budazhapova_e_count_freq_character_seq, test_if_character_is_one) {
 
   // Create Task
   budazhapova_e_count_freq_character_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_EQ(testTaskSequential.validation(), true);
-  testTaskSequential.pre_processing();
-  testTaskSequential.run();
-  testTaskSequential.post_processing();
+  ASSERT_EQ(testTaskSequential.Validation(), true);
+  testTaskSequential.PreProcessing();
+  testTaskSequential.Run();
+  testTaskSequential.PostProcessing();
   ASSERT_EQ(out[0], 1);
 }
