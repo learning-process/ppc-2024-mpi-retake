@@ -2,6 +2,7 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -39,8 +40,12 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
-  const boost::mpi::timer current_timer;
-  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
@@ -81,8 +86,12 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
-  const boost::mpi::timer current_timer;
-  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
