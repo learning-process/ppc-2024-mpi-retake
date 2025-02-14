@@ -15,9 +15,9 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
-  for (unsigned short dimension = 0; dimension < 100; dimension++) {
-    input_matrix_a[dimension * 101] = 1;
-    input_matrix_b[dimension * 101] = 1;
+  for (unsigned short dim = 0; dim < 100; dim++) {
+    input_matrix_a[dim * 101] = 1;
+    input_matrix_b[dim * 101] = 1;
   }
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -61,9 +61,9 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
-  for (unsigned short dimension = 0; dimension < 100; dimension++) {
-    input_matrix_a[dimension * 101] = 1;
-    input_matrix_b[dimension * 101] = 1;
+  for (unsigned short dim = 0; dim < 100; dim++) {
+    input_matrix_a[dim * 101] = 1;
+    input_matrix_b[dim * 101] = 1;
   }
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
