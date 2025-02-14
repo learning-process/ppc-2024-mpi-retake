@@ -79,25 +79,25 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase() {
   if (world_.rank() == 0) {
-  unsigned short i = 0;
-  unsigned short j = 0;
-  unsigned short count = 0;
-  auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
-  while (i != dimension) {
-    j = 0;
-    while (j != dimension) {
-      count = 0;
-      while (count != dimension) {
-        output_matrix_C_[(i * dimension) + j] +=
-            input_matrix_A_[(i * dimension) + count] * input_matrix_B_[(count * dimension) + j];
-        count++;
+    unsigned short i = 0;
+    unsigned short j = 0;
+    unsigned short count = 0;
+    auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
+    while (i != dimension) {
+      j = 0;
+      while (j != dimension) {
+        count = 0;
+        while (count != dimension) {
+          output_matrix_C_[(i * dimension) + j] +=
+              input_matrix_A_[(i * dimension) + count] * input_matrix_B_[(count * dimension) + j];
+          count++;
+        }
+        j++;
       }
-      j++;
+      i++;
     }
-    i++;
-  }
-  }
-}
+   }
+ }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::InitializeAndBroadcastParams() {
   if (world_.rank() == 0) {
