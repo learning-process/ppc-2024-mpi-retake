@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-// #include <boost/mpi/environment.hpp> // Удалено, если не используется
-#include <cstdint>  // Добавлено для uint8_t
-#include <cstdlib>  // Добавлено для srand и rand
-#include <ctime>    // Добавлено для time
+#include <cstdint>
+#include <cstdlib>
+#include <ctime>
 #include <memory>
 #include <string>
 #include <vector>
