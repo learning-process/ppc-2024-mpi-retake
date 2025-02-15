@@ -17,7 +17,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   std::vector<double> true_solution{90, 100, 110, 120, 202, 228, 254, 280, 314, 356, 398, 440, 426, 484, 542, 600};
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -46,7 +46,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_1_x_1_matrix) {
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   std::vector<double> true_solution{1};
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -74,7 +74,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_empty_matrix) {
   std::vector<double> output_matrix_c;
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
   std::vector<double> true_solution;
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -103,7 +103,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   std::vector<double> output_matrix_c(16, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -122,7 +122,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_random_matrix) {
   if (world.rank() == 0) {
     std::vector<std::vector<double>> reference_out_matrix_c(1, output_matrix_c);
 
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_seq->inputs_count.emplace_back(input_matrix_a.size());
@@ -150,7 +150,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
   std::vector<double> output_matrix_c(1600, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -169,7 +169,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_gigantic_random_matrix) {
   if (world.rank() == 0) {
     std::vector<std::vector<double>> reference_out_matrix_c(1, output_matrix_c);
 
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_seq->inputs_count.emplace_back(input_matrix_a.size());
@@ -194,7 +194,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_matrices_of_different_dimensions) {
   std::vector<double> output_matrix_c(9, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
@@ -204,7 +204,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_matrices_of_different_dimensions) {
     ASSERT_EQ(test_mpi_task_parallel.Validation(), false);
   }
   if (world.rank() == 0) {
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_seq->inputs_count.emplace_back(input_matrix_a.size());
@@ -222,7 +222,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_non_square_matrices) {
   std::vector<double> output_matrix_c(5, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
@@ -232,7 +232,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_non_square_matrices) {
     ASSERT_EQ(test_mpi_task_parallel.Validation(), false);
   }
   if (world.rank() == 0) {
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
     task_data_seq->inputs_count.emplace_back(input_matrix_a.size());
