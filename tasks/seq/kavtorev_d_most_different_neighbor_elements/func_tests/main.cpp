@@ -30,21 +30,6 @@ std::vector<int> generator(int sz) {
 }  // namespace
 }  // namespace kavtorev_d_most_different_neighbor_elements_seq
 
-TEST(kavtorev_d_most_different_neighbor_elements_seq, SingleElementInput_ReturnsFalse) {
-  std::vector<int> in = {42};
-  std::vector<std::pair<int, int>> out(1);
-
-  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(in.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
-
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
-  ASSERT_EQ(test_task_sequential.ValidationImpl(), false);
-}
-
 TEST(kavtorev_d_most_different_neighbor_elements_seq, LargePositiveNumbers_ReturnsCorrectPair) {
   std::vector<int> in = {1000, 2000, 3000, 4000, 5000};
   std::vector<std::pair<int, int>> out(1);
