@@ -9,6 +9,7 @@
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/kavtorev_d_most_different_neighbor_elements/include/ops_seq.hpp"
+#include "seq/kavtorev_d_most_different_neighbor_elements/src/ops_seq.cpp"
 
 TEST(kavtorev_d_most_different_neighbor_elements_seq, test_pipeline_run) {
   std::vector<int> in(10000000, 0);

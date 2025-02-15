@@ -11,7 +11,6 @@
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-#include "core/perf/include/perf.hpp"
 #include "mpi/kavtorev_d_most_different_neighbor_elements/include/ops_mpi.hpp"
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, test_pipeline_run) {
@@ -27,7 +26,9 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, test_pipeline_run) {
     task_data_mpi->outputs_count.emplace_back(out.size());
   }
 
-  auto test_task_mpi = std::make_shared<kavtorev_d_most_different_neighbor_elements_mpi::most_different_neighbor_elements_mpi>(task_data_mpi);
+  auto test_task_mpi =
+      std::make_shared<kavtorev_d_most_different_neighbor_elements_mpi::most_different_neighbor_elements_mpi>(
+          task_data_mpi);
   ASSERT_EQ(test_task_mpi->ValidationImpl(), true);
   test_task_mpi->PreProcessingImpl();
   test_task_mpi->RunImpl();

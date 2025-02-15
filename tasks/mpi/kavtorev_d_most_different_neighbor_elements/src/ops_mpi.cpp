@@ -5,7 +5,7 @@
 #include <random>
 #include <vector>
 
-#include "seq/kavtorev_d_most_different_neighbor_elements/include/ops_seq.hpp"
+#include "mpi/kavtorev_d_most_different_neighbor_elements/include/ops_mpi.hpp"
 
 bool kavtorev_d_most_different_neighbor_elements_mpi::most_different_neighbor_elements_seq::PreProcessingImpl() {
   auto input = std::vector<int>(task_data->inputs_count[0]);

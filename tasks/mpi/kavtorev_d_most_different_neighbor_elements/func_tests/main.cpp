@@ -7,9 +7,9 @@
 #include <cstdint>
 #include <fstream>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
@@ -30,6 +30,7 @@ std::vector<int> generator(int sz) {
   return ans;
 }
 }  // namespace kavtorev_d_most_different_neighbor_elements_mpi
+
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, SingleElementInput_ReturnsFalse) {
   boost::mpi::communicator world;
   std::vector<int> global_vec(1, 42);
