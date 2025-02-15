@@ -1,13 +1,14 @@
+
 #include <boost/mpi/communicator.hpp>
 #include <string>
 #include <vector>
 
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
-int budazhapova_e_count_freq_chart_mpi::counting_freq(std::string str, char symb_) {
+int budazhapova_e_count_freq_chart_mpi::CountingFreq(std::string str, char symb) {
   int resalt = 0;
   for (unsigned long i = 0; i < str.length(); i++) {
-    if (str[i] == symb_) {
+    if (str[i] == symb) {
       resalt++;
     }
   }
@@ -65,7 +66,7 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
 
   if (world_rank == 0) {
     for (int proc = 1; proc < world_.size(); proc++) {
-      world_.send(proc, 0, input_.data() + proc * delta, delta);
+      world_.send(proc, 0, input_.data() + (proc * delta), delta);
     }
   }
   local_input_.resize(delta);
@@ -74,8 +75,8 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
   } else {
     world_.recv(0, 0, local_input_.data(), delta);
   }
-  local_res = counting_freq(local_input_, symb_);
-  boost::mpi::reduce(world_, local_res, res_, std::plus<>(), 0);
+  local_res_ = counting_freq(local_input_, symb_);
+  boost::mpi::reduce(world_, local_res_, res_, std::plus<>(), 0);
   return true;
 }
 

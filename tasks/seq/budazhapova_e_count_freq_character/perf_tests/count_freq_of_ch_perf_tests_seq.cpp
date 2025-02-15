@@ -72,8 +72,8 @@ TEST(budazhapova_e_count_freq_chart_seq, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
-  perfAnalyzer->TaskRun(perf_attr, perf_results);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   // ASSERT_EQ(4, out[0]);
 }

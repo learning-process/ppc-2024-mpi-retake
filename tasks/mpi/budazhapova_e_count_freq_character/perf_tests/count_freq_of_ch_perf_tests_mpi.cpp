@@ -1,6 +1,7 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
 #include <cstdint>
 #include <cstdlib>
@@ -10,10 +11,12 @@
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
 namespace budazhapova_e_count_freq_chart_mpi {
-static std::string get_random_string(int length) {
+namespace {
+static std::string GetRandomString(int length) {
   static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   std::string result;
   result.resize(length);
@@ -24,12 +27,14 @@ static std::string get_random_string(int length) {
   }
   return result;
 }
+}  // namespace
+}  // namespace budazhapova_e_count_freq_chart_mpi
 
 TEST(budazhapova_e_count_freq_chart_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::string global_str;
   int size_string = 123456789;
-  global_str = get_random_string(size_string);
+  global_str = GetRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
   // Create TaskData
@@ -69,7 +74,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::string global_str;
   int size_string = 123456789;
-  global_str = get_random_string(size_string);
+  global_str = GetRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
 

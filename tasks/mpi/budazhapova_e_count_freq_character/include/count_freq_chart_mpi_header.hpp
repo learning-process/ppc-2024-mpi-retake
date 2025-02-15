@@ -2,14 +2,14 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "core/task/include/task.hpp"
 
 namespace budazhapova_e_count_freq_chart_mpi {
 
-int counting_freq(std::string str, char symb_);
+int CountingFreq(std::string str, char symb);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
@@ -35,7 +35,7 @@ class TestMPITaskParallel : public ppc::core::Task {
 
  private:
   std::string input_, local_input_;
-  int res_ = 0, local_res{};
+  int res_ = 0, local_res_{};
   char symb_;
   boost::mpi::communicator world_;
 };

@@ -13,31 +13,33 @@
 
 namespace budazhapova_e_count_freq_chart_mpi {
 namespace {
-std::string get_random_string(int length) {
+std::string GetRandomString(int length) {
   static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   std::string result;
   result.resize(length);
 
   srand(time(nullptr));
-  for (int i = 0; i < length; i++) result[i] = charset[rand() % charset.length()];
+  for (int i = 0; i < length; i++) {
+    result[i] = charset[rand() % charset.length()];
+  }
   return result;
 }
 }  // namespace
 }  // namespace budazhapova_e_count_freq_chart_mpi
 
 TEST(budazhapova_e_count_freq_chart_mpi, test_with_random_string) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
 
   std::string global_str;
   std::vector<int> global_out(1, 0);
   char symb = '1';
   const int size_string = 10;
-  global_str = budazhapova_e_count_freq_chart_mpi::get_random_string(size_string);
+  global_str = budazhapova_e_count_freq_chart_mpi::GetRandomString(size_string);
 
   // Create task_data
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
     task_data_par->inputs_count.emplace_back(global_str.size());
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
@@ -52,7 +54,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_with_random_string) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
     // Create TaskData
@@ -74,14 +76,14 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_with_random_string) {
   }
 }
 TEST(budazhapova_e_count_freq_chart_mpi, test_with_one_symb) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::string global_str = "3";
   std::vector<int> global_out(1, 0);
   char symb = '3';
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
     task_data_par->inputs_count.emplace_back(global_str.size());
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
@@ -94,7 +96,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_with_one_symb) {
   test_mpi_task_parallel.PreProcessing();
   test_mpi_task_parallel.Run();
   test_mpi_task_parallel.PostProcessing();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
     // Create TaskData
@@ -116,14 +118,14 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_with_one_symb) {
   }
 }
 TEST(budazhapova_e_count_freq_chart_mpi, big_string) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::string global_str(100, 'a');
   std::vector<int> global_out(1, 0);
   char symb = 'a';
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
     task_data_par->inputs_count.emplace_back(global_str.size());
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
@@ -136,7 +138,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, big_string) {
   test_mpi_task_parallel.PreProcessing();
   test_mpi_task_parallel.Run();
   test_mpi_task_parallel.PostProcessing();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     // Create data
     std::vector<int> reference_out(1, 0);
     // Create TaskData
