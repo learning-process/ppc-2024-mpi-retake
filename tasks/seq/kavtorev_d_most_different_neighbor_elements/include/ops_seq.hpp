@@ -15,6 +15,7 @@ class most_different_neighbor_elements_seq : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
+  std::vector<int> generator(int sz);
 
  private:
   std::vector<std::pair<int, int>> input_;
