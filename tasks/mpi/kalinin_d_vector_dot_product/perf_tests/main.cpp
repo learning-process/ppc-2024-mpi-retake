@@ -33,8 +33,8 @@ TEST(kalinin_d_vector_dot_product_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_vec;
 
-  std::vector<int> v1 = kalinin_d_vector_dot_produc_mpi::createRandomVector(count_size_vector);
-  std::vector<int> v2 = kalinin_d_vector_dot_produc_mpi::createRandomVector(count_size_vector);
+  std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+  std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
 
   std::vector<int32_t> res(1, 0);
   global_vec = {v1, v2};
@@ -82,8 +82,8 @@ TEST(kalinin_d_vector_dot_product_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_vec;
   std::vector<int32_t> res(1, 0);
-  std::vector<int> v1 = kalinin_d_vector_dot_produc_mpi::createRandomVector(count_size_vector);
-  std::vector<int> v2 = kalinin_d_vector_dot_produc_mpi::createRandomVector(count_size_vector);
+  std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+  std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
