@@ -98,7 +98,7 @@ bool SumValuesByRowsMatrixMpi::PostProcessingImpl() {
 
 bool SumValuesByRowsMatrixMpi::ValidationImpl() {
   if (world_.rank() == 0) {
-    if (task_data->inputs_count[0] != 3 || task_data->inputs[0][0] < 0) {
+    if (task_data->inputs_count[0] != 3 || reinterpret_cast<int*>(task_data->inputs[0])[0] < 0) {
       return false;
     }
   }
