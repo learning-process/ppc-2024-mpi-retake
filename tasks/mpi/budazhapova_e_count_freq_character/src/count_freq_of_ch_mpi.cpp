@@ -16,8 +16,8 @@ int budazhapova_e_count_freq_counter_mpi::counting_freq(std::string str, char sy
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::PreProcessingImpl() {
   InternalOrderTest();
   input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), static_cast<int>(task_data->inputs_count[0]));
-  symb = *reinterpret_cast<char*>(task_data->inputs[1]);
-  res = 0;
+  symb_ = *reinterpret_cast<char*>(task_data->inputs[1]);
+  res_ = 0;
   return true;
 }
 
@@ -28,13 +28,13 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::ValidationImpl()
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::RunImpl() {
   InternalOrderTest();
-  res = counting_freq(input_, symb);
+  res_ = counting_freq(input_, symb);
   return true;
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::PostProcessingImpl() {
   InternalOrderTest();
-  reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
+  reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
   return true;
 }
 
@@ -44,7 +44,7 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::PreProcessingImpl(
 
   if (world_rank == 0) {
     input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), static_cast<int>(task_data->inputs_count[0]));
-    symb = *reinterpret_cast<char*>(task_data->inputs[1]);
+    symb_ = *reinterpret_cast<char*>(task_data->inputs[1]);
   }
   return true;
 }
@@ -80,15 +80,15 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
   } else {
     world.recv(0, 0, local_input_.data(), delta);
   }
-  local_res = counting_freq(local_input_, symb);
-  boost::mpi::reduce(world, local_res, res, std::plus<>(), 0);
+  local_res_ = counting_freq(local_input_, symb);
+  boost::mpi::reduce(world, local_res_, res_, std::plus<>(), 0);
   return true;
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::PostProcessingImpl() {
   InternalOrderTest();
   if (world.rank() == 0) {
-    reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
+    reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
   }
   return true;
 }

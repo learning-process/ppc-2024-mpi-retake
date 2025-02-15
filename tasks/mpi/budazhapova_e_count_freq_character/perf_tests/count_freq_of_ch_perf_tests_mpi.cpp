@@ -11,7 +11,6 @@
 
 #include "core/perf/include/perf.hpp"
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
-#include "ppc/core/TaskData.hpp"
 
 namespace budazhapova_e_count_freq_chart_mpi {
 static std::string get_random_string(int length) {
