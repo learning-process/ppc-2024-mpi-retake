@@ -1,4 +1,5 @@
 
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
 #include <vector>
@@ -27,7 +28,7 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::ValidationImpl()
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::RunImpl() {
-  res_ = counting_freq(input_, symb_);
+  res_ = CountingFreq(input_, symb_);
   return true;
 }
 
@@ -75,7 +76,7 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
   } else {
     world_.recv(0, 0, local_input_.data(), delta);
   }
-  local_res_ = counting_freq(local_input_, symb_);
+  local_res_ = CountingFreq(local_input_, symb_);
   boost::mpi::reduce(world_, local_res_, res_, std::plus<>(), 0);
   return true;
 }
