@@ -15,9 +15,13 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
-  for (unsigned short dim = 0; dim < 100; dim++) {
-    input_matrix_a[dim * 101] = 1;
-    input_matrix_b[dim * 101] = 1;
+  std::vector<double> true_solution = std::vector<double>(10000, 0);
+  for (unsigned short i = 0; i < 100; i++) {
+    for (unsigned short j = 0; j < 100; j++) {
+      input_matrix_a[j + (i * 100)] = i + 1;
+      input_matrix_b[j + (i * 100)] = j + 1;
+      true_solution[j + (i * 100)] = (i + 1) * (j + 1) * 100;
+    }
   }
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
@@ -51,7 +55,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(input_matrix_a, output_matrix_c);
+    ASSERT_EQ(true_solution, output_matrix_c);
   }
 }
 
@@ -60,9 +64,13 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
-  for (unsigned short dim = 0; dim < 100; dim++) {
-    input_matrix_a[dim * 101] = 1;
-    input_matrix_b[dim * 101] = 1;
+  std::vector<double> true_solution = std::vector<double>(10000, 0);
+  for (unsigned short i = 0; i < 100; i++) {
+    for (unsigned short j = 0; j < 100; j++) {
+      input_matrix_a[j + (i * 100)] = i + 1;
+      input_matrix_b[j + (i * 100)] = j + 1;
+      true_solution[j + (i * 100)] = (i + 1) * (j + 1) * 100;
+    }
   }
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
@@ -96,6 +104,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(input_matrix_a, output_matrix_c);
+    ASSERT_EQ(true_solution, output_matrix_c);
   }
 }
