@@ -76,7 +76,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
                    (unsigned short)sqrt(world_.size()) !=
                0 &&
            (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) >
-               (unsigned short)sqrt(world_.size()))||
+               (unsigned short)sqrt(world_.size())) ||
           ((unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) %
                    (unsigned short)sqrt(world_.size()) ==
                0 &&
