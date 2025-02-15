@@ -281,7 +281,8 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformC
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl() {
-  if (IsTrivialCase()) {
+  auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
+  if (IsTrivialCase() || dimension < (unsigned short)sqrt(world_.size()) {
     HandleTrivialCase();
   } else {
     PerformCannonAlgorithm();
