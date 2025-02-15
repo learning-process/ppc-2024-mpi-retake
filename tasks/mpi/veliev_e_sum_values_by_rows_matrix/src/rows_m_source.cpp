@@ -37,12 +37,8 @@ bool SumValuesByRowsMatrixMpi::PreProcessingImpl() {
     cols_total_ = ptr[2];
 
     input_ = std::vector<int>(elem_total_);
-    void* ptr_r = task_data->inputs[1];
-    void* ptr_d = input_.data();
-    if (elem_total_ > 0) {
-      std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[1]),
-                        reinterpret_cast<int*>(task_data->inputs[1]) + elem_total_, input_.begin());
-    }
+    std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[1]),
+                      reinterpret_cast<int*>(task_data->inputs[1]) + elem_total_, input_.begin());
     output_ = std::vector<int>(rows_total_);
   }
   return true;
