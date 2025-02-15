@@ -66,11 +66,11 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_125) {
     task_data_seq->outputs_count.emplace_back(reference_res.size());
 
     // Create Task
-    kalinin_d_vector_dot_product_mpi::TestTaskSequential test_task_sequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
-    testMpiTaskSequential.PreProcessing();
-    testMpiTaskSequential.Run();
-    testMpiTaskSequential.PostProcessing();
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
     ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
@@ -100,7 +100,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_300) {
   }
 
   kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
@@ -120,11 +120,11 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_300) {
     task_data_seq->outputs_count.emplace_back(reference_res.size());
 
     // Create Task
-    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential testMpiTaskSequential(task_data_seq);
-    ASSERT_EQ(testMpiTaskSequential.Validation(), true);
-    testMpiTaskSequential.PreProcessing();
-    testMpiTaskSequential.Run();
-    testMpiTaskSequential.PostProcessing();
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
     ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
@@ -152,7 +152,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_not_equal) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
     task_data_mpi->outputs_count.emplace_back(res.size());
     kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-    ASSERT_EQ(testMpiTaskParallel.Validation(), false);
+    ASSERT_EQ(test_task_mpi.Validation(), false);
   }
   // Create Task
 }
@@ -179,7 +179,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_equal_true) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
     task_data_mpi->outputs_count.emplace_back(res.size());
     kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-    ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+    ASSERT_EQ(test_task_mpi.Validation(), true);
   }
   // Create Task
 }
@@ -211,7 +211,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_size_5) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
   kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
@@ -240,7 +240,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_size_3) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
   kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
@@ -269,7 +269,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_size_7) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
   kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
@@ -298,7 +298,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_empty) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
   kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_EQ(testMpiTaskParallel.Validation(), true);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
