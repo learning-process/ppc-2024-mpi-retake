@@ -72,7 +72,6 @@ bool SumValuesByRowsMatrixMpi::RunImpl() {
 
   std::vector<int> loc_vec(row_sz * rows_for_each);
   scatter(world_, myid == 0 ? input_.data() : nullptr, loc_vec.data(), row_sz * rows_for_each, 0);
-
   std::vector<int> local_sums(rows_for_each, 0);
   for (int i = 0; i < rows_for_each; ++i) {
     local_sums[i] = std::accumulate(loc_vec.begin() + i * row_sz, loc_vec.begin() + (i + 1) * row_sz, 0);
@@ -99,6 +98,9 @@ bool SumValuesByRowsMatrixMpi::PostProcessingImpl() {
 }
 
 bool SumValuesByRowsMatrixMpi::ValidationImpl() {
-  return task_data->inputs_count[0] == 3 && reinterpret_cast<int*>(task_data->inputs[0])[0] >= 0;
+  if (world_.rank() == 0) {
+    return task_data->inputs_count[0] == 3 && reinterpret_cast<int*>(task_data->inputs[0])[0] >= 0;
+  }
+  return true;
 }
 }  // namespace veliev_e_sum_values_by_rows_matrix_mpi
