@@ -13,6 +13,7 @@
 #include "seq/kavtorev_d_most_different_neighbor_elements/include/ops_seq.hpp"
 
 namespace kavtorev_d_most_different_neighbor_elements_seq {
+namespace {
 std::vector<int> generator(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -26,6 +27,7 @@ std::vector<int> generator(int sz) {
 
   return ans;
 }
+}  // namespace
 }  // namespace kavtorev_d_most_different_neighbor_elements_seq
 
 TEST(kavtorev_d_most_different_neighbor_elements_seq, SingleElementInput_ReturnsFalse) {
