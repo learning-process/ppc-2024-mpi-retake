@@ -3,10 +3,10 @@
 
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
-int budazhapova_e_count_freq_chart_mpi::counting_freq(std::string str, char symb) {
+int budazhapova_e_count_freq_chart_mpi::counting_freq(std::string str, char symb_) {
   int resalt = 0;
   for (unsigned long i = 0; i < str.length(); i++) {
-    if (str[i] == symb) {
+    if (str[i] == symb_) {
       resalt++;
     }
   }

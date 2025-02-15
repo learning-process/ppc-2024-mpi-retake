@@ -4,8 +4,8 @@ using namespace std::chrono_literals;
 
 bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::PreProcessingImpl() {
   input_ = *reinterpret_cast<std::string*>(task_data->inputs[0]);
-  symb = input_[0];
-  res = 0;
+  symb_ = input_[0];
+  res_ = 0;
   return true;
 }
 
@@ -17,14 +17,14 @@ bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::ValidationImpl() {
 
 bool budazhapova_e_count_freq_counter_seq::TestTaskSequential::RunImpl() {
   for (unsigned long i = 0; i < input_.length(); i++) {
-    if (input_[i] == symb) {
-      res++;
+    if (input_[i] == symb_) {
+      res_++;
     }
   }
   return true;
 }
 
 bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::PostProcessingImpl() {
-  reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
+  reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
   return true;
 }
