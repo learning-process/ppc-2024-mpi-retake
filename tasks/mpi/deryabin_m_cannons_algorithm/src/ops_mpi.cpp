@@ -75,7 +75,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
           (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) %
                   (unsigned short)sqrt(world_.size()) !=
               0 ||
-          input_matrix_A_.size() / world_.size() == 0);
+          input_matrix_A_.size() == 1);
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase() {
