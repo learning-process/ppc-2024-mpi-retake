@@ -1,5 +1,8 @@
 
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/resv.hpp>
+#include <boost/mpi/collectives/send.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
 #include <vector>
