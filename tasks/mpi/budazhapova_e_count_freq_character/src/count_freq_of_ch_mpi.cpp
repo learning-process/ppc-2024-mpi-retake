@@ -38,9 +38,7 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::PostProcessingIm
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::PreProcessingImpl() {
-  int world_rank = world_.rank();
-
-  if (world_rank == 0) {
+  if (world_.rank() == 0) {
     input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), static_cast<int>(task_data->inputs_count[0]));
     symb_ = *reinterpret_cast<char*>(task_data->inputs[1]);
   }
@@ -55,29 +53,28 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
-  int world_rank = world_.rank();
   int delta = 0;
-  if (world_rank == 0) {
+  if (world_.rank() == 0) {
     int input_size = static_cast<int>(task_data->inputs_count[0]);
     delta = (input_size % world_.size() == 0) ? (input_size / world_.size()) : ((input_size / world_.size()) + 1);
   }
 
-  boost::mpi::broadcast(world_, delta, 0);
-  boost::mpi::broadcast(world_, symb_, 0);
+  broadcast(world_, delta, 0);
+  broadcast(world_, symb_, 0);
 
-  if (world_rank == 0) {
+  if (world_.rank() == 0) {
     for (int proc = 1; proc < world_.size(); proc++) {
-      world_.send(proc, 0, input_.data() + (proc * delta), delta);
+      send(proc, 0, input_.data() + (proc * delta), delta);
     }
   }
   local_input_.resize(delta);
-  if (world_rank == 0) {
+  if (world_.rank() == 0) {
     local_input_ = std::string(input_.begin(), input_.begin() + delta);
   } else {
-    world_.recv(0, 0, local_input_.data(), delta);
+    recv(0, 0, local_input_.data(), delta);
   }
   local_res_ = CountingFreq(local_input_, symb_);
-  boost::mpi::reduce(world_, local_res_, res_, std::plus<>(), 0);
+  reduce(world_, local_res_, res_, std::plus<>(), 0);
   return true;
 }
 
