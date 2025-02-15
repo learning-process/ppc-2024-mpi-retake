@@ -1,11 +1,8 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/resv.hpp>
-#include <boost/mpi/collectives/send.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
-#include <vector>
 
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
@@ -58,7 +55,8 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::ValidationImpl() {
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
   int delta = 0;
   if (world_.rank() == 0) {
-    int input_size = static_cast<int>(task_data->inputs_count[0]);
+    int input_size = 0;
+    input_size = static_cast<int>(task_data->inputs_count[0]);
     delta = (input_size % world_.size() == 0) ? (input_size / world_.size()) : ((input_size / world_.size()) + 1);
   }
 
