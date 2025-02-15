@@ -3,6 +3,7 @@
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <functional>
 #include <string>
 
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
@@ -76,7 +77,7 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
     world_.recv(0, 0, local_input_.data(), delta);
   }
   local_res_ = CountingFreq(local_input_, symb_);
-  reduce(world_, local_res_, res_, std::plus<>(), 0);
+  boost::mpi::reduce(world_, local_res_, res_, std::plus<>(), 0);
   return true;
 }
 
