@@ -15,9 +15,9 @@ TEST(budazhapova_e_count_freq_chart_seq, ordinary_test) {
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(static_cast<int>(in.size()));
+  task_data_seq->inputs_count.emplace_back(in.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(static_cast<int>(out.size()));
+  task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
   budazhapova_e_count_freq_chart_seq::TestTaskSequential test_task_sequential(task_data_seq);
@@ -35,9 +35,9 @@ TEST(budazhapova_e_count_freq_chart_seq, test_if_character_is_not_in_line) {
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(static_cast<int>(in.size()));
+  task_data_seq->inputs_count.emplace_back(in.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(static_cast<int>(out.size()));
+  task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
   budazhapova_e_count_freq_chart_seq::TestTaskSequential test_task_sequential(task_data_seq);
@@ -55,9 +55,9 @@ TEST(budazhapova_e_count_freq_chart_seq, test_if_character_is_one) {
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(static_cast<int>(in.size()));
+  task_data_seq->inputs_count.emplace_back(in.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(static_cast<int>(out.size()));
+  task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
   budazhapova_e_count_freq_chart_seq::TestTaskSequential test_task_sequential(task_data_seq);
