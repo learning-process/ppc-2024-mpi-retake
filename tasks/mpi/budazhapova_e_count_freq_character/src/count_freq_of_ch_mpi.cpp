@@ -1,3 +1,4 @@
+#include <boost/mpi/communicator.hpp>
 #include <string>
 #include <vector>
 
@@ -14,7 +15,6 @@ int budazhapova_e_count_freq_chart_mpi::counting_freq(std::string str, char symb
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::PreProcessingImpl() {
-  InternalOrderTest();
   input_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), static_cast<int>(task_data->inputs_count[0]));
   symb_ = *reinterpret_cast<char*>(task_data->inputs[1]);
   res_ = 0;
@@ -22,24 +22,20 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::PreProcessingImp
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::ValidationImpl() {
-  InternalOrderTest();
   return task_data->outputs_count[0] == 1;
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::RunImpl() {
-  InternalOrderTest();
   res_ = counting_freq(input_, symb_);
   return true;
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskSequential::PostProcessingImpl() {
-  InternalOrderTest();
   reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
   return true;
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::PreProcessingImpl() {
-  InternalOrderTest();
   int world_rank = world_.rank();
 
   if (world_rank == 0) {
@@ -50,7 +46,6 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::PreProcessingImpl(
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::ValidationImpl() {
-  InternalOrderTest();
   if (world_.rank() == 0) {
     return task_data->outputs_count[0] == 1;
   }
@@ -58,7 +53,6 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
-  InternalOrderTest();
   int world_rank = world_.rank();
   int delta = 0;
   if (world_rank == 0) {
@@ -86,7 +80,6 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
 }
 
 bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::PostProcessingImpl() {
-  InternalOrderTest();
   if (world_.rank() == 0) {
     reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
   }

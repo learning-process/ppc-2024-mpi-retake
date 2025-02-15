@@ -1,15 +1,15 @@
 #pragma once
-#include <gtest/gtest.h>
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <utility>
 #include <string>
 
 #include "core/task/include/task.hpp"
 
 namespace budazhapova_e_count_freq_chart_mpi {
-int counting_freq(std::string str, char symb);
-std::string get_random_string(int length);
+
+int counting_freq(std::string str, char symb_);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:

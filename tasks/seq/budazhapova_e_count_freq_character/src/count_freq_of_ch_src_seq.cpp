@@ -11,8 +11,6 @@ bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::PreProcessingImpl()
 
 bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::ValidationImpl() {
   return task_data->inputs_count[0] == 1;
-  // Или, если вы хотите убедиться, что inputs_count[0] больше 0:
-  // return task_data->inputs_count[0] > 0;
 }
 
 bool budazhapova_e_count_freq_counter_seq::TestTaskSequential::RunImpl() {

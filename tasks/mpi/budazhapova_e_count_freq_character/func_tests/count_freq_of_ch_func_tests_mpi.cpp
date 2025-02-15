@@ -12,6 +12,7 @@
 #include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
 namespace budazhapova_e_count_freq_chart_mpi {
+namespace {
 std::string get_random_string(int length) {
   static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   std::string result;
@@ -21,10 +22,12 @@ std::string get_random_string(int length) {
   for (int i = 0; i < length; i++) result[i] = charset[rand() % charset.length()];
   return result;
 }
+}  // namespace
 }  // namespace budazhapova_e_count_freq_chart_mpi
 
 TEST(budazhapova_e_count_freq_chart_mpi, test_with_random_string) {
   boost::mpi::communicator world_;
+
   std::string global_str;
   std::vector<int> global_out(1, 0);
   char symb = '1';
