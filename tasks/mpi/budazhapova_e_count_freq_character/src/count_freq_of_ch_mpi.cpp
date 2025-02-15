@@ -1,6 +1,7 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
 
@@ -65,14 +66,14 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
 
   if (world_.rank() == 0) {
     for (int proc = 1; proc < world_.size(); proc++) {
-      send(proc, 0, input_.data() + (proc * delta), delta);
+      world_.send(proc, 0, input_.data() + (proc * delta), delta);
     }
   }
   local_input_.resize(delta);
   if (world_.rank() == 0) {
     local_input_ = std::string(input_.begin(), input_.begin() + delta);
   } else {
-    recv(0, 0, local_input_.data(), delta);
+    world_.recv(0, 0, local_input_.data(), delta);
   }
   local_res_ = CountingFreq(local_input_, symb_);
   reduce(world_, local_res_, res_, std::plus<>(), 0);
