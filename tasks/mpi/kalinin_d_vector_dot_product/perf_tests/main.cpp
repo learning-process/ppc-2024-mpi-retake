@@ -48,7 +48,7 @@ TEST(kalinin_d_vector_dot_product_mpi, test_pipeline_run) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
 
-  auto test_task_mpi = std::make_sharedkalinin_d_vector_dot_product_mpi::TestTaskMPI > (task_data_mpi);
+  auto test_task_mpi = std::make_sharedkalinin_d_vector_dot_product_mpi::TestMPITaskParallel > (task_data_mpi);
   ASSERT_EQ(test_task_mpi->ValidationImpl(), true);
   test_task_mpi->PreProcessingImpl();
   test_task_mpi->RunImpl();
@@ -95,7 +95,7 @@ TEST(kalinin_d_vector_dot_product_mpi, test_task_run) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
 
-  auto test_task_mpi = std::make_shared<kalinin_d_vector_dot_product_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<kalinin_d_vector_dot_product_mpi::TestMPITaskParallel>(task_data_mpi);
   ASSERT_EQ(test_task_mpi->ValidationImpl(), true);
   test_task_mpi->PreProcessingImpl();
   test_task_mpi->RunImpl();
