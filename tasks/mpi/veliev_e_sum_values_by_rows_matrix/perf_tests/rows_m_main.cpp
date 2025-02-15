@@ -1,11 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
-#include <random>
+#include <boost/mpi/communicator.hpp>
+#include <chrono>
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/veliev_e_sum_values_by_rows_matrix/include/rows_m_header.hpp"
-
 TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
   std::vector base_input = {10000000, 1000, 10000};
 
@@ -23,8 +26,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
   task_data->outputs_count.emplace_back(base_input[1]);
 
   // Create Task
-  auto test_task_mpi =
-      std::make_shared<veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi>(task_data);
+  auto test_task_mpi = std::make_shared<veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi>(task_data);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -47,7 +49,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
   }
 
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
@@ -68,8 +70,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_task_run) {
   task_data->outputs_count.emplace_back(base_input[1]);
 
   // Create Task
-  auto test_task_mpi =
-      std::make_shared<veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi>(task_data);
+  auto test_task_mpi = std::make_shared<veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi>(task_data);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -93,6 +94,6 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_task_run) {
   }
 
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }

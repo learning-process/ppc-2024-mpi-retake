@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <random>
+#include <chrono>
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/veliev_e_sum_values_by_rows_matrix/include/seq_rows_m_header.hpp"
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, test_pipeline_run) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, test_pipeline_run) {
   std::vector base_input = {10000000, 1000, 10000};
 
   // Create data
@@ -22,7 +26,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_pipeline_run) {
 
   // Create Task
   auto test_task_sequential =
-      std::make_shared<veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq>(task_data);
+      std::make_shared<veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq>(task_data);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -42,11 +46,11 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, test_task_run) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, test_task_run) {
   std::vector base_input = {10000000, 1000, 10000};
 
   // Create data
@@ -63,7 +67,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_task_run) {
 
   // Create Task
   auto test_task_sequential =
-      std::make_shared<veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq>(task_data);
+      std::make_shared<veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq>(task_data);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -83,6 +87,6 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }

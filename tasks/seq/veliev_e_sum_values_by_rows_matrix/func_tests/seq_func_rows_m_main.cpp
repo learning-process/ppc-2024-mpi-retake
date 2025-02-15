@@ -1,8 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+#include "core/task/include/task.hpp"
 #include "seq/veliev_e_sum_values_by_rows_matrix/include/seq_rows_m_header.hpp"
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_0x0) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_0x0) {
   std::vector base_input = {0, 0, 0};
 
   // Create data
@@ -16,18 +21,18 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_0x0) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data->outputs_count.emplace_back(base_input[1]);
 
-  veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq test1(task_data);
 
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_1x1) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_1x1) {
   std::vector base_input = {1, 1, 1};
 
   // Create data
@@ -41,18 +46,18 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_1x1) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data->outputs_count.emplace_back(base_input[1]);
 
-  veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq test1(task_data);
 
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_10x10) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_10x10) {
   std::vector base_input = {100, 10, 10};
 
   // Create data
@@ -66,18 +71,18 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_10x10) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data->outputs_count.emplace_back(base_input[1]);
 
-  veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq test1(task_data);
 
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_40x60) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_40x60) {
   std::vector base_input = {2400, 40, 60};
 
   // Create data
@@ -91,18 +96,18 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_40x60) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data->outputs_count.emplace_back(base_input[1]);
 
-  veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq test1(task_data);
 
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
-TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_100x100) {
+TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_100x100) {
   std::vector base_input = {10000, 100, 100};
 
   // Create data
@@ -116,13 +121,13 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, Test_matr_100x100) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data->outputs_count.emplace_back(base_input[1]);
 
-  veliev_e_sum_values_by_rows_matrix_seq::sum_values_by_rows_matrix_seq test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_seq::SumValuesByRowsMatrixSeq test1(task_data);
 
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_seq::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_seq::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }

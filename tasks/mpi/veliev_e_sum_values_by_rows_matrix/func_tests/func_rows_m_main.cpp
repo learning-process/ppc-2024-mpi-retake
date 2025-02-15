@@ -1,5 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+#include "core/task/include/task.hpp"
 #include "mpi/veliev_e_sum_values_by_rows_matrix/include/rows_m_header.hpp"
 
 TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_0x0) {
@@ -19,14 +25,14 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_0x0) {
     task_data->outputs_count.emplace_back(base_input[1]);
   }
 
-  veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi test1(task_data);
 
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
@@ -39,7 +45,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_1x1) {
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    veliev_e_sum_values_by_rows_matrix_mpi::get_rnd_matrix(arr);
+    veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(3);
@@ -47,13 +53,13 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_1x1) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data->outputs_count.emplace_back(base_input[1]);
   }
-  veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi test1(task_data);
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
@@ -66,7 +72,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_10x10) {
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    veliev_e_sum_values_by_rows_matrix_mpi::get_rnd_matrix(arr);
+    veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(3);
@@ -74,13 +80,13 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_10x10) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data->outputs_count.emplace_back(base_input[1]);
   }
-  veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi test1(task_data);
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_11x11) {
@@ -92,7 +98,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_11x11) {
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    veliev_e_sum_values_by_rows_matrix_mpi::get_rnd_matrix(arr);
+    veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(3);
@@ -100,13 +106,13 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_11x11) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data->outputs_count.emplace_back(base_input[1]);
   }
-  veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi test1(task_data);
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
@@ -119,7 +125,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_40x20) {
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    veliev_e_sum_values_by_rows_matrix_mpi::get_rnd_matrix(arr);
+    veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(3);
@@ -127,13 +133,13 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_40x20) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data->outputs_count.emplace_back(base_input[1]);
   }
-  veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi test1(task_data);
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
 
@@ -146,7 +152,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_100x100) {
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    veliev_e_sum_values_by_rows_matrix_mpi::get_rnd_matrix(arr);
+    veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(3);
@@ -154,12 +160,12 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, Test_matr_100x100) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data->outputs_count.emplace_back(base_input[1]);
   }
-  veliev_e_sum_values_by_rows_matrix_mpi::sum_values_by_rows_matrix_mpi test1(task_data);
+  veliev_e_sum_values_by_rows_matrix_mpi::SumValuesByRowsMatrixMpi test1(task_data);
   ASSERT_EQ(test1.Validation(), true);
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
   std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::seq_proc_for_checking(arr, base_input[2], ref_for_check);
+  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
   ASSERT_EQ(out, ref_for_check);
 }
