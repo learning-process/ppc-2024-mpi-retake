@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "ppc/core/task/include/task.hpp"
-#include "seq/budazhapova_e_count_freq_character/include/count_freq_chart_header.h"
+#include "seq/budazhapova_e_count_freq_character/include/count_freq_counter_header.h"
 
 TEST(budazhapova_e_count_freq_counter_seq, ordinary_test) {
   std::string line = "dsdasdasdsadsadsadsxzcacsdvfdggregfgdgwdvfsdfdvvbvbvbvbvbvbvbvbdsfdsfdsfsdfbcbfbvbvbv";
