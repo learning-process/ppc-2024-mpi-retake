@@ -71,8 +71,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 }
 
 [[nodiscard]] bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const {
-  return (static_cast<unsigned short>(input_matrix_A_.size()) <
-          static_cast<unsigned short>(world_.size()));
+  return (static_cast<unsigned short>(input_matrix_A_.size()) < static_cast<unsigned short>(world_.size()));
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase() {
