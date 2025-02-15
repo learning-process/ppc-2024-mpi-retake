@@ -8,7 +8,7 @@
 
 #include "core/perf/include/perf.hpp"
 #include "ppc/core/task/include/task.hpp"
-#include "seq/budazhapova_e_count_freq_counter/include/count_freq_counter_header.h"
+#include "seq/budazhapova_e_count_freq_character/include/count_freq_counter_header.h"
 
 TEST(budazhapova_e_count_freq_counter_seq, test_pipeline_run) {
   std::string line(100000, 'h');

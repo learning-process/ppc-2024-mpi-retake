@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 
-#include "mpi/budazhapova_e_count_freq_chart/include/count_freq_chart_mpi_header.hpp"
+#include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
 int budazhapova_e_count_freq_counter_mpi::counting_freq(std::string str, char symb) {
   int resalt = 0;

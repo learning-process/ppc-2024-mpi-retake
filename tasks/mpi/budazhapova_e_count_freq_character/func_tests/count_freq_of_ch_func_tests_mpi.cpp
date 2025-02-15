@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "mpi/budazhapova_e_count_freq_chart/include/count_freq_chart_mpi_header.hpp"
+#include "mpi/budazhapova_e_count_freq_character/include/count_freq_chart_mpi_header.hpp"
 
 namespace budazhapova_e_count_freq_chart_mpi {
 std::string get_random_string(int length) {

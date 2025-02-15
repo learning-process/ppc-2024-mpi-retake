@@ -1,4 +1,4 @@
-#include "seq/budazhapova_e_count_freq_chart/include/count_freq_chart_header.h"
+#include "seq/budazhapova_e_count_freq_character/include/count_freq_chart_header.h"
 
 using namespace std::chrono_literals;
 
