@@ -21,4 +21,4 @@ class TestTaskSequential : public ppc::core::Task {
   int res_{};
 };
 
-}  // namespace budazhapova_e_count_freq_chart_seq
+}  // namespace budazhapova_e_count_freq_chart_seq/
