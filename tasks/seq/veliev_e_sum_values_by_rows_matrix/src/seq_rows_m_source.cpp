@@ -9,7 +9,7 @@ namespace veliev_e_sum_values_by_rows_matrix_seq {
 
 void SeqProcForChecking(std::vector<int>& vec, int rows_size, std::vector<int>& output) {
   if (rows_size != 0) {
-    size_t cnt = vec.size() / rows_size;
+    int cnt = static_cast<int>(vec.size() / rows_size);
     output.resize(cnt);
     for (int i = 0; i < cnt; ++i) {
       output[i] = std::accumulate(vec.begin() + i * rows_size, vec.begin() + (i + 1) * rows_size, 0);
@@ -48,11 +48,11 @@ bool SumValuesByRowsMatrixSeq::RunImpl() {
 }
 
 bool SumValuesByRowsMatrixSeq::PostProcessingImpl() {
-  std::copy(output_.begin(), output_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
+  std::ranges::copy(output_, reinterpret_cast<int*>(task_data->outputs[0]));
   return true;
 }
 
 bool SumValuesByRowsMatrixSeq::ValidationImpl() {
-  return !(task_data->inputs_count[0] != 3 || reinterpret_cast<int*>(task_data->inputs[0])[0] < 0);
+  return task_data->inputs_count[0] == 3 && reinterpret_cast<int*>(task_data->inputs[0])[0] >= 0;
 }
 }  // namespace veliev_e_sum_values_by_rows_matrix_seq
