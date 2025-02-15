@@ -8,6 +8,8 @@
 #include "seq/kalinin_d_vector_dot_product/include/ops_seq.hpp"
 static int offset = 0;
 
+namespace kalinin_d_vector_dot_produc_seq {
+namespace {
 std::vector<int> createRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
@@ -15,13 +17,16 @@ std::vector<int> createRandomVector(int v_size) {
   for (int i = 0; i < v_size; i++) vec[i] = gen() % 100;
   return vec;
 }
+}  // namespace
+
+}  // namespace kalinin_d_vector_dot_produc_seq
 
 TEST(kalinin_d_vector_dot_product_seq, can_scalar_multiply_vec_size_10) {
   const int count = 10;
   // Create data
   std::vector<int> out(1, 0);
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -50,8 +55,8 @@ TEST(kalinin_d_vector_dot_product_seq, can_scalar_multiply_vec_size_100) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -80,8 +85,8 @@ TEST(kalinin_d_vector_dot_product_seq, check_none_equal_size_of_vec) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count + 1);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count + 1);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -105,8 +110,8 @@ TEST(kalinin_d_vector_dot_product_seq, check_equal_size_of_vec) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -127,8 +132,8 @@ TEST(kalinin_d_vector_dot_product_seq, check_equal_size_of_vec) {
 
 TEST(kalinin_d_vector_dot_product_seq, check_empty_vec_product_func) {
   const int count = 0;
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
   int answer = kalinin_d_vector_dot_product_seq::vectorDotProduct(v1, v2);
   ASSERT_EQ(0, answer);
 }
@@ -138,8 +143,8 @@ TEST(kalinin_d_vector_dot_product_seq, check_empty_vec_product_Run) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -168,8 +173,8 @@ TEST(kalinin_d_vector_dot_product_seq, v1_dot_product_v2_equal_v2_dot_product_v1
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
+  std::vector<int> v2 = kalinin_d_vector_dot_produc_seq::createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
