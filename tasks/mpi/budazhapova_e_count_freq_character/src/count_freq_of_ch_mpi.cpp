@@ -66,22 +66,22 @@ bool budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel::RunImpl() {
     delta = (input_size % world_.size() == 0) ? (input_size / world_.size()) : ((input_size / world_.size()) + 1);
   }
 
-  boost::mpi::broadcast(world, delta, 0);
-  boost::mpi::broadcast(world, symb_, 0);
+  boost::mpi::broadcast(world_, delta, 0);
+  boost::mpi::broadcast(world_, symb_, 0);
 
   if (world_rank == 0) {
-    for (int proc = 1; proc < world.size(); proc++) {
-      world.send(proc, 0, input_.data() + proc * delta, delta);
+    for (int proc = 1; proc < world_.size(); proc++) {
+      world_.send(proc, 0, input_.data() + proc * delta, delta);
     }
   }
   local_input_.resize(delta);
   if (world_rank == 0) {
     local_input_ = std::string(input_.begin(), input_.begin() + delta);
   } else {
-    world.recv(0, 0, local_input_.data(), delta);
+    world_.recv(0, 0, local_input_.data(), delta);
   }
-  local_res_ = counting_freq(local_input_, symb_);
-  boost::mpi::reduce(world, local_res_, res_, std::plus<>(), 0);
+  local_res = counting_freq(local_input_, symb_);
+  boost::mpi::reduce(world_, local_res, res_, std::plus<>(), 0);
   return true;
 }
 
