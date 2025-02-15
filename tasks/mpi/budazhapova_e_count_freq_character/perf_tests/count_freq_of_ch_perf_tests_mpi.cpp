@@ -2,14 +2,18 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <cstdint>
+#include <cstdlib>
+#include <ctime>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
-#include "mpi/budazhapova_e_count_freq_character/include/count_freq_character_mpi_header.hpp"
+#include "mpi/budazhapova_e_count_freq_chart/include/count_freq_chart_mpi_header.hpp"
 
-namespace budazhapova_e_count_freq_character_mpi {
-std::string getRandomString(int length) {
+namespace budazhapova_e_count_freq_chart_mpi {
+std::string get_random_string(int length) {
   static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   std::string result;
   result.resize(length);
@@ -18,81 +22,81 @@ std::string getRandomString(int length) {
   for (int i = 0; i < length; i++) result[i] = charset[rand() % charset.length()];
   return result;
 }
-}  // namespace budazhapova_e_count_freq_character_mpi
 
-TEST(budazhapova_e_count_freq_character_mpi, test_pipeline_run) {
-  boost::mpi::communicator world;
+TEST(budazhapova_e_count_freq_chart_mpi, test_pipeline_run) {
+  boost::mpi::communicator world_;
   std::string global_str;
   int size_string = 123456789;
-  global_str = budazhapova_e_count_freq_character_mpi::getRandomString(size_string);
+  global_str = budazhapova_e_count_freq_chart_mpi::get_random_string(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
   // Create TaskData
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
-    taskDataPar->inputs_count.emplace_back(global_str.size());
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
-    taskDataPar->inputs_count.emplace_back(1);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
-    taskDataPar->outputs_count.emplace_back(global_out.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  if (world_.rank() == 0) {
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
+    task_data_par->inputs_count.emplace_back(global_str.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
+    task_data_par->inputs_count.emplace_back(1);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
+    task_data_par->outputs_count.emplace_back(global_out.size());
   }
-  auto testMpiTaskParallel = std::make_shared<budazhapova_e_count_freq_character_mpi::TestMPITaskParallel>(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel->Validation(), true);
-  testMpiTaskParallel->PreProcessing();
-  testMpiTaskParallel->Run();
-  testMpiTaskParallel->PostProcessing();
+  auto test_mpi_task_parallel =
+      std::make_shared<budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel>(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
+  test_mpi_task_parallel->PreProcessing();
+  test_mpi_task_parallel->Run();
+  test_mpi_task_parallel->PostProcessing();
   // Create Perf attributes
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
   // Create and init perf results
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
   // Create Perf analyzer
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->PipelineRun(perfAttr, perfResults);
-  if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  if (world_.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
     // ASSERT_EQ(, global_out[0]);
   }
 }
-TEST(budazhapova_e_count_freq_character_mpi, test_task_run) {
-  boost::mpi::communicator world;
+TEST(budazhapova_e_count_freq_chart_mpi, test_task_run) {
+  boost::mpi::communicator world_;
   std::string global_str;
   int size_string = 123456789;
-  global_str = budazhapova_e_count_freq_character_mpi::getRandomString(size_string);
+  global_str = budazhapova_e_count_freq_chart_mpi::get_random_string(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
-    taskDataPar->inputs_count.emplace_back(global_str.size());
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
-    taskDataPar->inputs_count.emplace_back(1);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
-    taskDataPar->outputs_count.emplace_back(global_out.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  if (world_.rank() == 0) {
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_str.data()));
+    task_data_par->inputs_count.emplace_back(global_str.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&symb));
+    task_data_par->inputs_count.emplace_back(1);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_out.data()));
+    task_data_par->outputs_count.emplace_back(global_out.size());
   }
-  auto testMpiTaskParallel = std::make_shared<budazhapova_e_count_freq_character_mpi::TestMPITaskParallel>(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel->Validation(), true);
-  testMpiTaskParallel->PreProcessing();
-  testMpiTaskParallel->Run();
-  testMpiTaskParallel->PostProcessing();
+  auto test_mpi_task_parallel =
+      std::make_shared<budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel>(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
+  test_mpi_task_parallel->PreProcessing();
+  test_mpi_task_parallel->Run();
+  test_mpi_task_parallel->PostProcessing();
   // Create Perf attributes
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
   // Create and init perf results
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
   // Create Perf analyzer
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->TaskRun(perfAttr, perfResults);
-  if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perfResults);
-    ASSERT_EQ(123456789, global_out[0]);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  if (world_.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }

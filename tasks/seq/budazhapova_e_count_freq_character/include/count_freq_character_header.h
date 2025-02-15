@@ -1,12 +1,11 @@
 #pragma once
 
-#include <filesystem>
 #include <string>
-#include <vector>
+#include <utility>
 
 #include "core/task/include/task.hpp"
 
-namespace budazhapova_e_count_freq_character_seq {
+namespace budazhapova_e_count_freq_chart_seq {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
@@ -18,8 +17,8 @@ class TestTaskSequential : public ppc::core::Task {
 
  private:
   std::string input_;
-  char symb{};
-  int res{};
+  char symb_{};
+  int res_{};
 };
 
-}  // namespace budazhapova_e_count_freq_character_seq
+}  // namespace budazhapova_e_count_freq_chart_seq

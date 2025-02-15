@@ -3,17 +3,13 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <memory>
-#include <numeric>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 
-namespace budazhapova_e_count_freq_character_mpi {
+namespace budazhapova_e_count_freq_chart_mpi {
 int counting_freq(std::string str, char symb);
-std::string getRandomString(int length);
+std::string get_random_string(int length);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
@@ -25,8 +21,8 @@ class TestMPITaskSequential : public ppc::core::Task {
 
  private:
   std::string input_;
-  int res = 0;
-  char symb;
+  int res_ = 0;
+  char symb_;
 };
 
 class TestMPITaskParallel : public ppc::core::Task {
@@ -39,8 +35,8 @@ class TestMPITaskParallel : public ppc::core::Task {
 
  private:
   std::string input_, local_input_;
-  int res = 0, local_res{};
-  char symb;
-  boost::mpi::communicator world;
+  int res_ = 0, local_res{};
+  char symb_;
+  boost::mpi::communicator world_;
 };
-}  // namespace budazhapova_e_count_freq_character_mpi
+}  // namespace budazhapova_e_count_freq_chart_mpi

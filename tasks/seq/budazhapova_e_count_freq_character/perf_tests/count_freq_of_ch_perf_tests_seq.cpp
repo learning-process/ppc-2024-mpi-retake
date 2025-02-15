@@ -1,25 +1,27 @@
-
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "core/perf/include/perf.hpp"
-#include "seq/budazhapova_e_count_freq_character/include/count_freq_character_header.h"
+#include "ppc/core/task/include/task.hpp"
+#include "seq/budazhapova_e_count_freq_counter/include/count_freq_counter_header.h"
 
-TEST(budazhapova_e_count_freq_character_seq, test_pipeline_run) {
-  // Create data
-
+TEST(budazhapova_e_count_freq_counter_seq, test_pipeline_run) {
   std::string line(100000, 'h');
   std::vector<int> out(1, 0);
   std::vector<std::string> in(1, line);
 
-  // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->inputs_count.emplace_back(static_cast<int>(in.size()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  task_data_seq->outputs_count.emplace_back(static_cast<int>(out.size()));
 
-  auto test_task_sequential =
-      std::make_shared<budazhapova_e_count_freq_character_seq::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<budazhapova_e_count_freq_counter_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -41,7 +43,7 @@ TEST(budazhapova_e_count_freq_character_seq, test_pipeline_run) {
   ASSERT_EQ(17, out[0]);
 }
 
-TEST(budazhapova_e_count_freq_character_seq, test_task_run) {
+TEST(budazhapova_e_count_freq_chart_seq, test_task_run) {
   // Create data
   std::string line = "aaaaaaa pochemu tak neponyatno ya hochu spat!!!!";
   std::vector<int> out(1, 0);
@@ -50,12 +52,11 @@ TEST(budazhapova_e_count_freq_character_seq, test_task_run) {
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->inputs_count.emplace_back(static_cast<int>(in.size()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  task_data_seq->outputs_count.emplace_back(static_cast<int>(out.size()));
 
-  auto test_task_sequential =
-      std::make_shared<budazhapova_e_count_freq_character_seq::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<budazhapova_e_count_freq_chart_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
