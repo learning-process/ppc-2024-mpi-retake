@@ -4,7 +4,7 @@
 #include <boost/serialization/vector.hpp>
 #include <vector>
 
-bool malyshev_lent_horizontal::TestTaskSequential::pre_processing() {
+bool malyshev_lent_horizontal::TestTaskSequential::PreProcessingImpl() {
   InternalOrderTest();
 
   uint32_t rows = task_data->inputs_count[0];
@@ -26,7 +26,7 @@ bool malyshev_lent_horizontal::TestTaskSequential::pre_processing() {
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskSequential::validation() {
+bool malyshev_lent_horizontal::TestTaskSequential::ValidationImpl() {
   InternalOrderTest();
 
   uint32_t rows = task_data->inputs_count[0];
@@ -44,7 +44,7 @@ bool malyshev_lent_horizontal::TestTaskSequential::validation() {
   return task_data->outputs_count[0] == task_data->inputs_count[0];
 }
 
-bool malyshev_lent_horizontal::TestTaskSequential::run() {
+bool malyshev_lent_horizontal::TestTaskSequential::RunImpl() {
   InternalOrderTest();
 
   for (uint32_t i = 0; i < matrix_.size(); i++) {
@@ -57,7 +57,7 @@ bool malyshev_lent_horizontal::TestTaskSequential::run() {
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskSequential::post_processing() {
+bool malyshev_lent_horizontal::TestTaskSequential::PostProcessingImpl() {
   InternalOrderTest();
 
   std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(task_data->outputs[0]));
@@ -65,7 +65,7 @@ bool malyshev_lent_horizontal::TestTaskSequential::post_processing() {
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskParallel::pre_processing() {
+bool malyshev_lent_horizontal::TestTaskParallel::PreProcessingImpl() {
   InternalOrderTest();
 
   if (world.rank() == 0) {
@@ -92,7 +92,7 @@ bool malyshev_lent_horizontal::TestTaskParallel::pre_processing() {
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskParallel::validation() {
+bool malyshev_lent_horizontal::TestTaskParallel::ValidationImpl() {
   InternalOrderTest();
 
   if (world.rank() == 0) {
@@ -114,7 +114,7 @@ bool malyshev_lent_horizontal::TestTaskParallel::validation() {
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskParallel::run() {
+bool malyshev_lent_horizontal::TestTaskParallel::RunImpl() {
   InternalOrderTest();
 
   broadcast(world, delta_, 0);
@@ -143,7 +143,7 @@ bool malyshev_lent_horizontal::TestTaskParallel::run() {
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskParallel::post_processing() {
+bool malyshev_lent_horizontal::TestTaskParallel::PostProcessingImpl() {
   InternalOrderTest();
 
   if (world.rank() == 0) {
