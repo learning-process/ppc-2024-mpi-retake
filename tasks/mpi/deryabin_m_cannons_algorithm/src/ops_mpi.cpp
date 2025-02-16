@@ -57,6 +57,9 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PreProce
     auto* tmp_ptr_b = reinterpret_cast<double*>(task_data->inputs[1]);
     std::copy(tmp_ptr_a, tmp_ptr_a + task_data->inputs_count[0], input_matrix_A_.begin());
     std::copy(tmp_ptr_b, tmp_ptr_b + task_data->inputs_count[1], input_matrix_B_.begin());
+    dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
+    block_rows_columns_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())));
+    block_dimension_ = dimension_ / block_rows_columns_;
   }
   return true;
 }
@@ -71,7 +74,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 }
 
 [[nodiscard]] bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const {
-  return (((unsigned int)(task_data->inputs_count[0]) < (unsigned int)world_.size()) || world_.size() == 1 ||
+  return (dimension_ < block_rows_columns_ || world_.size() == 1 ||
           world_.size() != pow((unsigned short)sqrt(world_.size()), 2) ||
           (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) %
                   (unsigned short)sqrt(world_.size()) !=
@@ -83,15 +86,14 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
     unsigned short i = 0;
     unsigned short j = 0;
     unsigned short count = 0;
-    auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
-    output_matrix_C_.resize(dimension * dimension, 0.0);
-    while (i != dimension) {
+    output_matrix_C_.resize(dimension_ * dimension_, 0.0);
+    while (i != dimension_) {
       j = 0;
-      while (j != dimension) {
+      while (j != dimension_) {
         count = 0;
-        while (count != dimension) {
-          output_matrix_C_[(i * dimension) + j] +=
-              input_matrix_A_[(i * dimension) + count] * input_matrix_B_[(count * dimension) + j];
+        while (count != dimension_) {
+          output_matrix_C_[(i * dimension_) + j] +=
+              input_matrix_A_[(i * dimension_) + count] * input_matrix_B_[(count * dimension_) + j];
           count++;
         }
         j++;
@@ -103,11 +105,8 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::InitializeAndBroadcastParams() {
   if (world_.rank() == 0) {
-    dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
-    block_rows_columns_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())));
-    block_dimension_ = dimension_ / block_rows_columns_;
+
   }
-  boost::mpi::broadcast(world_, dimension_, 0);
   boost::mpi::broadcast(world_, block_dimension_, 0);
   boost::mpi::broadcast(world_, block_rows_columns_, 0);
 }
@@ -266,7 +265,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
-  InitializeAndBroadcastParams();
   output_matrix_C_.resize(dimension_ * dimension_, 0.0);
   local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
   local_input_matrix_B_.resize(block_dimension_ * block_dimension_, 0.0);
