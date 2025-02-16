@@ -76,7 +76,8 @@ TEST(malyshev_lent_horizontal, test_1x1_matrix) {
   int32_t max_value = 300;
 
   // Create data
-  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<std::vector<int32_t>> in =
+      malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
   std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
   std::vector<int32_t> out_par(rows, 0);
 
@@ -122,7 +123,8 @@ TEST(malyshev_lent_horizontal, test_1x_matrix) {
   int32_t max_value = 300;
 
   // Create data
-  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<std::vector<int32_t>> in =
+      malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
   std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
   std::vector<int32_t> out_par(rows, 0);
 
@@ -168,7 +170,8 @@ TEST(malyshev_lent_horizontal, test_x1_matrix) {
   int32_t max_value = 300;
 
   // Create data
-  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<std::vector<int32_t>> in =
+      malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
   std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
   std::vector<int32_t> out_par(rows, 0);
 
@@ -214,7 +217,8 @@ TEST(malyshev_lent_horizontal, test_random_matrix) {
   int32_t max_value = 300;
 
   // Create data
-  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<std::vector<int32_t>> in =
+      malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
   std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
   std::vector<int32_t> out_par(rows, 0);
 
