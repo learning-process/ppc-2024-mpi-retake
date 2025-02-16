@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/veliev_e_sum_values_by_rows_matrix/include/rows_m_header.hpp"
 TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
-  std::vector base_input = {10000000, 1000, 10000};
+  std::vector base_input = {100000000, 10000, 10000};
 
   // Create data
   boost::mpi::communicator world;
@@ -54,7 +54,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
 }
 
 TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_task_run) {
-  std::vector base_input = {10000000, 1000, 10000};
+  std::vector base_input = {100000000, 10000, 10000};
 
   // Create data
   boost::mpi::communicator world;

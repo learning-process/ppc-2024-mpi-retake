@@ -10,7 +10,7 @@
 #include "seq/veliev_e_sum_values_by_rows_matrix/include/seq_rows_m_header.hpp"
 
 TEST(veliev_e_sum_values_by_rows_matrix_seq, test_pipeline_run) {
-  std::vector base_input = {10000000, 1000, 10000};
+  std::vector base_input = {100000000, 10000, 10000};
 
   // Create data
   std::vector<int> arr(base_input[0]);
@@ -51,7 +51,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_pipeline_run) {
 }
 
 TEST(veliev_e_sum_values_by_rows_matrix_seq, test_task_run) {
-  std::vector base_input = {10000000, 1000, 10000};
+  std::vector base_input = {100000000, 10000, 10000};
 
   // Create data
   std::vector<int> arr(base_input[0]);
