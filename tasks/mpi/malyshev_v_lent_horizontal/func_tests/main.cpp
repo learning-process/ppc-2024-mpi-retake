@@ -69,10 +69,10 @@ TEST(malyshev_lent_horizontal, test_vertical_stretched_matrix_100x75) {
     taskDataPar->outputs_count.push_back(rows);
   }
 
-  ASSERT_TRUE(taskMPI.validation());
-  ASSERT_TRUE(taskMPI.pre_processing());
-  ASSERT_TRUE(taskMPI.run());
-  ASSERT_TRUE(taskMPI.post_processing());
+  ASSERT_TRUE(taskMPI.Validation());
+  ASSERT_TRUE(taskMPI.PreProcessing());
+  ASSERT_TRUE(taskMPI.Run());
+  ASSERT_TRUE(taskMPI.PostProcessing());
 
   if (world.rank() == 0) {
     std::vector<int32_t> seqResult(rows);
@@ -91,10 +91,10 @@ TEST(malyshev_lent_horizontal, test_vertical_stretched_matrix_100x75) {
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
     taskDataSeq->outputs_count.push_back(seqResult.size());
 
-    ASSERT_TRUE(taskSeq.validation());
-    ASSERT_TRUE(taskSeq.pre_processing());
-    ASSERT_TRUE(taskSeq.run());
-    ASSERT_TRUE(taskSeq.post_processing());
+    ASSERT_TRUE(taskSeq.Validation());
+    ASSERT_TRUE(taskSeq.PreProcessing());
+    ASSERT_TRUE(taskSeq.Run());
+    ASSERT_TRUE(taskSeq.PostProcessing());
 
     for (uint32_t i = 0; i < mpiResult.size(); i++) {
       ASSERT_EQ(seqResult[i], mpiResult[i]);
@@ -133,10 +133,10 @@ TEST(malyshev_lent_horizontal, test_horizontal_stretched_matrix_7x17) {
     taskDataPar->outputs_count.push_back(rows);
   }
 
-  ASSERT_TRUE(taskMPI.validation());
-  ASSERT_TRUE(taskMPI.pre_processing());
-  ASSERT_TRUE(taskMPI.run());
-  ASSERT_TRUE(taskMPI.post_processing());
+  ASSERT_TRUE(taskMPI.Validation());
+  ASSERT_TRUE(taskMPI.PreProcessing());
+  ASSERT_TRUE(taskMPI.Run());
+  ASSERT_TRUE(taskMPI.PostProcessing());
 
   if (world.rank() == 0) {
     std::vector<int32_t> seqResult(rows);
@@ -155,10 +155,10 @@ TEST(malyshev_lent_horizontal, test_horizontal_stretched_matrix_7x17) {
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
     taskDataSeq->outputs_count.push_back(seqResult.size());
 
-    ASSERT_TRUE(taskSeq.validation());
-    ASSERT_TRUE(taskSeq.pre_processing());
-    ASSERT_TRUE(taskSeq.run());
-    ASSERT_TRUE(taskSeq.post_processing());
+    ASSERT_TRUE(taskSeq.Validation());
+    ASSERT_TRUE(taskSeq.PreProcessing());
+    ASSERT_TRUE(taskSeq.Run());
+    ASSERT_TRUE(taskSeq.PostProcessing());
 
     for (uint32_t i = 0; i < mpiResult.size(); i++) {
       ASSERT_EQ(seqResult[i], mpiResult[i]);
@@ -197,10 +197,10 @@ TEST(malyshev_lent_horizontal, test_square_matrix_100x100) {
     taskDataPar->outputs_count.push_back(rows);
   }
 
-  ASSERT_TRUE(taskMPI.validation());
-  ASSERT_TRUE(taskMPI.pre_processing());
-  ASSERT_TRUE(taskMPI.run());
-  ASSERT_TRUE(taskMPI.post_processing());
+  ASSERT_TRUE(taskMPI.Validation());
+  ASSERT_TRUE(taskMPI.PreProcessing());
+  ASSERT_TRUE(taskMPI.Run());
+  ASSERT_TRUE(taskMPI.PostProcessing());
 
   if (world.rank() == 0) {
     std::vector<int32_t> seqResult(rows);
@@ -219,10 +219,10 @@ TEST(malyshev_lent_horizontal, test_square_matrix_100x100) {
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
     taskDataSeq->outputs_count.push_back(seqResult.size());
 
-    ASSERT_TRUE(taskSeq.validation());
-    ASSERT_TRUE(taskSeq.pre_processing());
-    ASSERT_TRUE(taskSeq.run());
-    ASSERT_TRUE(taskSeq.post_processing());
+    ASSERT_TRUE(taskSeq.Validation());
+    ASSERT_TRUE(taskSeq.PreProcessing());
+    ASSERT_TRUE(taskSeq.Run());
+    ASSERT_TRUE(taskSeq.PostProcessing());
 
     for (uint32_t i = 0; i < mpiResult.size(); i++) {
       ASSERT_EQ(seqResult[i], mpiResult[i]);
@@ -261,10 +261,10 @@ TEST(malyshev_lent_horizontal, test_single_element_matrix_1x1) {
     taskDataPar->outputs_count.push_back(rows);
   }
 
-  ASSERT_TRUE(taskMPI.validation());
-  ASSERT_TRUE(taskMPI.pre_processing());
-  ASSERT_TRUE(taskMPI.run());
-  ASSERT_TRUE(taskMPI.post_processing());
+  ASSERT_TRUE(taskMPI.Validation());
+  ASSERT_TRUE(taskMPI.PreProcessing());
+  ASSERT_TRUE(taskMPI.Run());
+  ASSERT_TRUE(taskMPI.PostProcessing());
 
   if (world.rank() == 0) {
     std::vector<int32_t> seqResult(rows);
@@ -283,10 +283,10 @@ TEST(malyshev_lent_horizontal, test_single_element_matrix_1x1) {
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
     taskDataSeq->outputs_count.push_back(seqResult.size());
 
-    ASSERT_TRUE(taskSeq.validation());
-    ASSERT_TRUE(taskSeq.pre_processing());
-    ASSERT_TRUE(taskSeq.run());
-    ASSERT_TRUE(taskSeq.post_processing());
+    ASSERT_TRUE(taskSeq.Validation());
+    ASSERT_TRUE(taskSeq.PreProcessing());
+    ASSERT_TRUE(taskSeq.Run());
+    ASSERT_TRUE(taskSeq.PostProcessing());
 
     for (uint32_t i = 0; i < mpiResult.size(); i++) {
       ASSERT_EQ(seqResult[i], mpiResult[i]);
@@ -324,7 +324,7 @@ TEST(malyshev_lent_horizontal, test_validation_failure) {
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
     taskDataPar->outputs_count.push_back(0);
 
-    ASSERT_FALSE(taskMPI.validation());
+    ASSERT_FALSE(taskMPI.Validation());
   }
 }
 
@@ -358,7 +358,7 @@ TEST(malyshev_lent_horizontal, test_size_mismatch) {
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
     taskDataPar->outputs_count.push_back(rows);
 
-    ASSERT_FALSE(taskMPI.validation());
+    ASSERT_FALSE(taskMPI.Validation());
   }
 }
 
@@ -387,10 +387,10 @@ TEST(malyshev_lent_horizontal, test_zero_values_mpi) {
     taskDataPar->outputs_count.push_back(mpiResult.size());
   }
 
-  ASSERT_TRUE(taskMPI.validation());
-  ASSERT_TRUE(taskMPI.pre_processing());
-  ASSERT_TRUE(taskMPI.run());
-  ASSERT_TRUE(taskMPI.post_processing());
+  ASSERT_TRUE(taskMPI.Validation());
+  ASSERT_TRUE(taskMPI.PreProcessing());
+  ASSERT_TRUE(taskMPI.Run());
+  ASSERT_TRUE(taskMPI.PostProcessing());
 
   if (world.rank() == 0) {
     for (uint32_t i = 0; i < mpiResult.size(); i++) {

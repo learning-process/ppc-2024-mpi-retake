@@ -67,10 +67,10 @@ TEST(malyshev_lent_horizontal, test_pipeline_run) {
 
   auto testMpiTaskParallel = std::make_shared<malyshev_lent_horizontal::TestTaskParallel>(taskDataPar);
 
-  ASSERT_TRUE(testMpiTaskParallel->validation());
-  ASSERT_TRUE(testMpiTaskParallel->pre_processing());
-  ASSERT_TRUE(testMpiTaskParallel->run());
-  ASSERT_TRUE(testMpiTaskParallel->post_processing());
+  ASSERT_TRUE(testMpiTaskParallel->Validation());
+  ASSERT_TRUE(testMpiTaskParallel->PreProcessing());
+  ASSERT_TRUE(testMpiTaskParallel->Run());
+  ASSERT_TRUE(testMpiTaskParallel->PostProcessing());
 
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -80,9 +80,9 @@ TEST(malyshev_lent_horizontal, test_pipeline_run) {
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
 
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
+  perfAnalyzer->PipelineRun(perfAttr, perfResults);
 
-  if (world.rank() == 0) ppc::core::Perf::print_perf_statistic(perfResults);
+  if (world.rank() == 0) perfAnalyzer->print_perf_statistic(perfResults);
 }
 
 TEST(malyshev_lent_horizontal, test_task_run) {
@@ -115,10 +115,10 @@ TEST(malyshev_lent_horizontal, test_task_run) {
 
   auto testMpiTaskParallel = std::make_shared<malyshev_lent_horizontal::TestTaskParallel>(taskDataPar);
 
-  ASSERT_TRUE(testMpiTaskParallel->validation());
-  ASSERT_TRUE(testMpiTaskParallel->pre_processing());
-  ASSERT_TRUE(testMpiTaskParallel->run());
-  ASSERT_TRUE(testMpiTaskParallel->post_processing());
+  ASSERT_TRUE(testMpiTaskParallel->Validation());
+  ASSERT_TRUE(testMpiTaskParallel->PreProcessing());
+  ASSERT_TRUE(testMpiTaskParallel->Run());
+  ASSERT_TRUE(testMpiTaskParallel->PostProcessing());
 
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -128,7 +128,7 @@ TEST(malyshev_lent_horizontal, test_task_run) {
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
 
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->task_run(perfAttr, perfResults);
+  perfAnalyzer->TaskRun(perfAttr, perfResults);
 
-  if (world.rank() == 0) ppc::core::Perf::print_perf_statistic(perfResults);
+  if (world.rank() == 0) perfAnalyzer->print_perf_statistic(perfResults);
 }
