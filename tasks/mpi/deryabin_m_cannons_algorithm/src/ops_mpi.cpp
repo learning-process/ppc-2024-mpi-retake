@@ -74,29 +74,19 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const {
   return (world_.size() == 1 || world_.size() != pow((unsigned short)sqrt(world_.size()), 2) ||
-          (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) %
-                  (unsigned short)sqrt(world_.size()) !=
-              0);
+          dimension_ % block_rows_columns_ != 0);
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase() {
   if (world_.rank() == 0) {
-    unsigned short i = 0;
-    unsigned short j = 0;
-    unsigned short count = 0;
     output_matrix_C_.resize(dimension_ * dimension_, 0.0);
-    while (i != dimension_) {
-      j = 0;
-      while (j != dimension_) {
-        count = 0;
-        while (count != dimension_) {
+    for (unsigned short i = 0; i < dimension_; ++i) {
+      for (unsigned short j = 0; j < dimension_; ++j) {
+        for (unsigned short k = 0; k < dimension_; ++k) {
           output_matrix_C_[(i * dimension_) + j] +=
-              input_matrix_A_[(i * dimension_) + count] * input_matrix_B_[(count * dimension_) + j];
-          count++;
+              input_matrix_A_[(i * dimension_) + k] * input_matrix_B_[(k * dimension_) + j];
         }
-        j++;
       }
-      i++;
     }
   }
 }
