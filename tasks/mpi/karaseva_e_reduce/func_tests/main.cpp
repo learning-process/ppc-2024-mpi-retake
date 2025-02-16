@@ -12,8 +12,8 @@ TEST(karaseva_e_reduce_mpi, test_reduce_large_matrix) {
   MPI_Comm_rank(world, &rank);
   MPI_Comm_size(world, &size);
 
-  constexpr size_t N = 1000;                 
-  std::vector<int> local_data(N, rank + 1);  
+  constexpr size_t N = 1000;
+  std::vector<int> local_data(N, rank + 1);
   std::vector<int> reduced_data(N, 0);
 
   // Create task_data
@@ -23,7 +23,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_large_matrix) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(reduced_data.data()));
   task_data_mpi->outputs_count.emplace_back(reduced_data.size());
 
-  //  Reduce
+  // Reduce
   karaseva_e_reduce_mpi::TestTaskMPI test_task_mpi(task_data_mpi, local_data.size());
   ASSERT_TRUE(test_task_mpi.Validation());
   test_task_mpi.PreProcessing();

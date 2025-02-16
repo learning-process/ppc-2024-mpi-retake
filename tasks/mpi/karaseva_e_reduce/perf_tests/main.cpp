@@ -15,8 +15,8 @@ TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
   constexpr int kCount = 500;
 
   // Create data
-  std::vector<int> in(kCount, 0);  
-  std::vector<int> out(1, 0);  
+  std::vector<int> in(kCount, 0);
+  std::vector<int> out(1, 0);
 
   boost::mpi::communicator world;
   if (world.rank() == 0) {
@@ -59,7 +59,7 @@ TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
 
   // Checking for rank 0 the result is equal to the number of elements
   if (world.rank() == 0) {
-    ASSERT_EQ(out[0], kCount);  
+    ASSERT_EQ(out[0], kCount);
   }
 }
 
@@ -67,13 +67,13 @@ TEST(karaseva_e_reduce_mpi, test_task_run) {
   constexpr int kCount = 500;
 
   // Create data
-  std::vector<int> in(kCount, 0);  
-  std::vector<int> out(1, 0);  
+  std::vector<int> in(kCount, 0);
+  std::vector<int> out(1, 0);
 
   boost::mpi::communicator world;
   if (world.rank() == 0) {
     for (size_t i = 0; i < kCount; ++i) {
-      in[i] = 1;  
+      in[i] = 1;
     }
   }
 
@@ -111,6 +111,6 @@ TEST(karaseva_e_reduce_mpi, test_task_run) {
 
   // Checking for rank 0 the result is equal to the number of elements
   if (world.rank() == 0) {
-    ASSERT_EQ(out[0], kCount);  
+    ASSERT_EQ(out[0], kCount);
   }
 }

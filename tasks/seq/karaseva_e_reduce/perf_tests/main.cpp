@@ -13,8 +13,8 @@
 TEST(karaseva_e_reduce_seq, test_pipeline_run) {
   constexpr int kCount = 500;
 
-  // Create data 
-  std::vector<int> in(kCount * kCount, 1);  
+  // Create data
+  std::vector<int> in(kCount * kCount, 1);
   std::vector<int> out(1, 0);
 
   // Create task_data
@@ -53,9 +53,9 @@ TEST(karaseva_e_reduce_seq, test_pipeline_run) {
 TEST(karaseva_e_reduce_seq, test_task_run) {
   constexpr int kCount = 500;
 
-  // Create data 
+  // Create data
   std::vector<int> in(kCount * kCount, 1);
-  std::vector<int> out(1, 0); 
+  std::vector<int> out(1, 0);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -86,6 +86,6 @@ TEST(karaseva_e_reduce_seq, test_task_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   // Checking that the output result is equal to the sum of all the elements
-  int expected_sum = kCount * kCount; 
+  int expected_sum = kCount * kCount;
   ASSERT_EQ(out[0], expected_sum);
 }

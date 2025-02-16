@@ -2,8 +2,8 @@
 
 #include <cmath>
 #include <cstddef>
-#include <numeric> 
-#include <iostream>  
+#include <numeric>
+#include <iostream>
 #include <vector>
 
 bool karaseva_e_reduce_seq::TestTaskSequential::PreProcessingImpl() {
@@ -12,7 +12,7 @@ bool karaseva_e_reduce_seq::TestTaskSequential::PreProcessingImpl() {
   input_ = std::vector<int>(in_ptr, in_ptr + input_size);  // int
 
   unsigned int output_size = task_data->outputs_count[0];
-  output_ = std::vector<int>(output_size, 0);  
+  output_ = std::vector<int>(output_size, 0);
 
   rc_size_ = static_cast<int>(std::sqrt(input_size));
 

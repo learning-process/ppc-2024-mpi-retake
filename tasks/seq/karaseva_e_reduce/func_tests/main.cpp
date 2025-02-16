@@ -28,9 +28,9 @@ TEST(karaseva_e_reduce_seq, test_reduce_50) {
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(in.size()); 
+  task_data_seq->inputs_count.emplace_back(in.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());  
+  task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
   karaseva_e_reduce_seq::TestTaskSequential test_task_sequential(task_data_seq);
@@ -53,11 +53,11 @@ TEST(karaseva_e_reduce_seq, test_reduce_100_from_file) {
   test_file.close();
 
   // Extracting the value from the file
-  const size_t count = std::stoi(line);  
+  const size_t count = std::stoi(line);
 
   // Create data
   std::vector<int> in(count * count, 0);
-  std::vector<int> out(1, 0);  
+  std::vector<int> out(1, 0);
 
   // Fill the diagonal with units
   for (size_t i = 0; i < count; i++) {

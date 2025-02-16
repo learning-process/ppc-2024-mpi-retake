@@ -3,7 +3,7 @@
 #include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <cstddef>
-#include <iostream>  
+#include <iostream>
 #include <numeric>
 #include <vector>
 
