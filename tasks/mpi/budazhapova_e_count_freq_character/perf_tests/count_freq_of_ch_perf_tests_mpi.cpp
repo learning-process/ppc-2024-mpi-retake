@@ -33,7 +33,7 @@ std::string GetRandomString(int length) {
 TEST(budazhapova_e_count_freq_chart_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::string global_str;
-  int size_string = 123456789;
+  int size_string = 12345678900;
   global_str = budazhapova_e_count_freq_chart_mpi::GetRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
@@ -73,7 +73,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_pipeline_run) {
 TEST(budazhapova_e_count_freq_chart_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::string global_str;
-  int size_string = 123456789;
+  int size_string = 12345678900;
   global_str = budazhapova_e_count_freq_chart_mpi ::GetRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
