@@ -103,14 +103,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
   }
 }
 
-void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::InitializeAndBroadcastParams() {
-  if (world_.rank() == 0) {
-
-  }
-  boost::mpi::broadcast(world_, block_dimension_, 0);
-  boost::mpi::broadcast(world_, block_rows_columns_, 0);
-}
-
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatrixAData(unsigned short i,
                                                                                         unsigned short j,
                                                                                         unsigned short k,
