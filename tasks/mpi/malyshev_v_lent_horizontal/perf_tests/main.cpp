@@ -67,10 +67,10 @@ TEST(malyshev_lent_horizontal, test_pipeline_run) {
 
   auto testMpiTaskParallel = std::make_shared<malyshev_lent_horizontal::TestTaskParallel>(taskDataPar);
 
-  ASSERT_TRUE(testMpiTaskParallel->Validation());
-  ASSERT_TRUE(testMpiTaskParallel->PreProcessing());
-  ASSERT_TRUE(testMpiTaskParallel->Run());
-  ASSERT_TRUE(testMpiTaskParallel->PostProcessing());
+  ASSERT_TRUE(testMpiTaskParallel->ValidationImpl());
+  ASSERT_TRUE(testMpiTaskParallel->PreProcessingImpl());
+  ASSERT_TRUE(testMpiTaskParallel->RunImpl());
+  ASSERT_TRUE(testMpiTaskParallel->PostProcessingImpl());
 
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -82,7 +82,7 @@ TEST(malyshev_lent_horizontal, test_pipeline_run) {
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
   perfAnalyzer->PipelineRun(perfAttr, perfResults);
 
-  if (world.rank() == 0) perfAnalyzer->print_perf_statistic(perfResults);
+  if (world.rank() == 0) perfAnalyzer->PrintPerfStatistic(perfResults);
 }
 
 TEST(malyshev_lent_horizontal, test_task_run) {
@@ -115,10 +115,10 @@ TEST(malyshev_lent_horizontal, test_task_run) {
 
   auto testMpiTaskParallel = std::make_shared<malyshev_lent_horizontal::TestTaskParallel>(taskDataPar);
 
-  ASSERT_TRUE(testMpiTaskParallel->Validation());
-  ASSERT_TRUE(testMpiTaskParallel->PreProcessing());
-  ASSERT_TRUE(testMpiTaskParallel->Run());
-  ASSERT_TRUE(testMpiTaskParallel->PostProcessing());
+  ASSERT_TRUE(testMpiTaskParallel->ValidationImpl());
+  ASSERT_TRUE(testMpiTaskParallel->PreProcessingImpl());
+  ASSERT_TRUE(testMpiTaskParallel->RunImpl());
+  ASSERT_TRUE(testMpiTaskParallel->PostProcessingImpl());
 
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
@@ -130,5 +130,5 @@ TEST(malyshev_lent_horizontal, test_task_run) {
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
   perfAnalyzer->TaskRun(perfAttr, perfResults);
 
-  if (world.rank() == 0) perfAnalyzer->print_perf_statistic(perfResults);
+  if (world.rank() == 0) perfAnalyzer->PrintPerfStatistic(perfResults);
 }

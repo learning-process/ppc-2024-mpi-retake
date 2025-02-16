@@ -13,10 +13,10 @@ namespace malyshev_lent_horizontal {
 class TestTaskSequential : public ppc::core::Task {
  public:
   explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
-  bool PreProcessing() override;
-  bool Validation() override;
-  bool Run() override;
-  bool PostProcessing() override;
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
 
  private:
   std::vector<std::vector<int32_t>> matrix_;
@@ -27,10 +27,10 @@ class TestTaskSequential : public ppc::core::Task {
 class TestTaskParallel : public ppc::core::Task {
  public:
   explicit TestTaskParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
-  bool PreProcessing() override;
-  bool Validation() override;
-  bool Run() override;
-  bool PostProcessing() override;
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
 
  private:
   std::vector<std::vector<int32_t>> matrix_, local_matrix_;
