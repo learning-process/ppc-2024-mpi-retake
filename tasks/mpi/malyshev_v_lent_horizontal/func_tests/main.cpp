@@ -10,7 +10,7 @@
 namespace malyshev_lent_horizontal {
 
 static std::vector<std::vector<int32_t>> generateRandomMatrix(uint32_t rows, uint32_t cols, int32_t min_value,
-                                                             int32_t max_value) {
+                                                              int32_t max_value) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<std::vector<int32_t>> data(rows, std::vector<int32_t>(cols));
