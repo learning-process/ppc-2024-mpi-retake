@@ -250,6 +250,10 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
+  if (static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) <
+          static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())))) {
+    HandleTrivialCase();
+          } else {
   InitializeAndBroadcastParams();
   output_matrix_C_.resize(dimension_ * dimension_, 0.0);
   local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
@@ -263,15 +267,14 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformC
   MultiplyLocalBlocks();
   PerformCannonShifts();
   GatherResults();
+          }
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl() {
   if (world_.size() != 1 && world_.size() == pow((unsigned short)sqrt(world_.size()), 2) &&
       static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) %
               static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size()))) ==
-          0 &&
-      static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) >
-          static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())))) {
+          0) {
     PerformCannonAlgorithm();
   } else {
     HandleTrivialCase();
