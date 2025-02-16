@@ -267,8 +267,8 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformC
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl() {
   if (world_.size() != 1 && world_.size() == pow((unsigned short)sqrt(world_.size()), 2) &&
-      !(static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) %
-        static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size()))))) {
+      static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) >
+        static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())))) {
     PerformCannonAlgorithm();
   } else {
     HandleTrivialCase();
