@@ -63,12 +63,12 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_parallel(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
+  ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
+  test_task_parallel.PreProcessingImpl();
+  test_task_parallel.RunImpl();
+  test_task_parallel.PostProcessingImpl();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
@@ -219,8 +219,8 @@ TEST(opolin_d_simple_iteration_method_mpi, test_singular_matrix) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    std::vector<double> A = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 5.0, 7.0, 9.0};
-    std::vector<double> b = {1.0, 2.0, 3.0};
+    A = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 5.0, 7.0, 9.0};
+    b = {1.0, 2.0, 3.0};
 
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
     task_data_mpi->inputs_count.emplace_back(x_out.size());
