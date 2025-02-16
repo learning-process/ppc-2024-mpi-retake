@@ -48,9 +48,9 @@ bool SumValuesByRowsMatrixMpi::RunImpl() {
   int myid = world_.rank();
   int world_size = world_.size();
   int original_rows_total = rows_total_;
-  int row_sz;
-  int rows_for_each;
-  int remainder;
+  int row_sz = 0;
+  int rows_for_each = 0;
+  int remainder = 0;
 
   // for 1 proc run
   if (world_size == 1) {
