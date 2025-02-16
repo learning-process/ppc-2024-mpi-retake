@@ -9,14 +9,14 @@ using namespace std::chrono_literals;
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PreProcessingImpl() {
   InternalOrderTest();
   // init data
-  auto* ptr = reinterpret_cast<double*>(task_data->inputs[1]);
+  auto *ptr = reinterpret_cast<double *>(task_data->inputs[1]);
   b_.assign(ptr, ptr + n_);
-  epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
+  epsilon_ = *reinterpret_cast<double *>(task_data->inputs[2]);
   C_.resize(n_ * n_, 0.0);
   d_.resize(n_, 0.0);
   Xold_.resize(n_, 0.0);
   Xnew_.resize(n_, 0.0);
-  max_iter_ = *reinterpret_cast<int*>(task_data->inputs[3]);
+  max_iter_ = *reinterpret_cast<int *>(task_data->inputs[3]);
   // generate C matrix and d vector
   for (size_t i = 0; i < n_; ++i) {
     for (size_t j = 0; j < n_; ++j) {
@@ -39,7 +39,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
 
   n_ = task_data->inputs_count[0];
   if (n_ <= 0) return false;
-  auto* ptr = reinterpret_cast<double*>(task_data->inputs[0]);
+  auto *ptr = reinterpret_cast<double *>(task_data->inputs[0]);
   A_.assign(ptr, ptr + n_ * n_);
   // check ranks
   size_t rankA = rank(A_, n_);
@@ -94,7 +94,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PostProcessingImpl() {
   InternalOrderTest();
   for (size_t i = 0; i < Xnew_.size(); i++) {
-    reinterpret_cast<int*>(task_data->outputs[0])[i] = Xnew_[i];
+    reinterpret_cast<int *>(task_data->outputs[0])[i] = Xnew_[i];
   }
   return true;
 }
@@ -165,31 +165,4 @@ bool opolin_d_simple_iteration_method_seq::isDiagonalDominance(std::vector<doubl
     }
   }
   return true;
-}
-
-void opolin_d_simple_iteration_method_seq::generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
-  std::srand(static_cast<unsigned>(std::time(nullptr)));
-
-  X.resize(size);
-  for (size_t i = 0; i < size; ++i) {
-    X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
-  }
-
-  A.resize(size * size, 0.0);
-  for (size_t i = 0; i < size; ++i) {
-    double sum = 0.0;
-    for (size_t j = 0; j < size; ++j) {
-      if (i != j) {
-        A[i * size + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
-        sum += std::abs(A[i * size + j]);
-      }
-    }
-    A[i * size + i] = sum + 1.0;
-  }
-  b.resize(size, 0.0);
-  for (size_t i = 0; i < size; ++i) {
-    for (size_t j = 0; j < size; ++j) {
-      b[i] += A[i * size + j] * X[j];
-    }
-  }
 }

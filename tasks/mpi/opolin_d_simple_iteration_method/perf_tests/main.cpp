@@ -19,7 +19,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
   for (size_t i = 0; i < size; ++i) {
     X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
-    
+
   A.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
@@ -65,7 +65,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data_mpi->outputs_count.emplace_back(out.size());
   }
-  
+
   auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::TestTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

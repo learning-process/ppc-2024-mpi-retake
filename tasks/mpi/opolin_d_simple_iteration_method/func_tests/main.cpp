@@ -20,7 +20,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
   for (size_t i = 0; i < size; ++i) {
     X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
-    
+
   A.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
@@ -49,7 +49,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   int maxIters = 10000;
 
   std::vector<double> x_ref, A, b;
-  
+
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
@@ -83,7 +83,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
   int maxIters = 10000;
 
   std::vector<double> x_ref, A, b;
-  
+
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
@@ -178,7 +178,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_negative_values) {
   int maxIters = 10000;
 
   std::vector<double> x_ref, A, b;
-  
+
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
@@ -228,7 +228,6 @@ TEST(opolin_d_simple_iteration_method_mpi, test_singular_matrix) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
-
   }
   opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
   if (world.rank() == 0) {

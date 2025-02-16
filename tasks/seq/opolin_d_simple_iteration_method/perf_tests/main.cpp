@@ -18,7 +18,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
   for (size_t i = 0; i < size; ++i) {
     X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
-    
+
   A.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
