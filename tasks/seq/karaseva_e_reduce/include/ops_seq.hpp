@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -11,6 +12,7 @@ namespace karaseva_e_reduce_seq {
 class TestTaskSequential : public ppc::core::Task {
  public:
   explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  ~TestTaskSequential() override = default;
 
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
@@ -18,8 +20,9 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_, output_;
-  int rc_size_{};
+  std::vector<int> input_;
+  std::vector<int> output_;
+  std::size_t rc_size_{};
 };
 
 }  // namespace karaseva_e_reduce_seq
