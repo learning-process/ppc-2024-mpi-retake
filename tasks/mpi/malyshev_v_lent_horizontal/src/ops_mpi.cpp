@@ -5,10 +5,10 @@
 #include <vector>
 
 bool malyshev_lent_horizontal::TestTaskSequential::pre_processing() {
-  internal_order_test();
+  InternalOrderTest();
 
-  uint32_t rows = taskData->inputs_count[0];
-  uint32_t cols = taskData->inputs_count[1];
+  uint32_t rows = task_data->inputs_count[0];
+  uint32_t cols = task_data->inputs_count[1];
 
   matrix_.resize(rows, std::vector<int32_t>(cols));
   vector_.resize(cols);
@@ -16,24 +16,24 @@ bool malyshev_lent_horizontal::TestTaskSequential::pre_processing() {
 
   int32_t* data;
   for (uint32_t i = 0; i < matrix_.size(); i++) {
-    data = reinterpret_cast<int32_t*>(taskData->inputs[i]);
+    data = reinterpret_cast<int32_t*>(task_data->inputs[i]);
     std::copy(data, data + cols, matrix_[i].data());
   }
 
-  data = reinterpret_cast<int32_t*>(taskData->inputs[rows]);
+  data = reinterpret_cast<int32_t*>(task_data->inputs[rows]);
   std::copy(data, data + cols, vector_.data());
 
   return true;
 }
 
 bool malyshev_lent_horizontal::TestTaskSequential::validation() {
-  internal_order_test();
+  InternalOrderTest();
 
-  uint32_t rows = taskData->inputs_count[0];
-  uint32_t cols = taskData->inputs_count[1];
-  uint32_t vector_size = taskData->inputs_count[2];
+  uint32_t rows = task_data->inputs_count[0];
+  uint32_t cols = task_data->inputs_count[1];
+  uint32_t vector_size = task_data->inputs_count[2];
 
-  if (taskData->inputs.size() != rows + 1 || taskData->inputs_count.size() < 3) {
+  if (task_data->inputs.size() != rows + 1 || task_data->inputs_count.size() < 3) {
     return false;
   }
 
@@ -41,11 +41,11 @@ bool malyshev_lent_horizontal::TestTaskSequential::validation() {
     return false;
   }
 
-  return taskData->outputs_count[0] == taskData->inputs_count[0];
+  return task_data->outputs_count[0] == task_data->inputs_count[0];
 }
 
 bool malyshev_lent_horizontal::TestTaskSequential::run() {
-  internal_order_test();
+  InternalOrderTest();
 
   for (uint32_t i = 0; i < matrix_.size(); i++) {
     result_[i] = 0;
@@ -58,19 +58,19 @@ bool malyshev_lent_horizontal::TestTaskSequential::run() {
 }
 
 bool malyshev_lent_horizontal::TestTaskSequential::post_processing() {
-  internal_order_test();
+  InternalOrderTest();
 
-  std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(taskData->outputs[0]));
+  std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(task_data->outputs[0]));
 
   return true;
 }
 
 bool malyshev_lent_horizontal::TestTaskParallel::pre_processing() {
-  internal_order_test();
+  InternalOrderTest();
 
   if (world.rank() == 0) {
-    uint32_t rows = taskData->inputs_count[0];
-    uint32_t cols = taskData->inputs_count[1];
+    uint32_t rows = task_data->inputs_count[0];
+    uint32_t cols = task_data->inputs_count[1];
 
     delta_ = rows / world.size();
     ext_ = rows % world.size();
@@ -81,11 +81,11 @@ bool malyshev_lent_horizontal::TestTaskParallel::pre_processing() {
 
     int32_t* data;
     for (uint32_t i = 0; i < matrix_.size(); i++) {
-      data = reinterpret_cast<int32_t*>(taskData->inputs[i]);
+      data = reinterpret_cast<int32_t*>(task_data->inputs[i]);
       std::copy(data, data + cols, matrix_[i].data());
     }
 
-    data = reinterpret_cast<int32_t*>(taskData->inputs[rows]);
+    data = reinterpret_cast<int32_t*>(task_data->inputs[rows]);
     std::copy(data, data + cols, vector_.data());
   }
 
@@ -93,14 +93,14 @@ bool malyshev_lent_horizontal::TestTaskParallel::pre_processing() {
 }
 
 bool malyshev_lent_horizontal::TestTaskParallel::validation() {
-  internal_order_test();
+  InternalOrderTest();
 
   if (world.rank() == 0) {
-    uint32_t rows = taskData->inputs_count[0];
-    uint32_t cols = taskData->inputs_count[1];
-    uint32_t vector_size = taskData->inputs_count[2];
+    uint32_t rows = task_data->inputs_count[0];
+    uint32_t cols = task_data->inputs_count[1];
+    uint32_t vector_size = task_data->inputs_count[2];
 
-    if (taskData->inputs.size() != rows + 1 || taskData->inputs_count.size() < 3) {
+    if (task_data->inputs.size() != rows + 1 || task_data->inputs_count.size() < 3) {
       return false;
     }
 
@@ -108,14 +108,14 @@ bool malyshev_lent_horizontal::TestTaskParallel::validation() {
       return false;
     }
 
-    return taskData->outputs_count[0] == taskData->inputs_count[0];
+    return task_data->outputs_count[0] == task_data->inputs_count[0];
   }
 
   return true;
 }
 
 bool malyshev_lent_horizontal::TestTaskParallel::run() {
-  internal_order_test();
+  InternalOrderTest();
 
   broadcast(world, delta_, 0);
   broadcast(world, ext_, 0);
@@ -144,10 +144,10 @@ bool malyshev_lent_horizontal::TestTaskParallel::run() {
 }
 
 bool malyshev_lent_horizontal::TestTaskParallel::post_processing() {
-  internal_order_test();
+  InternalOrderTest();
 
   if (world.rank() == 0) {
-    std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(taskData->outputs[0]));
+    std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(task_data->outputs[0]));
   }
 
   return true;
