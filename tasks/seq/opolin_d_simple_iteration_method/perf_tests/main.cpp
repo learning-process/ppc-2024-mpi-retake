@@ -10,7 +10,7 @@
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
 namespace opolin_d_simple_iteration_method_seq {
-
+namespace {
 void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -18,7 +18,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
   for (size_t i = 0; i < size; ++i) {
     X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
-
+    
   A.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
@@ -37,7 +37,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
     }
   }
 }
-
+}  // namespace
 }  // namespace opolin_d_simple_iteration_method_seq
 
 TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
@@ -45,8 +45,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
-  opolin_d_simple_iteration_method_seq::generateTestData(size, X, A, b);
+
   std::vector<double> out(size, 0);
+  opolin_d_simple_iteration_method_seq::generateTestData(size, X, A, b);
+
   double epsilon = 1e-7;
   int maxIters = 10000;
   // Create TaskData

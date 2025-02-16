@@ -16,7 +16,6 @@ namespace opolin_d_simple_iteration_method_mpi {
 
 size_t rank(std::vector<double> matrix, size_t n);
 bool isDiagonalDominance(std::vector<double> mat, size_t dim);
-
 class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}

@@ -11,7 +11,7 @@
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
 namespace opolin_d_simple_iteration_method_seq {
-
+namespace {
 void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -19,7 +19,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
   for (size_t i = 0; i < size; ++i) {
     X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
-
+    
   A.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
@@ -38,7 +38,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
     }
   }
 }
-
+}  // namespace
 }  // namespace opolin_d_simple_iteration_method_seq
 
 TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
@@ -60,10 +60,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }
@@ -88,10 +88,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }
@@ -119,10 +119,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_negative_values) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }
@@ -148,10 +148,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }
@@ -175,7 +175,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_no_dominance_matrix) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), false);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), false);
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_singular_matrix) {
@@ -197,7 +197,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_singular_matrix) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), false);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), false);
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_random_generated_data) {
@@ -219,10 +219,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_random_generated_data) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }
@@ -250,10 +250,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_correct_input) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }
@@ -281,10 +281,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_simple_matrix) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   opolin_d_simple_iteration_method_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(expectedX[i], out[i], 1e-3);
   }

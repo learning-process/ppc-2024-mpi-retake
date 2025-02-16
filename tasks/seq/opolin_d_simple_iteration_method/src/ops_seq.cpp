@@ -166,3 +166,30 @@ bool opolin_d_simple_iteration_method_seq::isDiagonalDominance(std::vector<doubl
   }
   return true;
 }
+
+void opolin_d_simple_iteration_method_seq::generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
+  std::srand(static_cast<unsigned>(std::time(nullptr)));
+
+  X.resize(size);
+  for (size_t i = 0; i < size; ++i) {
+    X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
+  }
+
+  A.resize(size * size, 0.0);
+  for (size_t i = 0; i < size; ++i) {
+    double sum = 0.0;
+    for (size_t j = 0; j < size; ++j) {
+      if (i != j) {
+        A[i * size + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
+        sum += std::abs(A[i * size + j]);
+      }
+    }
+    A[i * size + i] = sum + 1.0;
+  }
+  b.resize(size, 0.0);
+  for (size_t i = 0; i < size; ++i) {
+    for (size_t j = 0; j < size; ++j) {
+      b[i] += A[i * size + j] * X[j];
+    }
+  }
+}
