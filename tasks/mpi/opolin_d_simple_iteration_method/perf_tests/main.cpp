@@ -1,6 +1,8 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <random>
 #include <string>
 #include <vector>
@@ -103,7 +105,6 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   if (world.rank() == 0) {
     opolin_d_simple_iteration_method_mpi::generateTestData(size, X, A, b);
     // Create TaskData
-    auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
     task_data_mpi->inputs_count.emplace_back(out.size());
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
