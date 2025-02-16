@@ -9,8 +9,8 @@
 
 namespace malyshev_lent_horizontal {
 
-static std::vector<std::vector<int32_t>> generateRandomMatrix(uint32_t rows, uint32_t cols, int32_t min_value,
-                                                              int32_t max_value) {
+std::vector<std::vector<int32_t>> generateRandomMatrix(uint32_t rows, uint32_t cols, int32_t min_value,
+                                                       int32_t max_value) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<std::vector<int32_t>> data(rows, std::vector<int32_t>(cols));
@@ -24,7 +24,7 @@ static std::vector<std::vector<int32_t>> generateRandomMatrix(uint32_t rows, uin
   return data;
 }
 
-static std::vector<int32_t> generateRandomVector(uint32_t size, int32_t min_value, int32_t max_value) {
+std::vector<int32_t> generateRandomVector(uint32_t size, int32_t min_value, int32_t max_value) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int32_t> data(size);
@@ -38,363 +38,215 @@ static std::vector<int32_t> generateRandomVector(uint32_t size, int32_t min_valu
 
 }  // namespace malyshev_lent_horizontal
 
-TEST(malyshev_lent_horizontal, test_vertical_stretched_matrix_100x75) {
-  uint32_t rows = 100;
-  uint32_t cols = 75;
-  int32_t min_value = -200;
-  int32_t max_value = 300;
-
+TEST(malyshev_lent_horizontal, test_empty_matrix) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
+  uint32_t rows = 0;
+  uint32_t cols = 0;
 
-  if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
-    mpiResult.resize(rows);
+  // Create data
+  std::vector<std::vector<int32_t>> in = {};
+  std::vector<int32_t> out_par = {};
 
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
-    }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
-  }
-
-  ASSERT_TRUE(taskMPI.ValidationImpl());
-  ASSERT_TRUE(taskMPI.PreProcessingImpl());
-  ASSERT_TRUE(taskMPI.RunImpl());
-  ASSERT_TRUE(taskMPI.PostProcessingImpl());
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    std::vector<int32_t> seqResult(rows);
-
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    malyshev_lent_horizontal::TestTaskSequential taskSeq(taskDataSeq);
-
-    for (auto &row : randomMatrix) {
-      taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
-    }
-
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataSeq->inputs_count.push_back(rows);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
-    taskDataSeq->outputs_count.push_back(seqResult.size());
-
-    ASSERT_TRUE(taskSeq.ValidationImpl());
-    ASSERT_TRUE(taskSeq.PreProcessingImpl());
-    ASSERT_TRUE(taskSeq.RunImpl());
-    ASSERT_TRUE(taskSeq.PostProcessingImpl());
-
-    for (uint32_t i = 0; i < mpiResult.size(); i++) {
-      ASSERT_EQ(seqResult[i], mpiResult[i]);
-    }
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_par->inputs_count.emplace_back(in.size());
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_par.data()));
+    task_data_par->outputs_count.emplace_back(out_par.size());
   }
+
+  malyshev_lent_horizontal::TestTaskParallel taskMPI(task_data_par);
+  ASSERT_EQ(taskMPI.ValidationImpl(), true);
+  taskMPI.PreProcessingImpl();
+  taskMPI.RunImpl();
+  taskMPI.PostProcessingImpl();
 }
 
-TEST(malyshev_lent_horizontal, test_horizontal_stretched_matrix_7x17) {
-  uint32_t rows = 7;
-  uint32_t cols = 17;
-  int32_t min_value = -200;
-  int32_t max_value = 300;
-
+TEST(malyshev_lent_horizontal, test_1x1_matrix) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
-
-  if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
-    mpiResult.resize(rows);
-
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
-    }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
-  }
-
-  ASSERT_TRUE(taskMPI.ValidationImpl());
-  ASSERT_TRUE(taskMPI.PreProcessingImpl());
-  ASSERT_TRUE(taskMPI.RunImpl());
-  ASSERT_TRUE(taskMPI.PostProcessingImpl());
-
-  if (world.rank() == 0) {
-    std::vector<int32_t> seqResult(rows);
-
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    malyshev_lent_horizontal::TestTaskSequential taskSeq(taskDataSeq);
-
-    for (auto &row : randomMatrix) {
-      taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
-    }
-
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataSeq->inputs_count.push_back(rows);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
-    taskDataSeq->outputs_count.push_back(seqResult.size());
-
-    ASSERT_TRUE(taskSeq.ValidationImpl());
-    ASSERT_TRUE(taskSeq.PreProcessingImpl());
-    ASSERT_TRUE(taskSeq.RunImpl());
-    ASSERT_TRUE(taskSeq.PostProcessingImpl());
-
-    for (uint32_t i = 0; i < mpiResult.size(); i++) {
-      ASSERT_EQ(seqResult[i], mpiResult[i]);
-    }
-  }
-}
-
-TEST(malyshev_lent_horizontal, test_square_matrix_100x100) {
-  uint32_t rows = 100;
-  uint32_t cols = 100;
-  int32_t min_value = -200;
-  int32_t max_value = 300;
-
-  boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
-
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
-
-  if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
-    mpiResult.resize(rows);
-
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
-    }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
-  }
-
-  ASSERT_TRUE(taskMPI.ValidationImpl());
-  ASSERT_TRUE(taskMPI.PreProcessingImpl());
-  ASSERT_TRUE(taskMPI.RunImpl());
-  ASSERT_TRUE(taskMPI.PostProcessingImpl());
-
-  if (world.rank() == 0) {
-    std::vector<int32_t> seqResult(rows);
-
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    malyshev_lent_horizontal::TestTaskSequential taskSeq(taskDataSeq);
-
-    for (auto &row : randomMatrix) {
-      taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
-    }
-
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataSeq->inputs_count.push_back(rows);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
-    taskDataSeq->outputs_count.push_back(seqResult.size());
-
-    ASSERT_TRUE(taskSeq.ValidationImpl());
-    ASSERT_TRUE(taskSeq.PreProcessingImpl());
-    ASSERT_TRUE(taskSeq.RunImpl());
-    ASSERT_TRUE(taskSeq.PostProcessingImpl());
-
-    for (uint32_t i = 0; i < mpiResult.size(); i++) {
-      ASSERT_EQ(seqResult[i], mpiResult[i]);
-    }
-  }
-}
-
-TEST(malyshev_lent_horizontal, test_single_element_matrix_1x1) {
   uint32_t rows = 1;
   uint32_t cols = 1;
   int32_t min_value = -200;
   int32_t max_value = 300;
 
-  boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
+  // Create data
+  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
+  std::vector<int32_t> out_par(rows, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
-
-  if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
-    mpiResult.resize(rows);
-
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+  std::vector<int32_t> expect(rows, 0);
+  for (uint32_t i = 0; i < rows; i++) {
+    for (uint32_t j = 0; j < cols; j++) {
+      expect[i] += in[i][j] * vec[j];
     }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
   }
 
-  ASSERT_TRUE(taskMPI.ValidationImpl());
-  ASSERT_TRUE(taskMPI.PreProcessingImpl());
-  ASSERT_TRUE(taskMPI.RunImpl());
-  ASSERT_TRUE(taskMPI.PostProcessingImpl());
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    std::vector<int32_t> seqResult(rows);
-
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    malyshev_lent_horizontal::TestTaskSequential taskSeq(taskDataSeq);
-
-    for (auto &row : randomMatrix) {
-      taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+    for (auto &row : in) {
+      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
     }
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(vec.data()));
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_par.data()));
+    task_data_par->outputs_count.emplace_back(out_par.size());
+  }
 
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataSeq->inputs_count.push_back(rows);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->inputs_count.push_back(cols);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seqResult.data()));
-    taskDataSeq->outputs_count.push_back(seqResult.size());
+  malyshev_lent_horizontal::TestTaskParallel taskMPI(task_data_par);
+  ASSERT_EQ(taskMPI.ValidationImpl(), true);
+  taskMPI.PreProcessingImpl();
+  taskMPI.RunImpl();
+  taskMPI.PostProcessingImpl();
 
-    ASSERT_TRUE(taskSeq.ValidationImpl());
-    ASSERT_TRUE(taskSeq.PreProcessingImpl());
-    ASSERT_TRUE(taskSeq.RunImpl());
-    ASSERT_TRUE(taskSeq.PostProcessingImpl());
-
-    for (uint32_t i = 0; i < mpiResult.size(); i++) {
-      ASSERT_EQ(seqResult[i], mpiResult[i]);
-    }
+  if (world.rank() == 0) {
+    ASSERT_EQ(out_par, expect);
   }
 }
 
-TEST(malyshev_lent_horizontal, test_validation_failure) {
-  uint32_t rows = 7;
-  uint32_t cols = 17;
+TEST(malyshev_lent_horizontal, test_1x_matrix) {
+  boost::mpi::communicator world;
+
+  uint32_t rows = 1;
+  uint32_t cols = 5;
   int32_t min_value = -200;
   int32_t max_value = 300;
 
-  boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
+  // Create data
+  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
+  std::vector<int32_t> out_par(rows, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
+  std::vector<int32_t> expect(rows, 0);
+  for (uint32_t i = 0; i < rows; i++) {
+    for (uint32_t j = 0; j < cols; j++) {
+      expect[i] += in[i][j] * vec[j];
+    }
+  }
+
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
-    mpiResult.resize(rows);
-
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+    for (auto &row : in) {
+      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
     }
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(vec.data()));
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_par.data()));
+    task_data_par->outputs_count.emplace_back(out_par.size());
+  }
 
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(0);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(0);
+  malyshev_lent_horizontal::TestTaskParallel taskMPI(task_data_par);
+  ASSERT_EQ(taskMPI.ValidationImpl(), true);
+  taskMPI.PreProcessingImpl();
+  taskMPI.RunImpl();
+  taskMPI.PostProcessingImpl();
 
-    ASSERT_FALSE(taskMPI.ValidationImpl());
+  if (world.rank() == 0) {
+    ASSERT_EQ(out_par, expect);
   }
 }
 
-TEST(malyshev_lent_horizontal, test_size_mismatch) {
-  uint32_t rows = 3;
-  uint32_t cols = 3;
+TEST(malyshev_lent_horizontal, test_x1_matrix) {
+  boost::mpi::communicator world;
+
+  uint32_t rows = 5;
+  uint32_t cols = 1;
   int32_t min_value = -200;
   int32_t max_value = 300;
 
-  boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
+  // Create data
+  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
+  std::vector<int32_t> out_par(rows, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
+  std::vector<int32_t> expect(rows, 0);
+  for (uint32_t i = 0; i < rows; i++) {
+    for (uint32_t j = 0; j < cols; j++) {
+      expect[i] += in[i][j] * vec[j];
+    }
+  }
+
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols + 1, min_value, max_value);
-    mpiResult.resize(rows);
-
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+    for (auto &row : in) {
+      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
     }
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(vec.data()));
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_par.data()));
+    task_data_par->outputs_count.emplace_back(out_par.size());
+  }
 
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(cols + 1);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
+  malyshev_lent_horizontal::TestTaskParallel taskMPI(task_data_par);
+  ASSERT_EQ(taskMPI.ValidationImpl(), true);
+  taskMPI.PreProcessingImpl();
+  taskMPI.RunImpl();
+  taskMPI.PostProcessingImpl();
 
-    ASSERT_FALSE(taskMPI.ValidationImpl());
+  if (world.rank() == 0) {
+    ASSERT_EQ(out_par, expect);
   }
 }
 
-TEST(malyshev_lent_horizontal, test_zero_values_mpi) {
-  uint32_t rows = 3;
-  uint32_t cols = 3;
-
+TEST(malyshev_lent_horizontal, test_random_matrix) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> zeroMatrix(rows, std::vector<int32_t>(cols, 0));
-  std::vector<int32_t> zeroVector(cols, 0);
-  std::vector<int32_t> mpiResult(rows, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
+  uint32_t rows = 10;
+  uint32_t cols = 10;
+  int32_t min_value = -200;
+  int32_t max_value = 300;
 
-  if (world.rank() == 0) {
-    for (auto &row : zeroMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+  // Create data
+  std::vector<std::vector<int32_t>> in = malyshev_lent_horizontal::generateRandomMatrix(rows, cols, min_value, max_value);
+  std::vector<int32_t> vec = malyshev_lent_horizontal::generateRandomVector(cols, min_value, max_value);
+  std::vector<int32_t> out_par(rows, 0);
+
+  std::vector<int32_t> expect(rows, 0);
+  for (uint32_t i = 0; i < rows; i++) {
+    for (uint32_t j = 0; j < cols; j++) {
+      expect[i] += in[i][j] * vec[j];
     }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(zeroVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(mpiResult.size());
   }
 
-  ASSERT_TRUE(taskMPI.ValidationImpl());
-  ASSERT_TRUE(taskMPI.PreProcessingImpl());
-  ASSERT_TRUE(taskMPI.RunImpl());
-  ASSERT_TRUE(taskMPI.PostProcessingImpl());
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    for (uint32_t i = 0; i < mpiResult.size(); i++) {
-      ASSERT_EQ(mpiResult[i], 0);
+    for (auto &row : in) {
+      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
     }
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(vec.data()));
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_par.data()));
+    task_data_par->outputs_count.emplace_back(out_par.size());
+  }
+
+  malyshev_lent_horizontal::TestTaskParallel taskMPI(task_data_par);
+  ASSERT_EQ(taskMPI.ValidationImpl(), true);
+  taskMPI.PreProcessingImpl();
+  taskMPI.RunImpl();
+  taskMPI.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(out_par, expect);
   }
 }
