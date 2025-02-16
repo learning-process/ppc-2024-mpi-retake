@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
-#include <boost/mpi/collectives/broadcast.hpp>
 #include <cmath>
 #include <vector>
 
