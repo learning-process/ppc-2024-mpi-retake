@@ -11,23 +11,26 @@
 #include "core/util/include/util.hpp"
 #include "seq/karaseva_e_reduce/include/ops_seq.hpp"
 
-TEST(karaseva_e_reduce_seq, test_matmul_50) {
+TEST(karaseva_e_reduce_seq, test_reduce_50) {
   constexpr size_t kCount = 50;
 
   // Create data
   std::vector<int> in(kCount * kCount, 0);
-  std::vector<int> out(kCount * kCount, 0);
+  std::vector<int> out(1, 0);
 
+  // Fill the diagonal with units
   for (size_t i = 0; i < kCount; i++) {
     in[(i * kCount) + i] = 1;
   }
 
+  //std::cout << "Input data count: " << in.size() << std::endl;
+
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->inputs_count.emplace_back(in.size()); 
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  task_data_seq->outputs_count.emplace_back(out.size());  
 
   // Create Task
   karaseva_e_reduce_seq::TestTaskSequential test_task_sequential(task_data_seq);
@@ -35,10 +38,13 @@ TEST(karaseva_e_reduce_seq, test_matmul_50) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  EXPECT_EQ(in, out);
+
+  //std::cout << "Output data count: " << out.size() << std::endl;
+
+  EXPECT_EQ(out[0], kCount);  // Sum of all units on the diagonal = kCount
 }
 
-TEST(karaseva_e_reduce_seq, test_matmul_100_from_file) {
+TEST(karaseva_e_reduce_seq, test_reduce_100_from_file) {
   std::string line;
   std::ifstream test_file(ppc::util::GetAbsolutePath("seq/karaseva_e_reduce/data/test.txt"));
   if (test_file.is_open()) {
@@ -46,12 +52,14 @@ TEST(karaseva_e_reduce_seq, test_matmul_100_from_file) {
   }
   test_file.close();
 
-  const size_t count = std::stoi(line);
+  // Extracting the value from the file
+  const size_t count = std::stoi(line);  
 
   // Create data
   std::vector<int> in(count * count, 0);
-  std::vector<int> out(count * count, 0);
+  std::vector<int> out(1, 0);  
 
+  // Fill the diagonal with units
   for (size_t i = 0; i < count; i++) {
     in[(i * count) + i] = 1;
   }
@@ -69,5 +77,6 @@ TEST(karaseva_e_reduce_seq, test_matmul_100_from_file) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  EXPECT_EQ(in, out);
+
+  EXPECT_EQ(out[0], count);
 }

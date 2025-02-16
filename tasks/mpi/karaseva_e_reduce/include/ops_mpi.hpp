@@ -24,28 +24,9 @@ class TestTaskMPI : public ppc::core::Task {
  private:
   std::vector<int> input_, output_;
   int size_;       
-  int rc_size_{};  // после reduce
+  int rc_size_{};  // aftter reduce
 
   void ReduceBinaryTree(boost::mpi::communicator& world);
 };
 
 }  // namespace karaseva_e_reduce_mpi
-
-
-//namespace karaseva_e_reduce_mpi {
-//
-//class TestTaskMPI : public ppc::core::Task {
-// public:
-//  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
-//  bool PreProcessingImpl() override;
-//  bool ValidationImpl() override;
-//  bool RunImpl() override;
-//  bool PostProcessingImpl() override;
-//
-// private:
-//  std::vector<int> input_, output_;
-//  int rc_size_{};
-//  boost::mpi::communicator world_;
-//};
-//
-//}  // namespace karaseva_e_reduce_mpi

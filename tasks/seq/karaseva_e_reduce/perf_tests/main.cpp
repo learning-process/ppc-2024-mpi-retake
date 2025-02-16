@@ -13,13 +13,9 @@
 TEST(karaseva_e_reduce_seq, test_pipeline_run) {
   constexpr int kCount = 500;
 
-  // Create data
-  std::vector<int> in(kCount * kCount, 0);
-  std::vector<int> out(kCount * kCount, 0);
-
-  for (size_t i = 0; i < kCount; i++) {
-    in[(i * kCount) + i] = 1;
-  }
+  // Create data 
+  std::vector<int> in(kCount * kCount, 1);  
+  std::vector<int> out(1, 0);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -48,19 +44,18 @@ TEST(karaseva_e_reduce_seq, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  ASSERT_EQ(in, out);
+
+  // Checking that the output result is equal to the sum of all the elements
+  int expected_sum = kCount * kCount;  
+  ASSERT_EQ(out[0], expected_sum);
 }
 
 TEST(karaseva_e_reduce_seq, test_task_run) {
   constexpr int kCount = 500;
 
-  // Create data
-  std::vector<int> in(kCount * kCount, 0);
-  std::vector<int> out(kCount * kCount, 0);
-
-  for (size_t i = 0; i < kCount; i++) {
-    in[(i * kCount) + i] = 1;
-  }
+  // Create data 
+  std::vector<int> in(kCount * kCount, 1);
+  std::vector<int> out(1, 0); 
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -89,5 +84,8 @@ TEST(karaseva_e_reduce_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  ASSERT_EQ(in, out);
+
+  // Checking that the output result is equal to the sum of all the elements
+  int expected_sum = kCount * kCount; 
+  ASSERT_EQ(out[0], expected_sum);
 }
