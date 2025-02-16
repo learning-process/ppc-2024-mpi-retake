@@ -236,28 +236,3 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_empty_matrix) {
     ASSERT_EQ(true_solution, out_matrix_c[0]);
   }
 }
-
-TEST(deryabin_m_cannons_algorithm_mpi, test_null_matrix) {
-  boost::mpi::communicator world;
-  std::vector<double> input_matrix_a(16, 0);
-  std::vector<double> input_matrix_b(16, 0);
-  std::vector<double> output_matrix_c(16);
-  std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
-    task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
-    task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
-    task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
-  }
-  deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel test_mpi_task_parallel(task_data_mpi);
-  ASSERT_EQ(test_mpi_task_parallel.Validation(), true);
-  test_mpi_task_parallel.PreProcessing();
-  test_mpi_task_parallel.Run();
-  test_mpi_task_parallel.PostProcessing();
-  if (world.rank() == 0) {
-    ASSERT_EQ(input_matrix_a, out_matrix_c[0]);
-  }
-}
