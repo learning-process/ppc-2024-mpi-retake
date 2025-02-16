@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <cmath>
 #include <vector>
 
@@ -56,9 +57,6 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PreProce
     auto* tmp_ptr_b = reinterpret_cast<double*>(task_data->inputs[1]);
     std::copy(tmp_ptr_a, tmp_ptr_a + task_data->inputs_count[0], input_matrix_A_.begin());
     std::copy(tmp_ptr_b, tmp_ptr_b + task_data->inputs_count[1], input_matrix_B_.begin());
-    dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
-    block_rows_columns_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())));
-    block_dimension_ = dimension_ / block_rows_columns_;
   }
   return true;
 }
@@ -74,7 +72,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const {
   return (world_.size() == 1 || world_.size() != pow((unsigned short)sqrt(world_.size()), 2) ||
-          dimension_ % block_rows_columns_ != 0);
+          static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) % static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size()))) != 0);
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTrivialCase() {
@@ -89,6 +87,17 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
       }
     }
   }
+}
+
+void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::InitializeAndBroadcastParams() {
+  if (world_.rank() == 0) {
+    dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
+    block_rows_columns_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())));
+    block_dimension_ = dimension_ / block_rows_columns_;
+  }
+  boost::mpi::broadcast(world_, dimension_, 0);
+  boost::mpi::broadcast(world_, block_dimension_, 0);
+  boost::mpi::broadcast(world_, block_rows_columns_, 0);
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatrixAData(unsigned short i,
@@ -245,6 +254,7 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
 }
 
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
+  InitializeAndBroadcastParams();
   output_matrix_C_.resize(dimension_ * dimension_, 0.0);
   local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
   local_input_matrix_B_.resize(block_dimension_ * block_dimension_, 0.0);
