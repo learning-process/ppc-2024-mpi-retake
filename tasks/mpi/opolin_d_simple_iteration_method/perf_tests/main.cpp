@@ -98,6 +98,8 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   std::vector<double> b;
   std::vector<double> X;
   std::vector<double> out(size, 0.0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
   if (world.rank() == 0) {
     opolin_d_simple_iteration_method_mpi::generateTestData(size, X, A, b);
     // Create TaskData
@@ -125,7 +127,6 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   // Create Perf analyzer
-  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
