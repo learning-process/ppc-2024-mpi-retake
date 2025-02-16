@@ -53,7 +53,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   std::vector<double> x_ref, A, b;
 
   std::vector<double> x_out(size, 0.0);
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     opolin_d_simple_iteration_method_mpi::generateTestData(size, x_ref, A, b);
@@ -65,7 +65,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_parallel(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_parallel(task_data_mpi);
 
   ASSERT_EQ(test_task_parallel.Validation(), true);
   test_task_parallel.PreProcessing();
@@ -99,7 +99,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
   ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
   test_task_mpi.PreProcessingImpl();
@@ -134,7 +134,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_correct_input) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
   ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
   test_task_mpi.PreProcessingImpl();
@@ -167,7 +167,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_no_dominance_matrix) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
 
-    opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+    opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
     ASSERT_EQ(test_task_mpi.ValidationImpl(), false);
   }
@@ -196,7 +196,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_negative_values) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
   ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
   test_task_mpi.PreProcessingImpl();
@@ -232,7 +232,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_singular_matrix) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
   if (world.rank() == 0) {
     ASSERT_EQ(test_task_mpi.ValidationImpl(), false);
   }
@@ -262,7 +262,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_simple_matrix) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
   ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
@@ -296,7 +296,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_single_element) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(x_out.data()));
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
-  opolin_d_simple_iteration_method_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
   ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
   test_task_mpi.PreProcessingImpl();

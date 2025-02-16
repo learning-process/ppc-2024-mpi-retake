@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PreProcessingImpl() {
+bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingImpl() {
   InternalOrderTest();
   // init data
   if (world_.rank() == 0) {
@@ -36,7 +36,7 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PreProcessingImpl() {
   return true;
 }
 
-bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::ValidationImpl() {
+bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::ValidationImpl() {
   InternalOrderTest();
   // check input and output
   if (world_.rank() == 0) {
@@ -68,7 +68,7 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::ValidationImpl() {
   return true;
 }
 
-bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::RunImpl() {
+bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
   InternalOrderTest();
 
   broadcast(world_, n_, 0);
@@ -125,7 +125,7 @@ bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::RunImpl() {
   return true;
 }
 
-bool opolin_d_simple_iteration_method_mpi::TestTaskMPI::PostProcessingImpl() {
+bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingImpl() {
   InternalOrderTest();
   if (world_.rank() == 0) {
     for (size_t i = 0; i < Xnew_.size(); i++) {

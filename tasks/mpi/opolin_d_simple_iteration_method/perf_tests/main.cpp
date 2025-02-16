@@ -68,7 +68,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
     task_data_mpi->outputs_count.emplace_back(out.size());
   }
 
-  auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -113,7 +113,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
     task_data_mpi->outputs_count.emplace_back(out.size());
   }
-  auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
