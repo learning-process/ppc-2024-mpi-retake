@@ -47,24 +47,30 @@ bool SumValuesByRowsMatrixMpi::PreProcessingImpl() {
 bool SumValuesByRowsMatrixMpi::RunImpl() {
   int myid = world_.rank();
   int world_size = world_.size();
-  int row_sz = cols_total_;
   int original_rows_total = rows_total_;
-  int rows_for_each = rows_total_ / world_size;
-  int remainder = rows_total_ % world_size;
+  int row_sz;
+  int rows_for_each;
+  int remainder;
+
+  // for 1 proc run
+  if (world_size == 1) {
+    output_.resize(rows_total_);
+    for (int i = 0; i < rows_total_; ++i) {
+      output_[i] = std::accumulate(input_.begin() + i * cols_total_, input_.begin() + (i + 1) * cols_total_, 0);
+    }
+    return true;
+  }
+
   if (myid == 0) {
+    original_rows_total = rows_total_;
+    rows_for_each = rows_total_ / world_size;
+    remainder = rows_total_ % world_size;
+    row_sz = cols_total_;
     if (remainder != 0) {
       rows_total_ += (world_size - remainder);
       input_.resize(rows_total_ * row_sz, 0);
       rows_for_each = rows_total_ / world_size;
     }
-  }
-
-  if (world_size == 1) {
-    output_.resize(original_rows_total);
-    for (int i = 0; i < original_rows_total; ++i) {
-      output_[i] = std::accumulate(input_.begin() + i * row_sz, input_.begin() + (i + 1) * row_sz, 0);
-    }
-    return true;
   }
   broadcast(world_, row_sz, 0);
   broadcast(world_, rows_for_each, 0);
@@ -72,6 +78,7 @@ bool SumValuesByRowsMatrixMpi::RunImpl() {
   std::vector<int> loc_vec(row_sz * rows_for_each);
   scatter(world_, myid == 0 ? input_.data() : nullptr, loc_vec.data(), row_sz * rows_for_each, 0);
   std::vector<int> local_sums(rows_for_each, 0);
+
   for (int i = 0; i < rows_for_each; ++i) {
     local_sums[i] = std::accumulate(loc_vec.begin() + i * row_sz, loc_vec.begin() + (i + 1) * row_sz, 0);
   }

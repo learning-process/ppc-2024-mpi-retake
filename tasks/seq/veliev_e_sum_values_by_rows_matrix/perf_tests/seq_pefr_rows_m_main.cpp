@@ -14,6 +14,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_pipeline_run) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -55,6 +56,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_seq, test_task_run) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 

@@ -15,6 +15,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
   // Create data
   boost::mpi::communicator world;
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -48,9 +49,11 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_pipeline_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 
-  std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
-  ASSERT_EQ(out, ref_for_check);
+  if (world.rank() == 0) {
+    std::vector<int> ref_for_check;
+    veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
+    ASSERT_EQ(out, ref_for_check);
+  }
 }
 
 TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_task_run) {
@@ -59,6 +62,7 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_task_run) {
   // Create data
   boost::mpi::communicator world;
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_mpi::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -93,7 +97,9 @@ TEST(veliev_e_sum_values_by_rows_matrix_mpi, test_task_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 
-  std::vector<int> ref_for_check;
-  veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
-  ASSERT_EQ(out, ref_for_check);
+  if (world.rank() == 0) {
+    std::vector<int> ref_for_check;
+    veliev_e_sum_values_by_rows_matrix_mpi::SeqProcForChecking(arr, base_input[2], ref_for_check);
+    ASSERT_EQ(out, ref_for_check);
+  }
 }

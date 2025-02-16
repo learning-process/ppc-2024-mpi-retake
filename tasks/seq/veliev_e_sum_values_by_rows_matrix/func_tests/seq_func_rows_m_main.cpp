@@ -12,6 +12,7 @@ TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_0x0) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
@@ -37,6 +38,7 @@ TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_1x1) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
@@ -62,6 +64,7 @@ TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_10x10) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
@@ -87,6 +90,7 @@ TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_40x60) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
@@ -112,6 +116,7 @@ TEST(veliev_e_SumValuesByRowsMatrixSeq, Test_matr_100x100) {
 
   // Create data
   std::vector<int> arr(base_input[0]);
+  veliev_e_sum_values_by_rows_matrix_seq::GetRndMatrix(arr);
   std::vector<int> out(base_input[1]);
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(base_input.data()));  // num_elem + rows + cols
