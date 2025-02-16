@@ -208,6 +208,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_negative_values) {
 }
 
 TEST(opolin_d_simple_iteration_method_mpi, test_singular_matrix) {
+  boost::mpi::communicator world;
   int size = 3;
   double epsilon = 1e-8;
   int maxIters = 10000;

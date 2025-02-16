@@ -84,7 +84,6 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
-  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
