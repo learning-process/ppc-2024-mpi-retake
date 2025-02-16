@@ -81,10 +81,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
   if (world_.rank() == 0) {
     dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
     output_matrix_C_.resize(dimension_ * dimension_, 0.0);
-    if (dimension_ == 1) {
-      output_matrix_C_[0] = 1;
-      return;
-    }
     for (unsigned short i = 0; i < dimension_; i++) {
       for (unsigned short j = 0; j < dimension_; j++) {
         for (unsigned short k = 0; k < dimension_; k++) {
@@ -277,7 +273,18 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformC
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl() {
-  if (IsTrivialCase()) {
+  if (static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size()))) < static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())))) {
+    dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
+    output_matrix_C_.resize(dimension_ * dimension_, 0.0);
+    for (unsigned short i = 0; i < dimension_; i++) {
+      for (unsigned short j = 0; j < dimension_; j++) {
+        for (unsigned short k = 0; k < dimension_; k++) {
+          output_matrix_C_[(i * dimension_) + j] +=
+              input_matrix_A_[(i * dimension_) + k] * input_matrix_B_[(k * dimension_) + j];
+        }
+      }
+    }
+  } else if (IsTrivialCase()) {
     HandleTrivialCase();
   } else {
     PerformCannonAlgorithm();
