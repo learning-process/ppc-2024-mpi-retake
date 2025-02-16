@@ -71,7 +71,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::Validati
 }
 
 [[nodiscard]] bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::IsTrivialCase() const {
-  return (input_matrix_A_.size() == 1 || world_.size() == 1 ||
+  return (task_data->inputs_count[0] < world_.size() || world_.size() == 1 ||
           world_.size() != pow((unsigned short)sqrt(world_.size()), 2) ||
           (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size())) %
                   (unsigned short)sqrt(world_.size()) !=
