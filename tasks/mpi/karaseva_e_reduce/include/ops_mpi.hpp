@@ -11,10 +11,10 @@ namespace karaseva_e_reduce_mpi {
 
 class TestTaskMPI : public ppc::core::Task {
  public:
- explicit TestTaskMPI(ppc::core::TaskDataPtr task_data, int size) : Task(std::move(task_data)), size_(size) {
+    explicit TestTaskMPI(ppc::core::TaskDataPtr task_data, int size) : Task(std::move(task_data)), size_(size) {
     input_.resize(size_);
     output_.resize(size_);
-  }
+    }
 
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;

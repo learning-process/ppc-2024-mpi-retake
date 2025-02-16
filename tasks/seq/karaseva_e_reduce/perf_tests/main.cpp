@@ -46,7 +46,7 @@ TEST(karaseva_e_reduce_seq, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   // Checking that the output result is equal to the sum of all the elements
-  int expected_sum = kCount * kCount;  
+  int expected_sum = kCount * kCount;
   ASSERT_EQ(out[0], expected_sum);
 }
 

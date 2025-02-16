@@ -2,8 +2,8 @@
 
 #include <cmath>
 #include <cstddef>
-#include <numeric>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 bool karaseva_e_reduce_seq::TestTaskSequential::PreProcessingImpl() {

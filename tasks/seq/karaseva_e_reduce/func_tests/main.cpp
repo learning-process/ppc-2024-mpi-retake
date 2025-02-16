@@ -23,8 +23,6 @@ TEST(karaseva_e_reduce_seq, test_reduce_50) {
     in[(i * kCount) + i] = 1;
   }
 
-  //std::cout << "Input data count: " << in.size() << std::endl;
-
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
@@ -38,8 +36,6 @@ TEST(karaseva_e_reduce_seq, test_reduce_50) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-
-  //std::cout << "Output data count: " << out.size() << std::endl;
 
   EXPECT_EQ(out[0], kCount);  // Sum of all units on the diagonal = kCount
 }
