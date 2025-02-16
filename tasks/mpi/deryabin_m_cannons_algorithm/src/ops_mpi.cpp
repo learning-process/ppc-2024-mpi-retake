@@ -81,6 +81,10 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
   if (world_.rank() == 0) {
     dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
     output_matrix_C_.resize(dimension_ * dimension_, 0.0);
+    if (dimension_ == 1) {
+      output_matrix_C_[0] = 1;
+      return;
+    }
     for (unsigned short i = 0; i < dimension_; i++) {
       for (unsigned short j = 0; j < dimension_; j++) {
         for (unsigned short k = 0; k < dimension_; k++) {
