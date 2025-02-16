@@ -61,7 +61,7 @@ bool SumValuesByRowsMatrixMpi::RunImpl() {
     return true;
   }
 
-  if (myid == 0) {
+  if (world_.rank() == 0) {
     original_rows_total = rows_total_;
     rows_for_each = rows_total_ / world_size;
     remainder = rows_total_ % world_size;
@@ -83,13 +83,13 @@ bool SumValuesByRowsMatrixMpi::RunImpl() {
     local_sums[i] = std::accumulate(loc_vec.begin() + i * row_sz, loc_vec.begin() + (i + 1) * row_sz, 0);
   }
 
-  if (myid == 0) {
+  if (world_.rank() == 0) {
     output_.resize(rows_total_);
   }
 
   gather(world_, local_sums.data(), rows_for_each, output_.data(), 0);
 
-  if (myid == 0) {
+  if (world_.rank() == 0) {
     output_.resize(original_rows_total);
   }
 
