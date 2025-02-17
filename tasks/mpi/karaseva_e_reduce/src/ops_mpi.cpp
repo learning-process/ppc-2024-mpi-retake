@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstddef>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 
 template <typename T>
@@ -47,24 +48,24 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
     if (rank < partner_rank) {
       // The smaller process sends the data
-      if constexpr (std::is_same<T, float>::value) {
+      if constexpr (std::is_same_v<T, float>) {
         MPI_Send(&local_sum, 1, MPI_FLOAT, partner_rank, 0, MPI_COMM_WORLD);
-      } else if constexpr (std::is_same<T, double>::value) {
+      } else if constexpr (std::is_same_v<T, double>) {
         MPI_Send(&local_sum, 1, MPI_DOUBLE, partner_rank, 0, MPI_COMM_WORLD);
-      } else if constexpr (std::is_same<T, int>::value) {
+      } else if constexpr (std::is_same_v<T, int>) {
         MPI_Send(&local_sum, 1, MPI_INT, partner_rank, 0, MPI_COMM_WORLD);
       }
-      break;  // No need for "else" after "break"
+      break;
     }
 
     if (rank > partner_rank) {
       // A larger process receives the data
       T recv_data = 0;
-      if constexpr (std::is_same<T, float>::value) {
+      if constexpr (std::is_same_v<T, float>) {
         MPI_Recv(&recv_data, 1, MPI_FLOAT, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      } else if constexpr (std::is_same<T, double>::value) {
+      } else if constexpr (std::is_same_v<T, double>) {
         MPI_Recv(&recv_data, 1, MPI_DOUBLE, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      } else if constexpr (std::is_same<T, int>::value) {
+      } else if constexpr (std::is_same_v<T, int>) {
         MPI_Recv(&recv_data, 1, MPI_INT, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       }
       local_sum += recv_data;
