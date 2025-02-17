@@ -33,5 +33,5 @@ class NumOfAlternationsSignsMpi : public ppc::core::Task {
   std::vector<int> start;
   int res{};
   boost::mpi::communicator world;
- };
+};
 }  // namespace khovansky_d_num_of_alternations_signs_mpi
