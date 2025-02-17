@@ -11,6 +11,8 @@
 
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
+void FillInputImage(std::vector<uint8_t>& in, size_t kSize);
+
 void FillInputImage(std::vector<uint8_t>& in, size_t kSize) {
   for (size_t i = 0; i < kSize; ++i) {
     for (size_t j = 0; j < kSize; ++j) {
