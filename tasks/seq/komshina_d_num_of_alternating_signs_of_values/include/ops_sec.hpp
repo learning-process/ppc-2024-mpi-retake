@@ -20,4 +20,4 @@ class TestTaskSequential : public ppc::core::Task {
   int result_{};
 };
 
-}  // namespace komshina_d_num_of_alternating_signs_of_values_seq
+}  // namespace komshina_d_num_of_alternations_signs_seq

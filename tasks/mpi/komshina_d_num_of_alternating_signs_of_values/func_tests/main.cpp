@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"

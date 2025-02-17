@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
 #include <vector>
 
@@ -10,7 +9,6 @@
 #include "seq/komshina_d_num_of_alternating_signs_of_values/include/ops_sec.hpp"
 
 TEST(komshina_d_num_of_alternations_signs_seq, LongAlternatingWithZeros) {
-
   // Create data
   std::vector<int> in = {1, -1, 2, -2, 3, -3, 4, 5, -6, 7};
   std::vector<int> out(1, 0);
@@ -32,7 +30,6 @@ TEST(komshina_d_num_of_alternations_signs_seq, LongAlternatingWithZeros) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_seq, AlternatingWithZero) {
-
   // Create data
   std::vector<int> in = {9, 1, -10, 15, 3, 4, 8, -1};
   std::vector<int> out(1, 0);
@@ -54,7 +51,6 @@ TEST(komshina_d_num_of_alternations_signs_seq, AlternatingWithZero) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_seq, AllZeros) {
-
   // Create data
   std::vector<int> in = {1, 2, 3, 4, 5};
   std::vector<int> out(1, 0);
@@ -76,7 +72,6 @@ TEST(komshina_d_num_of_alternations_signs_seq, AllZeros) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_seq, AllZeros2) {
-
   // Create data
   std::vector<int> in = {-1, -2, -3, -4, -5};
   std::vector<int> out(1, 0);
@@ -98,7 +93,6 @@ TEST(komshina_d_num_of_alternations_signs_seq, AllZeros2) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_seq, OnePositive) {
-
   // Create data
   std::vector<int> in = {1};
   std::vector<int> out(1, 0);
@@ -116,7 +110,6 @@ TEST(komshina_d_num_of_alternations_signs_seq, OnePositive) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_seq, InvalidOutputCount) {
-
   // Create data
   std::vector<int> in = {1, -1, 2, -2};
   std::vector<int> out(2, 0);

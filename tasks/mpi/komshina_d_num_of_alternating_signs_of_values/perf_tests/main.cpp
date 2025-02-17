@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -11,7 +12,7 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
-  constexpr int input_size = 500;
+  const int input_size = 500;
 
   // Create data
   std::vector<int> in(input_size);
@@ -29,7 +30,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto task_data_mpi = std::make_shared<komshina_d_num_of_alternations_signs_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<komshina_d_num_of_alternations_signs_mpi::TestTaskMPI>(task_data_mpi);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -55,7 +56,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_mpi, test_task_Run) {
-  constexpr int input_size = 500;
+  const int input_size = 500;
 
   // Create data
   std::vector<int> in(input_size);
@@ -73,7 +74,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, test_task_Run) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto task_data_mpi = std::make_shared<komshina_d_num_of_alternations_signs_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<komshina_d_num_of_alternations_signs_mpi::TestTaskMPI>(task_data_mpi);
   
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

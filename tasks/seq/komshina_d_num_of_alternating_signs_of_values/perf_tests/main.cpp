@@ -11,7 +11,7 @@
 #include "seq/komshina_d_num_of_alternating_signs_of_values/include/ops_sec.hpp"
 
 TEST(komshina_d_num_of_alternations_signs_seq, test_pipeline_run) {
-  constexpr int input_size = 500;
+  const int input_size = 500;
 
   // Create data
   std::vector<int> in(input_size);
@@ -54,7 +54,7 @@ TEST(komshina_d_num_of_alternations_signs_seq, test_pipeline_run) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_seq, test_task_run) {
-  constexpr int input_size = 500;
+  const int input_size = 500;
 
   // Create data
   std::vector<int> in(input_size);

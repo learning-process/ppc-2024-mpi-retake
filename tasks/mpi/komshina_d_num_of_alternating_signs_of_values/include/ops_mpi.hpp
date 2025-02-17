@@ -23,4 +23,4 @@ class TestTaskMPI : public ppc::core::Task {
 
 };
 
-}  // namespace komshina_d_num_of_alternating_signs_of_values_mpi
+}  // namespace komshina_d_num_of_alternations_signs_mpi
