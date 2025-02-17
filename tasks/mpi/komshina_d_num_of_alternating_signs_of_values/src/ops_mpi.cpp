@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi.hpp>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -37,7 +38,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   broadcast(world_, chunk_size, 0);
   broadcast(world_, remainder, 0);
 
-  size_t local_data_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
+  size_t local_data_size = static_cast<size_t>(chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0));
   local_input_ = std::vector<int>(local_data_size);
 
   if (world_.rank() == 0) {
