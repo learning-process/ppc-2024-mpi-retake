@@ -30,7 +30,6 @@ bool LinearHistogramStretch::Validation() const { return image_size_ > 0; }
 bool LinearHistogramStretch::PreProcessing() {
   if (!Validation()) {
     return false;
-    '\n';
   }
 
   DistributeData();

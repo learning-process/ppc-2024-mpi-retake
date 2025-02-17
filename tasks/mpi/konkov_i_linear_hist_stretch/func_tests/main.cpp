@@ -5,6 +5,26 @@
 
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
 
+void InitializeImageData(int*& image_data, int image_size, int value) {
+  image_data = new int[image_size];
+  for (int i = 0; i < image_size; ++i) {
+    image_data[i] = value;
+  }
+}
+
+void CheckImageData(const int* image_data, int image_size, int expected_value) {
+  for (int i = 0; i < image_size; ++i) {
+    EXPECT_EQ(image_data[i], expected_value);
+  }
+}
+
+void CheckImageDataRange(const int* image_data, int image_size, int min_value, int max_value) {
+  for (int i = 0; i < image_size; ++i) {
+    EXPECT_GE(image_data[i], min_value);
+    EXPECT_LE(image_data[i], max_value);
+  }
+}
+
 TEST(konkov_i_LinearHistStretchTest, ValidImageData) {
   const int image_size = 100;
   int image_data[image_size];
@@ -111,25 +131,5 @@ TEST(konkov_i_LinearHistStretchTest, SinglePixelImage) {
     EXPECT_GE(image_data[0], 0);
     EXPECT_LE(image_data[0], 255);
     delete[] image_data;
-  }
-}
-
-void InitializeImageData(int*& image_data, int image_size, int value) {
-  image_data = new int[image_size];
-  for (int i = 0; i < image_size; ++i) {
-    image_data[i] = value;
-  }
-}
-
-void CheckImageData(const int* image_data, int image_size, int expected_value) {
-  for (int i = 0; i < image_size; ++i) {
-    EXPECT_EQ(image_data[i], expected_value);
-  }
-}
-
-void CheckImageDataRange(const int* image_data, int image_size, int min_value, int max_value) {
-  for (int i = 0; i < image_size; ++i) {
-    EXPECT_GE(image_data[i], min_value);
-    EXPECT_LE(image_data[i], max_value);
   }
 }
