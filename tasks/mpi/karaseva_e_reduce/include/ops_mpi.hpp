@@ -1,7 +1,8 @@
 #pragma once
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <mpi.h>
+
+#include <numeric>  // Для std::accumulate
 #include <utility>
 #include <vector>
 
@@ -9,23 +10,20 @@
 
 namespace karaseva_e_reduce_mpi {
 
+template <typename T>
 class TestTaskMPI : public ppc::core::Task {
  public:
-  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data, int size) : Task(std::move(task_data)), size_(size) {
-    input_.resize(size_);
-    output_.resize(size_);
-  }
-
+  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_, output_;
-  int size_;
+  std::vector<T> input_, output_;
+  int rc_size_{};  // Размер данных
 
-  void ReduceBinaryTree(boost::mpi::communicator& world);
+  void ReduceBinaryTree(T* local_data, T& global_data, int root);
 };
 
 }  // namespace karaseva_e_reduce_mpi
