@@ -2,8 +2,6 @@
 
 #include <cmath>
 #include <cstddef>
-#include <iostream>
-#include <memory>
 #include <numeric>
 #include <vector>
 
@@ -14,7 +12,7 @@ bool karaseva_e_reduce_seq::TestTaskSequential::PreProcessingImpl() {
 
   unsigned int input_size = task_data->inputs_count[0];
   auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-  if (!in_ptr) {
+  if (in_ptr == nullptr) {
     return false;
   }
   input_.assign(in_ptr, in_ptr + input_size);
@@ -40,7 +38,7 @@ bool karaseva_e_reduce_seq::TestTaskSequential::ValidationImpl() {
     return false;
   }
 
-  size_t expected_input_size = static_cast<size_t>(std::sqrt(static_cast<double>(task_data->inputs_count[0])));
+  auto expected_input_size = static_cast<size_t>(std::sqrt(static_cast<double>(task_data->inputs_count[0])));
   if (task_data->inputs_count[0] != expected_input_size * expected_input_size) {
     return false;
   }
@@ -55,12 +53,12 @@ bool karaseva_e_reduce_seq::TestTaskSequential::RunImpl() {
 }
 
 bool karaseva_e_reduce_seq::TestTaskSequential::PostProcessingImpl() {
-  if (!task_data || task_data->outputs.empty() || !task_data->outputs[0]) {
+  if (!task_data || task_data->outputs.empty() || task_data->outputs[0] == nullptr) {
     return false;
   }
 
   auto *out_ptr = reinterpret_cast<int *>(task_data->outputs[0]);
-  if (!out_ptr) {
+  if (out_ptr == nullptr) {
     return false;
   }
 

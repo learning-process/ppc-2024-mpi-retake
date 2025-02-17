@@ -1,10 +1,11 @@
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
+#include <mpi.h>
+
 #include <cmath>
 #include <cstddef>
 #include <numeric>
 #include <vector>
-#include <mpi.h>
 
 
 template <typename T>
