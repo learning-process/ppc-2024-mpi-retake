@@ -4,13 +4,16 @@
 
 #include "seq/konkov_i_linear_hist_stretch/include/ops_seq.hpp"
 
+void InitializeImageData(int* image_data, int size, int value = -1) {
+  for (int i = 0; i < size; ++i) {
+    image_data[i] = (value == -1) ? rand() % 256 : value;
+  }
+}
+
 TEST(konkov_i_LinearHistStretchTest, ValidImageData) {
   const int image_size = 100;
   int image_data[image_size];
-
-  for (int i = 0; i < image_size; ++i) {
-    image_data[i] = rand() % 256;
-  }
+  InitializeImageData(image_data, image_size);
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
@@ -37,10 +40,8 @@ TEST(konkov_i_LinearHistStretchTest, InvalidImageData) {
 TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueSeq) {
   const int image_size = 100;
   int image_data[image_size];
+  InitializeImageData(image_data, image_size, 128);
 
-  for (int i = 0; i < image_size; ++i) {
-    image_data[i] = 128;
-  }
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
   ASSERT_TRUE(lht.Validation());
@@ -56,7 +57,6 @@ TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueSeq) {
 TEST(konkov_i_LinearHistStretchTest, NegativeValuesSeq) {
   const int image_size = 100;
   int image_data[image_size];
-
   for (int i = 0; i < image_size; ++i) {
     image_data[i] = -100 + i;
   }
@@ -76,8 +76,7 @@ TEST(konkov_i_LinearHistStretchTest, NegativeValuesSeq) {
 
 TEST(konkov_i_LinearHistStretchTest, SinglePixelImageSeq) {
   const int image_size = 1;
-  int image_data[image_size];
-  image_data[0] = 50;
+  int image_data[image_size] = {50};
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
