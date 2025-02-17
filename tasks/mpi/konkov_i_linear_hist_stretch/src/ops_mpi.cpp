@@ -1,7 +1,8 @@
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
 
-#include "mpi.h"
 #include <algorithm>
+
+#include "mpi.h"
 
 namespace konkov_i_linear_hist_stretch {
 

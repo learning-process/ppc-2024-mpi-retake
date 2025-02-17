@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
+
 #include <cstdlib>
 
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
