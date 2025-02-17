@@ -89,8 +89,8 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PostProcessingImpl() {
-    auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::copy(Xnew_.begin(), Xnew_.end(), out);
+  auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
+  std::copy(Xnew_.begin(), Xnew_.end(), out);
   return true;
 }
 
