@@ -24,7 +24,6 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
-
   unsigned int chunk_size = 0;
   unsigned int remainder = 0;
 
