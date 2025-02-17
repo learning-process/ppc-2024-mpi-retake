@@ -7,7 +7,6 @@
 
 #include "core/task/include/task.hpp"
 #include "seq/shuravina_o_contrast/include/ops_seq.hpp"
-
 TEST(shuravina_o_contrast, test_contrast_stretching_uniform_image) {
   constexpr size_t kSize = 8;
   std::vector<uint8_t> in(kSize * kSize, 128);
