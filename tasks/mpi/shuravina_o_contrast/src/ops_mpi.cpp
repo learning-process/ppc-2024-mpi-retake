@@ -1,7 +1,9 @@
+
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
