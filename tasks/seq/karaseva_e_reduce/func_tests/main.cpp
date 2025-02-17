@@ -33,7 +33,7 @@ TEST(karaseva_e_reduce_seq, test_reduce_50) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(out[0], kCount);
+  EXPECT_EQ(out[0], static_cast<int>(kCount));
 }
 
 TEST(karaseva_e_reduce_seq, test_reduce_100_from_file) {
@@ -67,5 +67,5 @@ TEST(karaseva_e_reduce_seq, test_reduce_100_from_file) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(out[0], count);
+  EXPECT_EQ(out[0], static_cast<int>(count));
 }

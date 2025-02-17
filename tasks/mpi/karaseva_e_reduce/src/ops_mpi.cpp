@@ -1,10 +1,10 @@
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <functional>
 #include <iostream>
+#include <ranges>
 #include <vector>
 
 bool karaseva_e_reduce_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -54,6 +54,6 @@ bool karaseva_e_reduce_mpi::TestTaskMPI::PostProcessingImpl() {
     return false;
   }
 
-  std::copy(output_.begin(), output_.end(), out_ptr);
+  std::ranges::copy(output_, out_ptr);
   return true;
 }

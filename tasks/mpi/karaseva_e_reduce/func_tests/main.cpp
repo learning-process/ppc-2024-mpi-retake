@@ -1,14 +1,13 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <numeric>
 #include <vector>
 
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 TEST(karaseva_e_reduce_mpi, test_reduce_large_matrix) {
   MPI_Comm world = MPI_COMM_WORLD;
-  int rank, size;
+  int rank = 0, size = 0;
   MPI_Comm_rank(world, &rank);
   MPI_Comm_size(world, &size);
 
@@ -44,7 +43,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_large_matrix) {
 
 TEST(karaseva_e_reduce_mpi, test_reduce_vs_mpi_reduce) {
   MPI_Comm world = MPI_COMM_WORLD;
-  int rank, size;
+  int rank = 0, size = 0;
   MPI_Comm_rank(world, &rank);
   MPI_Comm_size(world, &size);
 
