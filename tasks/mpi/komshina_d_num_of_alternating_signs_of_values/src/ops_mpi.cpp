@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <cmath>
-#include <cstddef>
 #include <functional>
 #include <vector>
 
@@ -30,7 +29,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
 
   unsigned int local_size = task_data->inputs_count[0] / world_size;
   unsigned int remainder = task_data->inputs_count[0] % world_size;
-  if (world_rank < remainder) {
+  if (world_rank < static_cast<int>(remainder)) {
     local_size++;
   }
 
