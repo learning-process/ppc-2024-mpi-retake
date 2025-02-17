@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <core/perf/include/perf.hpp>
 #include <cstdint>
 #include <vector>
 
 #include "seq/shuravina_o_contrast/include/ops_seq.hpp"
-#include <core/perf/include/perf.hpp>
 
 TEST(shuravina_o_contrast, test_pipeline_run) {
   constexpr size_t kSize = 512;

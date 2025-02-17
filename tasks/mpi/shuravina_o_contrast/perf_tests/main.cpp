@@ -2,11 +2,11 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
+#include <core/perf/include/perf.hpp>
 #include <cstdint>
 #include <vector>
 
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
-#include <core/perf/include/perf.hpp>
 
 TEST(shuravina_o_contrast, test_pipeline_run) {
   boost::mpi::environment env;
