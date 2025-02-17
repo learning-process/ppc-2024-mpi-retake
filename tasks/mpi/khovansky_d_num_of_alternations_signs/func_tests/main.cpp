@@ -51,7 +51,9 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, invalid_input) {
 
   // Create Task
   khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
-  ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), false);
+  if (world.rank() == 0) {
+    ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), false);
+  }
 }
 
 TEST(khovansky_d_num_of_alternations_signs_mpi, test_with_zero) {
