@@ -28,7 +28,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   // Create Task
   karaseva_e_reduce_mpi::TestTaskMPI<int> test_task_mpi(task_data_mpi);
 
-  //
   auto start = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -40,8 +39,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on int vector: " << duration.count() << " seconds\n";
 
-  //
-  EXPECT_EQ(out[0], kCount);
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected comparison
 }
 
 // MPI_DOUBLE
@@ -62,7 +60,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   // Create Task
   karaseva_e_reduce_mpi::TestTaskMPI<double> test_task_mpi(task_data_mpi);
 
-  //
   auto start = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -74,7 +71,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on double vector: " << duration.count() << " seconds\n";
 
-  EXPECT_EQ(out[0], kCount);
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected comparison
 }
 
 // MPI_FLOAT
@@ -95,7 +92,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   // Create Task
   karaseva_e_reduce_mpi::TestTaskMPI<float> test_task_mpi(task_data_mpi);
 
-  //
   auto start = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -107,5 +103,5 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on float vector: " << duration.count() << " seconds\n";
 
-  EXPECT_EQ(out[0], kCount);
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected comparison
 }
