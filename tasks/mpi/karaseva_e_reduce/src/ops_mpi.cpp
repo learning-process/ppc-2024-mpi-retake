@@ -3,7 +3,6 @@
 #include <mpi.h>
 
 #include <cmath>
-#include <cstddef>
 #include <numeric>
 #include <type_traits>
 #include <vector>
