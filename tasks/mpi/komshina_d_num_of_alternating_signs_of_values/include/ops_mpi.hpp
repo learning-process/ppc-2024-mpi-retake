@@ -20,7 +20,6 @@ class TestTaskMPI : public ppc::core::Task {
   std::vector<int> input_;
   int result_{};
   boost::mpi::communicator world_;
-
 };
 
 }  // namespace komshina_d_num_of_alternations_signs_mpi

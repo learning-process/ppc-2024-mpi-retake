@@ -1,15 +1,15 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <cstddef>
-#include <vector>
 #include <functional>
-#include <boost/mpi/collectives.hpp>
+#include <vector>
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    int input_size = task_data->inputs_count[0];
+    unsigned int input_size = task_data->inputs_count[0];
     auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
     input_ = std::vector<int>(in_ptr, in_ptr + input_size);
   }
@@ -28,8 +28,8 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   int world_size = world_.size();
   int world_rank = world_.rank();
 
-  int local_size = task_data->inputs_count[0] / world_size;
-  int remainder = task_data->inputs_count[0] % world_size;
+  unsigned int local_size = task_data->inputs_count[0] / world_size;
+  unsigned int remainder = task_data->inputs_count[0] % world_size;
   if (world_rank < remainder) {
     local_size++;
   }
