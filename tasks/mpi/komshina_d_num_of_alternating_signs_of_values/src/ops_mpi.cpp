@@ -4,6 +4,7 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
+#include <cstddef>
 #include <functional>
 #include <vector>
 
@@ -44,7 +45,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   if (world_.rank() == 0) {
     std::copy(input_.begin(), input_.begin() + local_data_size, local_input_.begin());
   } else {
-    world_.recv(0, 0, local_input_.data(), local_data_size);
+    world_.recv(0, 0, local_input_.data(), static_cast<int>(local_data_size));
   }
 
   int sign_changes = 0;
