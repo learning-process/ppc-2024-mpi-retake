@@ -16,7 +16,7 @@
 
 namespace budazhapova_e_count_freq_chart_mpi {
 namespace {
-std::string GetRandomString(int length) {
+std::string GetRandomString(long length) {
   static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   std::string result;
   result.resize(length);
