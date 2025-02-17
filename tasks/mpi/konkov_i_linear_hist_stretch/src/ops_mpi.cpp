@@ -28,9 +28,12 @@ LinearHistogramStretch::~LinearHistogramStretch() { delete[] local_data_; }
 bool LinearHistogramStretch::Validation() const { return image_size_ > 0; }
 
 bool LinearHistogramStretch::PreProcessing() {
-  if (!Validation()) return false;
+  if (!Validation()) {
+    return false;
+    '\n';
+  }
 
-  distribute_data();
+  DistributeData();
   return true;
 }
 
@@ -38,8 +41,8 @@ bool LinearHistogramStretch::Run() {
   int local_min = *std::min_element(local_data_, local_data_ + local_size_);
   int local_max = *std::max_element(local_data_, local_data_ + local_size_);
 
-  int global_min;
-  int global_max;
+  int global_min = 0;
+  int global_max = 0;
   MPI_Allreduce(&local_min, &global_min, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
   MPI_Allreduce(&local_max, &global_max, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
@@ -58,11 +61,11 @@ bool LinearHistogramStretch::Run() {
 }
 
 bool LinearHistogramStretch::PostProcessing() {
-  gather_data();
+  GatherData();
   return true;
 }
 
-void LinearHistogramStretch::distribute_data() {
+void LinearHistogramStretch::DistributeData() {
   int* send_counts = new int[size_];
   int* displacements = new int[size_];
   displacements[0] = 0;
@@ -84,7 +87,7 @@ void LinearHistogramStretch::distribute_data() {
   delete[] displacements;
 }
 
-void LinearHistogramStretch::gather_data() {
+void LinearHistogramStretch::GatherData() {
   int* send_counts = new int[size_];
   int* displacements = new int[size_];
   displacements[0] = 0;

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <cstdlib>
+
 #include "seq/konkov_i_linear_hist_stretch/include/ops_seq.hpp"
 
 TEST(konkov_i_LinearHistStretchTest, ValidImageData) {

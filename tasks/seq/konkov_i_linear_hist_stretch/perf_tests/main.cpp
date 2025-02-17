@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
 
 #include "seq/konkov_i_linear_hist_stretch/include/ops_seq.hpp"

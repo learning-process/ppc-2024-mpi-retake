@@ -10,7 +10,10 @@ LinearHistogramStretch::LinearHistogramStretch(int image_size, int* image_data)
 bool LinearHistogramStretch::Validation() const { return image_size_ > 0 && image_data_ != nullptr; }
 
 bool LinearHistogramStretch::PreProcessing() {
-  if (!Validation()) return false;
+  if (!Validation()) {
+    return false;
+    '\n';
+  }
 
   CalculateGlobalMinMax();
   return true;

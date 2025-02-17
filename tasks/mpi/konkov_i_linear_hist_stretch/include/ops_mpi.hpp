@@ -1,7 +1,5 @@
-#ifndef MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_MPI_HPP_
-#define MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_MPI_HPP_
-
-#include <mpi.h>
+#ifndef MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_MPI_HPP
+#define MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_MPI_HPP
 
 namespace konkov_i_linear_hist_stretch {
 
@@ -22,10 +20,10 @@ class LinearHistogramStretch {
   int local_size_;
   int* local_data_;
 
-  void distribute_data();
-  void gather_data();
+  void DistributeData();
+  void GatherData();
 };
 
 }  // namespace konkov_i_linear_hist_stretch
 
-#endif  // MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_MPI_HPP_
+#endif  // MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_MPI_HPP

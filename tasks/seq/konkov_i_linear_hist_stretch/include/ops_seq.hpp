@@ -1,4 +1,4 @@
-#ifndef MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_SEQ_HPP_
+#ifndef MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_SEQ_HPP
 #define MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_SEQ_HPP
 
 namespace konkov_i_linear_hist_stretch {
@@ -23,4 +23,4 @@ class LinearHistogramStretch {
 
 }  // namespace konkov_i_linear_hist_stretch
 
-#endif  // MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_SEQ_HPP_
+#endif  // MODULES_TASK_2_KONKOV_I_LINEAR_HIST_STRETCH_OPS_SEQ_HPP
