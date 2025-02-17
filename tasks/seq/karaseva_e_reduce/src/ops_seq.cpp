@@ -39,11 +39,8 @@ bool karaseva_e_reduce_seq::TestTaskSequential::ValidationImpl() {
   }
 
   auto expected_input_size = static_cast<size_t>(std::sqrt(static_cast<double>(task_data->inputs_count[0])));
-  if (task_data->inputs_count[0] != expected_input_size * expected_input_size) {
-    return false;
-  }
 
-  return true;
+  return task_data->inputs_count[0] == expected_input_size * expected_input_size;
 }
 
 bool karaseva_e_reduce_seq::TestTaskSequential::RunImpl() {
