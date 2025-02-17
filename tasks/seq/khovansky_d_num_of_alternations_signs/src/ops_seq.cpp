@@ -1,4 +1,6 @@
 #include "seq/khovansky_d_num_of_alternations_signs/include/ops_seq.hpp"
+
+#include <cstddef>
 #include <vector>
 
 bool khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq::PreProcessingImpl() {
@@ -31,7 +33,7 @@ bool khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq::Valid
 bool khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq::RunImpl() {
   auto input_size = input_.size();
 
-  for (auto i = 0; i < input_size - 1; i++) {
+  for (size_t i = 0; i < input_size - 1; i++) {
     if ((input_[i] < 0 && input_[i + 1] >= 0) || (input_[i] >= 0 && input_[i + 1] < 0)) {
       res_++;
     }

@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <stdint.h>
 
-#include <boost/mpi/communicator.hpp>
 #include "core/task/include/task.hpp"
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
 

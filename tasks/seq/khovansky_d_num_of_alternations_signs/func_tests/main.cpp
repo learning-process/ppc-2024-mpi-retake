@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <stdint.h>
 
 #include "core/task/include/task.hpp"
 #include "seq/khovansky_d_num_of_alternations_signs/include/ops_seq.hpp"

@@ -1,12 +1,11 @@
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <stdint.h>
-
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/collectives/reduce.hpp>
 #include <vector>
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq::PreProcessingImpl() {
@@ -113,7 +112,7 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::Valid
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::RunImpl() {
   auto process_res = 0;
   auto start_size = start_.size();
-  for (auto i = 0; i < start_size - 1; i++) {
+  for (size_t i = 0; i < start_size - 1; i++) {
     if ((start_[i] < 0 && start_[i + 1] >= 0) || (start_[i] >= 0 && start_[i + 1] < 0)) {
       process_res++;
     }
