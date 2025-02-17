@@ -1,42 +1,50 @@
-#include "seq/example/include/ops_seq.hpp"
+#include "seq/shuravina_o_contrast/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <stdexcept>
 #include <vector>
 
-bool nesterov_a_test_task_seq::TestTaskSequential::PreProcessingImpl() {
-  // Init value for input and output
-  unsigned int input_size = task_data->inputs_count[0];
-  auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-  input_ = std::vector<int>(in_ptr, in_ptr + input_size);
+bool shuravina_o_contrast::ContrastTaskSequential::PreProcessingImpl() {
+  auto *in_ptr = reinterpret_cast<uint8_t *>(task_data->inputs[0]);
+  if (in_ptr == nullptr) {
+    throw std::runtime_error("Input pointer is null");
+  }
+  input_ = std::vector<uint8_t>(in_ptr, in_ptr + task_data->inputs_count[0]);
 
-  unsigned int output_size = task_data->outputs_count[0];
-  output_ = std::vector<int>(output_size, 0);
+  output_ = std::vector<uint8_t>(task_data->outputs_count[0], 0);
 
-  rc_size_ = static_cast<int>(std::sqrt(input_size));
+  const int size = static_cast<int>(std::sqrt(task_data->inputs_count[0]));
+  width_ = height_ = size;
   return true;
 }
 
-bool nesterov_a_test_task_seq::TestTaskSequential::ValidationImpl() {
-  // Check equality of counts elements
+bool shuravina_o_contrast::ContrastTaskSequential::ValidationImpl() {
   return task_data->inputs_count[0] == task_data->outputs_count[0];
 }
 
-bool nesterov_a_test_task_seq::TestTaskSequential::RunImpl() {
-  // Multiply matrices
-  for (int i = 0; i < rc_size_; ++i) {
-    for (int j = 0; j < rc_size_; ++j) {
-      for (int k = 0; k < rc_size_; ++k) {
-        output_[(i * rc_size_) + j] += input_[(i * rc_size_) + k] * input_[(k * rc_size_) + j];
-      }
-    }
+void shuravina_o_contrast::ContrastTaskSequential::IncreaseContrast() {
+  const uint8_t min_val = *std::ranges::min_element(input_);
+  const uint8_t max_val = *std::ranges::max_element(input_);
+
+  if (min_val == max_val) {
+    std::ranges::copy(input_.begin(), input_.end(), output_.begin());
+    return;
   }
+
+  for (size_t i = 0; i < input_.size(); ++i) {
+    output_[i] = static_cast<uint8_t>((input_[i] - min_val) * 255 / (max_val - min_val));
+  }
+}
+
+bool shuravina_o_contrast::ContrastTaskSequential::RunImpl() {
+  IncreaseContrast();
   return true;
 }
 
-bool nesterov_a_test_task_seq::TestTaskSequential::PostProcessingImpl() {
-  for (size_t i = 0; i < output_.size(); i++) {
-    reinterpret_cast<int *>(task_data->outputs[0])[i] = output_[i];
-  }
+bool shuravina_o_contrast::ContrastTaskSequential::PostProcessingImpl() {
+  std::ranges::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t *>(task_data->outputs[0]));
   return true;
 }

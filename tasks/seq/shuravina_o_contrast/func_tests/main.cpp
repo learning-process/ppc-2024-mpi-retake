@@ -2,72 +2,77 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
-#include "seq/example/include/ops_seq.hpp"
+#include "seq/shuravina_o_contrast/include/ops_seq.hpp"
 
-TEST(nesterov_a_test_task_seq, test_matmul_50) {
-  constexpr size_t kCount = 50;
+TEST(shuravina_o_contrast, test_contrast_stretching_uniform_image) {
+  constexpr size_t kSize = 8;
 
-  // Create data
-  std::vector<int> in(kCount * kCount, 0);
-  std::vector<int> out(kCount * kCount, 0);
+  std::vector<uint8_t> in(kSize * kSize, 128);
+  std::vector<uint8_t> out(kSize * kSize, 0);
 
-  for (size_t i = 0; i < kCount; i++) {
-    in[(i * kCount) + i] = 1;
-  }
-
-  // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
   task_data_seq->inputs_count.emplace_back(in.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  // Create Task
-  nesterov_a_test_task_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
-  EXPECT_EQ(in, out);
+  shuravina_o_contrast::ContrastTaskSequential contrast_task_sequential(task_data_seq);
+  ASSERT_EQ(contrast_task_sequential.Validation(), true);
+  contrast_task_sequential.PreProcessing();
+  contrast_task_sequential.Run();
+  contrast_task_sequential.PostProcessing();
+
+  for (size_t i = 0; i < out.size(); ++i) {
+    EXPECT_EQ(out[i], in[i]);
+  }
 }
 
-TEST(nesterov_a_test_task_seq, test_matmul_100_from_file) {
-  std::string line;
-  std::ifstream test_file(ppc::util::GetAbsolutePath("seq/example/data/test.txt"));
-  if (test_file.is_open()) {
-    getline(test_file, line);
-  }
-  test_file.close();
+TEST(shuravina_o_contrast, test_contrast_stretching_min_intensity) {
+  constexpr size_t kSize = 8;
 
-  const size_t count = std::stoi(line);
+  std::vector<uint8_t> in(kSize * kSize, 0);
+  std::vector<uint8_t> out(kSize * kSize, 0);
 
-  // Create data
-  std::vector<int> in(count * count, 0);
-  std::vector<int> out(count * count, 0);
-
-  for (size_t i = 0; i < count; i++) {
-    in[(i * count) + i] = 1;
-  }
-
-  // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
   task_data_seq->inputs_count.emplace_back(in.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  // Create Task
-  nesterov_a_test_task_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
-  EXPECT_EQ(in, out);
+  shuravina_o_contrast::ContrastTaskSequential contrast_task_sequential(task_data_seq);
+  ASSERT_EQ(contrast_task_sequential.Validation(), true);
+  contrast_task_sequential.PreProcessing();
+  contrast_task_sequential.Run();
+  contrast_task_sequential.PostProcessing();
+
+  for (size_t i = 0; i < out.size(); ++i) {
+    EXPECT_EQ(out[i], 0);
+  }
+}
+
+TEST(shuravina_o_contrast, test_contrast_stretching_max_intensity) {
+  constexpr size_t kSize = 8;
+
+  std::vector<uint8_t> in(kSize * kSize, 255);
+  std::vector<uint8_t> out(kSize * kSize, 0);
+
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs_count.emplace_back(out.size());
+
+  shuravina_o_contrast::ContrastTaskSequential contrast_task_sequential(task_data_seq);
+  ASSERT_EQ(contrast_task_sequential.Validation(), true);
+  contrast_task_sequential.PreProcessing();
+  contrast_task_sequential.Run();
+  contrast_task_sequential.PostProcessing();
+
+  for (size_t i = 0; i < out.size(); ++i) {
+    EXPECT_EQ(out[i], 255);
+  }
 }

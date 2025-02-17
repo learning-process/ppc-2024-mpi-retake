@@ -2,12 +2,13 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
-namespace nesterov_a_test_task_mpi {
+namespace shuravina_o_contrast {
 
 class TestTaskMPI : public ppc::core::Task {
  public:
@@ -18,9 +19,11 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_, output_;
+  std::vector<uint8_t> input_, output_;
   int rc_size_{};
   boost::mpi::communicator world_;
+
+  void IncreaseContrast();
 };
 
-}  // namespace nesterov_a_test_task_mpi
+}  // namespace shuravina_o_contrast
