@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <functional>
 #include <vector>
 
