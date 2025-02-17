@@ -24,7 +24,6 @@ class TestTaskMPI : public ppc::core::Task {
  private:
   std::vector<int> input_, output_;
   int size_;
-  int rc_size_{};  // aftter reduce
 
   void ReduceBinaryTree(boost::mpi::communicator& world);
 };

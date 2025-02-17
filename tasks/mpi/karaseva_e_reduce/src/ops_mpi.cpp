@@ -5,17 +5,16 @@
 #include <boost/mpi/communicator.hpp>
 #include <functional>
 #include <iostream>
-#include <ranges>
 #include <vector>
 
 bool karaseva_e_reduce_mpi::TestTaskMPI::PreProcessingImpl() {
-  if (!task_data || task_data->inputs.empty() || task_data->outputs.empty()) {
+  if (task_data == nullptr || task_data->inputs.empty() || task_data->outputs.empty()) {
     return false;
   }
 
   unsigned int input_size = task_data->inputs_count[0];
   auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-  if (!in_ptr) {
+  if (in_ptr == nullptr) {
     return false;
   }
 
@@ -28,7 +27,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool karaseva_e_reduce_mpi::TestTaskMPI::ValidationImpl() {
-  return task_data && task_data->inputs_count[0] == task_data->outputs_count[0];
+  return task_data != nullptr && task_data->inputs_count[0] == task_data->outputs_count[0];
 }
 
 bool karaseva_e_reduce_mpi::TestTaskMPI::RunImpl() {
@@ -46,15 +45,15 @@ void karaseva_e_reduce_mpi::TestTaskMPI::ReduceBinaryTree(boost::mpi::communicat
 }
 
 bool karaseva_e_reduce_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (!task_data || task_data->outputs.empty() || !task_data->outputs[0]) {
+  if (task_data == nullptr || task_data->outputs.empty() || task_data->outputs[0] == nullptr) {
     return false;
   }
 
   auto *out_ptr = reinterpret_cast<int *>(task_data->outputs[0]);
-  if (!out_ptr) {
+  if (out_ptr == nullptr) {
     return false;
   }
 
-  std::ranges::copy(output_, out_ptr);
+  std::copy(output_.begin(), output_.end(), out_ptr);
   return true;
 }
