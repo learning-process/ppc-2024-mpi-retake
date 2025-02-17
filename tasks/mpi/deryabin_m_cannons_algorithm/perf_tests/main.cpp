@@ -11,7 +11,6 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
-  boost::mpi::communicator world;
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
@@ -25,14 +24,12 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
     }
   }
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
-    task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
-    task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
-    task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
-  }
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
+  task_data_mpi->inputs_count.emplace_back(input_matrix_a.size());
+  task_data_mpi->inputs_count.emplace_back(input_matrix_b.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c.data()));
+  task_data_mpi->outputs_count.emplace_back(out_matrix_c.size());
 
   auto test_mpi_task_parallel =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
@@ -42,7 +39,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   test_mpi_task_parallel->PostProcessing();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 0;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -54,14 +51,16 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
+
+  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(true_solution, out_matrix_c[0]);
   }
+
+  ASSERT_EQ(true_solution, out_matrix_c[0]);
 }
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
-  boost::mpi::communicator world;
   std::vector<double> input_matrix_a1 = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b1 = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c1 = std::vector<double>(10000, 0);
@@ -92,7 +91,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   test_mpi_task_parallel->PostProcessing();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 1;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -104,8 +103,11 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
   perf_analyzer->TaskRun(perf_attr, perf_results);
+
+  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(true_solution1, out_matrix_c1[0]);
   }
+
+  ASSERT_EQ(true_solution1, out_matrix_c1[0]);
 }
