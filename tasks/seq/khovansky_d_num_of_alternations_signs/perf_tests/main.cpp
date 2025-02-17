@@ -7,7 +7,7 @@
 #include "seq/khovansky_d_num_of_alternations_signs/include/ops_seq.hpp"
 
 TEST(khovansky_d_num_of_alternations_signs_seq, test_pipeline_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 10000;
 
   // Create data
   std::vector<int> in(kCount * kCount, 0);
@@ -45,7 +45,7 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_pipeline_run) {
 }
 
 TEST(khovansky_d_num_of_alternations_signs_seq, test_task_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 10000;
 
   // Create data
   std::vector<int> in(kCount * kCount, 0);
