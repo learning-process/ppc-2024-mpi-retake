@@ -1,25 +1,20 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <vector>
 
-#include "core/perf/include/perf.hpp"
-#include "core/task/include/task.hpp"
 #include "seq/shuravina_o_contrast/include/ops_seq.hpp"
+#include <core/perf/include/perf.hpp>
 
 TEST(shuravina_o_contrast, test_pipeline_run) {
   constexpr size_t kSize = 512;
-
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data_seq->inputs_count.emplace_back(in.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
   auto contrast_task_sequential = std::make_shared<shuravina_o_contrast::ContrastTaskSequential>(task_data_seq);
@@ -38,4 +33,8 @@ TEST(shuravina_o_contrast, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(contrast_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
+
+  for (size_t i = 0; i < out.size(); ++i) {
+    EXPECT_EQ(out[i], 255);
+  }
 }

@@ -1,25 +1,25 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <cstddef>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
 #include <cstdint>
-#include <memory>
 #include <vector>
 
-#include "core/perf/include/perf.hpp"
-#include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
+#include <core/perf/include/perf.hpp>
 
 TEST(shuravina_o_contrast, test_pipeline_run) {
-  constexpr size_t kSize = 512;
+  boost::mpi::environment env;
+  boost::mpi::communicator world;
 
+  constexpr size_t kSize = 512;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
@@ -38,4 +38,10 @@ TEST(shuravina_o_contrast, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
+
+  if (world.rank() == 0) {
+    for (size_t i = 0; i < out.size(); ++i) {
+      EXPECT_EQ(out[i], 255);
+    }
+  }
 }
