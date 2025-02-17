@@ -41,13 +41,17 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingIm
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::ValidationImpl() {
   // check input and output
   if (world_.rank() == 0) {
-    if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) { return false; }
+    if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) {
+      return false;
+    }
     if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
         task_data->outputs.empty()) {
       return false;
-      }
+    }
     n_ = task_data->inputs_count[0];
-    if (n_ <= 0) { return false; }
+    if (n_ <= 0) {
+      return false;
+    }
     auto *ptr = reinterpret_cast<double *>(task_data->inputs[0]);
     A_.assign(ptr, ptr + (n_ * n_));
 
@@ -117,7 +121,9 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
     }
 
     broadcast(world_, global_error, 0);
-    if (world_.rank() == 0) { Xold_ = Xnew_; }
+    if (world_.rank() == 0) {
+      Xold_ = Xnew_;
+    }
     ++iteration;
     broadcast(world_, iteration, 0);
   } while (iteration < max_iters_ && global_error > epsilon_);
@@ -126,7 +132,7 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingImpl() {
   if (world.rank() == 0) {
-    auto* out = reinterpret_cast<double*>(taskData->outputs[0]);
+    auto *out = reinterpret_cast<double *>(taskData->outputs[0]);
     std::copy(Xnew_.begin(), Xnew_.end(), out);
   }
   return true;
@@ -134,7 +140,9 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingI
 
 size_t opolin_d_simple_iteration_method_mpi::Rank(std::vector<double> matrix, size_t n) {
   size_t row_count = n;
-  if (row_count == 0) { return 0; }
+  if (row_count == 0) {
+    return 0;
+  }
   size_t col_count = n;
   size_t rank = 0;
   for (size_t col = 0, row = 0; col < col_count && row < row_count; ++col) {
@@ -147,7 +155,9 @@ size_t opolin_d_simple_iteration_method_mpi::Rank(std::vector<double> matrix, si
         max_row_idx = i;
       }
     }
-    if (max_value < 1e-10) { continue; }
+    if (max_value < 1e-10) {
+      continue;
+    }
 
     if (max_row_idx != row) {
       for (size_t j = 0; j < col_count; ++j) {
