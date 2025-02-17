@@ -40,7 +40,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
   auto *ptr = reinterpret_cast<double *>(task_data->inputs[0]);
   A_.assign(ptr, ptr + n_ * n_);
   // check ranks
-  size_t rankA = rank(A_, n_);
+  size_t rankA = Rank(A_, n_);
   if (rankA != n_) return false;
 
   // check main diagonal
@@ -49,7 +49,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
       return false;
     }
   }
-  if (!isDiagonalDominance(A_, n_)) {
+  if (!IsDiagonalDominance(A_, n_)) {
     return false;
   }
   return true;
