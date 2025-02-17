@@ -1,7 +1,5 @@
 #ifndef MODULES_TASK_2_KONKOV_I_DINING_PHILOSOPHERS_OPS_MPI_HPP_
-#define MODULES_TASK_2_KONKOV_I_DINING_PHILOSOPHERS_OPS_MPI_HPP_
-
-#include <mpi.h>
+#define MODULES_TASK_2_KONKOV_I_DINING_PHILOSOPHERS_OPS_MPI_HPP
 
 #include <vector>
 
@@ -10,11 +8,11 @@ namespace konkov_i_dining_philosophers {
 class DiningPhilosophers {
  public:
   explicit DiningPhilosophers(int num_philosophers);
-  bool validation() const;
-  bool pre_processing();
-  bool run();
-  bool post_processing();
-  bool check_deadlock();
+  [[nodiscard]] bool Validation() const;
+  bool PreProcessing();
+  bool Run();
+  bool PostProcessing();
+  bool CheckDeadlock();
 
  private:
   int num_philosophers_;
@@ -23,10 +21,10 @@ class DiningPhilosophers {
   std::vector<int> fork_states_;
   std::vector<int> philosopher_states_;
 
-  void init_philosophers();
-  void philosopher_actions(int id);
-  bool is_deadlock();
-  void update_fork_states();
+  void InitPhilosophers();
+  void PhilosopherActions(int id);
+  bool IsDeadlock();
+  void UpdateForkStates();
 };
 
 }  // namespace konkov_i_dining_philosophers

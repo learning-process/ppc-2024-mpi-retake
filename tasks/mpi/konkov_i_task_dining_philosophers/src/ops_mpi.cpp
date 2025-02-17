@@ -13,38 +13,39 @@ DiningPhilosophers::DiningPhilosophers(int num_philosophers)
   MPI_Comm_size(MPI_COMM_WORLD, &size_);
 }
 
-bool DiningPhilosophers::validation() const { return num_philosophers_ > 1; }
+bool DiningPhilosophers::Validation() const { return num_philosophers_ > 1; }
 
-bool DiningPhilosophers::pre_processing() {
+bool DiningPhilosophers::PreProcessing() {
   if (rank_ == 0) {
-    init_philosophers();
+    InitPhilosophers();
   }
   MPI_Bcast(fork_states_.data(), num_philosophers_, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
   return true;
 }
 
-bool DiningPhilosophers::run() {
+bool DiningPhilosophers::Run() {
   for (int i = 0; i < num_philosophers_; ++i) {
     if (rank_ == i) {
-      philosopher_actions(i);
+      PhilosopherActions(i);
     }
-    update_fork_states();
+    UpdateForkStates();
     MPI_Barrier(MPI_COMM_WORLD);
   }
   return true;
 }
 
-bool DiningPhilosophers::post_processing() { return !is_deadlock(); }
+bool DiningPhilosophers::PostProcessing() { return !IsDeadlock(); }
 
-bool DiningPhilosophers::check_deadlock() { return is_deadlock(); }
+bool DiningPhilosophers::CheckDeadlock() { return IsDeadlock(); }
 
-void DiningPhilosophers::init_philosophers() {
-  std::fill(fork_states_.begin(), fork_states_.end(), 0);
-  std::fill(philosopher_states_.begin(), philosopher_states_.end(), 0);
+void DiningPhilosophers::InitPhilosophers() {
+  std::ranges::fill(fork_states_, 0);
+  std::ranges::fill(philosopher_states_, 0);
+  ;
 }
 
-void DiningPhilosophers::philosopher_actions(int id) {
+void DiningPhilosophers::PhilosopherActions(int id) {
   int left_fork = id;
   int right_fork = (id + 1) % num_philosophers_;
 
@@ -59,15 +60,15 @@ void DiningPhilosophers::philosopher_actions(int id) {
   philosopher_states_[id] = 0;  // Thinking
 }
 
-bool DiningPhilosophers::is_deadlock() {
-  bool local_deadlock =
-      std::all_of(philosopher_states_.begin(), philosopher_states_.end(), [](int state) { return state == 1; });
+bool DiningPhilosophers::IsDeadlock() {
+  bool local_deadlock = 
+      std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; });
   bool global_deadlock = false;
   MPI_Allreduce(&local_deadlock, &global_deadlock, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
   return global_deadlock;
 }
 
-void DiningPhilosophers::update_fork_states() {
+void DiningPhilosophers::UpdateForkStates() {
   MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, fork_states_.data(), 1, MPI_INT, MPI_COMM_WORLD);
 }
 

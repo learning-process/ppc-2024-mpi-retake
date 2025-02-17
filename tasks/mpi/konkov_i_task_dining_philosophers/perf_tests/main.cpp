@@ -7,35 +7,35 @@
 #include "mpi/konkov_i_task_dining_philosophers/include/ops_mpi.hpp"
 
 TEST(konkov_i_DiningPhilosophersPerformance, RunPipelinePerformance) {
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int num_philosophers = 100;
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  if (!dp.validation()) {
+  if (!dp.Validation()) {
     if (rank == 0) {
-      std::cerr << "Validation failed for pipeline with " << num_philosophers << " philosophers." << std::endl;
+      std::cerr << "Validation failed for pipeline with " << num_philosophers << " philosophers." << '\\n';
     }
     GTEST_SKIP();
   }
 
-  if (!dp.pre_processing()) {
+  if (!dp.PreProcessing()) {
     if (rank == 0) {
-      std::cerr << "Pre-processing failed for pipeline." << std::endl;
+      std::cerr << "Pre-processing failed for pipeline." << '\\n';
     }
     GTEST_SKIP();
   }
 
   auto start = std::chrono::high_resolution_clock::now();
-  dp.run();
+  dp.Run();
   auto end = std::chrono::high_resolution_clock::now();
 
-  if (!dp.post_processing()) {
+  if (!dp.PostProcessing()) {
     if (rank == 0) {
-      std::cerr << "Post-processing failed for pipeline." << std::endl;
+      std::cerr << "Post-processing failed for pipeline." << '\\n';
     }
     GTEST_SKIP();
   }
@@ -43,40 +43,40 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunPipelinePerformance) {
   std::chrono::duration<double> elapsed = end - start;
   if (rank == 0) {
     std::cout << "Pipeline execution time with " << num_philosophers << " philosophers: " << elapsed.count()
-              << " seconds" << std::endl;
+              << " seconds" << '\\n';
   }
 }
 
 TEST(konkov_i_DiningPhilosophersPerformance, RunTaskPerformance) {
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int num_philosophers = 100;
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  if (!dp.validation()) {
+  if (!dp.Validation()) {
     if (rank == 0) {
-      std::cerr << "Validation failed for task with " << num_philosophers << " philosophers." << std::endl;
+      std::cerr << "Validation failed for task with " << num_philosophers << " philosophers." << '\\n';
     }
     GTEST_SKIP();
   }
 
-  if (!dp.pre_processing()) {
+  if (!dp.PreProcessing()) {
     if (rank == 0) {
-      std::cerr << "Pre-processing failed for task." << std::endl;
+      std::cerr << "Pre-processing failed for task." << '\\n';
     }
     GTEST_SKIP();
   }
 
   auto start = std::chrono::high_resolution_clock::now();
-  dp.run();
+  dp.Run();
   auto end = std::chrono::high_resolution_clock::now();
 
-  if (!dp.post_processing()) {
+  if (!dp.PostProcessing()) {
     if (rank == 0) {
-      std::cerr << "Post-processing failed for task." << std::endl;
+      std::cerr << "Post-processing failed for task." << '\\n';
     }
     GTEST_SKIP();
   }
@@ -84,6 +84,6 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunTaskPerformance) {
   std::chrono::duration<double> elapsed = end - start;
   if (rank == 0) {
     std::cout << "Task execution time with " << num_philosophers << " philosophers: " << elapsed.count() << " seconds"
-              << std::endl;
+              << '\\n';
   }
 }

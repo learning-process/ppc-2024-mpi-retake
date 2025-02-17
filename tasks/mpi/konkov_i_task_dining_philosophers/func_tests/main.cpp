@@ -7,15 +7,15 @@ TEST(konkov_i_DiningPhilosophersTest, ValidNumberOfPhilosophers) {
   int num_philosophers = 5;
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  ASSERT_TRUE(dp.validation());
-  ASSERT_TRUE(dp.pre_processing());
-  ASSERT_TRUE(dp.run());
-  ASSERT_TRUE(dp.post_processing());
+  ASSERT_TRUE(dp.Validation());
+  ASSERT_TRUE(dp.PreProcessing());
+  ASSERT_TRUE(dp.Run());
+  ASSERT_TRUE(dp.PostProcessing());
 }
 
 TEST(konkov_i_DiningPhilosophersTest, DeadlockFreeExecution) {
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -26,12 +26,12 @@ TEST(konkov_i_DiningPhilosophersTest, DeadlockFreeExecution) {
   int num_philosophers = size;
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  ASSERT_TRUE(dp.validation());
-  ASSERT_TRUE(dp.pre_processing());
-  ASSERT_TRUE(dp.run());
-  ASSERT_TRUE(dp.post_processing());
+  ASSERT_TRUE(dp.Validation());
+  ASSERT_TRUE(dp.PreProcessing());
+  ASSERT_TRUE(dp.Run());
+  ASSERT_TRUE(dp.PostProcessing());
 
-  bool local_deadlock = dp.check_deadlock();
+  bool local_deadlock = dp.CheckDeadlock();
 
   bool global_deadlock = false;
   MPI_Allreduce(&local_deadlock, &global_deadlock, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
@@ -43,21 +43,21 @@ TEST(konkov_i_DiningPhilosophersTest, SmallNumberOfPhilosophers) {
   int num_philosophers = 3;
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  ASSERT_TRUE(dp.validation());
-  ASSERT_TRUE(dp.pre_processing());
-  ASSERT_TRUE(dp.run());
-  ASSERT_TRUE(dp.post_processing());
+  ASSERT_TRUE(dp.Validation());
+  ASSERT_TRUE(dp.PreProcessing());
+  ASSERT_TRUE(dp.Run());
+  ASSERT_TRUE(dp.PostProcessing());
 }
 
 TEST(konkov_i_DiningPhilosophersTest, SinglePhilosopher) {
   int num_philosophers = 1;
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  ASSERT_FALSE(dp.validation());
+  ASSERT_FALSE(dp.Validation());
 }
 
 TEST(DiningPhilosophersFunctional, InvalidPhilosopherCount) {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   int num_philosophers = -5;
@@ -72,7 +72,7 @@ TEST(DiningPhilosophersFunctional, InvalidPhilosopherCount) {
 
   konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
 
-  ASSERT_TRUE(dp.pre_processing());
-  ASSERT_TRUE(dp.run());
-  ASSERT_TRUE(dp.post_processing());
+  ASSERT_TRUE(dp.PreProcessing());
+  ASSERT_TRUE(dp.Run());
+  ASSERT_TRUE(dp.PostProcessing());
 }
