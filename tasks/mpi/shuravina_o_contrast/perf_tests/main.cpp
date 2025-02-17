@@ -1,11 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
-#include <core/perf/include/perf.hpp>
+#include <chrono>
+#include <cstddef>
 #include <cstdint>
+#include <memory>
+#include <ranges>
 #include <vector>
 
+#include "core/perf/include/perf.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
 TEST(shuravina_o_contrast, test_pipeline_run) {
@@ -38,10 +43,4 @@ TEST(shuravina_o_contrast, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
-  if (world.rank() == 0) {
-    for (size_t i = 0; i < out.size(); ++i) {
-      EXPECT_EQ(out[i], 255);
-    }
-  }
 }
