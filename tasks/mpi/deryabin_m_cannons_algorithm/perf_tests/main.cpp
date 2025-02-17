@@ -11,7 +11,6 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
-  
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
@@ -63,7 +62,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 }
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
-  
   std::vector<double> input_matrix_a1 = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b1 = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c1 = std::vector<double>(10000, 0);
