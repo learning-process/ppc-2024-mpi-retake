@@ -11,6 +11,7 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
+  
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
@@ -23,6 +24,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
       true_solution[j + (i * 100)] = (i + 1) * (j + 1) * 100;
     }
   }
+  
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -61,6 +63,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 }
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
+  
   std::vector<double> input_matrix_a1 = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b1 = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c1 = std::vector<double>(10000, 0);
@@ -73,6 +76,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
       true_solution1[j + (i * 100)] = (i + 1) * (j + 1) * 100;
     }
   }
+  
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a1.data()));
