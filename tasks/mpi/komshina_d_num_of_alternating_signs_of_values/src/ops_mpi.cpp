@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <cstdint>
 #include <cmath>
 #include <functional>
 #include <vector>
