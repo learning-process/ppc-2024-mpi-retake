@@ -11,7 +11,8 @@
 #include "seq/budazhapova_e_count_freq_character/include/count_freq_counter_header.h"
 
 TEST(budazhapova_e_count_freq_chart_seq, test_pipeline_run) {
-  std::string line(4294967200, 'h');
+  size_t length = 4294967200;
+  std::string line(length, 'h');
   std::vector<int> out(1, 0);
   std::vector<std::string> in(1, line);
 
@@ -45,7 +46,8 @@ TEST(budazhapova_e_count_freq_chart_seq, test_pipeline_run) {
 
 TEST(budazhapova_e_count_freq_chart_seq, test_task_run) {
   // Create data
-  std::string line(4294967200, 'h');
+  size_t length = 4294967200;
+  std::string line(length, 'h');
   std::vector<int> out(1, 0);
   std::vector<std::string> in(1, line);
 
