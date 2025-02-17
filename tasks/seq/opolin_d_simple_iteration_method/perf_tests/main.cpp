@@ -41,7 +41,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
 }  // namespace opolin_d_simple_iteration_method_seq
 
 TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
-  int size = 500;
+  int size = 1200;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
@@ -83,7 +83,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
-  int size = 500;
+  int size = 1200;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;

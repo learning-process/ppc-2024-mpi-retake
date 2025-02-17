@@ -46,7 +46,7 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
 TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   boost::mpi::communicator world;
-  int size = 500;
+  int size = 1200;
   double epsilon = 1e-7;
   int maxIters = 10000;
   std::vector<double> A;
@@ -93,7 +93,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
 
 TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   boost::mpi::communicator world;
-  int size = 500;
+  int size = 1200;
   double epsilon = 1e-7;
   int maxIters = 10000;
   std::vector<double> A;
