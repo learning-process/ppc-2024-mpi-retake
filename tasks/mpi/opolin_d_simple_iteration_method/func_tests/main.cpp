@@ -67,10 +67,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_parallel(task_data_mpi);
 
-  ASSERT_EQ(test_task_parallel.Validation(), true);
-  test_task_parallel.PreProcessing();
-  test_task_parallel.Run();
-  test_task_parallel.PostProcessing();
+  ASSERT_EQ(test_task_parallel->Validation(), true);
+  test_task_parallel->PreProcessing();
+  test_task_parallel->Run();
+  test_task_parallel->PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
