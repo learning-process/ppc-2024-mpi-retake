@@ -17,7 +17,7 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_;
+  std::vector<int> input_, local_input_;
   int result_{};
   boost::mpi::communicator world_;
 };
