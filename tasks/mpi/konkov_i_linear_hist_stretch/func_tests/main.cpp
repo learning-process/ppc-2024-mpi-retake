@@ -5,7 +5,7 @@
 
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
 
-void InitializeImageData(int rank, int image_size, int*& image_data, int value) {
+static void InitializeImageData(int rank, int image_size, int*& image_data, int value) {
   if (rank == 0) {
     image_data = new int[image_size];
     for (int i = 0; i < image_size; ++i) {
@@ -14,7 +14,7 @@ void InitializeImageData(int rank, int image_size, int*& image_data, int value) 
   }
 }
 
-void CleanUpImageData(int rank, int* image_data) {
+static void CleanUpImageData(int rank, const int* image_data) {
   if (rank == 0 && image_data != nullptr) {
     delete[] image_data;
   }

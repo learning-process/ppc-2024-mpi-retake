@@ -4,7 +4,7 @@
 
 #include "seq/konkov_i_linear_hist_stretch/include/ops_seq.hpp"
 
-void InitializeImageData(int* image_data, int size, int value = -1) {
+static void InitializeImageData(int* image_data, int size, int value = -1) {
   for (int i = 0; i < size; ++i) {
     image_data[i] = (value == -1) ? rand() % 256 : value;
   }
