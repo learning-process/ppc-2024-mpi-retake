@@ -101,10 +101,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
@@ -136,10 +136,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_correct_input) {
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
@@ -169,7 +169,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_no_dominance_matrix) {
 
     opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
-    ASSERT_EQ(test_task_mpi.ValidationImpl(), false);
+    ASSERT_EQ(test_task_mpi.Validation(), false);
   }
 }
 
@@ -198,10 +198,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_negative_values) {
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
@@ -234,7 +234,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_singular_matrix) {
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
   if (world.rank() == 0) {
-    ASSERT_EQ(test_task_mpi.ValidationImpl(), false);
+    ASSERT_EQ(test_task_mpi.Validation(), false);
   }
 }
 
@@ -263,10 +263,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_simple_matrix) {
     task_data_mpi->outputs_count.emplace_back(x_out.size());
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);
@@ -298,10 +298,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_single_element) {
   }
   opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < x_ref.size(); ++i) {
       ASSERT_NEAR(x_ref[i], x_out[i], 1e-3);

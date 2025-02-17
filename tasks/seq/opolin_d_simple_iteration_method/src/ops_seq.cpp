@@ -7,7 +7,6 @@
 using namespace std::chrono_literals;
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PreProcessingImpl() {
-  InternalOrderTest();
   // init data
   auto *ptr = reinterpret_cast<double *>(task_data->inputs[1]);
   b_.assign(ptr, ptr + n_);
@@ -30,7 +29,6 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PreProcessingImpl
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() {
-  InternalOrderTest();
   // check input and output
   if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
   if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
@@ -58,7 +56,6 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
-  InternalOrderTest();
   // simple iteration method
   int iteration = 0;
   while (iteration < max_iter_) {
@@ -92,14 +89,12 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PostProcessingImpl() {
-  InternalOrderTest();
-  for (size_t i = 0; i < Xnew_.size(); i++) {
-    reinterpret_cast<int *>(task_data->outputs[0])[i] = Xnew_[i];
-  }
+    auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
+    std::copy(Xnew_.begin(), Xnew_.end(), out);
   return true;
 }
 
-size_t opolin_d_simple_iteration_method_seq::rank(std::vector<double> matrix, size_t n) {
+size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, size_t n) {
   size_t rowCount = n;
   if (rowCount == 0) return 0;
   size_t colCount = n;
@@ -149,7 +144,7 @@ size_t opolin_d_simple_iteration_method_seq::rank(std::vector<double> matrix, si
   return rank;
 }
 
-bool opolin_d_simple_iteration_method_seq::isDiagonalDominance(std::vector<double> mat, size_t dim) {
+bool opolin_d_simple_iteration_method_seq::IsDiagonalDominance(std::vector<double> mat, size_t dim) {
   for (size_t i = 0; i < dim; i++) {
     double diagonal_value = std::abs(mat[i * dim + i]);
     double row_sum = 0.0;
