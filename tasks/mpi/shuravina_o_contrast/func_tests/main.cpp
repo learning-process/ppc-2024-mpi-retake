@@ -8,6 +8,7 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
+
 TEST(shuravina_o_contrast, test_min_max_values) {
   constexpr size_t kCount = 256;
 
@@ -32,7 +33,6 @@ TEST(shuravina_o_contrast, test_min_max_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t min_val = *std::ranges::min_element(out);
   uint8_t max_val = *std::ranges::max_element(out);
   EXPECT_EQ(max_val, 255);
 }
