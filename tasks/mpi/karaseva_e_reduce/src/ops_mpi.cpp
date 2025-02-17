@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <numeric>
 #include <vector>
+#include <mpi.h>
+
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
@@ -12,7 +14,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   auto* in_ptr = reinterpret_cast<T*>(task_data->inputs[0]);
   input_ = std::vector<T>(in_ptr, in_ptr + input_size);
 
-// The output vector uses type T
+  // The output vector uses type T
   unsigned int output_size = task_data->outputs_count[0];
   output_ = std::vector<T>(output_size, 0.0);
 
@@ -34,7 +36,8 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   T global_sum = 0;
 
   // Binary tree for reduction
-  int rank, size;
+  int rank;
+  int size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 

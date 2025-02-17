@@ -20,8 +20,7 @@ TEST(karaseva_e_reduce_seq, test_pipeline_run) {
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<unsigned char *>(in.data()));
   task_data_seq->inputs_count.emplace_back(in.size());
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<unsigned char *>(out.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<unsigned char *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
@@ -54,8 +53,7 @@ TEST(karaseva_e_reduce_seq, test_task_run) {
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<unsigned char *>(in.data()));
   task_data_seq->inputs_count.emplace_back(in.size());
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<unsigned char *>(out.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<unsigned char *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task

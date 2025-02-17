@@ -1,8 +1,5 @@
 #pragma once
 
-#include <mpi.h>
-
-#include <numeric>
 #include <utility>
 #include <vector>
 
