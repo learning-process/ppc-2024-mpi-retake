@@ -3,10 +3,7 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
-#include <memory>
-#include <numeric>
-#include <string>
+#include <cstddef>
 #include <utility>
 #include <vector>
 
@@ -14,8 +11,8 @@
 
 namespace opolin_d_simple_iteration_method_mpi {
 
-size_t rank(std::vector<double> matrix, size_t n);
-bool isDiagonalDominance(std::vector<double> mat, size_t dim);
+size_t Rank(std::vector<double> matrix, size_t n);
+bool IsDiagonalDominance(std::vector<double> mat, size_t dim);
 class SimpleIterMethodkMPI : public ppc::core::Task {
  public:
   explicit SimpleIterMethodkMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
