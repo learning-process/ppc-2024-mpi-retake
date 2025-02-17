@@ -12,10 +12,10 @@ TEST(konkov_i_LinearHistStretchTest, ValidImageData) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_TRUE(lht.validation());
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.Validation());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   for (int i = 0; i < image_size; ++i) {
     EXPECT_GE(image_data[i], 0);
@@ -29,7 +29,7 @@ TEST(konkov_i_LinearHistStretchTest, InvalidImageData) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_FALSE(lht.validation());
+  ASSERT_FALSE(lht.Validation());
 }
 
 TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueSeq) {
@@ -41,10 +41,10 @@ TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueSeq) {
   }
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_TRUE(lht.validation());
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.Validation());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   for (int i = 0; i < image_size; ++i) {
     EXPECT_EQ(image_data[i], 128);
@@ -61,10 +61,10 @@ TEST(konkov_i_LinearHistStretchTest, NegativeValuesSeq) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_TRUE(lht.validation());
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.Validation());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   for (int i = 0; i < image_size; ++i) {
     EXPECT_GE(image_data[i], 0);
@@ -79,10 +79,10 @@ TEST(konkov_i_LinearHistStretchTest, SinglePixelImageSeq) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_TRUE(lht.validation());
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.Validation());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   EXPECT_GE(image_data[0], 0);
   EXPECT_LE(image_data[0], 255);

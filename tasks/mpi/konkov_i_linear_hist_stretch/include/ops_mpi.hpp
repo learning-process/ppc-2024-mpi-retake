@@ -9,10 +9,10 @@ class LinearHistogramStretch {
  public:
   explicit LinearHistogramStretch(int image_size, int* image_data);
   ~LinearHistogramStretch();
-  bool validation() const;
-  bool pre_processing();
-  bool run();
-  bool post_processing();
+  bool Validation() const;
+  bool PreProcessing();
+  bool Run();
+  bool PostProcessing();
 
  private:
   int image_size_;

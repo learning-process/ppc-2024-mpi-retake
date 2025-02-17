@@ -2,13 +2,14 @@
 #include <mpi.h>
 
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
 
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
 
 TEST(konkov_i_LinearHistStretchPerformance, StretchLargeImage) {
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -24,14 +25,14 @@ TEST(konkov_i_LinearHistStretchPerformance, StretchLargeImage) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  if (!lht.validation()) {
+  if (!lht.Validation()) {
     if (rank == 0) {
       delete[] image_data;
     }
     return;
   }
 
-  if (!lht.pre_processing()) {
+  if (!lht.PreProcessing()) {
     if (rank == 0) {
       delete[] image_data;
     }
@@ -39,10 +40,10 @@ TEST(konkov_i_LinearHistStretchPerformance, StretchLargeImage) {
   }
 
   auto start = std::chrono::high_resolution_clock::now();
-  lht.run();
+  lht.Run();
   auto end = std::chrono::high_resolution_clock::now();
 
-  if (!lht.post_processing()) {
+  if (!lht.PostProcessing()) {
     if (rank == 0) {
       delete[] image_data;
     }
@@ -52,7 +53,7 @@ TEST(konkov_i_LinearHistStretchPerformance, StretchLargeImage) {
   std::chrono::duration<double> elapsed = end - start;
   if (rank == 0) {
     std::cout << "Stretching execution time for image size " << image_size << ": " << elapsed.count() << " seconds"
-              << std::endl;
+              << '\n';
     delete[] image_data;
   }
 }

@@ -1,5 +1,6 @@
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
 
+#include "mpi.h"
 #include <algorithm>
 
 namespace konkov_i_linear_hist_stretch {
@@ -23,16 +24,16 @@ LinearHistogramStretch::LinearHistogramStretch(int image_size, int* image_data)
 
 LinearHistogramStretch::~LinearHistogramStretch() { delete[] local_data_; }
 
-bool LinearHistogramStretch::validation() const { return image_size_ > 0; }
+bool LinearHistogramStretch::Validation() const { return image_size_ > 0; }
 
-bool LinearHistogramStretch::pre_processing() {
-  if (!validation()) return false;
+bool LinearHistogramStretch::PreProcessing() {
+  if (!Validation()) return false;
 
   distribute_data();
   return true;
 }
 
-bool LinearHistogramStretch::run() {
+bool LinearHistogramStretch::Run() {
   int local_min = *std::min_element(local_data_, local_data_ + local_size_);
   int local_max = *std::max_element(local_data_, local_data_ + local_size_);
 
@@ -55,7 +56,7 @@ bool LinearHistogramStretch::run() {
   return true;
 }
 
-bool LinearHistogramStretch::post_processing() {
+bool LinearHistogramStretch::PostProcessing() {
   gather_data();
   return true;
 }

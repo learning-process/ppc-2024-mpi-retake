@@ -7,28 +7,28 @@ namespace konkov_i_linear_hist_stretch {
 LinearHistogramStretch::LinearHistogramStretch(int image_size, int* image_data)
     : image_size_(image_size), image_data_(image_data) {}
 
-bool LinearHistogramStretch::validation() const { return image_size_ > 0 && image_data_ != nullptr; }
+bool LinearHistogramStretch::Validation() const { return image_size_ > 0 && image_data_ != nullptr; }
 
-bool LinearHistogramStretch::pre_processing() {
-  if (!validation()) return false;
+bool LinearHistogramStretch::PreProcessing() {
+  if (!Validation()) return false;
 
-  calculate_global_min_max();
+  CalculateGlobalMinMax();
   return true;
 }
 
-bool LinearHistogramStretch::run() {
-  stretch_pixels();
+bool LinearHistogramStretch::Run() {
+  StretchPixels();
   return true;
 }
 
-bool LinearHistogramStretch::post_processing() { return true; }
+bool LinearHistogramStretch::PostProcessing() { return true; }
 
-void LinearHistogramStretch::calculate_global_min_max() {
+void LinearHistogramStretch::CalculateGlobalMinMax() {
   global_min_ = *std::min_element(image_data_, image_data_ + image_size_);
   global_max_ = *std::max_element(image_data_, image_data_ + image_size_);
 }
 
-void LinearHistogramStretch::stretch_pixels() {
+void LinearHistogramStretch::StretchPixels() {
   if (global_max_ - global_min_ == 0) {
     return;
   }

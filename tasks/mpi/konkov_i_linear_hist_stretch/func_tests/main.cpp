@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
+#include <cstdlib>
 
 #include "mpi/konkov_i_linear_hist_stretch/include/ops_mpi.hpp"
 
@@ -12,10 +13,10 @@ TEST(konkov_i_LinearHistStretchTest, ValidImageData) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_TRUE(lht.validation());
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.Validation());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 }
 
 TEST(konkov_i_LinearHistStretchTest, InvalidImageData) {
@@ -24,11 +25,11 @@ TEST(konkov_i_LinearHistStretchTest, InvalidImageData) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_FALSE(lht.validation());
+  ASSERT_FALSE(lht.Validation());
 }
 
 TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueMPI) {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   const int image_size = 100;
@@ -44,12 +45,12 @@ TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueMPI) {
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
   if (rank == 0) {
-    ASSERT_TRUE(lht.validation());
+    ASSERT_TRUE(lht.Validation());
   }
 
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   if (rank == 0) {
     for (int i = 0; i < image_size; ++i) {
@@ -60,8 +61,8 @@ TEST(konkov_i_LinearHistStretchTest, AllPixelsSameValueMPI) {
 }
 
 TEST(konkov_i_LinearHistStretchTest, NegativeValuesMPI) {
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -77,10 +78,10 @@ TEST(konkov_i_LinearHistStretchTest, NegativeValuesMPI) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  ASSERT_TRUE(lht.validation());
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.Validation());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   if (rank == 0) {
     for (int i = 0; i < image_size; ++i) {
@@ -92,7 +93,7 @@ TEST(konkov_i_LinearHistStretchTest, NegativeValuesMPI) {
 }
 
 TEST(konkov_i_LinearHistStretchTest, SinglePixelImage) {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   const int image_size = 1;
@@ -106,12 +107,12 @@ TEST(konkov_i_LinearHistStretchTest, SinglePixelImage) {
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
   if (rank == 0) {
-    ASSERT_TRUE(lht.validation());
+    ASSERT_TRUE(lht.Validation());
   }
 
-  ASSERT_TRUE(lht.pre_processing());
-  ASSERT_TRUE(lht.run());
-  ASSERT_TRUE(lht.post_processing());
+  ASSERT_TRUE(lht.PreProcessing());
+  ASSERT_TRUE(lht.Run());
+  ASSERT_TRUE(lht.PostProcessing());
 
   if (rank == 0) {
     EXPECT_GE(image_data[0], 0);

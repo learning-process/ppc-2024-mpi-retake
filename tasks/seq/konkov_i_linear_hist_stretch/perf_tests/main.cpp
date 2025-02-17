@@ -15,28 +15,28 @@ TEST(konkov_i_LinearHistStretchPerformance, StretchLargeImage) {
 
   konkov_i_linear_hist_stretch::LinearHistogramStretch lht(image_size, image_data);
 
-  if (!lht.validation()) {
-    std::cerr << "Validation failed for large image." << std::endl;
+  if (!lht.Validation()) {
+    std::cerr << "Validation failed for large image." << '\n';
     GTEST_SKIP();
   }
 
-  if (!lht.pre_processing()) {
-    std::cerr << "Pre-processing failed for large image." << std::endl;
+  if (!lht.PreProcessing()) {
+    std::cerr << "Pre-processing failed for large image." << '\n';
     GTEST_SKIP();
   }
 
   auto start = std::chrono::high_resolution_clock::now();
-  lht.run();
+  lht.Run();
   auto end = std::chrono::high_resolution_clock::now();
 
-  if (!konkov_i_linear_hist_stretch::LinearHistogramStretch::post_processing()) {
-    std::cerr << "Post-processing failed for large image." << std::endl;
+  if (!konkov_i_linear_hist_stretch::LinearHistogramStretch::PostProcessing()) {
+    std::cerr << "Post-processing failed for large image." << '\n';
     GTEST_SKIP();
   }
 
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "Stretching execution time for image size " << image_size << ": " << elapsed.count() << " seconds"
-            << std::endl;
+            << '\n';
 
   delete[] image_data;
 }
