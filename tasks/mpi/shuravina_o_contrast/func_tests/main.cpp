@@ -70,7 +70,6 @@ TEST(shuravina_o_contrast, test_uniform_distribution) {
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
 }
-
 TEST(shuravina_o_contrast, test_random_values) {
   constexpr size_t kCount = 256;
 
