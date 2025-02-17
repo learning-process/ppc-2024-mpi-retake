@@ -16,8 +16,8 @@ class NumOfAlternationsSignsSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input;
-  int res{};
+  std::vector<int> input_;
+  int res_{};
 };
 
 class NumOfAlternationsSignsMpi : public ppc::core::Task {
@@ -29,9 +29,9 @@ class NumOfAlternationsSignsMpi : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input;
-  std::vector<int> start;
-  int res{};
-  boost::mpi::communicator world;
+  std::vector<int> input_;
+  std::vector<int> start_;
+  int res_{};
+  boost::mpi::communicator world_;
 };
 }  // namespace khovansky_d_num_of_alternations_signs_mpi

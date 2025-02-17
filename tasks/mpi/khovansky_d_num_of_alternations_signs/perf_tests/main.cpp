@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <vector>
+#include <memory>
+#include <chrono>
 
-#include "boost/mpi/communicator.hpp"
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"

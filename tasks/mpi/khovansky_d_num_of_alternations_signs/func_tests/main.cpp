@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/communicator.hpp>
+#include <cstdint>
+#include <memory>
 #include <vector>
+#include <stdint.h>
 
+#include <boost/mpi/communicator.hpp>
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
 
 TEST(khovansky_d_num_of_alternations_signs_mpi, test_10) {
@@ -23,11 +25,11 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_10) {
   }
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
-  ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), true);
-  numOfAlternationsSignsMpi.PreProcessingImpl();
-  numOfAlternationsSignsMpi.RunImpl();
-  numOfAlternationsSignsMpi.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
     ASSERT_EQ(4, out[0]);
@@ -50,9 +52,9 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, invalid_input) {
   }
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
+  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi num_of_alternations_signs_mpi(task_data_mpi);
   if (world.rank() == 0) {
-    ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), false);
+    ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), false);
   }
 }
 
@@ -72,11 +74,11 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_with_zero) {
   }
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
-  ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), true);
-  numOfAlternationsSignsMpi.PreProcessingImpl();
-  numOfAlternationsSignsMpi.RunImpl();
-  numOfAlternationsSignsMpi.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
     ASSERT_EQ(4, out[0]);
@@ -99,11 +101,11 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_with_only_zero) {
   }
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
-  ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), true);
-  numOfAlternationsSignsMpi.PreProcessingImpl();
-  numOfAlternationsSignsMpi.RunImpl();
-  numOfAlternationsSignsMpi.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
   if (world.rank() == 0) {
     ASSERT_EQ(0, out[0]);
   }
@@ -125,11 +127,11 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_with_only_positive) {
   }
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
-  ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), true);
-  numOfAlternationsSignsMpi.PreProcessingImpl();
-  numOfAlternationsSignsMpi.RunImpl();
-  numOfAlternationsSignsMpi.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
   if (world.rank() == 0) {
     ASSERT_EQ(0, out[0]);
   }
@@ -151,11 +153,11 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_with_only_negative) {
   }
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi numOfAlternationsSignsMpi(task_data_mpi);
-  ASSERT_EQ(numOfAlternationsSignsMpi.ValidationImpl(), true);
-  numOfAlternationsSignsMpi.PreProcessingImpl();
-  numOfAlternationsSignsMpi.RunImpl();
-  numOfAlternationsSignsMpi.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
   if (world.rank() == 0) {
     ASSERT_EQ(0, out[0]);
   }

@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <vector>
+#include <stdint.h>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"

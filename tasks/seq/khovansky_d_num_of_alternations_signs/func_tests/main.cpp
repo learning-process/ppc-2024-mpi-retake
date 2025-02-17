@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <memory>
 #include <vector>
+#include <stdint.h>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/khovansky_d_num_of_alternations_signs/include/ops_seq.hpp"
 
 TEST(khovansky_d_num_of_alternations_signs_seq, test_10) {
@@ -19,11 +21,11 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_10) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq numOfAlternationsSignsSeq(task_data_seq);
-  ASSERT_EQ(numOfAlternationsSignsSeq.ValidationImpl(), true);
-  numOfAlternationsSignsSeq.PreProcessingImpl();
-  numOfAlternationsSignsSeq.RunImpl();
-  numOfAlternationsSignsSeq.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
+  ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), true);
+  num_of_alternations_signs_seq.PreProcessingImpl();
+  num_of_alternations_signs_seq.RunImpl();
+  num_of_alternations_signs_seq.PostProcessingImpl();
   ASSERT_EQ(4, out[0]);
 }
 
@@ -40,8 +42,8 @@ TEST(khovansky_d_num_of_alternations_signs_seq, invalid_input) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq numOfAlternationsSignsSeq(task_data_seq);
-  ASSERT_EQ(numOfAlternationsSignsSeq.ValidationImpl(), false);
+  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
+  ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), false);
 }
 
 TEST(khovansky_d_num_of_alternations_signs_seq, test_with_zero) {
@@ -57,11 +59,11 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_with_zero) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq numOfAlternationsSignsSeq(task_data_seq);
-  ASSERT_EQ(numOfAlternationsSignsSeq.ValidationImpl(), true);
-  numOfAlternationsSignsSeq.PreProcessingImpl();
-  numOfAlternationsSignsSeq.RunImpl();
-  numOfAlternationsSignsSeq.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
+  ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), true);
+  num_of_alternations_signs_seq.PreProcessingImpl();
+  num_of_alternations_signs_seq.RunImpl();
+  num_of_alternations_signs_seq.PostProcessingImpl();
   ASSERT_EQ(4, out[0]);
 }
 
@@ -78,11 +80,11 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_with_only_zero) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq numOfAlternationsSignsSeq(task_data_seq);
-  ASSERT_EQ(numOfAlternationsSignsSeq.ValidationImpl(), true);
-  numOfAlternationsSignsSeq.PreProcessingImpl();
-  numOfAlternationsSignsSeq.RunImpl();
-  numOfAlternationsSignsSeq.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
+  ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), true);
+  num_of_alternations_signs_seq.PreProcessingImpl();
+  num_of_alternations_signs_seq.RunImpl();
+  num_of_alternations_signs_seq.PostProcessingImpl();
   ASSERT_EQ(0, out[0]);
 }
 
@@ -99,11 +101,11 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_with_only_positive) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq numOfAlternationsSignsSeq(task_data_seq);
-  ASSERT_EQ(numOfAlternationsSignsSeq.ValidationImpl(), true);
-  numOfAlternationsSignsSeq.PreProcessingImpl();
-  numOfAlternationsSignsSeq.RunImpl();
-  numOfAlternationsSignsSeq.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
+  ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), true);
+  num_of_alternations_signs_seq.PreProcessingImpl();
+  num_of_alternations_signs_seq.RunImpl();
+  num_of_alternations_signs_seq.PostProcessingImpl();
   ASSERT_EQ(0, out[0]);
 }
 
@@ -120,10 +122,10 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_with_only_negative) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq numOfAlternationsSignsSeq(task_data_seq);
-  ASSERT_EQ(numOfAlternationsSignsSeq.ValidationImpl(), true);
-  numOfAlternationsSignsSeq.PreProcessingImpl();
-  numOfAlternationsSignsSeq.RunImpl();
-  numOfAlternationsSignsSeq.PostProcessingImpl();
+  khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
+  ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), true);
+  num_of_alternations_signs_seq.PreProcessingImpl();
+  num_of_alternations_signs_seq.RunImpl();
+  num_of_alternations_signs_seq.PostProcessingImpl();
   ASSERT_EQ(0, out[0]);
 }

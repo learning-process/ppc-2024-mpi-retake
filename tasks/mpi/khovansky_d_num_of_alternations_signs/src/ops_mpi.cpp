@@ -1,14 +1,21 @@
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
 
+#include <cstdint>
+#include <functional>
+#include <stdint.h>
+
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
+#include <vector>
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq::PreProcessingImpl() {
   // Init value for input and output
   unsigned int input_size = task_data->inputs_count[0];
   auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-  input = std::vector<int>(in_ptr, in_ptr + input_size);
+  input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
-  res = 0;
+  res_ = 0;
 
   return true;
 }
@@ -30,11 +37,11 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq::Valid
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq::RunImpl() {
-  int input_size = input.size();
+  auto input_size = input_.size();
 
-  for (int i = 0; i < input_size - 1; i++) {
-    if ((input[i] < 0 && input[i + 1] >= 0) || (input[i] >= 0 && input[i + 1] < 0)) {
-      res++;
+  for (size_t i = 0; i < input_size - 1; i++) {
+    if ((input_[i] < 0 && input_[i + 1] >= 0) || (input_[i] >= 0 && input_[i + 1] < 0)) {
+      res_++;
     }
   }
 
@@ -42,14 +49,14 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq::RunIm
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq::PostProcessingImpl() {
-  reinterpret_cast<int *>(task_data->outputs[0])[0] = res;
+  reinterpret_cast<int *>(task_data->outputs[0])[0] = res_;
 
   return true;
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::PreProcessingImpl() {
   // Init value for input and output
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     if (!task_data) {
       return false;
     }
@@ -62,29 +69,29 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::PrePr
       return false;
     }
 
-    int input_size = task_data->inputs_count[0];
-    int start_size = input_size / world.size();
+    auto input_size = task_data->inputs_count[0];
+    auto start_size = input_size / world_.size();
     auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-    input = std::vector<int>(in_ptr, in_ptr + input_size);
-    start = std::vector<int>(in_ptr, in_ptr + start_size + uint32_t(world.size() > 1));
+    input_ = std::vector<int>(in_ptr, in_ptr + input_size);
+    start_ = std::vector<int>(in_ptr, in_ptr + start_size + uint32_t(world_.size() > 1));
 
-    for (int process = 1; process < world.size(); process++) {
+    for (int process = 1; process < world_.size(); process++) {
       auto local_start = process * start_size;
-      auto is_last_proc = (process == world.size() - 1);
+      auto is_last_proc = (process == world_.size() - 1);
       auto size = is_last_proc ? (input_size - local_start) : (start_size + 1);
-      world.send(process, 0, std::vector<int>(in_ptr + local_start, in_ptr + local_start + size));
+      world_.send(process, 0, std::vector<int>(in_ptr + local_start, in_ptr + local_start + size));
     }
   } else {
-    world.recv(0, 0, start);
+    world_.recv(0, 0, start_);
   }
 
-  res = 0;
+  res_ = 0;
 
   return true;
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::ValidationImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     if (!task_data) {
       return false;
     }
@@ -104,20 +111,20 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::Valid
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::RunImpl() {
-  int process_res = 0;
-  int start_size = start.size();
-  for (int i = 0; i < start_size - 1; i++) {
-    if ((start[i] < 0 && start[i + 1] >= 0) || (start[i] >= 0 && start[i + 1] < 0)) {
+  auto process_res = 0;
+  auto start_size = start_.size();
+  for (auto i = 0; i < start_size - 1; i++) {
+    if ((start_[i] < 0 && start_[i + 1] >= 0) || (start_[i] >= 0 && start_[i + 1] < 0)) {
       process_res++;
     }
   }
-  boost::mpi::reduce(world, process_res, res, std::plus(), 0);
+  boost::mpi::reduce(world_, process_res, res_, std::plus(), 0);
   return true;
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::PostProcessingImpl() {
-  if (world.rank() == 0) {
-    reinterpret_cast<int *>(task_data->outputs[0])[0] = res;
+  if (world_.rank() == 0) {
+    reinterpret_cast<int *>(task_data->outputs[0])[0] = res_;
   }
 
   return true;

@@ -16,8 +16,8 @@ class NumOfAlternationsSignsSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input;
-  int res{};
+  std::vector<int> input_;
+  int res_{};
 };
 
 }  // namespace khovansky_d_num_of_alternations_signs_seq
