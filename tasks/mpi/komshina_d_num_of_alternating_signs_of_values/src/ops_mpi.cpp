@@ -58,7 +58,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   int local_count = 0;
   if (local_input.size() > 1) {
     for (size_t i = 1; i < local_input.size(); ++i) {
-      if ((input_[i] * input_[i - 1]) < 0) {
+      if ((local_input[i] * local_input[i - 1]) < 0) {
         local_count++;
       }
     }
