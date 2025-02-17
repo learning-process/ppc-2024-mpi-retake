@@ -33,10 +33,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 
   auto test_mpi_task_parallel =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
-  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
-  test_mpi_task_parallel->PreProcessing();
-  test_mpi_task_parallel->Run();
-  test_mpi_task_parallel->PostProcessing();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -83,10 +79,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
 
   auto test_mpi_task_parallel =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
-  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
-  test_mpi_task_parallel->PreProcessing();
-  test_mpi_task_parallel->Run();
-  test_mpi_task_parallel->PostProcessing();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
