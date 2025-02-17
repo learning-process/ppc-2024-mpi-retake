@@ -17,14 +17,14 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunPipelinePerformance) {
 
   if (!dp.Validation()) {
     if (rank == 0) {
-      std::cerr << "Validation failed for pipeline with " << num_philosophers << " philosophers." << '\\n';
+      std::cerr << "Validation failed for pipeline with " << num_philosophers << " philosophers." << '\n';
     }
     GTEST_SKIP();
   }
 
   if (!dp.PreProcessing()) {
     if (rank == 0) {
-      std::cerr << "Pre-processing failed for pipeline." << '\\n';
+      std::cerr << "Pre-processing failed for pipeline." << '\n';
     }
     GTEST_SKIP();
   }
@@ -35,7 +35,7 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunPipelinePerformance) {
 
   if (!dp.PostProcessing()) {
     if (rank == 0) {
-      std::cerr << "Post-processing failed for pipeline." << '\\n';
+      std::cerr << "Post-processing failed for pipeline." << '\n';
     }
     GTEST_SKIP();
   }
@@ -43,7 +43,7 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunPipelinePerformance) {
   std::chrono::duration<double> elapsed = end - start;
   if (rank == 0) {
     std::cout << "Pipeline execution time with " << num_philosophers << " philosophers: " << elapsed.count()
-              << " seconds" << '\\n';
+              << " seconds" << '\n';
   }
 }
 
@@ -58,14 +58,14 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunTaskPerformance) {
 
   if (!dp.Validation()) {
     if (rank == 0) {
-      std::cerr << "Validation failed for task with " << num_philosophers << " philosophers." << '\\n';
+      std::cerr << "Validation failed for task with " << num_philosophers << " philosophers." << '\n';
     }
     GTEST_SKIP();
   }
 
   if (!dp.PreProcessing()) {
     if (rank == 0) {
-      std::cerr << "Pre-processing failed for task." << '\\n';
+      std::cerr << "Pre-processing failed for task." << '\n';
     }
     GTEST_SKIP();
   }
@@ -76,7 +76,7 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunTaskPerformance) {
 
   if (!dp.PostProcessing()) {
     if (rank == 0) {
-      std::cerr << "Post-processing failed for task." << '\\n';
+      std::cerr << "Post-processing failed for task." << '\n';
     }
     GTEST_SKIP();
   }
@@ -84,6 +84,6 @@ TEST(konkov_i_DiningPhilosophersPerformance, RunTaskPerformance) {
   std::chrono::duration<double> elapsed = end - start;
   if (rank == 0) {
     std::cout << "Task execution time with " << num_philosophers << " philosophers: " << elapsed.count() << " seconds"
-              << '\\n';
+              << '\n';
   }
 }

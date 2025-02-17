@@ -61,8 +61,7 @@ void DiningPhilosophers::PhilosopherActions(int id) {
 }
 
 bool DiningPhilosophers::IsDeadlock() {
-  bool local_deadlock = 
-      std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; });
+  bool local_deadlock = std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; });
   bool global_deadlock = false;
   MPI_Allreduce(&local_deadlock, &global_deadlock, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
   return global_deadlock;
