@@ -16,7 +16,7 @@
 
 namespace budazhapova_e_count_freq_chart_mpi {
 namespace {
-std::string GetRandomString(long length) {
+std::string GetRandomString(long long length) {
   static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   std::string result;
   result.resize(length);
@@ -33,7 +33,7 @@ std::string GetRandomString(long length) {
 TEST(budazhapova_e_count_freq_chart_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::string global_str;
-  long int size_string = 12345678900;
+  long long size_string = 12345678900;
   global_str = budazhapova_e_count_freq_chart_mpi::GetRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
@@ -73,7 +73,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, test_pipeline_run) {
 TEST(budazhapova_e_count_freq_chart_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::string global_str;
-  long int size_string = 12345678900;
+  long long size_string = 12345678900;
   global_str = budazhapova_e_count_freq_chart_mpi ::GetRandomString(size_string);
   std::vector<int> global_out(1, 0);
   char symb = 'a';
