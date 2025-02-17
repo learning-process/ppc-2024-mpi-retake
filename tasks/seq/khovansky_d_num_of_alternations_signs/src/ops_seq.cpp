@@ -28,12 +28,14 @@ bool khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq::Valid
 }
 
 bool khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq::RunImpl() {
-  int input_size = input.size(); 
+  int input_size = input.size();
+
   for (int i = 0; i < input_size - 1; i++) {
     if ((input[i] < 0 && input[i + 1] >= 0) || (input[i] >= 0 && input[i + 1] < 0)) {
       res++;
     }
   }
+
   return true;
 }
 

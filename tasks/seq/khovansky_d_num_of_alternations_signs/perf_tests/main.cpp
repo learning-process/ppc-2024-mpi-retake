@@ -21,7 +21,8 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_pipeline_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = std::make_shared<khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq>(task_data_seq);
+  auto test_task_sequential =
+      std::make_shared<khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -58,7 +59,8 @@ TEST(khovansky_d_num_of_alternations_signs_seq, test_task_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = std::make_shared<khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq>(task_data_seq);
+  auto test_task_sequential =
+      std::make_shared<khovansky_d_num_of_alternations_signs_seq::NumOfAlternationsSignsSeq>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

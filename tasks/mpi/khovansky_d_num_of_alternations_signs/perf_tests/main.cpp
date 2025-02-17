@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "boost/mpi/communicator.hpp"
 #include <vector>
 
+#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
@@ -22,7 +22,8 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_pipeline_run) {
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = std::make_shared<khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi>(task_data_mpi);
+  auto test_task_sequential =
+      std::make_shared<khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi>(task_data_mpi);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -59,7 +60,8 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_task_run) {
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = std::make_shared<khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi>(task_data_mpi);
+  auto test_task_sequential =
+      std::make_shared<khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi>(task_data_mpi);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
