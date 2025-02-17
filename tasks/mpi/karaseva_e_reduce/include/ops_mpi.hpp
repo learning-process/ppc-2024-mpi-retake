@@ -2,7 +2,7 @@
 
 #include <mpi.h>
 
-#include <numeric>  // Для std::accumulate
+#include <numeric>
 #include <utility>
 #include <vector>
 
@@ -21,7 +21,7 @@ class TestTaskMPI : public ppc::core::Task {
 
  private:
   std::vector<T> input_, output_;
-  int rc_size_{};  // Размер данных
+  int rc_size_{};
 
   void ReduceBinaryTree(T* local_data, T& global_data, int root);
 };

@@ -10,13 +10,13 @@
 #include "core/util/include/util.hpp"
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
-// Тест с типом данных MPI_INT
+// MPI_INT
 TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   constexpr size_t kCount = 50;
 
   // Create data
-  std::vector<int> in(kCount, 1);  // Вектор с элементами типа int, все равны 1
-  std::vector<int> out(1, 0);      // Один выходной элемент для хранения суммы
+  std::vector<int> in(kCount, 1);
+  std::vector<int> out(1, 0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -28,7 +28,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   // Create Task
   karaseva_e_reduce_mpi::TestTaskMPI<int> test_task_mpi(task_data_mpi);
 
-  // Замер времени выполнения
+  //
   auto start = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -40,17 +40,17 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on int vector: " << duration.count() << " seconds" << std::endl;
 
-  // Для всех процессов сумма должна быть равна kCount
+  //
   EXPECT_EQ(out[0], kCount);
 }
 
-// Тест с типом данных MPI_DOUBLE
+// MPI_DOUBLE
 TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   constexpr size_t kCount = 50;
 
   // Create data
-  std::vector<double> in(kCount, 1.0);  // Вектор с элементами типа double, все равны 1.0
-  std::vector<double> out(1, 0.0);      // Один выходной элемент для хранения суммы
+  std::vector<double> in(kCount, 1.0);
+  std::vector<double> out(1, 0.0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -62,7 +62,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   // Create Task
   karaseva_e_reduce_mpi::TestTaskMPI<double> test_task_mpi(task_data_mpi);
 
-  // Замер времени выполнения
+  //
   auto start = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -74,17 +74,16 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on double vector: " << duration.count() << " seconds" << std::endl;
 
-  // Для всех процессов сумма должна быть равна kCount
   EXPECT_EQ(out[0], kCount);
 }
 
-// Тест с типом данных MPI_FLOAT
+// MPI_FLOAT
 TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   constexpr size_t kCount = 50;
 
   // Create data
-  std::vector<float> in(kCount, 1.0f);  // Вектор с элементами типа float, все равны 1.0f
-  std::vector<float> out(1, 0.0f);      // Один выходной элемент для хранения суммы
+  std::vector<float> in(kCount, 1.0f);
+  std::vector<float> out(1, 0.0f);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -96,7 +95,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   // Create Task
   karaseva_e_reduce_mpi::TestTaskMPI<float> test_task_mpi(task_data_mpi);
 
-  // Замер времени выполнения
+  //
   auto start = std::chrono::high_resolution_clock::now();
 
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -108,6 +107,5 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on float vector: " << duration.count() << " seconds" << std::endl;
 
-  // Для всех процессов сумма должна быть равна kCount
   EXPECT_EQ(out[0], kCount);
 }
