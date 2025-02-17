@@ -23,7 +23,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
       true_solution[j + (i * 100)] = (i + 1) * (j + 1) * 100;
     }
   }
-  
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b.data()));
@@ -74,16 +73,13 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
       true_solution1[j + (i * 100)] = (i + 1) * (j + 1) * 100;
     }
   }
-  
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a1.data()));
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b1.data()));
-    task_data_mpi->inputs_count.emplace_back(input_matrix_a1.size());
-    task_data_mpi->inputs_count.emplace_back(input_matrix_b1.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c1.data()));
-    task_data_mpi->outputs_count.emplace_back(out_matrix_c1.size());
-  }
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a1.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_b1.data()));
+  task_data_mpi->inputs_count.emplace_back(input_matrix_a1.size());
+  task_data_mpi->inputs_count.emplace_back(input_matrix_b1.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_matrix_c1.data()));
+  task_data_mpi->outputs_count.emplace_back(out_matrix_c1.size());
 
   auto test_mpi_task_parallel =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
