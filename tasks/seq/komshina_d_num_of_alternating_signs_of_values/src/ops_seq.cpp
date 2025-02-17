@@ -1,5 +1,5 @@
-#include <cstddef>
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include "seq/komshina_d_num_of_alternating_signs_of_values/include/ops_sec.hpp"
