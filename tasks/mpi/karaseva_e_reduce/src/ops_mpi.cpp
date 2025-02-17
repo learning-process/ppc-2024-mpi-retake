@@ -10,12 +10,12 @@
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
-  // We read the input data as T (int, float or double)
+  // Read input data as T (int, float or double)
   unsigned int input_size = task_data->inputs_count[0];
   auto* in_ptr = reinterpret_cast<T*>(task_data->inputs[0]);
   input_ = std::vector<T>(in_ptr, in_ptr + input_size);
 
-  // The output vector uses type T
+  // Initialize output vector, but only process with rank 0 will store the final result
   unsigned int output_size = task_data->outputs_count[0];
   output_ = std::vector<T>(output_size, 0.0);
 
@@ -25,29 +25,29 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
-  // For reduction, the size of the input data must be greater than 1, and the size of the output data must be 1.
+  // Validation ensures there is enough data to reduce, and the output array is of size 1
   return task_data->inputs_count[0] > 1 && task_data->outputs_count[0] == 1;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
-  // Local summation
   T local_sum = std::accumulate(input_.begin(), input_.end(), T(0));
 
+  // To store the global sum
   T global_sum = 0;
 
-  // Binary tree for reduction
   int rank = 0;
   int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int partner_rank = 0;
+  // Binary tree reduce (log(size) communication steps)
   for (int step = 1; step < size; step *= 2) {
     partner_rank = rank ^ step;
 
     if (rank < partner_rank) {
-      // The smaller process sends the data
+      // The smaller process sends the local_sum to the larger process
       if constexpr (std::is_same_v<T, float>) {
         MPI_Send(&local_sum, 1, MPI_FLOAT, partner_rank, 0, MPI_COMM_WORLD);
       } else if constexpr (std::is_same_v<T, double>) {
@@ -59,7 +59,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     }
 
     if (rank > partner_rank) {
-      // A larger process receives the data
+      // Larger process receives the local_sum from the smaller process
       T recv_data = 0;
       if constexpr (std::is_same_v<T, float>) {
         MPI_Recv(&recv_data, 1, MPI_FLOAT, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -72,21 +72,21 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     }
   }
 
+  // Only process 0 will store the final result
   if (rank == 0) {
     global_sum = local_sum;
-    output_ = {global_sum};
+    output_ = {global_sum};  // Store the result in output
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);  // Synchronize processes
   return true;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
-  // Copying the result to the output array
-  // Transform the output vector to match the type T
-  for (size_t i = 0; i < output_.size(); i++) {
-    reinterpret_cast<T*>(task_data->outputs[0])[i] = output_[i];
+  // Only the root process writes to the output array
+  if (task_data->outputs_count[0] > 0) {
+    reinterpret_cast<T*>(task_data->outputs[0])[0] = output_[0];
   }
   return true;
 }
