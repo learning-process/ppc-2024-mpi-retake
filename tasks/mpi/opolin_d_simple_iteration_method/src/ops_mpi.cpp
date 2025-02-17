@@ -8,7 +8,6 @@
 #include <vector>
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingImpl() {
-  InternalOrderTest();
   // init data
   if (world_.rank() == 0) {
     auto *ptr = reinterpret_cast<double *>(task_data->inputs[1]);
@@ -37,7 +36,6 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingIm
 }
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::ValidationImpl() {
-  InternalOrderTest();
   // check input and output
   if (world_.rank() == 0) {
     if (task_data->inputs_count.empty() || task_data->inputs.size() != 4) return false;
@@ -69,8 +67,6 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::ValidationImpl(
 }
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
-  InternalOrderTest();
-
   broadcast(world_, n_, 0);
   broadcast(world_, epsilon_, 0);
   broadcast(world_, max_iters_, 0);
@@ -126,7 +122,6 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
 }
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingImpl() {
-  InternalOrderTest();
   if (world_.rank() == 0) {
     for (size_t i = 0; i < Xnew_.size(); i++) {
       reinterpret_cast<int *>(task_data->outputs[0])[i] = Xnew_[i];
