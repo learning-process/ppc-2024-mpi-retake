@@ -7,7 +7,6 @@
 #include <numeric>
 #include <vector>
 
-
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   // We read the input data as T (int, float or double)
@@ -37,23 +36,37 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   T global_sum = 0;
 
   // Binary tree for reduction
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  int partner_rank;
+  int partner_rank = 0;
   for (int step = 1; step < size; step *= 2) {
     partner_rank = rank ^ step;
 
     if (rank < partner_rank) {
       // The smaller process sends the data
-      MPI_Send(&local_sum, 1, MPI_DOUBLE, partner_rank, 0, MPI_COMM_WORLD);
-      break;
-    } else if (rank > partner_rank) {
+      if constexpr (std::is_same<T, float>::value) {
+        MPI_Send(&local_sum, 1, MPI_FLOAT, partner_rank, 0, MPI_COMM_WORLD);
+      } else if constexpr (std::is_same<T, double>::value) {
+        MPI_Send(&local_sum, 1, MPI_DOUBLE, partner_rank, 0, MPI_COMM_WORLD);
+      } else if constexpr (std::is_same<T, int>::value) {
+        MPI_Send(&local_sum, 1, MPI_INT, partner_rank, 0, MPI_COMM_WORLD);
+      }
+      break;  // No need for "else" after "break"
+    }
+
+    if (rank > partner_rank) {
       // A larger process receives the data
       T recv_data = 0;
-      MPI_Recv(&recv_data, 1, MPI_DOUBLE, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      if constexpr (std::is_same<T, float>::value) {
+        MPI_Recv(&recv_data, 1, MPI_FLOAT, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      } else if constexpr (std::is_same<T, double>::value) {
+        MPI_Recv(&recv_data, 1, MPI_DOUBLE, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      } else if constexpr (std::is_same<T, int>::value) {
+        MPI_Recv(&recv_data, 1, MPI_INT, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      }
       local_sum += recv_data;
     }
   }

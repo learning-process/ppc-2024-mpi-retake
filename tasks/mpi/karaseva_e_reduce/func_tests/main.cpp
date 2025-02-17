@@ -2,11 +2,12 @@
 
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 // MPI_INT
@@ -37,7 +38,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> duration = end - start;
-  std::cout << "Time taken for reduce operation on int vector: " << duration.count() << " seconds" << std::endl;
+  std::cout << "Time taken for reduce operation on int vector: " << duration.count() << " seconds\n";
 
   //
   EXPECT_EQ(out[0], kCount);
@@ -71,7 +72,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> duration = end - start;
-  std::cout << "Time taken for reduce operation on double vector: " << duration.count() << " seconds" << std::endl;
+  std::cout << "Time taken for reduce operation on double vector: " << duration.count() << " seconds\n";
 
   EXPECT_EQ(out[0], kCount);
 }
@@ -81,8 +82,8 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   constexpr size_t kCount = 50;
 
   // Create data
-  std::vector<float> in(kCount, 1.0f);
-  std::vector<float> out(1, 0.0f);
+  std::vector<float> in(kCount, 1.0F);
+  std::vector<float> out(1, 0.0F);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -104,7 +105,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> duration = end - start;
-  std::cout << "Time taken for reduce operation on float vector: " << duration.count() << " seconds" << std::endl;
+  std::cout << "Time taken for reduce operation on float vector: " << duration.count() << " seconds\n";
 
   EXPECT_EQ(out[0], kCount);
 }
