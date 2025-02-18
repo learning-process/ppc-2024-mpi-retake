@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
-
+#include "seq/Konstantinov_I_sum_of_vector_elements/include/ops_seq.hpp"
+#include <cmath>
+#include <cstddef>
+#include <random>
 #include <vector>
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
 
-#include "seq/Konstantinov_I_sum_of_vector_elements/include/ops_seq.hpp"
+
 
 std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_bound = 50) {
   std::vector<int> result(size);
