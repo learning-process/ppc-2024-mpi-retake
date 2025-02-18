@@ -87,7 +87,7 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
-  int size = 2500;
+  int size = 3500;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;

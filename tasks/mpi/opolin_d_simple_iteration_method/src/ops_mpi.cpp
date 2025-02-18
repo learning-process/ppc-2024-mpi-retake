@@ -5,12 +5,13 @@
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <vector>
+#include <iterator>
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingImpl() {
   // init data
@@ -135,7 +136,7 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::copy(Xnew_.begin(), Xnew_.end(), out);
+    std::ranges::copy(Xnew_, out.begin());
   }
   return true;
 }
