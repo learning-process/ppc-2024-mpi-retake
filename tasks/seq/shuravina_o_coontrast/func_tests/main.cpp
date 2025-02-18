@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "seq/shuravina_o_contrast/include/ops_seq.hpp"
+#include "seq/shuravina_o_coontrast/include/ops_seq.hpp"
 
-TEST(shuravina_o_contrast_seq, test_contrast_stretching_uniform_image) {
+TEST(shuravina_o_contrast, test_contrast_stretching_uniform_image) {
   constexpr size_t kSize = 8;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -30,7 +30,7 @@ TEST(shuravina_o_contrast_seq, test_contrast_stretching_uniform_image) {
   }
 }
 
-TEST(shuravina_o_contrast_seq, test_contrast_stretching_random_image) {
+TEST(shuravina_o_contrast, test_contrast_stretching_random_image) {
   constexpr size_t kSize = 256;
   std::vector<uint8_t> in(kSize * kSize, 0);
   std::vector<uint8_t> out(kSize * kSize, 0);

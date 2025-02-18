@@ -8,7 +8,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
-TEST(shuravina_o_contrast_mpi, test_min_max_values) {
+TEST(shuravina_o_contrast, test_min_max_values) {
   constexpr size_t kCount = 256;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
@@ -36,7 +36,7 @@ TEST(shuravina_o_contrast_mpi, test_min_max_values) {
   EXPECT_EQ(max_val, 255);
 }
 
-TEST(shuravina_o_contrast_mpi, test_random_values) {
+TEST(shuravina_o_contrast, test_random_values) {
   constexpr size_t kCount = 256;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
@@ -64,4 +64,4 @@ TEST(shuravina_o_contrast_mpi, test_random_values) {
   uint8_t max_val = *std::ranges::max_element(out.begin(), out.end());
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
-}
+  } 
