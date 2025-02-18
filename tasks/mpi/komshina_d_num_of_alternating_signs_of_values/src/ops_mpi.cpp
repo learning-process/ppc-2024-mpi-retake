@@ -34,10 +34,10 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
     remainder = task_data->inputs_count[0] % world_.size();
   }
 
-  broadcast(world_, chunk_size, 0);
-  broadcast(world_, remainder, 0);
+  boost::mpi::broadcast(world_, chunk_size, 0);
+  boost::mpi::broadcast(world_, remainder, 0);
 
-  int local_data_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
+  unsigned int local_data_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
   local_input_ = std::vector<int>(local_data_size);
 
   if (world_.rank() == 0) {
@@ -48,7 +48,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
 
   int sign_changes = 0;
   for (size_t i = 1; i < local_input_.size(); ++i) {
-    sign_changes += (local_input_[i - 1] * local_input_[i] < 0);
+    sign_changes += static_cast<int>(local_input_[i - 1] * local_input_[i] < 0);
   }
 
   if (world_.rank() > 0) {
