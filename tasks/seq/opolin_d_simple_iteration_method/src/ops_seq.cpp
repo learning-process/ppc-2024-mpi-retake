@@ -104,9 +104,9 @@ size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, si
   size_t rank = 0;
   for (size_t col = 0, row = 0; col < col_count && row < row_count; ++col) {
     size_t max_row_idx = row;
-    double max_value = std::abs(matrix[row * n + col]);
+    double max_value = std::abs(matrix[(row * n) + col]);
     for (size_t i = row + 1; i < row_count; ++i) {
-      double current_value = std::abs(matrix[i * n + col]);
+      double current_value = std::abs(matrix[(i * n) + col]);
       if (current_value > max_value) {
         max_value = current_value;
         max_row_idx = i;
@@ -117,11 +117,8 @@ size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, si
     }
 
     if (max_row_idx != row) {
-      for (size_t j = 0; j < col_count; ++j) {
-        double temp = matrix[(row * n) + j];
-        matrix[(row * n) + j] = matrix[(max_row_idx * n) + j];
-        matrix[(max_row_idx * n) + j] = temp;
-      }
+      std::swap_ranges(matrix.begin() + (row * n), matrix.begin() + (row * n) + col_count,
+                       matrix.begin() + (max_row_idx * n));
     }
 
     double lead_element = matrix[(row * n) + col];
@@ -132,18 +129,12 @@ size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, si
       matrix[(row * n) + j] /= lead_element;
     }
 
-    for (size_t i = 0; i < row; ++i) {
+    for (size_t i = 0; i < row_count; ++i) {
+      if (i == row)
+        continue;
       double factor = matrix[(i * n) + col];
-      size_t base = i * n;
-      size_t pivot_base = row * n;
       for (size_t j = col; j < col_count; ++j) {
-        matrix[base + j] -= factor * matrix[pivot_base + j];
-      }
-    }
-    for (size_t i = row + 1; i < row_count; ++i) {
-      double factor = matrix[i * n + col];
-      for (size_t j = col; j < col_count; ++j) {
-        matrix[(i * n) + j] -= factor * matrix[row * n + j];
+        matrix[(i * n) + j] -= factor * matrix[(row * n) + j];
       }
     }
     ++rank;
