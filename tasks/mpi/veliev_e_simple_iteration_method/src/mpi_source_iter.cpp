@@ -79,7 +79,7 @@ bool VelievSlaeIterMpi::RunImpl() {
   int rank = world_.rank();
   int size = world_.size();
 
-  // broadcast(world_, matrix_size_, 0);
+  broadcast(world_, matrix_size_, 0);
 
   int local_rows = 0;
   int local_displ = 0;
@@ -118,22 +118,23 @@ bool VelievSlaeIterMpi::RunImpl() {
   scatterv(world_, iteration_matrix_.data(), elements_per_proc, element_displs, local_matrix.data(),
            local_rows * matrix_size_, 0);
   scatterv(world_, free_term_vector_.data(), rows_per_proc, displs, local_free_terms.data(), local_rows, 0);
-
-  broadcast(world_, solution_vector_.data(), static_cast<int>(solution_vector_.size()), 0);
+  solution_vector_.resize(matrix_size_);
+  broadcast(world_, solution_vector_.data(), matrix_size_, 0);
 
   std::vector<double> next_solution(matrix_size_, 0.0);
-  std::vector<double> local_current(local_rows);
+  std::vector<double> local_current(local_rows, 0.0);
   double max_difference = 100.0;
-
   while (max_difference > convergence_tolerance_) {
     for (int i = 0; i < local_rows; ++i) {
       double sum = 0.0;
       int global_row = local_displ + i;
+
       for (int j = 0; j < matrix_size_; ++j) {
         if (j != global_row) {
           sum += local_matrix[(i * matrix_size_) + j] * solution_vector_[j];
         }
       }
+
       local_current[i] = local_free_terms[i] + sum;
     }
 
@@ -147,6 +148,7 @@ bool VelievSlaeIterMpi::RunImpl() {
       }
       solution_vector_ = next_solution;
     }
+
     broadcast(world_, solution_vector_.data(), static_cast<int>(solution_vector_.size()), 0);
     broadcast(world_, max_difference, 0);
   }
