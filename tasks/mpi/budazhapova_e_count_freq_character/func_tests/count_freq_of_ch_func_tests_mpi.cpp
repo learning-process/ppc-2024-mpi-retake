@@ -161,7 +161,7 @@ TEST(budazhapova_e_count_freq_chart_mpi, all_same_symb) {
 }
 TEST(budazhapova_e_count_freq_chart_mpi, empty_string) {
   boost::mpi::communicator world;
-  std::string global_str = "";
+  std::string global_str;
   std::vector<int> global_out(1, 0);
   char symb = 'a';
   // Create TaskData
