@@ -1,6 +1,7 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
@@ -19,21 +20,27 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() 
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::ValidationImpl() {
-  if (world_.rank() == 0) {
-    return task_data->inputs_count[0] >= 2 && task_data->outputs_count[0] == 1;
-  }
-  return true;
+  return world_.rank() != 0 || (task_data->inputs_count[0] >= 2 && task_data->outputs_count[0] == 1);
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   std::size_t chunk_size = 0;
   std::size_t remainder = 0;
+
   if (world_.rank() == 0) {
     chunk_size = static_cast<std::size_t>(task_data->inputs_count[0]) / static_cast<std::size_t>(world_.size());
     remainder = static_cast<std::size_t>(task_data->inputs_count[0]) % static_cast<std::size_t>(world_.size());
   }
-  boost::mpi::broadcast(world_, chunk_size, 0);
-  boost::mpi::broadcast(world_, remainder, 0);
+
+  if (world_.rank() == 0) {
+    for (int proc = 1; proc < world_.size(); ++proc) {
+      world_.send(proc, 0, chunk_size);
+      world_.send(proc, 0, remainder);
+    }
+  } else {
+    world_.recv(0, 0, chunk_size);
+    world_.recv(0, 0, remainder);
+  }
 
   std::size_t local_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
   local_input_.resize(local_size);
@@ -85,7 +92,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
-    *reinterpret_cast<int32_t *>(task_data->outputs[0]) = result_;
+    reinterpret_cast<int32_t *>(task_data->outputs[0])[0] = result_;
   }
   return true;
 }
