@@ -96,7 +96,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
 
 TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   boost::mpi::communicator world;
-  int size = 1200;
+  int size = 2500;
   double epsilon = 1e-7;
   int maxIters = 10000;
   std::vector<double> A;
