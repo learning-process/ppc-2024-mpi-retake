@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
-TEST(shuravina_o_contrast, test_pipeline_run) {
+TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
   constexpr size_t kSize = 512;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -38,7 +38,7 @@ TEST(shuravina_o_contrast, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
 
-TEST(shuravina_o_contrast, test_task_run) {
+TEST(shuravina_o_contrast_mpi, test_task_run) {
   constexpr size_t kSize = 512;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
