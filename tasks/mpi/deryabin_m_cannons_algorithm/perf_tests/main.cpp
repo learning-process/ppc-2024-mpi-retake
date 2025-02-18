@@ -33,10 +33,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
 
   auto test_task_par =
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_par);
-  ASSERT_EQ(test_task_par->ValidationImpl(), true);
-  test_task_par->PreProcessingImpl();
-  test_task_par->PostProcessingImpl();
-  test_task_par->RunImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 0;
