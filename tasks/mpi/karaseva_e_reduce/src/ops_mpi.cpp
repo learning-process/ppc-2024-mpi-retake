@@ -86,7 +86,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   if (task_data->outputs_count[0] > 0) {
-    std::memcpy(task_data->outputs[0], &output_[0], sizeof(T));  // Fixed: Using memcpy for alignment safety
+    std::memcpy(task_data->outputs[0], output_.data(), sizeof(T));
   }
   return true;
 }
