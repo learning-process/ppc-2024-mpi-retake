@@ -26,10 +26,9 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
-  int rank = world_.rank();
-  int size = world_.size();
-
   unsigned int chunk_size = 0, extra = 0;
+  int rank = world_.rank(), size = world_.size();
+
   if (rank == 0) {
     chunk_size = task_data->inputs_count[0] / size;
     extra = task_data->inputs_count[0] % size;
@@ -42,11 +41,11 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   local_input_.resize(local_size);
 
   if (rank == 0) {
-    std::copy(input_.begin(), input_.begin() + local_size, local_input_.begin());
     for (int proc = 1; proc < size; ++proc) {
       int send_count = chunk_size + (proc == size - 1 ? extra : 0);
       world_.send(proc, 0, input_.data() + proc * chunk_size, send_count);
     }
+    std::copy(input_.begin(), input_.begin() + local_size, local_input_.begin());
   } else {
     world_.recv(0, 0, local_input_.data(), local_size);
   }
@@ -61,7 +60,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   if (rank > 0) {
     int prev_value;
     world_.recv(rank - 1, 0, &prev_value, 1);
-    if (!local_input_.empty() && prev_value * local_input_[0] < 0) {
+    if (!local_input_.empty() && (prev_value * local_input_[0] < 0)) {
       ++local_count;
     }
   }
