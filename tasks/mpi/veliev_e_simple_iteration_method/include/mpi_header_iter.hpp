@@ -24,12 +24,10 @@ class VelievSlaeIterMpi : public ppc::core::Task {
   std::vector<double> free_term_vector_;
   std::vector<double> coeff_matrix_;
   double convergence_tolerance_;
-  bool isDiagonallyDominant();
+  bool IsDiagonallyDominant();
   boost::mpi::communicator world_;
 
-  inline double& matrixAt(std::vector<double>& matrix, int row, int col) const {
-    return matrix[row * matrix_size_ + col];
-  }
+  double& MatrixAt(std::vector<double>& matrix, int row, int col) { return matrix[(row * matrix_size_) + col]; }
 };
 
 }  // namespace veliev_e_simple_iteration_method_mpi

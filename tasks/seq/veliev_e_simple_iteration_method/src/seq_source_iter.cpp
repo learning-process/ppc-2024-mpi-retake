@@ -10,14 +10,14 @@
 
 namespace veliev_e_simple_iteration_method_seq {
 
-bool VelievSlaeIterSeq::isDiagonallyDominant() {
+bool VelievSlaeIterSeq::IsDiagonallyDominant() {
   for (int row = 0; row < matrix_size_; ++row) {
-    double diag_value = std::abs(matrixAt(coeff_matrix_, row, row));
+    double diag_value = std::abs(MatrixAt(coeff_matrix_, row, row));
     double row_sum = 0.0;
 
     for (int col = 0; col < matrix_size_; ++col) {
       if (row != col) {
-        row_sum += std::abs(matrixAt(coeff_matrix_, row, col));
+        row_sum += std::abs(MatrixAt(coeff_matrix_, row, col));
       }
     }
 
@@ -41,7 +41,7 @@ bool VelievSlaeIterSeq::ValidationImpl() {
   rhs_vector_.resize(matrix_size_);
   std::ranges::copy(reinterpret_cast<double*>(task_data->inputs[1]),
                     reinterpret_cast<double*>(task_data->inputs[1]) + matrix_size_, rhs_vector_.begin());
-  return isDiagonallyDominant();
+  return IsDiagonallyDominant();
 }
 
 bool VelievSlaeIterSeq::PreProcessingImpl() {
@@ -53,14 +53,14 @@ bool VelievSlaeIterSeq::PreProcessingImpl() {
   iteration_matrix_.resize(matrix_size_ * matrix_size_, 0.0);
   free_term_vector_.resize(matrix_size_);
   for (int row = 0; row < matrix_size_; ++row) {
-    double diag_value = matrixAt(coeff_matrix_, row, row);
+    double diag_value = MatrixAt(coeff_matrix_, row, row);
     if (diag_value == 0.0) {
       return false;
     }
     free_term_vector_[row] = rhs_vector_[row] / diag_value;
     for (int col = 0; col < matrix_size_; ++col) {
       if (row != col) {
-        matrixAt(iteration_matrix_, row, col) = -matrixAt(coeff_matrix_, row, col) / diag_value;
+        MatrixAt(iteration_matrix_, row, col) = -MatrixAt(coeff_matrix_, row, col) / diag_value;
       }
     }
   }
@@ -76,7 +76,7 @@ bool VelievSlaeIterSeq::RunImpl() {
       double sum = 0.0;
       for (int col = 0; col < matrix_size_; ++col) {
         if (row != col) {
-          sum += matrixAt(iteration_matrix_, row, col) * solution_vector_[col];
+          sum += MatrixAt(iteration_matrix_, row, col) * solution_vector_[col];
         }
       }
       next_solution[row] = free_term_vector_[row] + sum;
