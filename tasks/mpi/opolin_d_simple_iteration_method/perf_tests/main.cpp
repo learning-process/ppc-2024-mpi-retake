@@ -2,12 +2,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
-#include <random>
-#include <string>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -33,7 +33,7 @@ void GenerateTestData(size_t size, std::vector<double> &x, std::vector<double> &
         sum += std::abs(a[(i * size) + j]);
       }
     }
-    a[i * size + i] = sum + 1.0;
+    a[(i * size) + i] = sum + 1.0;
   }
   b.resize(size, 0.0);
   for (size_t i = 0; i < size; ++i) {
