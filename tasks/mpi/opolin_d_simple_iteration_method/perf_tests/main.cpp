@@ -1,11 +1,11 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
-#include <time.h>
 
 #include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <cstdlib>
+#include <ctime>
+#include <string>
 #include <memory>
 #include <random>
 #include <vector>
@@ -59,7 +59,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   // Create data
   if (world.rank() == 0) {
-    opolin_d_simple_iteration_method_mpi::generateTestData(size, x, a, b);
+    opolin_d_simple_iteration_method_mpi::GenerateTestData(size, x, a, b);
     // Create TaskData
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
     task_data_mpi->inputs_count.emplace_back(out.size());
@@ -108,7 +108,7 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    opolin_d_simple_iteration_method_mpi::generateTestData(size, x, a, b);
+    opolin_d_simple_iteration_method_mpi::GenerateTestData(size, x, a, b);
     // Create TaskData
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
     task_data_mpi->inputs_count.emplace_back(out.size());
