@@ -3,10 +3,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <seq/shuravina_o_coontrast/include/ops_seq.hpp>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include <seq/shuravina_o_coontrast/include/ops_seq.hpp>
+
 TEST(shuravina_o_contrast, test_contrast_stretching_uniform_image) {
   constexpr size_t kSize = 8;
   std::vector<uint8_t> in(kSize * kSize, 128);
