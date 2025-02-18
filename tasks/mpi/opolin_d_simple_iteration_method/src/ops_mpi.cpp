@@ -5,11 +5,11 @@
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <ranges>
 #include <vector>
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingImpl() {
@@ -78,8 +78,8 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
   Xnew_.resize(n_);
   Xold_.resize(n_);
 
-  int32_t base_rows = n_ / world_.size();
-  int32_t remainder = n_ % world_.size();
+  auto base_rows = static_cast<int32_t>(n_ / world_.size());
+  auto remainder = static_cast<int32_t>(n_ % world_.size());
 
   std::vector<int32_t> rows_per_worker(world_.size());
   std::vector<int32_t> elements_per_worker(world_.size());
@@ -131,7 +131,7 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::copy(Xnew_.begin(), Xnew_.end(), out);
+    std::ranges::copy(Xnew_, out);
   }
   return true;
 }
