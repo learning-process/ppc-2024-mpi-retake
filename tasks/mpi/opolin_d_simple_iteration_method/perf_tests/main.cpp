@@ -69,7 +69,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_pipeline_run) {
   }
 
   auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI>(task_data_mpi);
-
+  ASSERT_EQ(test_task_mpi->Validation(), true);
+  test_task_mpi->PreProcessing();
+  test_task_mpi->Run();
+  test_task_mpi->PostProcessing();
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
@@ -114,7 +117,10 @@ TEST(opolin_d_simple_iteration_method_mpi, test_task_run) {
     task_data_mpi->outputs_count.emplace_back(out.size());
   }
   auto test_task_mpi = std::make_shared<opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI>(task_data_mpi);
-
+  ASSERT_EQ(test_task_mpi->Validation(), true);
+  test_task_mpi->PreProcessing();
+  test_task_mpi->Run();
+  test_task_mpi->PostProcessing();
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
