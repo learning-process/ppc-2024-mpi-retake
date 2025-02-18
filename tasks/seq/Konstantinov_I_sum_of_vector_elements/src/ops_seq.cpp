@@ -1,10 +1,13 @@
 #include "seq/Konstantinov_I_sum_of_vector_elements/include/ops_seq.hpp"
-#include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
+
 #include <random>
 #include <vector>
 #include <cmath>
 #include <cstddef>
+
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
+
 
 int Konstantinov_I_sum_of_vector_elements_seq::vec_elem_sum(const std::vector<int>& vec) {
   int result = 0;

@@ -4,7 +4,6 @@
 
 #include "core/task/include/task.hpp"
 
-
 namespace Konstantinov_I_sum_of_vector_elements_seq {
 
 int vec_elem_sum(const std::vector<int>& vec);

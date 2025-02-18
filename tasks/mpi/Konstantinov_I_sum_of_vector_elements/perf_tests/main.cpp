@@ -1,17 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/timer.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <boost/mpi/timer.hpp>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
-
 
 std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_bound = 50) {
   std::vector<int> result(size);
