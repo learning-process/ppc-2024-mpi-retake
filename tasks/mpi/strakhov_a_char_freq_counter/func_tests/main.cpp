@@ -1,20 +1,16 @@
 #include <gtest/gtest.h>
 
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
-
-
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
 TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {
@@ -24,7 +20,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
-  //Parallel
+  // Parallel
 
   // Create task_data
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
@@ -47,11 +43,9 @@ TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {
   test_task_par.Run();
   test_task_par.PostProcessing();
 
-  //Sequential
+  // Sequential
 
-
-   // Create task_data
-
+  // Create task_data
 
   if (world.rank() == 0) {
     int_string = std::vector<char>(1000, 'a');
@@ -198,8 +192,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_single_character) {
 
   if (world.rank() == 0) {
     in_string = std::vector<char>(1000, 'a');
-    in_string[500] = 'b'
-    task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
+    in_string[500] = 'b' task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_string.size());
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_target.size());
@@ -220,8 +213,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_single_character) {
 
   if (world.rank() == 0) {
     int_string = std::vector<char>(1000, 'a');
-    in_string[500] = 'b'
-    auto task_data_mpi_seq = std::make_shared<ppc::core::TaskData>();
+    in_string[500] = 'b' auto task_data_mpi_seq = std::make_shared<ppc::core::TaskData>();
 
     task_data_mpi_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_seq->inputs_count.emplace_back(in_string.size());
@@ -241,7 +233,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_single_character) {
 }
 
 TEST(strakhov_a_char_freq_counter_mpi, random_string) {
-    //random generator
+  // random generator
   std::vector<char> fill_random_chars(int size, const std::string &charset) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -259,7 +251,8 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
       fill_random_chars(300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int32_t> out_par(1, 0);
   std::vector<int32_t> out_seq(1, 0);
-  std::vector<char> in_target = fill_random_chars(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+  std::vector<char> in_target =
+      fill_random_chars(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
 
   // Parallel
 
@@ -286,7 +279,6 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
   // Create task_data
 
   if (world.rank() == 0) {
-
     task_data_mpi_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_seq->inputs_count.emplace_back(in_string.size());
     task_data_mpi_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
@@ -307,9 +299,9 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
 TEST(strakhov_a_char_freq_counter_mpi, simple_test_1) {
   boost::mpi::communicator world;
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-      std::vector<int32_t> out_par(1, 0);
+  std::vector<int32_t> out_par(1, 0);
   std::vector<int32_t> out_seq(1, 0);
-      std::vector<char> in_target(1, 'H');
+  std::vector<char> in_target(1, 'H');
   // Parallel
 
   // Create task_data

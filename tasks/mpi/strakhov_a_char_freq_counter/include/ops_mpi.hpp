@@ -2,15 +2,15 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <memory>
+#include <numeric>
+#include <string>
 #include <utility>
 #include <vector>
-#include <numeric>
-#include <memory>
-#include <string>
 
 #include "core/task/include/task.hpp"
 
-namespace strakhov_a_char_freq_counter_mpi{
+namespace strakhov_a_char_freq_counter_mpi {
 
 class CharFreqCounterSeq : public ppc::core::Task {
  public:

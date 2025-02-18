@@ -9,14 +9,11 @@
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
-
 TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
-
   boost::mpi::communicator world;
-  
+
   // Create data
   int expectation = 1000;
   std::vector<char> in_string(expectation, a);
@@ -40,8 +37,6 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-
-
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -57,7 +52,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
- 
+
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
