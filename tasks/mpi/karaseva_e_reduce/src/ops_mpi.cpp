@@ -7,24 +7,26 @@
 #include <type_traits>
 #include <vector>
 
-// Function for getting the MPI type
+namespace {
+// Utility function to get MPI datatype based on template type
 template <typename T>
-MPI_Datatype MPI_Type();
+MPI_Datatype GetMPIType();
 
 template <>
-MPI_Datatype MPI_Type<int>() {
+MPI_Datatype GetMPIType<int>() {
   return MPI_INT;
 }
 
 template <>
-MPI_Datatype MPI_Type<float>() {
+MPI_Datatype GetMPIType<float>() {
   return MPI_FLOAT;
 }
 
 template <>
-MPI_Datatype MPI_Type<double>() {
+MPI_Datatype GetMPIType<double>() {
   return MPI_DOUBLE;
 }
+}  // namespace
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
@@ -33,7 +35,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   input_ = std::vector<T>(in_ptr, in_ptr + input_size);
 
   unsigned int output_size = task_data->outputs_count[0];
-  output_ = std::vector<T>(output_size, 0.0);
+  output_ = std::vector<T>(output_size, static_cast<T>(0));
 
   rc_size_ = static_cast<int>(std::sqrt(input_size));
   return true;
@@ -46,7 +48,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
-  T local_sum = std::accumulate(input_.begin(), input_.end(), T(0));
+  T local_sum = std::accumulate(input_.begin(), input_.end(), static_cast<T>(0));
   T global_sum = 0;
 
   int rank = 0;
@@ -59,14 +61,13 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     partner_rank = rank ^ step;
 
     if (rank < partner_rank) {
-      T temp = local_sum;
-      MPI_Send(&temp, 1, MPI_Type<T>(), partner_rank, 0, MPI_COMM_WORLD);
+      MPI_Send(&local_sum, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD);
       break;
     }
 
     if (rank > partner_rank) {
       T recv_data = 0;
-      MPI_Recv(&recv_data, 1, MPI_Type<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(&recv_data, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       local_sum += recv_data;
     }
   }
@@ -83,11 +84,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   if (task_data->outputs_count[0] > 0) {
-    if constexpr (std::is_same_v<T, bool>) {
-      reinterpret_cast<int*>(task_data->outputs[0])[0] = static_cast<int>(output_[0]);
-    } else {
-      reinterpret_cast<T*>(task_data->outputs[0])[0] = output_[0];
-    }
+    reinterpret_cast<T*>(task_data->outputs[0])[0] = output_[0];
   }
   return true;
 }
