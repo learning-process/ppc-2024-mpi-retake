@@ -135,7 +135,7 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::ranges::copy(Xnew_, out.begin());
+    std::copy(Xnew_.begin(), Xnew_.end(), out);
   }
   return true;
 }
