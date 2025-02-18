@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
 #include <limits>
 #include <vector>
 
@@ -59,10 +58,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::ValidationImpl() 
       return false;
     }
   }
-  if (!IsDiagonalDominance(A_, n_)) {
-    return false;
-  }
-  return true;
+  return IsDiagonalDominance(A_, n_);
 }
 
 bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
@@ -73,7 +69,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
       double sum = d_[i];
       for (size_t j = 0; j < n_; ++j) {
         if (i != j) {
-          sum += C_[i * n_ + j] * Xold_[j];
+          sum += C_[(i * n_) + j] * Xold_[j];
         }
       }
       Xnew_[i] = sum;
@@ -81,9 +77,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
     double max_error = 0.0;
     for (size_t i = 0; i < n_; ++i) {
       double error = std::abs(Xnew_[i] - Xold_[i]);
-      if (error > max_error) {
-        max_error = error;
-      }
+      max_error = std::max(error, max_error);
     }
     Xold_ = Xnew_;
     if (max_error < epsilon_) {
@@ -91,10 +85,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::RunImpl() {
     }
     ++iteration;
   }
-  if (iteration == max_iter_) {
-    return false;
-  }
-
+  return iteration != max_iter_;
   return true;
 }
 

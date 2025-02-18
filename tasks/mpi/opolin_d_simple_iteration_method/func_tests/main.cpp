@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/opolin_d_simple_iteration_method/include/ops_mpi.hpp"
 
 namespace opolin_d_simple_iteration_method_mpi {

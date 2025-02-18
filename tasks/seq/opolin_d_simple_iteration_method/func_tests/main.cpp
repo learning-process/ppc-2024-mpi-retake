@@ -1,13 +1,16 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <ctime>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/opolin_d_simple_iteration_method/include/ops_seq.hpp"
 
 namespace opolin_d_simple_iteration_method_seq {
