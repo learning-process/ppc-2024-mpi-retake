@@ -1,12 +1,11 @@
 // Copyright 2024 Nesterov Alexander
+#include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatter.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
-#include <boost/serialization/vector.hpp>
+#include <cmath>
 #include <cstring>
-#include <numeric>
-#include <random>
 #include <vector>
 
 #include "mpi/veliev_e_simple_iteration_method/include/mpi_header_iter.hpp"
@@ -37,10 +36,11 @@ bool VelievSlaeIterMpi::ValidationImpl() {
         task_data->inputs_count[0] != task_data->outputs_count[0]) {
       return false;
     }
-    matrix_size_ = task_data->inputs_count[0];
+    matrix_size_ = static_cast<int>(task_data->inputs_count[0]);
+
     coeff_matrix_.resize(matrix_size_ * matrix_size_);
     std::ranges::copy(reinterpret_cast<double*>(task_data->inputs[0]),
-                      reinterpret_cast<double*>(task_data->inputs[0]) + matrix_size_ * matrix_size_,
+                      reinterpret_cast<double*>(task_data->inputs[0]) + (matrix_size_ * matrix_size_),
                       coeff_matrix_.begin());
     rhs_vector_.resize(matrix_size_);
     std::ranges::copy(reinterpret_cast<double*>(task_data->inputs[1]),
@@ -79,7 +79,7 @@ bool VelievSlaeIterMpi::RunImpl() {
   int rank = world_.rank();
   int size = world_.size();
 
-  boost::mpi::broadcast(world_, matrix_size_, 0);
+  // broadcast(world_, matrix_size_, 0);
 
   int local_rows = 0;
   int local_displ = 0;
@@ -119,7 +119,7 @@ bool VelievSlaeIterMpi::RunImpl() {
            local_rows * matrix_size_, 0);
   scatterv(world_, free_term_vector_.data(), rows_per_proc, displs, local_free_terms.data(), local_rows, 0);
 
-  boost::mpi::broadcast(world_, solution_vector_, 0);
+  broadcast(world_, solution_vector_.data(), static_cast<int>(solution_vector_.size()), 0);
 
   std::vector<double> next_solution(matrix_size_, 0.0);
   std::vector<double> local_current(local_rows);
@@ -131,13 +131,14 @@ bool VelievSlaeIterMpi::RunImpl() {
       int global_row = local_displ + i;
       for (int j = 0; j < matrix_size_; ++j) {
         if (j != global_row) {
-          sum += local_matrix[i * matrix_size_ + j] * solution_vector_[j];
+          sum += local_matrix[(i * matrix_size_) + j] * solution_vector_[j];
         }
       }
       local_current[i] = local_free_terms[i] + sum;
     }
 
-    gatherv(world_, local_current.data(), local_current.size(), next_solution.data(), rows_per_proc, displs, 0);
+    gatherv(world_, local_current.data(), static_cast<int>(local_current.size()), next_solution.data(), rows_per_proc,
+            displs, 0);
 
     if (rank == 0) {
       max_difference = 0.0;
@@ -146,7 +147,7 @@ bool VelievSlaeIterMpi::RunImpl() {
       }
       solution_vector_ = next_solution;
     }
-    broadcast(world_, solution_vector_.data(), solution_vector_.size(), 0);
+    broadcast(world_, solution_vector_.data(), static_cast<int>(solution_vector_.size()), 0);
     broadcast(world_, max_difference, 0);
   }
 

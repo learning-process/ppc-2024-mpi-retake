@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "seq/veliev_e_simple_iteration_method/include/seq_header_iter.hpp"
 
 TEST(veliev_e_simple_iteration_method_seq, veliev_slae_2x2) {
@@ -18,15 +19,15 @@ TEST(veliev_e_simple_iteration_method_seq, veliev_slae_2x2) {
 
   std::vector<double> expected_solution = {2, 1};
 
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(taskDataSeq);
+  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(task_data_seq);
 
   ASSERT_TRUE(test1.ValidationImpl());
   test1.PreProcessingImpl();
@@ -45,15 +46,15 @@ TEST(veliev_e_simple_iteration_method_seq, veliev_slae_non_dominant_matrix) {
   std::vector<double> b = {10.0, 12.0, 9.0};
   std::vector<double> x(input_size, 0.0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(4);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(b.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(4);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(b.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(taskDataSeq);
+  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(task_data_seq);
 
   ASSERT_FALSE(test1.ValidationImpl());
 }
@@ -68,15 +69,15 @@ TEST(veliev_e_simple_iteration_method_seq, VelievSlaeIterSeq_IterationConvergenc
   std::vector<double> x(input_size, 0.0);
 
   std::vector<double> expected_solution = {217.0 / 208.0, 59.0 / 26.0, -225.0 / 208.0};
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(taskDataSeq);
+  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(task_data_seq);
 
   ASSERT_TRUE(test1.ValidationImpl());
   test1.PreProcessingImpl();
@@ -98,15 +99,15 @@ TEST(veliev_e_simple_iteration_method_seq, veliev_slae_4x4) {
   std::vector<double> x(input_size, 0.0);
 
   std::vector<double> expected_solution = {-2982.0 / 8215, 92239.0 / 8215, -803.0 / 8215, -827.0 / 8215};
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(taskDataSeq);
+  veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq test1(task_data_seq);
 
   ASSERT_TRUE(test1.ValidationImpl());
   test1.PreProcessingImpl();

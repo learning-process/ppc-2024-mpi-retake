@@ -1,8 +1,10 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -11,23 +13,23 @@
 #include "core/task/include/task.hpp"
 #include "mpi/veliev_e_simple_iteration_method/include/mpi_header_iter.hpp"
 namespace veliev_e_simple_iteration_method_mpi {
-void generate_strictly_diagonally_dominant_matrix(int size, std::vector<double> &matrix,
-                                                  std::vector<double> &rhs_vector) {
+static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<double> &matrix,
+                                                     std::vector<double> &rhs_vector) {
   matrix.resize(size * size);
   rhs_vector.resize(size);
 
   for (int row = 0; row < size; ++row) {
     double off_diag_sum = 0.0;
-    matrix[row * size + row] = 2.0 * size;
+    matrix[(row * size) + row] = 2.0 * size;
 
     for (int col = 0; col < size; ++col) {
       if (row != col) {
-        matrix[row * size + col] = 1.0;
-        off_diag_sum += std::abs(matrix[row * size + col]);
+        matrix[(row * size) + col] = 1.0;
+        off_diag_sum += std::abs(matrix[(row * size) + col]);
       }
     }
 
-    rhs_vector[row] = matrix[row * size + row] + off_diag_sum;
+    rhs_vector[row] = matrix[(row * size) + row] + off_diag_sum;
   }
 }
 }  // namespace veliev_e_simple_iteration_method_mpi
@@ -38,19 +40,19 @@ TEST(veliev_e_simple_iteration_method_mpi, test_pipeline_run) {
   std::vector<double> matrix;
   std::vector<double> g;
   std::vector<double> x;
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  veliev_e_simple_iteration_method_mpi::generate_strictly_diagonally_dominant_matrix(input_size, matrix, g);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  veliev_e_simple_iteration_method_mpi::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   x = std::vector<double>(input_size, 0.0);
 
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  auto testTaskSequential = std::make_shared<veliev_e_simple_iteration_method_mpi::VelievSlaeIterMpi>(taskDataSeq);
+  auto test_task_sequential = std::make_shared<veliev_e_simple_iteration_method_mpi::VelievSlaeIterMpi>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -65,7 +67,7 @@ TEST(veliev_e_simple_iteration_method_mpi, test_pipeline_run) {
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
   if (world.rank() == 0) {
@@ -88,20 +90,20 @@ TEST(veliev_e_simple_iteration_method_mpi, test_task_run) {
   std::vector<double> matrix;
   std::vector<double> g;
   std::vector<double> x;
-  std::shared_ptr<ppc::core::TaskData> taskDataMpi = std::make_shared<ppc::core::TaskData>();
-  veliev_e_simple_iteration_method_mpi::generate_strictly_diagonally_dominant_matrix(input_size, matrix, g);
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  veliev_e_simple_iteration_method_mpi::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   x = std::vector<double>(input_size, 0.0);
 
-  taskDataMpi->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataMpi->inputs_count.push_back(input_size);
-  taskDataMpi->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataMpi->inputs_count.push_back(input_size);
-  taskDataMpi->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataMpi->outputs_count.push_back(input_size);
+  task_data_mpi->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_mpi->inputs_count.push_back(input_size);
+  task_data_mpi->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_mpi->inputs_count.push_back(input_size);
+  task_data_mpi->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_mpi->outputs_count.push_back(input_size);
 
   // Create Task
-  auto test_task_mpi = std::make_shared<veliev_e_simple_iteration_method_mpi::VelievSlaeIterMpi>(taskDataMpi);
+  auto test_task_mpi = std::make_shared<veliev_e_simple_iteration_method_mpi::VelievSlaeIterMpi>(task_data_mpi);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -10,23 +11,23 @@
 #include "core/task/include/task.hpp"
 #include "seq/veliev_e_simple_iteration_method/include/seq_header_iter.hpp"
 namespace veliev_e_simple_iteration_method_seq {
-void generate_strictly_diagonally_dominant_matrix(int size, std::vector<double> &matrix,
-                                                  std::vector<double> &rhs_vector) {
+static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<double> &matrix,
+                                                     std::vector<double> &rhs_vector) {
   matrix.resize(size * size);
   rhs_vector.resize(size);
 
   for (int row = 0; row < size; ++row) {
     double off_diag_sum = 0.0;
-    matrix[row * size + row] = 2.0 * size;
+    matrix[(row * size) + row] = 2.0 * size;
 
     for (int col = 0; col < size; ++col) {
       if (row != col) {
-        matrix[row * size + col] = 1.0;
-        off_diag_sum += std::abs(matrix[row * size + col]);
+        matrix[(row * size) + col] = 1.0;
+        off_diag_sum += std::abs(matrix[(row * size) + col]);
       }
     }
 
-    rhs_vector[row] = matrix[row * size + row] + off_diag_sum;
+    rhs_vector[row] = matrix[(row * size) + row] + off_diag_sum;
   }
 }
 }  // namespace veliev_e_simple_iteration_method_seq
@@ -36,18 +37,18 @@ TEST(veliev_e_simple_iteration_method_seq, test_pipeline_run) {
 
   std::vector<double> matrix;
   std::vector<double> g;
-  veliev_e_simple_iteration_method_seq::generate_strictly_diagonally_dominant_matrix(input_size, matrix, g);
+  veliev_e_simple_iteration_method_seq::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   std::vector<double> x(input_size, 0.0);
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  auto testTaskSequential = std::make_shared<veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq>(taskDataSeq);
+  auto test_task_sequential = std::make_shared<veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -63,7 +64,7 @@ TEST(veliev_e_simple_iteration_method_seq, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
@@ -80,18 +81,18 @@ TEST(veliev_e_simple_iteration_method_seq, test_task_run) {
 
   std::vector<double> matrix;
   std::vector<double> g;
-  veliev_e_simple_iteration_method_seq::generate_strictly_diagonally_dominant_matrix(input_size, matrix, g);
+  veliev_e_simple_iteration_method_seq::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   std::vector<double> x(input_size, 0.0);
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
-  taskDataSeq->inputs_count.push_back(input_size);
-  taskDataSeq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
-  taskDataSeq->outputs_count.push_back(input_size);
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(g.data()));
+  task_data_seq->inputs_count.push_back(input_size);
+  task_data_seq->outputs.push_back(reinterpret_cast<uint8_t *>(x.data()));
+  task_data_seq->outputs_count.push_back(input_size);
 
-  auto testTaskSequential = std::make_shared<veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq>(taskDataSeq);
+  auto test_task_sequential = std::make_shared<veliev_e_simple_iteration_method_seq::VelievSlaeIterSeq>(task_data_seq);
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -106,7 +107,7 @@ TEST(veliev_e_simple_iteration_method_seq, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 

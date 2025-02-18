@@ -2,8 +2,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <iostream>
-#include <numeric>
 #include <vector>
 
 #include "seq/veliev_e_simple_iteration_method/include/seq_header_iter.hpp"
@@ -33,10 +31,10 @@ bool VelievSlaeIterSeq::ValidationImpl() {
       task_data->inputs_count[0] != task_data->outputs_count[0]) {
     return false;
   }
-  matrix_size_ = task_data->inputs_count[0];
+  matrix_size_ = static_cast<int>(task_data->inputs_count[0]);
   coeff_matrix_.resize(matrix_size_ * matrix_size_);
   std::ranges::copy(reinterpret_cast<double*>(task_data->inputs[0]),
-                    reinterpret_cast<double*>(task_data->inputs[0]) + matrix_size_ * matrix_size_,
+                    reinterpret_cast<double*>(task_data->inputs[0]) + (matrix_size_ * matrix_size_),
                     coeff_matrix_.begin());
   rhs_vector_.resize(matrix_size_);
   std::ranges::copy(reinterpret_cast<double*>(task_data->inputs[1]),
@@ -82,7 +80,9 @@ bool VelievSlaeIterSeq::RunImpl() {
       next_solution[row] = free_term_vector_[row] + sum;
       max_difference = std::max(max_difference, std::abs(next_solution[row] - solution_vector_[row]));
     }
-    if (max_difference <= convergence_tolerance_) break;
+    if (max_difference <= convergence_tolerance_) {
+      break;
+    }
     solution_vector_ = next_solution;
     ++iteration;
     if (iteration > 10000) {

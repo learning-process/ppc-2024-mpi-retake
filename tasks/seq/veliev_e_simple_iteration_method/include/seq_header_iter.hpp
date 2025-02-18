@@ -25,7 +25,7 @@ class VelievSlaeIterSeq : public ppc::core::Task {
   double convergence_tolerance_;
   bool IsDiagonallyDominant();
 
-  double& MatrixAt(std::vector<double>& matrix, int row, int col) { return matrix[(row * matrix_size_) + col]; }
+  double& MatrixAt(std::vector<double>& matrix, int row, int col) const { return matrix[(row * matrix_size_) + col]; }
 };
 
 }  // namespace veliev_e_simple_iteration_method_seq
