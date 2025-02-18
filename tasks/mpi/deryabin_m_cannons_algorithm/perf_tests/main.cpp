@@ -51,9 +51,8 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+    ASSERT_EQ(true_solution1, out_matrix_c1[0]);
   }
-
-  ASSERT_EQ(true_solution1, out_matrix_c1[0]);
 }
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
