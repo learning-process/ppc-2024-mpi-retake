@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <random>
 #include <vector>
+
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
 #include "seq/Konstantinov_I_sum_of_vector_elements/include/ops_seq.hpp"
