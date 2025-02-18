@@ -130,8 +130,9 @@ size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, si
     }
 
     for (size_t i = 0; i < row_count; ++i) {
-      if (i == row)
+      if (i == row) {
         continue;
+      }
       double factor = matrix[(i * n) + col];
       for (size_t j = col; j < col_count; ++j) {
         matrix[(i * n) + j] -= factor * matrix[(row * n) + j];
