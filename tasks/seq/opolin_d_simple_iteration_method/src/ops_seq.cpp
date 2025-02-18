@@ -19,7 +19,7 @@ bool opolin_d_simple_iteration_method_seq::TestTaskSequential::PreProcessingImpl
   d_.resize(n_, 0.0);
   Xold_.resize(n_, 0.0);
   Xnew_.resize(n_, 0.0);
-  max_iters_ = *reinterpret_cast<int *>(task_data->inputs[3]);
+  max_iter_ = *reinterpret_cast<int *>(task_data->inputs[3]);
   // generate C matrix and d vector
   for (size_t i = 0; i < n_; ++i) {
     for (size_t j = 0; j < n_; ++j) {
