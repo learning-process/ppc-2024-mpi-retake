@@ -15,7 +15,7 @@
 #include "mpi/kalinin_d_vector_dot_product/include/ops_mpi.hpp"
 
 static int offset = 0;
-namespace kalinin_d_vector_dot_product_mpi {
+
 namespace {
 std::vector<int> createRandomVector(int v_size) {
   std::vector<int> vec(v_size);
@@ -25,7 +25,6 @@ std::vector<int> createRandomVector(int v_size) {
   return vec;
 }
 }  // namespace
-}  // namespace kalinin_d_vector_dot_product_mpi
 
 TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_125) {
   boost::mpi::communicator world;
@@ -35,8 +34,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_125) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     const int count_size_vector = 125;
-    std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
-    std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -89,8 +88,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_300) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 300;
-    std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
-    std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -143,8 +142,8 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_not_equal) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 120;
-    std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
-    std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector + 5);
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector + 5);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -170,8 +169,8 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_equal_true) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 120;
-    std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
-    std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -307,5 +306,245 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_empty) {
   test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(v1, v2), res[0]);
+  }
+}
+
+TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_50) {
+  boost::mpi::communicator world;
+  std::vector<std::vector<int>> global_vec;
+  std::vector<int32_t> res(1, 0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    const int count_size_vector = 50;
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
+
+    global_vec = {v1, v2};
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
+    task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
+    task_data_mpi->outputs_count.emplace_back(res.size());
+  }
+
+  kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  if (world.rank() == 0) {
+    std::vector<int32_t> reference_res(1, 0);
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_seq->inputs_count.emplace_back(global_vec[0].size());
+    task_data_seq->inputs_count.emplace_back(global_vec[1].size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
+
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
+    ASSERT_EQ(reference_res[0], res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+  }
+}
+
+TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_75) {
+  boost::mpi::communicator world;
+  std::vector<std::vector<int>> global_vec;
+  std::vector<int32_t> res(1, 0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    const int count_size_vector = 75;
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
+
+    global_vec = {v1, v2};
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
+    task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
+    task_data_mpi->outputs_count.emplace_back(res.size());
+  }
+
+  kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  if (world.rank() == 0) {
+    std::vector<int32_t> reference_res(1, 0);
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_seq->inputs_count.emplace_back(global_vec[0].size());
+    task_data_seq->inputs_count.emplace_back(global_vec[1].size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
+
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
+    ASSERT_EQ(reference_res[0], res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+  }
+}
+
+TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_150) {
+  boost::mpi::communicator world;
+  std::vector<std::vector<int>> global_vec;
+  std::vector<int32_t> res(1, 0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    const int count_size_vector = 150;
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
+
+    global_vec = {v1, v2};
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
+    task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
+    task_data_mpi->outputs_count.emplace_back(res.size());
+  }
+
+  kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  if (world.rank() == 0) {
+    std::vector<int32_t> reference_res(1, 0);
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_seq->inputs_count.emplace_back(global_vec[0].size());
+    task_data_seq->inputs_count.emplace_back(global_vec[1].size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
+
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
+    ASSERT_EQ(reference_res[0], res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+  }
+}
+
+TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_200) {
+  boost::mpi::communicator world;
+  std::vector<std::vector<int>> global_vec;
+  std::vector<int32_t> res(1, 0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    const int count_size_vector = 200;
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
+
+    global_vec = {v1, v2};
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
+    task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
+    task_data_mpi->outputs_count.emplace_back(res.size());
+  }
+
+  kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  if (world.rank() == 0) {
+    std::vector<int32_t> reference_res(1, 0);
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_seq->inputs_count.emplace_back(global_vec[0].size());
+    task_data_seq->inputs_count.emplace_back(global_vec[1].size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
+
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
+    ASSERT_EQ(reference_res[0], res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+  }
+}
+
+TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_250) {
+  boost::mpi::communicator world;
+  std::vector<std::vector<int>> global_vec;
+  std::vector<int32_t> res(1, 0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    const int count_size_vector = 250;
+    std::vector<int> v1 = createRandomVector(count_size_vector);
+    std::vector<int> v2 = createRandomVector(count_size_vector);
+
+    global_vec = {v1, v2};
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
+    task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
+    task_data_mpi->outputs_count.emplace_back(res.size());
+  }
+
+  kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  if (world.rank() == 0) {
+    std::vector<int32_t> reference_res(1, 0);
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    for (size_t i = 0; i < global_vec.size(); i++) {
+      task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
+    }
+    task_data_seq->inputs_count.emplace_back(global_vec[0].size());
+    task_data_seq->inputs_count.emplace_back(global_vec[1].size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
+
+    kalinin_d_vector_dot_product_mpi::TestMPITaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
+    ASSERT_EQ(reference_res[0], res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }

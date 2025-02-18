@@ -14,7 +14,6 @@
 
 static int offset = 0;
 
-namespace kalinin_d_vector_dot_product_seq {
 namespace {
 std::vector<int> createRandomVector(int v_size) {
   std::vector<int> vec(v_size);
@@ -24,15 +23,14 @@ std::vector<int> createRandomVector(int v_size) {
   return vec;
 }
 }  // namespace
-}  // namespace kalinin_d_vector_dot_product_seq
 
 TEST(kalinin_d_vector_dot_product_seq, test_pipeline_run) {
   const int count = 42000000;
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = kalinin_d_vector_dot_product_seq::createRandomVector(count);
-  std::vector<int> v2 = kalinin_d_vector_dot_product_seq::createRandomVector(count);
+  std::vector<int> v1 = createRandomVector(count);
+  std::vector<int> v2 = createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -76,8 +74,8 @@ TEST(kalinin_d_vector_dot_product_seq, test_task_run) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = kalinin_d_vector_dot_product_seq::createRandomVector(count);
-  std::vector<int> v2 = kalinin_d_vector_dot_product_seq::createRandomVector(count);
+  std::vector<int> v1 = createRandomVector(count);
+  std::vector<int> v2 = createRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();

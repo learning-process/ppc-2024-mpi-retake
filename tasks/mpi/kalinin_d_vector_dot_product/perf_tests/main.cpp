@@ -17,7 +17,6 @@
 static int offset = 0;
 const int count_size_vector = 42000000;
 
-namespace kalinin_d_vector_dot_product {
 namespace {
 std::vector<int> createRandomVector(int v_size) {
   std::vector<int> vec(v_size);
@@ -27,14 +26,13 @@ std::vector<int> createRandomVector(int v_size) {
   return vec;
 }
 }  // namespace
-}  // namespace kalinin_d_vector_dot_product
 
 TEST(kalinin_d_vector_dot_product_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_vec;
 
-  std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
-  std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+  std::vector<int> v1 = createRandomVector(count_size_vector);
+  std::vector<int> v2 = createRandomVector(count_size_vector);
 
   std::vector<int32_t> res(1, 0);
   global_vec = {v1, v2};
@@ -52,7 +50,7 @@ TEST(kalinin_d_vector_dot_product_mpi, test_pipeline_run) {
     task_data_mpi->outputs_count.emplace_back(res.size());
   }
 
-  auto test_task_mpi = std::make_sharedkalinin_d_vector_dot_product_mpi::test_task_mpi > (task_data_mpi);
+  auto test_task_mpi = std::make_shared<kalinin_d_vector_dot_product_mpi::TestMPITaskParallel>(task_data_mpi);
   ASSERT_EQ(test_task_mpi->ValidationImpl(), true);
   test_task_mpi->PreProcessingImpl();
   test_task_mpi->RunImpl();
@@ -82,8 +80,8 @@ TEST(kalinin_d_vector_dot_product_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_vec;
   std::vector<int32_t> res(1, 0);
-  std::vector<int> v1 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
-  std::vector<int> v2 = kalinin_d_vector_dot_product_mpi::createRandomVector(count_size_vector);
+  std::vector<int> v1 = createRandomVector(count_size_vector);
+  std::vector<int> v2 = createRandomVector(count_size_vector);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
