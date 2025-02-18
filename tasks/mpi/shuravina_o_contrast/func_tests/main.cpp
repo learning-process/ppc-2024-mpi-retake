@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -34,7 +35,7 @@ TEST(shuravina_o_contrast_mpi, test_min_max_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t max_val = *std::max_element(out.begin(), out.end());
+  uint8_t max_val = *std::ranges::max_element(out);
   EXPECT_EQ(max_val, 255);
 }
 
@@ -62,8 +63,8 @@ TEST(shuravina_o_contrast_mpi, test_random_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t min_val = *std::min_element(out.begin(), out.end());
-  uint8_t max_val = *std::max_element(out.begin(), out.end());
+  uint8_t min_val = *std::ranges::min_element(out);
+  uint8_t max_val = *std::ranges::max_element(out);
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
 }
