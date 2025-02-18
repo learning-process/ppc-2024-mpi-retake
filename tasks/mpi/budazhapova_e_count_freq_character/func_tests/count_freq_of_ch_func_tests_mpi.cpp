@@ -176,8 +176,16 @@ TEST(budazhapova_e_count_freq_chart_mpi, empty_string) {
     task_data_par->outputs_count.emplace_back(global_out.size());
   }
   budazhapova_e_count_freq_chart_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
-  ASSERT_EQ(test_mpi_task_parallel.Validation(), false);
+  ASSERT_EQ(test_mpi_task_parallel.Validation(), true);
+  test_mpi_task_parallel.PreProcessing();
+  test_mpi_task_parallel.Run();
+  test_mpi_task_parallel.PostProcessing();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(0, global_out[0]);
+  }
 }
+
 TEST(budazhapova_e_count_freq_chart_mpi, no_symb_in_string) {
   boost::mpi::communicator world;
   std::string global_str(10, 'b');

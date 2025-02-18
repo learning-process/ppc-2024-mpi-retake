@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <cstdint>
+#include <cstdlib>
+#include <ctime>
 #include <memory>
 #include <string>
 #include <vector>
