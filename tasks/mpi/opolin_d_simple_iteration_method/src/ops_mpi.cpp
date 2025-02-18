@@ -86,7 +86,6 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
   for (int rank = 0; rank < world_.size(); ++rank) {
     rows_per_worker[rank] = base_rows + (rank < remainder ? 1 : 0);
     elements_per_worker[rank] = rows_per_worker[rank] * static_cast<int32_t>(n_);
-
   }
 
   std::vector<double> local_c(elements_per_worker[world_.rank()]);
