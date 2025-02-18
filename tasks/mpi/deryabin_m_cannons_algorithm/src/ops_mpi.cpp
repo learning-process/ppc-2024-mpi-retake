@@ -272,6 +272,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
               static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size()))) *
               static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(world_.size())))) {
     PerformCannonAlgorithm();
+    world_.barrier();
   } else {
     HandleTrivialCase();
   }
