@@ -3,11 +3,12 @@
 #include <mpi.h>
 
 #include <cmath>
+#include <cstring>
 #include <numeric>
-#include <type_traits>
 #include <vector>
 
 namespace {
+
 // Utility function to get MPI datatype based on template type
 template <typename T>
 MPI_Datatype GetMPIType();
@@ -26,6 +27,7 @@ template <>
 MPI_Datatype GetMPIType<double>() {
   return MPI_DOUBLE;
 }
+
 }  // namespace
 
 template <typename T>
@@ -84,11 +86,12 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   if (task_data->outputs_count[0] > 0) {
-    reinterpret_cast<T*>(task_data->outputs[0])[0] = output_[0];
+    std::memcpy(task_data->outputs[0], &output_[0], sizeof(T));  // Fixed: Using memcpy for alignment safety
   }
   return true;
 }
 
+// Explicit template instantiations
 template bool karaseva_e_reduce_mpi::TestTaskMPI<int>::PreProcessingImpl();
 template bool karaseva_e_reduce_mpi::TestTaskMPI<int>::ValidationImpl();
 template bool karaseva_e_reduce_mpi::TestTaskMPI<int>::RunImpl();
