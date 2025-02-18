@@ -1,10 +1,9 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
-#include <algorithm>
 #include <mpi.h>
+
 #include <cmath>
 #include <cstddef>
-#include <functional>
 #include <vector>
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -41,10 +40,10 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   const auto local_size = static_cast<std::size_t>(delta) + (world_.rank() == world_.size() - 1 ? remainder : 0);
 
   if (world_.rank() == 0) {
-    local_input.assign(input_.begin(), input_.begin() + local_size);
+    local_input.assign(input_.begin(), input_.begin() + static_cast<int>(local_size));
     for (int proc = 1; proc < world_.size(); ++proc) {
       const std::size_t send_count = delta + (proc == world_.size() - 1 ? remainder : 0);
-      MPI_Send(input_.data() + proc * static_cast<int>(delta), static_cast<int>(send_count), MPI_INT, proc, 0,
+      MPI_Send(input_.data() + (proc * static_cast<int>(delta)), static_cast<int>(send_count), MPI_INT, proc, 0,
                MPI_COMM_WORLD);
     }
   } else {

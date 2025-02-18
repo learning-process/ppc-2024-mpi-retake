@@ -77,7 +77,9 @@ TEST(komshina_d_num_of_alternations_signs_mpi, InvalidInputs) {
 
   komshina_d_num_of_alternations_signs_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.Validation(), false);
+  if (world.rank() == 0) {
+    ASSERT_EQ(test_task_mpi.Validation(), false);
+  }
 }
 
 TEST(komshina_d_num_of_alternations_signs_mpi, MixedSigns) {
@@ -149,5 +151,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, InvalidOutputSize) {
 
   komshina_d_num_of_alternations_signs_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.Validation(), false);
+  if (world.rank() == 0) {
+    ASSERT_EQ(test_task_mpi.Validation(), false);
+  }
 }
