@@ -59,6 +59,8 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int partner_rank = 0;
+
+  // Binary tree reduction algorithm
   for (int step = 1; step < size; step *= 2) {
     partner_rank = rank ^ step;
 
@@ -76,7 +78,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
   if (rank == 0) {
     global_sum = local_sum;
-    output_ = {global_sum};
+    output_[0] = global_sum;
   }
 
   MPI_Barrier(MPI_COMM_WORLD);

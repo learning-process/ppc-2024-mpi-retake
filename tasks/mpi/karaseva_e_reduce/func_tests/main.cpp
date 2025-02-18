@@ -39,7 +39,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on int vector: " << duration.count() << " seconds\n";
 
-  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);
 }
 
 // MPI_DOUBLE
