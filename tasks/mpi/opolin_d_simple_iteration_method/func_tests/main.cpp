@@ -51,7 +51,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_small_system) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> x_ref, a, b;
+  std::vector<double> x_ref;
+  std::vector<double> a;
+  std::vector<double> b;
 
   std::vector<double> x_out(size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -85,7 +87,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_big_system) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> x_ref, a, b;
+  std::vector<double> x_ref;
+  std::vector<double> a;
+  std::vector<double> b;
 
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -119,7 +123,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_correct_input) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> x_ref, a, b;
+  std::vector<double> x_ref;
+  std::vector<double> a;
+  std::vector<double> b;
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
@@ -180,7 +186,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_negative_values) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> x_ref, a, b;
+  std::vector<double> x_ref;
+  std::vector<double> a;
+  std::vector<double> b;
 
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -216,7 +224,8 @@ TEST(opolin_d_simple_iteration_method_mpi, test_singular_matrix) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> a, b;
+  std::vector<double> a;
+  std::vector<double> b;
 
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -245,7 +254,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_simple_matrix) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> x_ref, a, b;
+  std::vector<double> x_ref;
+  std::vector<double> a;
+  std::vector<double> b;
   std::vector<double> x_out(size, 0.0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -281,7 +292,9 @@ TEST(opolin_d_simple_iteration_method_mpi, test_single_element) {
   double epsilon = 1e-8;
   int max_iters = 10000;
 
-  std::vector<double> x_ref, a, b;
+  std::vector<double> x_ref;
+  std::vector<double> a;
+  std::vector<double> b;
   std::vector<double> x_out(size, 0.0);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {

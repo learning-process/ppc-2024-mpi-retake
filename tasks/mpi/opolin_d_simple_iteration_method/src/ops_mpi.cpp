@@ -23,10 +23,6 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingIm
     Xold_.resize(n_, 0.0);
     Xnew_.resize(n_, 0.0);
     max_iters_ = *reinterpret_cast<int *>(task_data->inputs[3]);
-    std::vector<double> augmen_matrix = A_;
-    for (size_t i = 0; i < n_; ++i) {
-      augmen_matrix.push_back(b_[i]);
-    }
     // generate C matrix and d vector
     for (size_t i = 0; i < n_; ++i) {
       for (size_t j = 0; j < n_; ++j) {

@@ -12,29 +12,29 @@
 
 namespace opolin_d_simple_iteration_method_seq {
 namespace {
-void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
+void GenerateTestData(size_t size, std::vector<double> &x, std::vector<double> &a, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-  X.resize(size);
+  x.resize(size);
   for (size_t i = 0; i < size; ++i) {
-    X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
+    x[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
 
-  A.resize(size * size, 0.0);
+  a.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
     for (size_t j = 0; j < size; ++j) {
       if (i != j) {
-        A[i * size + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
-        sum += std::abs(A[i * size + j]);
+        a[(i * size) + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
+        sum += std::abs(a[(i * size) + j]);
       }
     }
-    A[i * size + i] = sum + 1.0;
+    a[(i * size) + i] = sum + 1.0;
   }
   b.resize(size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     for (size_t j = 0; j < size; ++j) {
-      b[i] += A[i * size + j] * X[j];
+      b[i] += a[(i * size) + j] * x[j];
     }
   }
 }
@@ -44,18 +44,20 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
 TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   int size = 3;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> expectedX, A, b;
-  opolin_d_simple_iteration_method_seq::generateTestData(size, expectedX, A, b);
+  int max_iters = 1000;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
+  opolin_d_simple_iteration_method_seq::GenerateTestData(size, expected, a, b);
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -65,25 +67,27 @@ TEST(opolin_d_simple_iteration_method_seq, test_small_system) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
   int size = 100;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> expectedX, A, b;
-  opolin_d_simple_iteration_method_seq::generateTestData(size, expectedX, A, b);
+  int max_iters = 1000;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
+  opolin_d_simple_iteration_method_seq::GenerateTestData(size, expected, a, b);
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -93,28 +97,30 @@ TEST(opolin_d_simple_iteration_method_seq, test_big_system) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_negative_values) {
   int size = 3;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> expectedX, A, b;
+  int max_iters = 1000;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
 
-  A = {5.0, -1.0, 2.0, -1.0, 6.0, -1.0, 2.0, -1.0, 7.0};
+  a = {5.0, -1.0, 2.0, -1.0, 6.0, -1.0, 2.0, -1.0, 7.0};
   b = {-9.0, -8.0, -21.0};
-  expectedX = {-1.0, -2.0, -3.0};
+  expected = {-1.0, -2.0, -3.0};
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -124,26 +130,26 @@ TEST(opolin_d_simple_iteration_method_seq, test_negative_values) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
   int size = 1;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> A = {4.0};
+  int max_iters = 1000;
+  std::vector<double> a = {4.0};
   std::vector<double> b = {8.0};
-  std::vector<double> expectedX = {2.0};
+  std::vector<double> expected = {2.0};
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -153,24 +159,24 @@ TEST(opolin_d_simple_iteration_method_seq, test_single_element) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_no_dominance_matrix) {
   int size = 3;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> A = {3.0, 2.0, 4.0, 1.0, 2.0, 4.0, 1.0, 2.0, 3.0};
+  int max_iters = 1000;
+  std::vector<double> a = {3.0, 2.0, 4.0, 1.0, 2.0, 4.0, 1.0, 2.0, 3.0};
   std::vector<double> b = {3.0, 2.0, 2.0};
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -181,18 +187,18 @@ TEST(opolin_d_simple_iteration_method_seq, test_no_dominance_matrix) {
 TEST(opolin_d_simple_iteration_method_seq, test_singular_matrix) {
   int size = 3;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> A = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 5.0, 7.0, 9.0};
+  int max_iters = 1000;
+  std::vector<double> a = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 5.0, 7.0, 9.0};
   std::vector<double> b = {1.0, 2.0, 3.0};
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -203,18 +209,20 @@ TEST(opolin_d_simple_iteration_method_seq, test_singular_matrix) {
 TEST(opolin_d_simple_iteration_method_seq, test_random_generated_data) {
   int size = 5;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> expectedX, A, b;
-  opolin_d_simple_iteration_method_seq::generateTestData(size, expectedX, A, b);
+  int max_iters = 1000;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
+  opolin_d_simple_iteration_method_seq::GenerateTestData(size, expected, a, b);
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -224,28 +232,29 @@ TEST(opolin_d_simple_iteration_method_seq, test_random_generated_data) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_correct_input) {
   int size = 3;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> expectedX, A, b;
-
-  A = {4.0, 1.0, 2.0, 1.0, 5.0, 1.0, 2.0, 1.0, 5.0};
+  int max_iters = 1000;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
+  a = {4.0, 1.0, 2.0, 1.0, 5.0, 1.0, 2.0, 1.0, 5.0};
   b = {7.0, 7.0, 8.0};
-  expectedX = {1.0, 1.0, 1.0};
+  expected = {1.0, 1.0, 1.0};
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -255,28 +264,29 @@ TEST(opolin_d_simple_iteration_method_seq, test_correct_input) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }
 
 TEST(opolin_d_simple_iteration_method_seq, test_simple_matrix) {
   int size = 3;
   double epsilon = 1e-9;
-  int maxIters = 1000;
-  std::vector<double> expectedX, A, b;
-
-  A = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+  int max_iters = 1000;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
+  a = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
   b = {1.0, 1.0, 1.0};
-  expectedX = {1.0, 1.0, 1.0};
+  expected = {1.0, 1.0, 1.0};
 
   std::vector<double> out(size, 0.0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -286,6 +296,6 @@ TEST(opolin_d_simple_iteration_method_seq, test_simple_matrix) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(expectedX[i], out[i], 1e-3);
+    ASSERT_NEAR(expected[i], out[i], 1e-3);
   }
 }

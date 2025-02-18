@@ -11,29 +11,29 @@
 
 namespace opolin_d_simple_iteration_method_seq {
 namespace {
-void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &A, std::vector<double> &b) {
+void GenerateTestData(size_t size, std::vector<double> &x, std::vector<double> &a, std::vector<double> &b) {
   std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-  X.resize(size);
+  x.resize(size);
   for (size_t i = 0; i < size; ++i) {
-    X[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
+    x[i] = -10.0 + static_cast<double>(std::rand() % 1000) / 50.0;
   }
 
-  A.resize(size * size, 0.0);
+  a.resize(size * size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     double sum = 0.0;
     for (size_t j = 0; j < size; ++j) {
       if (i != j) {
-        A[i * size + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
-        sum += std::abs(A[i * size + j]);
+        a[(i * size) + j] = -1.0 + static_cast<double>(std::rand() % 1000) / 500.0;
+        sum += std::abs(a[(i * size) + j]);
       }
     }
-    A[i * size + i] = sum + 1.0;
+    a[(i * size) + i] = sum + 1.0;
   }
   b.resize(size, 0.0);
   for (size_t i = 0; i < size; ++i) {
     for (size_t j = 0; j < size; ++j) {
-      b[i] += A[i * size + j] * X[j];
+      b[i] += a[(i * size) + j] * x[j];
     }
   }
 }
@@ -42,22 +42,22 @@ void generateTestData(size_t size, std::vector<double> &X, std::vector<double> &
 
 TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
   int size = 1200;
-  std::vector<double> A;
+  std::vector<double> a;
   std::vector<double> b;
-  std::vector<double> X;
+  std::vector<double> x;
 
   std::vector<double> out(size, 0);
-  opolin_d_simple_iteration_method_seq::generateTestData(size, X, A, b);
+  opolin_d_simple_iteration_method_seq::GenerateTestData(size, x, a, b);
 
   double epsilon = 1e-7;
-  int maxIters = 10000;
+  int max_iters = 10000;
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
@@ -88,21 +88,21 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
 
 TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
   int size = 3500;
-  std::vector<double> A;
+  std::vector<double> a;
   std::vector<double> b;
-  std::vector<double> X;
-  opolin_d_simple_iteration_method_seq::generateTestData(size, X, A, b);
+  std::vector<double> x;
+  opolin_d_simple_iteration_method_seq::GenerateTestData(size, x, a, b);
 
   std::vector<double> out(size, 0);
   double epsilon = 1e-9;
-  int maxIters = 10000;
+  int max_iters = 10000;
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&maxIters));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&max_iters));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
