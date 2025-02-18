@@ -1,7 +1,8 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -9,9 +10,9 @@
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    input_ = std::vector<int>(task_data->inputs_count[0]);
-    auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
-    std::copy(in_ptr, in_ptr + task_data->inputs_count[0], input_.begin());
+    unsigned int input_size = task_data->inputs_count[0];
+    auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+    input_ = std::vector<int>(in_ptr, in_ptr + input_size);
   }
   result_ = 0;
   return true;
@@ -25,43 +26,57 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
-  int chunk_size = 0;
-  int remainder = 0;
+  int rank = world_.rank();
+  int size = world_.size();
 
-  if (world_.rank() == 0) {
-    chunk_size = task_data->inputs_count[0] / world_.size();
-    remainder = task_data->inputs_count[0] % world_.size();
+  unsigned int chunk_size = 0, extra = 0;
+  if (rank == 0) {
+    chunk_size = task_data->inputs_count[0] / size;
+    extra = task_data->inputs_count[0] % size;
   }
 
-  broadcast(world_, chunk_size, 0);
-  broadcast(world_, remainder, 0);
+  boost::mpi::broadcast(world_, chunk_size, 0);
+  boost::mpi::broadcast(world_, extra, 0);
 
-  int local_data_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
-  local_input_ = std::vector<int>(local_data_size);
+  int local_size = chunk_size + (rank == size - 1 ? extra : 0);
+  local_input_.resize(local_size);
 
-  if (world_.rank() == 0) {
-    std::copy(input_.begin(), input_.begin() + local_data_size, local_input_.begin());
+  if (rank == 0) {
+    std::copy(input_.begin(), input_.begin() + local_size, local_input_.begin());
+    for (int proc = 1; proc < size; ++proc) {
+      int send_count = chunk_size + (proc == size - 1 ? extra : 0);
+      world_.send(proc, 0, input_.data() + proc * chunk_size, send_count);
+    }
   } else {
-    world_.recv(0, 0, local_input_.data(), local_data_size);
+    world_.recv(0, 0, local_input_.data(), local_size);
   }
 
-  int sign_changes = 0;
+  int local_count = 0;
   for (size_t i = 1; i < local_input_.size(); ++i) {
-    sign_changes += (local_input_[i - 1] * local_input_[i] < 0);
+    if (local_input_[i - 1] * local_input_[i] < 0) {
+      ++local_count;
+    }
   }
 
-  if (world_.rank() > 0) {
-    int prev_value = 0;
-    world_.recv(world_.rank() - 1, 0, &prev_value, 1);
-    sign_changes += (prev_value * local_input_[0] < 0);
+  if (rank > 0) {
+    int prev_value;
+    world_.recv(rank - 1, 0, &prev_value, 1);
+    if (!local_input_.empty() && prev_value * local_input_[0] < 0) {
+      ++local_count;
+    }
   }
 
-  if (world_.rank() < world_.size() - 1) {
-    int last_value = local_input_.back();
-    world_.send(world_.rank() + 1, 0, &last_value, 1);
+  if (rank < size - 1) {
+    int last_value = local_input_.empty() ? 0 : local_input_.back();
+    world_.send(rank + 1, 0, &last_value, 1);
   }
 
-  boost::mpi::reduce(world_, sign_changes, result_, std::plus<>(), 0);
+  int total_count = 0;
+  boost::mpi::reduce(world_, local_count, total_count, std::plus<>(), 0);
+
+  if (rank == 0) {
+    result_ = total_count;
+  }
 
   return true;
 }
