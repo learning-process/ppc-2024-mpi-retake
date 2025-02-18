@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
 
-#include <algorithm>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cstddef>
 #include <cstdint>
-#include <cstdlib>
 #include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
-TEST(shuravina_o_contrast, test_min_max_values) {
+
+TEST(shuravina_o_contrast_mpi, test_min_max_values) {
   constexpr size_t kCount = 256;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
@@ -27,7 +28,7 @@ TEST(shuravina_o_contrast, test_min_max_values) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  shuravina_o_contrast::TestTaskMPI test_task_mpi(task_data_mpi);
+  shuravina_o_contrast::ContrastTaskMPI test_task_mpi(task_data_mpi);
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();
@@ -37,7 +38,7 @@ TEST(shuravina_o_contrast, test_min_max_values) {
   EXPECT_EQ(max_val, 255);
 }
 
-TEST(shuravina_o_contrast, test_random_values) {
+TEST(shuravina_o_contrast_mpi, test_random_values) {
   constexpr size_t kCount = 256;
 
   std::vector<uint8_t> in(kCount * kCount, 0);
@@ -55,7 +56,7 @@ TEST(shuravina_o_contrast, test_random_values) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  shuravina_o_contrast::TestTaskMPI test_task_mpi(task_data_mpi);
+  shuravina_o_contrast::ContrastTaskMPI test_task_mpi(task_data_mpi);
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();

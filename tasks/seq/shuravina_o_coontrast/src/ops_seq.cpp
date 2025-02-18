@@ -1,4 +1,4 @@
-#include "seq/shuravina_o_contrast/include/ops_seq.hpp"
+#include "seq/shuravina_o_coontrast/include/ops_seq.hpp"
 
 #include <algorithm>
 #include <cmath>
