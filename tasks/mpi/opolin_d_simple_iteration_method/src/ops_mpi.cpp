@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
-#include <ranges>
 #include <vector>
 
 bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::PreProcessingImpl() {
@@ -86,7 +85,8 @@ bool opolin_d_simple_iteration_method_mpi::SimpleIterMethodkMPI::RunImpl() {
   std::vector<int32_t> elements_per_worker(world_.size());
   for (int rank = 0; rank < world_.size(); ++rank) {
     rows_per_worker[rank] = base_rows + (rank < remainder ? 1 : 0);
-    elements_per_worker[rank] = rows_per_worker[rank] * n_;
+    elements_per_worker[rank] = rows_per_worker[rank] * static_cast<int32_t>(n_);
+
   }
 
   std::vector<double> local_c(elements_per_worker[world_.rank()]);
@@ -146,9 +146,9 @@ size_t opolin_d_simple_iteration_method_mpi::Rank(std::vector<double> matrix, si
   size_t rank = 0;
   for (size_t col = 0, row = 0; col < col_count && row < row_count; ++col) {
     size_t max_row_idx = row;
-    double max_value = std::abs(matrix[(row * n) + col]);
+    double max_value = std::abs(matrix[row * n + col]);
     for (size_t i = row + 1; i < row_count; ++i) {
-      double current_value = std::abs(matrix[(i * n) + col]);
+      double current_value = std::abs(matrix[i * n + col]);
       if (current_value > max_value) {
         max_value = current_value;
         max_row_idx = i;
@@ -174,12 +174,18 @@ size_t opolin_d_simple_iteration_method_mpi::Rank(std::vector<double> matrix, si
       matrix[(row * n) + j] /= lead_element;
     }
 
-    for (size_t i = 0; i < row_count; ++i) {
-      if (i != row) {
-        double factor = matrix[(i * n) + col];
-        for (size_t j = col; j < col_count; ++j) {
-          matrix[(i * n) + j] -= factor * matrix[(row * n) + j];
-        }
+    for (size_t i = 0; i < row; ++i) {
+      double factor = matrix[(i * n) + col];
+      size_t base = i * n;
+      size_t pivot_base = row * n;
+      for (size_t j = col; j < col_count; ++j) {
+        matrix[base + j] -= factor * matrix[pivot_base + j];
+      }
+    }
+    for (size_t i = row + 1; i < row_count; ++i) {
+      double factor = matrix[i * n + col];
+      for (size_t j = col; j < col_count; ++j) {
+        matrix[(i * n) + j] -= factor * matrix[row * n + j];
       }
     }
     ++rank;
