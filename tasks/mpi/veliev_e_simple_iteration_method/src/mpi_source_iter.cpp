@@ -84,17 +84,18 @@ bool VelievSlaeIterMpi::RunImpl() {
   int local_rows = 0;
   int local_displ = 0;
   std::vector<int> rows_per_proc;
-  std::vector<int> displs;
+  std::vector<int> displs(1, 0);
   std::vector<int> elements_per_proc;
-  std::vector<int> element_displs;
+  std::vector<int> element_displs(1, 0);
   if (rank == 0) {
     int base_rows = matrix_size_ / size;
     int extra_rows = matrix_size_ % size;
-
-    rows_per_proc.resize(size);
-    displs.resize(size);
-    elements_per_proc.resize(size);
-    element_displs.resize(size);
+    if (size != 0) {
+      rows_per_proc.resize(size);
+      displs.resize(size);
+      elements_per_proc.resize(size);
+      element_displs.resize(size);
+    }
 
     for (int i = 0; i < size; ++i) {
       rows_per_proc[i] = base_rows + (i < extra_rows ? 1 : 0);
