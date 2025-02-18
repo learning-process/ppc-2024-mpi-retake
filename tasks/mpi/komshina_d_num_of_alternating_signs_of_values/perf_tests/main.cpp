@@ -11,15 +11,19 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
-  const int input_size = 500;
+  const int input_size = 10000000;
 
   // Create data
   std::vector<int> in(input_size);
   std::vector<int> out(1, 0);
 
   int sign = 1;
-  for (int i = 0; i < input_size; ++i, sign = -sign) {
-    in[i] = sign;
+  for (int i = 0; i < input_size; i++) {
+    if (i % 3 == 0 || i % 3 == 1) {
+      in[i] = 1;
+    } else {
+      in[i] = -1;
+    }
   }
 
   // Create TaskData
@@ -50,20 +54,24 @@ TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
   boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ((input_size - 1), out[0]);
+    ASSERT_EQ(input_size / 3, out[0]);
   }
 }
 
 TEST(komshina_d_num_of_alternations_signs_mpi, test_task_Run) {
-  const int input_size = 500;
+  const int input_size = 10000000;
 
   // Create data
   std::vector<int> in(input_size);
   std::vector<int> out(1, 0);
 
   int sign = 1;
-  for (int i = 0; i < input_size; ++i, sign = -sign) {
-    in[i] = sign;
+  for (int i = 0; i < input_size; i++) {
+    if (i % 3 == 0 || i % 3 == 1) {
+      in[i] = 1;
+    } else {
+      in[i] = -1;
+    }
   }
 
   // Create TaskData
@@ -95,6 +103,6 @@ TEST(komshina_d_num_of_alternations_signs_mpi, test_task_Run) {
   boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ((input_size - 1), out[0]);
+    ASSERT_EQ(input_size / 3, out[0]);
   }
 }
