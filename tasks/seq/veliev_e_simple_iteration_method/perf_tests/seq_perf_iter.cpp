@@ -11,8 +11,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/veliev_e_simple_iteration_method/include/seq_header_iter.hpp"
 namespace {
-static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<double> &matrix,
-                                                     std::vector<double> &rhs_vector) {
+void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<double> &matrix, std::vector<double> &rhs_vector) {
   matrix.resize(size * size);
   rhs_vector.resize(size);
 
