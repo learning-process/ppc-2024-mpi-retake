@@ -27,7 +27,7 @@ class VelievSlaeIterMpi : public ppc::core::Task {
   bool IsDiagonallyDominant();
   boost::mpi::communicator world_;
 
-  double& MatrixAt(std::vector<double>& matrix, int row, int col) { return matrix[(row * matrix_size_) + col]; }
+  double& MatrixAt(std::vector<double>& matrix, int row, int col) const { return matrix[(row * matrix_size_) + col]; }
 };
 
 }  // namespace veliev_e_simple_iteration_method_mpi

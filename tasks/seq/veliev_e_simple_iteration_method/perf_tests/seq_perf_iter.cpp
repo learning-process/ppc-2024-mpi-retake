@@ -10,7 +10,7 @@
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/veliev_e_simple_iteration_method/include/seq_header_iter.hpp"
-namespace veliev_e_simple_iteration_method_seq {
+namespace {
 static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<double> &matrix,
                                                      std::vector<double> &rhs_vector) {
   matrix.resize(size * size);
@@ -30,14 +30,14 @@ static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<doubl
     rhs_vector[row] = matrix[(row * size) + row] + off_diag_sum;
   }
 }
-}  // namespace veliev_e_simple_iteration_method_seq
+}  // namespace
 
 TEST(veliev_e_simple_iteration_method_seq, test_pipeline_run) {
   const int input_size = 5000;
 
   std::vector<double> matrix;
   std::vector<double> g;
-  veliev_e_simple_iteration_method_seq::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
+  GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   std::vector<double> x(input_size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -81,7 +81,7 @@ TEST(veliev_e_simple_iteration_method_seq, test_task_run) {
 
   std::vector<double> matrix;
   std::vector<double> g;
-  veliev_e_simple_iteration_method_seq::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
+  GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   std::vector<double> x(input_size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();

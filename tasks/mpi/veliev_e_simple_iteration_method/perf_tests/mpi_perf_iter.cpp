@@ -1,7 +1,6 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
-#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cmath>
@@ -12,7 +11,7 @@
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/veliev_e_simple_iteration_method/include/mpi_header_iter.hpp"
-namespace veliev_e_simple_iteration_method_mpi {
+namespace {
 static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<double> &matrix,
                                                      std::vector<double> &rhs_vector) {
   matrix.resize(size * size);
@@ -32,7 +31,7 @@ static void GenerateStrictlyDiagonallyDominantMatrix(int size, std::vector<doubl
     rhs_vector[row] = matrix[(row * size) + row] + off_diag_sum;
   }
 }
-}  // namespace veliev_e_simple_iteration_method_mpi
+}  // namespace
 
 TEST(veliev_e_simple_iteration_method_mpi, test_pipeline_run) {
   const int input_size = 5000;
@@ -41,7 +40,7 @@ TEST(veliev_e_simple_iteration_method_mpi, test_pipeline_run) {
   std::vector<double> g;
   std::vector<double> x;
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  veliev_e_simple_iteration_method_mpi::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
+  GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   x = std::vector<double>(input_size, 0.0);
 
@@ -91,7 +90,7 @@ TEST(veliev_e_simple_iteration_method_mpi, test_task_run) {
   std::vector<double> g;
   std::vector<double> x;
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  veliev_e_simple_iteration_method_mpi::GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
+  GenerateStrictlyDiagonallyDominantMatrix(input_size, matrix, g);
 
   x = std::vector<double>(input_size, 0.0);
 
