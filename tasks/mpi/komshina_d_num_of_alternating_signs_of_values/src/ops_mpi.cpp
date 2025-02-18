@@ -6,12 +6,11 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <functional>
 #include <vector>
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    std::size_t input_size = static_cast<std::size_t>(task_data->inputs_count[0]);
+    auto input_size = static_cast<std::size_t>(task_data->inputs_count[0]);
     auto *data_ptr = reinterpret_cast<int32_t *>(task_data->inputs[0]);
     input_.assign(data_ptr, data_ptr + input_size);
   }
@@ -20,17 +19,21 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() 
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::ValidationImpl() {
-  return world_.rank() != 0 || (task_data->inputs_count[0] >= 2 && task_data->outputs_count[0] == 1);
+  if (world_.rank() == 0) {
+    return task_data->inputs_count[0] >= 2 && task_data->outputs_count[0] == 1;
+  }
+  return true;
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
-  std::size_t chunk_size = 0, remainder = 0;
+  std::size_t chunk_size = 0;
+  std::size_t remainder = 0;
   if (world_.rank() == 0) {
     chunk_size = static_cast<std::size_t>(task_data->inputs_count[0]) / static_cast<std::size_t>(world_.size());
     remainder = static_cast<std::size_t>(task_data->inputs_count[0]) % static_cast<std::size_t>(world_.size());
   }
-  broadcast(world_, chunk_size, 0);
-  broadcast(world_, remainder, 0);
+  boost::mpi::broadcast(world_, chunk_size, 0);
+  boost::mpi::broadcast(world_, remainder, 0);
 
   std::size_t local_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
   local_input_.resize(local_size);
