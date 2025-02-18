@@ -43,7 +43,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   if (world_.rank() == 0) {
     std::copy(input_.begin(), input_.begin() + local_data_size, local_input_.begin());
   } else {
-    world_.recv(0, 0, local_input_.data(), local_data_size);
+    world_.recv(0, 0, local_input_.data(), static_cast<int>(local_data_size));
   }
 
   int sign_changes = 0;
@@ -54,7 +54,7 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
   if (world_.rank() > 0) {
     int prev_value = 0;
     world_.recv(world_.rank() - 1, 0, &prev_value, 1);
-    sign_changes += (prev_value * local_input_[0] < 0);
+    sign_changes += static_cast<int>(prev_value * local_input_[0] < 0);
   }
 
   if (world_.rank() < world_.size() - 1) {
