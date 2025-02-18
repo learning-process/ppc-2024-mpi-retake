@@ -11,17 +11,17 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
-  constexpr size_t matrix_size = 100;
-  std::vector<double> input_matrix_a = std::vector<double>(matrix_size * matrix_size, 0);
-  std::vector<double> input_matrix_b = std::vector<double>(matrix_size * matrix_size, 0);
-  std::vector<double> output_matrix_c = std::vector<double>(matrix_size * matrix_size, 0);
+  constexpr size_t kMatrixSize = 100;
+  std::vector<double> input_matrix_a = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> input_matrix_b = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> output_matrix_c = std::vector<double>(kMatrixSize * kMatrixSize, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::vector<double> true_solution = std::vector<double>(matrix_size * matrix_size, 0);
-  for (unsigned short i = 0; i < matrix_size; i++) {
-    for (unsigned short j = 0; j < matrix_size; j++) {
-      input_matrix_a[j + (i * matrix_size)] = i + 1;
-      input_matrix_b[j + (i * matrix_size)] = j + 1;
-      true_solution[j + (i * matrix_size)] = (i + 1) * (j + 1) * matrix_size;
+  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  for (unsigned short i = 0; i < kMatrixSize; i++) {
+    for (unsigned short j = 0; j < kMatrixSize; j++) {
+      input_matrix_a[j + (i * kMatrixSize)] = i + 1;
+      input_matrix_b[j + (i * kMatrixSize)] = j + 1;
+      true_solution[j + (i * kMatrixSize)] = (i + 1) * (j + 1) * kMatrixSize;
     }
   }
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -58,17 +58,17 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 }
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
-  constexpr size_t matrix_size = 100;
-  std::vector<double> input_matrix_a1 = std::vector<double>(matrix_size * matrix_size, 0);
-  std::vector<double> input_matrix_b1 = std::vector<double>(matrix_size * matrix_size, 0);
-  std::vector<double> output_matrix_c1 = std::vector<double>(matrix_size * matrix_size, 0);
+  constexpr size_t kMatrixSize = 100;
+  std::vector<double> input_matrix_a1 = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> input_matrix_b1 = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> output_matrix_c1 = std::vector<double>(kMatrixSize * kMatrixSize, 0);
   std::vector<std::vector<double>> out_matrix_c1(1, output_matrix_c1);
-  std::vector<double> true_solution1 = std::vector<double>(matrix_size * matrix_size, 0);
-  for (unsigned short i = 0; i < matrix_size; i++) {
-    for (unsigned short j = 0; j < matrix_size; j++) {
-      input_matrix_a1[j + (i * matrix_size)] = i + 1;
-      input_matrix_b1[j + (i * matrix_size)] = j + 1;
-      true_solution1[j + (i * matrix_size)] = 2 * (i + 1) * (j + 1) * matrix_size;
+  std::vector<double> true_solution1 = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  for (unsigned short i = 0; i < kMatrixSize; i++) {
+    for (unsigned short j = 0; j < kMatrixSize; j++) {
+      input_matrix_a1[j + (i * kMatrixSize)] = i + 1;
+      input_matrix_b1[j + (i * kMatrixSize)] = j + 1;
+      true_solution1[j + (i * kMatrixSize)] = 2 * (i + 1) * (j + 1) * kMatrixSize;
     }
   }
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
