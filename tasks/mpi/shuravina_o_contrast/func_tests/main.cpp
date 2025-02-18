@@ -64,4 +64,4 @@ TEST(shuravina_o_contrast, test_random_values) {
   uint8_t max_val = *std::ranges::max_element(out.begin(), out.end());
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
-} 
+  } 
