@@ -59,28 +59,30 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int partner_rank = 0;
-
-  // Binary tree reduction algorithm
   for (int step = 1; step < size; step *= 2) {
     partner_rank = rank ^ step;
 
     if (rank < partner_rank) {
+      // Send local sum to partner
       MPI_Send(&local_sum, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD);
       break;
     }
 
     if (rank > partner_rank) {
+      // Receive sum from partner and add it to local sum
       T recv_data = 0;
       MPI_Recv(&recv_data, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       local_sum += recv_data;
     }
   }
 
+  // Process with rank 0 collects the global sum
   if (rank == 0) {
     global_sum = local_sum;
-    output_[0] = global_sum;
+    output_ = {global_sum};  // Assign the global sum to the output
   }
 
+  // Ensure synchronization before finishing
   MPI_Barrier(MPI_COMM_WORLD);
   return true;
 }
