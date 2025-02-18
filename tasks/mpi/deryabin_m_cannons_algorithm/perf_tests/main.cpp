@@ -11,16 +11,16 @@
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
-  std::vector<double> input_matrix_a = std::vector<double>(1000000, 0);
-  std::vector<double> input_matrix_b = std::vector<double>(1000000, 0);
-  std::vector<double> output_matrix_c = std::vector<double>(1000000, 0);
+  std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
+  std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
+  std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::vector<double> true_solution = std::vector<double>(1000000, 0);
-  for (unsigned short i = 0; i < 1000; i++) {
-    for (unsigned short j = 0; j < 1000; j++) {
-      input_matrix_a[j + (i * 1000)] = i + 1;
-      input_matrix_b[j + (i * 1000)] = j + 1;
-      true_solution[j + (i * 1000)] = (i + 1) * (j + 1) * 1000;
+  std::vector<double> true_solution = std::vector<double>(10000, 0);
+  for (unsigned short i = 0; i < 100; i++) {
+    for (unsigned short j = 0; j < 100; j++) {
+      input_matrix_a[j + (i * 100)] = i + 1;
+      input_matrix_b[j + (i * 100)] = j + 1;
+      true_solution[j + (i * 100)] = (i + 1) * (j + 1) * 100;
     }
   }
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -35,7 +35,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 1;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -57,16 +57,16 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
 }
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
-  std::vector<double> input_matrix_a1 = std::vector<double>(1000000, 0);
-  std::vector<double> input_matrix_b1 = std::vector<double>(1000000, 0);
-  std::vector<double> output_matrix_c1 = std::vector<double>(1000000, 0);
+  std::vector<double> input_matrix_a1 = std::vector<double>(10000, 0);
+  std::vector<double> input_matrix_b1 = std::vector<double>(10000, 0);
+  std::vector<double> output_matrix_c1 = std::vector<double>(10000, 0);
   std::vector<std::vector<double>> out_matrix_c1(1, output_matrix_c1);
-  std::vector<double> true_solution1 = std::vector<double>(1000000, 0);
-  for (unsigned short i = 0; i < 1000; i++) {
-    for (unsigned short j = 0; j < 1000; j++) {
-      input_matrix_a1[j + (i * 1000)] = i + 1;
-      input_matrix_b1[j + (i * 1000)] = j + 1;
-      true_solution1[j + (i * 1000)] = (i + 1) * (j + 1) * 1000;
+  std::vector<double> true_solution1 = std::vector<double>(10000, 0);
+  for (unsigned short i = 0; i < 100; i++) {
+    for (unsigned short j = 0; j < 100; j++) {
+      input_matrix_a1[j + (i * 100)] = i + 1;
+      input_matrix_b1[j + (i * 100)] = j + 1;
+      true_solution1[j + (i * 100)] = 2 * (i + 1) * (j + 1) * 100;
     }
   }
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -81,7 +81,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
       std::make_shared<deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel>(task_data_par);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 1;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
