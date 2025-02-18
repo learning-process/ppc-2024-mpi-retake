@@ -6,7 +6,6 @@
 #include <memory>
 #include <vector>
 
-#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
