@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
-#include <string>
 #include <memory>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
