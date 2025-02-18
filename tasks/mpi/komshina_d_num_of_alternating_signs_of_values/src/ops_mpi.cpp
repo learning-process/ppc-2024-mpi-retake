@@ -1,8 +1,7 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <mpi.h>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -45,11 +44,12 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
     local_input.assign(input_.begin(), input_.begin() + local_size);
     for (int proc = 1; proc < world_.size(); ++proc) {
       const std::size_t send_count = delta + (proc == world_.size() - 1 ? remainder : 0);
-      MPI_Send(input_.data() + proc * static_cast<int>(delta), send_count, MPI_INT, proc, 0, MPI_COMM_WORLD);
+      MPI_Send(input_.data() + proc * static_cast<int>(delta), static_cast<int>(send_count), MPI_INT, proc, 0,
+               MPI_COMM_WORLD);
     }
   } else {
     local_input.resize(local_size);
-    MPI_Recv(local_input.data(), local_size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(local_input.data(), static_cast<int>(local_size), MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   int local_count = 0;
