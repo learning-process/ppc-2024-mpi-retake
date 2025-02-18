@@ -63,10 +63,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_pipeline_run) {
 
   // Create Task
   auto test_task_sequential = std::make_shared<opolin_d_simple_iteration_method_seq::TestTaskSequential>(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential->Validation(), true);
+  test_task_sequential->PreProcessing();
+  test_task_sequential->Run();
+  test_task_sequential->PostProcessing();
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -109,10 +109,10 @@ TEST(opolin_d_simple_iteration_method_seq, test_task_run) {
 
   // Create Task
   auto test_task_sequential = std::make_shared<opolin_d_simple_iteration_method_seq::TestTaskSequential>(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
+  ASSERT_EQ(test_task_sequential->Validation(), true);
+  test_task_sequential->PreProcessing();
+  test_task_sequential->Run();
+  test_task_sequential->PostProcessing();
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
