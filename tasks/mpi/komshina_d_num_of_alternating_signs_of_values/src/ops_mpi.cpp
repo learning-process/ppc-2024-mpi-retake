@@ -1,8 +1,7 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <boost/mpi.hpp>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -10,9 +9,9 @@
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    unsigned int input_size = task_data->inputs_count[0];
-    auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-    input_ = std::vector<int>(in_ptr, in_ptr + input_size);
+    input_ = std::vector<int>(task_data->inputs_count[0]);
+    auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
+    std::copy(in_ptr, in_ptr + task_data->inputs_count[0], input_.begin());
   }
   result_ = 0;
   return true;
@@ -26,35 +25,35 @@ bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool komshina_d_num_of_alternations_signs_mpi::TestTaskMPI::RunImpl() {
-  unsigned int chunk_size = 0;
-  unsigned int remainder = 0;
+  int chunk_size = 0;
+  int remainder = 0;
 
   if (world_.rank() == 0) {
     chunk_size = task_data->inputs_count[0] / world_.size();
     remainder = task_data->inputs_count[0] % world_.size();
   }
 
-  boost::mpi::broadcast(world_, chunk_size, 0);
-  boost::mpi::broadcast(world_, remainder, 0);
+  broadcast(world_, chunk_size, 0);
+  broadcast(world_, remainder, 0);
 
-  unsigned int local_data_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
+  int local_data_size = chunk_size + (world_.rank() == world_.size() - 1 ? remainder : 0);
   local_input_ = std::vector<int>(local_data_size);
 
   if (world_.rank() == 0) {
     std::copy(input_.begin(), input_.begin() + local_data_size, local_input_.begin());
   } else {
-    world_.recv(0, 0, local_input_.data(), static_cast<int>(local_data_size));
+    world_.recv(0, 0, local_input_.data(), local_data_size);
   }
 
   int sign_changes = 0;
   for (size_t i = 1; i < local_input_.size(); ++i) {
-    sign_changes += static_cast<int>(local_input_[i - 1] * local_input_[i] < 0);
+    sign_changes += (local_input_[i - 1] * local_input_[i] < 0);
   }
 
   if (world_.rank() > 0) {
     int prev_value = 0;
     world_.recv(world_.rank() - 1, 0, &prev_value, 1);
-    sign_changes += static_cast<int>(prev_value * local_input_[0] < 0);
+    sign_changes += (prev_value * local_input_[0] < 0);
   }
 
   if (world_.rank() < world_.size() - 1) {
