@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -44,11 +43,11 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_pipeline_run) {
     task_data_par->outputs_count.emplace_back(out.size());
   }
 
-  auto test_mpi_task_parallel = std::make_shared<budazhapova_betcher_odd_even_merge_mpi::MergeParallel>(task_data_par);
-  ASSERT_EQ(test_task_par->ValidationImpl(), true);
-  test_task_par->PreProcessingImpl();
-  test_task_par->RunImpl();
-  test_task_par->PostProcessingImpl();
+  auto test_mpi_task_par = std::make_shared<budazhapova_betcher_odd_even_merge_mpi::MergeParallel>(task_data_par);
+  ASSERT_EQ(test_mpi_task_par->ValidationImpl(), true);
+  test_mpi_task_par->PreProcessingImpl();
+  test_mpi_task_par->RunImpl();
+  test_mpi_task_par->PostProcessingImpl();
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -84,11 +83,11 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_task_run) {
     task_data_par->outputs_count.emplace_back(out.size());
   }
 
-  auto test_mpi_task_parallel = std::make_shared<budazhapova_betcher_odd_even_merge_mpi::MergeParallel>(task_data_par);
-  ASSERT_EQ(test_task_par->ValidationImpl(), true);
-  test_task_par->PreProcessingImpl();
-  test_task_par->RunImpl();
-  test_task_par->PostProcessingImpl();
+  auto test_mpi_task_par = std::make_shared<budazhapova_betcher_odd_even_merge_mpi::MergeParallel>(task_data_par);
+  ASSERT_EQ(test_mpi_task_par->ValidationImpl(), true);
+  test_mpi_task_par->PreProcessingImpl();
+  test_mpi_task_par->RunImpl();
+  test_mpi_task_par->PostProcessingImpl();
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

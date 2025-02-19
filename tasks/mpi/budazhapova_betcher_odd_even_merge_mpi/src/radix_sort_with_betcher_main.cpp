@@ -50,7 +50,7 @@ void OddEvenMerge(std::vector<int>& local_, std::vector<int>& received_data) {
 }  // namespace
 
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
-bool budazhapova_betcher_oddEvenMerge_mpi::MergeSequential::PreProcessingImpl(){
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PreProcessingImpl(){
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   return true;
