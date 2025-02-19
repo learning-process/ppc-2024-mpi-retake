@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <vector>
 #include <ranges>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 #include "seq/shuravina_o_coontrast/include/ops_seq.hpp"
