@@ -31,8 +31,8 @@ std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_seq::generat
 }
 
 TEST(Konstantinov_I_sum_of_vector_seq, test_pipeline_run) {
-  int rows = 10000;
-  int columns = 10000;
+  int rows = 100000;
+  int columns = 100000;
   int result;
   std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
@@ -75,8 +75,8 @@ TEST(Konstantinov_I_sum_of_vector_seq, test_pipeline_run) {
 }
 
 TEST(Konstantinov_I_sum_of_vector_seq, test_task_run) {
-  int rows = 10000;
-  int columns = 10000;
+  int rows = 100000;
+  int columns = 100000;
   int result;
   std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
