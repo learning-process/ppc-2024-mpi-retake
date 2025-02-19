@@ -272,6 +272,7 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
   } else {
     HandleTrivialCase();
   }
+  world_.barrier();
   return true;
 }
 
