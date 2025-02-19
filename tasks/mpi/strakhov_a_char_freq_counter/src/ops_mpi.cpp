@@ -3,16 +3,16 @@
 //  Sequential
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PreProcessingImpl() {
-  auto *tmp = reinterpret_cast<char *>(taskData->inputs[0]);
-  for (int i = 0; i < taskData->inputs_count[0]; i++) {
+  auto *tmp = reinterpret_cast<char *>(task_data->inputs[0]);
+  for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp[i];
   }
-  target_ = *reinterpret_cast<char *>(taskData->inputs[1]);
+  target_ = *reinterpret_cast<char *>(task_data->inputs[1]);
   result_ = 0;
   return true;
 }
 
-bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::ValidationImpl() { return taskData->inputs_count[1] == 1; }
+bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::ValidationImpl() { return (task_data->inputs_count[1] == 1); }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::RunImpl() {
   result_ = std::count(input_.begin(), input_.end(), target_);
@@ -20,7 +20,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::RunImpl() {
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PostProcessingImpl() {
-  reinterpret_cast<int *>(taskData->outputs[0])[0] = result_;
+  reinterpret_cast<int *>(task_data->outputs[0])[0] = result_;
   return true;
 }
 
@@ -28,30 +28,28 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PostProcessingImpl() 
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    auto *tmp = reinterpret_cast<char *>(taskData->inputs[0]);
-    for (int i = 0; i < taskData->inputs_count[0]; i++) {
+    auto *tmp = reinterpret_cast<char *>(task_data->inputs[0]);
+    for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
       input_[i] = tmp[i];
     }
-    target_ = *reinterpret_cast<char *>(taskData->inputs[1]);
+    target_ = *reinterpret_cast<char *>(task_data->inputs[1]);
   }
 
   result_ = 0;
-  local_result = 0;
+  local_result_ = 0;
   return true;
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
   if (world_.rank() == 0) {
-    return taskData->inputs_count[1] == 1;
+    return (task_data->inputs_count[1] == 1);
   }
   return true;
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
   int rank_ = world_.rank();
-  if (world_.rank() == 0) {
-    int input_length_ = taskData->inputs_count[0];
-  }
+    int input_length_ = task_data->inputs_count[0];  
   int world_size_ = world_.size();
   int segment_ = input_length_ / world_size_;
   int excess_ = input_length_ % world_size_;
@@ -73,7 +71,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::PostProcessingImpl() {
   if (world_.rank() == 0) {
-    reinterpret_cast<int *>(taskData->outputs[0])[0] = result_;
+    reinterpret_cast<int *>(task_data->outputs[0])[0] = result_;
   }
   return true;
 }

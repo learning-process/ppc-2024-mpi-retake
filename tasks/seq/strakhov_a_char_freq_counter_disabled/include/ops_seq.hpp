@@ -12,7 +12,7 @@ namespace strakhov_a_char_freq_counter_seq {
 
 class CharFreqCounterSeq : public ppc::core::Task {
  public:
-  explicit CharFreqCounterSeq(ppc::core::TaskDataPtr taskData) : Task(std::move(taskData)) {}
+  explicit CharFreqCounterSeq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

@@ -16,11 +16,11 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
 
   // Create data
   int expectation = 1000;
-  std::vector<char> in_string(expectation, a);
+  std::vector<char> in_string(expectation, 'a');
   std::vector<int32_t> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
-
-  // Create task_data
+ 
+  // Create taskdata 
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
@@ -32,10 +32,10 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   }
   // Create Task
   auto test_task_mpi = std::make_shared<strakhov_a_char_freq_counter_mpi::CharFreqCounterPar>(task_data_mpi_par);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
+  ASSERT_EQ(test_task_mpi->ValidationImpl(), true);
+  test_task_mpi->PreProcessingImpl();
+  test_task_mpi->RunImpl();
+  test_task_mpi->PostProcessingImpl();
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -65,7 +65,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
 
   // Create data
   int expectation = 1000;
-  std::vector<char> in_string(expectation, a);
+  std::vector<char> in_string(expectation, 'a');
   std::vector<int32_t> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
 
@@ -81,10 +81,10 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
   }
   // Create Task
   auto test_task_mpi = std::make_shared<strakhov_a_char_freq_counter_mpi::CharFreqCounterPar>(task_data_mpi_par);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
+  ASSERT_EQ(test_task_mpi->ValidationImpl(), true);
+  test_task_mpi->PreProcessingImpl();
+  test_task_mpi->RunImpl();
+  test_task_mpi->PostProcessingImpl();
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
