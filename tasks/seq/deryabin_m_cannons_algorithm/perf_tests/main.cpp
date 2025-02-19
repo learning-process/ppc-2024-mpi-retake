@@ -9,7 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
 
-TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run) {
+TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run_Seq) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
@@ -49,7 +49,7 @@ TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run) {
   ASSERT_EQ(in_matrix_a[0], out_matrix_c[0]);
 }
 
-TEST(deryabin_m_cannons_algorithm_seq, test_task_run) {
+TEST(deryabin_m_cannons_algorithm_seq, test_task_run_Seq) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
   std::vector<double> input_matrix_b = std::vector<double>(10000, 0);
   std::vector<double> output_matrix_c = std::vector<double>(10000, 0);
