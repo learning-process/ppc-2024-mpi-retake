@@ -2,12 +2,14 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <random>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace malyshev_v_lent_horizontal {
+
 class MatVecMultMpi : public ppc::core::Task {
  public:
   explicit MatVecMultMpi(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
@@ -21,5 +23,8 @@ class MatVecMultMpi : public ppc::core::Task {
   unsigned int rows_, cols_;
   boost::mpi::communicator world_;
 };
+
+std::vector<int> GetRandomMatrix(int rows, int cols);
+std::vector<int> GetRandomVector(int size);
 
 }  // namespace malyshev_v_lent_horizontal

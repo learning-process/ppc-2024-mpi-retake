@@ -6,7 +6,29 @@
 #include <boost/serialization/vector.hpp>
 #include <vector>
 
-bool malyshev_v_lent_horizontal::MatVecMultMpi::PreProcessingImpl() {
+namespace malyshev_v_lent_horizontal {
+
+std::vector<int> GetRandomMatrix(int rows, int cols) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::vector<int> vec(rows * cols);
+  for (int i = 0; i < rows * cols; i++) {
+    vec[i] = (int)(gen() % 100);
+  }
+  return vec;
+}
+
+std::vector<int> GetRandomVector(int size) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::vector<int> vec(size);
+  for (int i = 0; i < size; i++) {
+    vec[i] = (int)(gen() % 100);
+  }
+  return vec;
+}
+
+bool MatVecMultMpi::PreProcessingImpl() {
   if (world_.rank() == 0) {
     // Init matrix and vector
     matrix_ = std::vector<int>(task_data->inputs_count[0]);
@@ -23,7 +45,7 @@ bool malyshev_v_lent_horizontal::MatVecMultMpi::PreProcessingImpl() {
   return true;
 }
 
-bool malyshev_v_lent_horizontal::MatVecMultMpi::ValidationImpl() {
+bool MatVecMultMpi::ValidationImpl() {
   if (world_.rank() == 0) {
     return (task_data->inputs_count[2] == task_data->outputs_count[0]) &&
            (task_data->inputs_count[3] == task_data->inputs_count[1]);
@@ -31,7 +53,7 @@ bool malyshev_v_lent_horizontal::MatVecMultMpi::ValidationImpl() {
   return true;
 }
 
-bool malyshev_v_lent_horizontal::MatVecMultMpi::RunImpl() {
+bool MatVecMultMpi::RunImpl() {
   broadcast(world_, rows_, 0);
   broadcast(world_, cols_, 0);
   broadcast(world_, vector_, 0);
@@ -69,4 +91,6 @@ bool malyshev_v_lent_horizontal::MatVecMultMpi::RunImpl() {
   return true;
 }
 
-bool malyshev_v_lent_horizontal::MatVecMultMpi::PostProcessingImpl() { return true; }
+bool MatVecMultMpi::PostProcessingImpl() { return true; }
+
+}  // namespace malyshev_v_lent_horizontal
