@@ -17,7 +17,6 @@ TEST(malyshev_v_lent_horizontal, test_pipeline_Run) {
   int cols = 12000;
   int rows = 12000;
 
-  // Create data
   std::vector<int> matrix = malyshev_v_lent_horizontal::GetRandomMatrix(rows, cols);
   std::vector<int> vector = malyshev_v_lent_horizontal::GetRandomVector(cols);
   std::vector<int> out(rows, 0);
@@ -29,7 +28,6 @@ TEST(malyshev_v_lent_horizontal, test_pipeline_Run) {
     }
   }
 
-  // Create TaskData
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
@@ -48,7 +46,6 @@ TEST(malyshev_v_lent_horizontal, test_pipeline_Run) {
   test_task_par->RunImpl();
   test_task_par->PostProcessingImpl();
 
-  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
@@ -58,7 +55,6 @@ TEST(malyshev_v_lent_horizontal, test_pipeline_Run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
-  // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);
@@ -75,7 +71,6 @@ TEST(malyshev_v_lent_horizontal, test_task_Run) {
   int cols = 12000;
   int rows = 12000;
 
-  // Create data
   std::vector<int> matrix = malyshev_v_lent_horizontal::GetRandomMatrix(rows, cols);
   std::vector<int> vector = malyshev_v_lent_horizontal::GetRandomVector(cols);
   std::vector<int> out(rows, 0);
@@ -87,7 +82,6 @@ TEST(malyshev_v_lent_horizontal, test_task_Run) {
     }
   }
 
-  // Create TaskData
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
@@ -106,7 +100,6 @@ TEST(malyshev_v_lent_horizontal, test_task_Run) {
   test_task_par->RunImpl();
   test_task_par->PostProcessingImpl();
 
-  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
@@ -116,7 +109,6 @@ TEST(malyshev_v_lent_horizontal, test_task_Run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
-  // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);

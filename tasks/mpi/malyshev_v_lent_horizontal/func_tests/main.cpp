@@ -15,12 +15,10 @@ TEST(malyshev_v_lent_horizontal, test_empty_matrix) {
   int cols = 0;
   int rows = 0;
 
-  // Create data
   std::vector<int> matrix = {};
   std::vector<int> vector = {};
   std::vector<int> out_par = {};
 
-  // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -47,14 +45,12 @@ TEST(malyshev_v_lent_horizontal, test_1x1_matrix) {
   int cols = 1;
   int rows = 1;
 
-  // Create data
   std::vector<int> matrix = {2};
   std::vector<int> vector = {3};
   std::vector<int> out_par(rows, 0);
 
   std::vector<int> expect = {6};
 
-  // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -84,7 +80,6 @@ TEST(malyshev_v_lent_horizontal, test_random_matrix) {
   int cols = 20;
   int rows = 13;
 
-  // Create data
   std::vector<int> matrix = malyshev_v_lent_horizontal::GetRandomMatrix(rows, cols);
   std::vector<int> vector = malyshev_v_lent_horizontal::GetRandomVector(cols);
   std::vector<int> out_par(rows, 0);
@@ -96,7 +91,6 @@ TEST(malyshev_v_lent_horizontal, test_random_matrix) {
     }
   }
 
-  // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
