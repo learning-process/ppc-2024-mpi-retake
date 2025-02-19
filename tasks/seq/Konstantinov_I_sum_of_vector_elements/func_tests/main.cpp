@@ -26,7 +26,6 @@ std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_seq::generat
     result[i] = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_vector(columns, lower_bound, upper_bound);
   }
   return result;
-  return std::vector<std::vector<int>>();
 }
 
 TEST(Konstantinov_I_sum_of_vector_seq, EmptyInput) {

@@ -29,7 +29,6 @@ std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_mpi::generat
     result[i] = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_vector(columns, lower_bound, upper_bound);
   }
   return result;
-  return std::vector<std::vector<int>>();
 }
 
 TEST(Konstantinov_I_sum_of_vector_mpi, test_pipeline_run) {
