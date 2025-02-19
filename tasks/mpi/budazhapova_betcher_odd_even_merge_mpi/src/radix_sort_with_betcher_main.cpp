@@ -1,9 +1,7 @@
-#include "mpi/budazhapova_betcher_odd_even_merge_mpi/include/odd_even_merge.hpp"
 
-#include <algorithm>
-#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/map.hpp>
@@ -14,172 +12,161 @@
 #include <thread>
 #include <vector>
 
+#include "mpi/budazhapova_betcher_odd_even_merge_mpi/include/radix_sort_with_betcher.h"
+
 namespace budazhapova_betcher_odd_even_merge_mpi {
 
-    void CountingSort(std::vector<int>& arr, int exp) {
-        int n = arr.size();
-        std::vector<int> output(n);
-        std::vector<int> count(10, 0);
+void CountingSort(std::vector<int>& arr, int exp) {
+  int n = arr.size();
+  std::vector<int> output(n);
+  std::vector<int> count(10, 0);
 
-        for (int i = 0; i < n; i++) {
-            int index = (arr[i] / exp) % 10;
-            count[index]++;
-        }
-        for (int i = 1; i < 10; i++) {
-            count[i] += count[i - 1];
-        }
-        for (int i = n - 1; i >= 0; i--) {
-            int index = (arr[i] / exp) % 10;
-            output[count[index] - 1] = arr[i];
-            count[index]--;
-        }
-        for (int i = 0; i < n; i++) {
-            arr[i] = output[i];
-        }
-    }
+  for (int i = 0; i < n; i++) {
+    int index = (arr[i] / exp) % 10;
+    count[index]++;
+  }
+  for (int i = 1; i < 10; i++) {
+    count[i] += count[i - 1];
+  }
+  for (int i = n - 1; i >= 0; i--) {
+    int index = (arr[i] / exp) % 10;
+    output[count[index] - 1] = arr[i];
+    count[index]--;
+  }
+  for (int i = 0; i < n; i++) {
+    arr[i] = output[i];
+  }
+}
 
-    void RadixSort(std::vector<int>& arr) {
-        int max_num = *std::max_element(arr.begin(), arr.end());
-        for (int exp = 1; max_num / exp > 0; exp *= 10) {
-            CountingSort(arr, exp);
-        }
-    }
-    void OddEvenMerge(std::vector<int>& local_res, std::vector<int>& received_data) {
-        std::vector<int> merged(local_res.size() + received_data.size());
-        std::copy(local_res.begin(), local_res.end(), merged.begin());
-        std::copy(received_data.begin(), received_data.end(), merged.begin() + local_res.size());
-        budazhapova_betcher_odd_even_merge_mpi::RadixSort(merged);
-        local_res.assign(merged.begin(), merged.begin() + local_res.size());
-        received_data.assign(merged.begin() + local_res.size(), merged.end());
-    }
+void RadixSort(std::vector<int>& arr) {
+  int max_num = *std::max_element(arr.begin(), arr.end());
+  for (int exp = 1; max_num / exp > 0; exp *= 10) {
+    CountingSort(arr, exp);
+  }
+}
+void OddEvenMerge(std::vector<int>& local_res, std::vector<int>& received_data) {
+  std::vector<int> merged(local_res.size() + received_data.size());
+  std::copy(local_res.begin(), local_res.end(), merged.begin());
+  std::copy(received_data.begin(), received_data.end(), merged.begin() + local_res.size());
+  budazhapova_betcher_odd_even_merge_mpi::RadixSort(merged);
+  local_res.assign(merged.begin(), merged.begin() + local_res.size());
+  received_data.assign(merged.begin() + local_res.size(), merged.end());
+}
 
-}  // namespace budazhapova_betcher_OddEvenMerge_mpi
+}  // namespace budazhapova_betcher_odd_even_merge_mpi
 bool budazhapova_betcher_OddEvenMerge_mpi::MergeSequential::PreProcessing() {
-
-    res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
-        reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
-    n_el_ = task_data->inputs_count[0];
-    return true;
+  res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
+                          reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
+  n_el_ = task_data->inputs_count[0];
+  return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::Validation() {
-
-    return task_data->inputs_count[0] > 0;
-}
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::Validation() { return task_data->inputs_count[0] > 0; }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::Run() {
-
-    budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
-    return true;
+  budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
+  return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PostProcessing() {
-
-    int* output = reinterpret_cast<int*>(task_data->outputs[0]);
-    for (size_t i = 0; i < res_.size(); i++) {
-        output[i] = res_[i];
-    }
-    return true;
+  int* output = reinterpret_cast<int*>(task_data->outputs[0]);
+  for (size_t i = 0; i < res_.size(); i++) {
+    output[i] = res_[i];
+  }
+  return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PreProcessing() {
-
-    if (world.rank() == 0) {
-        res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
-            reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
-        n_el_ = task_data->inputs_count[0];
-    }
-    return true;
+  if (world.rank() == 0) {
+    res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
+                            reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
+    n_el_ = task_data->inputs_count[0];
+  }
+  return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::Validation() {
-
-    if (world.rank() == 0) {
-        return task_data->inputs_count[0] > 0;
-    }
-    return true;
+  if (world.rank() == 0) {
+    return task_data->inputs_count[0] > 0;
+  }
+  return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::Run() {
+  std::vector<int> recv_counts(world.size(), 0);
+  std::vector<int> displacements(world.size(), 0);
 
-    std::vector<int> recv_counts(world.size(), 0);
-    std::vector<int> displacements(world.size(), 0);
+  boost::mpi::broadcast(world, res_, 0);
 
-    boost::mpi::broadcast(world, res_, 0);
+  int n_of_send_elements;
+  int n_of_proc_with_extra_elements;
+  int start;
+  int end;
+  int world_size = world.size();
+  int world_rank = world.rank();
+  int res_size = static_cast<int>(res_.size());
 
-    int n_of_send_elements;
-    int n_of_proc_with_extra_elements;
-    int start;
-    int end;
-    int world_size = world.size();
-    int world_rank = world.rank();
-    int res_size = static_cast<int>(res_.size());
+  n_of_send_elements = res_size / world_size;
+  n_of_proc_with_extra_elements = res_size % world_size;
 
-    n_of_send_elements = res_size / world_size;
-    n_of_proc_with_extra_elements = res_size % world_size;
+  for (int i = 0; i < world_size; i++) {
+    start = i * n_of_send_elements + std::min(i, n_of_proc_with_extra_elements);
+    end = start + n_of_send_elements + (i < n_of_proc_with_extra_elements ? 1 : 0);
+    recv_counts[i] = end - start;
+    displacements[i] = (i == 0) ? 0 : displacements[i - 1] + recv_counts[i - 1];
+  }
 
-    for (int i = 0; i < world_size; i++) {
-        start = i * n_of_send_elements + std::min(i, n_of_proc_with_extra_elements);
-        end = start + n_of_send_elements + (i < n_of_proc_with_extra_elements ? 1 : 0);
-        recv_counts[i] = end - start;
-        displacements[i] = (i == 0) ? 0 : displacements[i - 1] + recv_counts[i - 1];
+  start = world_rank * n_of_send_elements + std::min(world_rank, n_of_proc_with_extra_elements);
+  end = start + n_of_send_elements + (world_rank < n_of_proc_with_extra_elements ? 1 : 0);
+
+  local_res_.resize(end - start);
+  for (int i = start; i < end; i++) {
+    local_res_[i - start] = res_[i];
+  }
+
+  for (int phase = 0; phase < world_size; ++phase) {
+    int next_rank = world_rank + 1;
+    int prev_rank = world_rank - 1;
+
+    if (phase % 2 == 0) {
+      if (world_rank % 2 == 0 && next_rank < world_size) {
+        world.send(next_rank, world_rank, local_res_);
+      } else if (world_rank % 2 == 1) {
+        std::vector<int> received_data;
+        world.recv(prev_rank, prev_rank, received_data);
+        OddEvenMerge(received_data, local_res_);
+        world.send(prev_rank, world_rank, received_data);
+      }
+      if (world_rank % 2 == 0 && next_rank < world_size) {
+        world.recv(next_rank, next_rank, local_res_);
+      }
+    } else {
+      if (world_rank % 2 == 1 && next_rank < world_size) {
+        world.send(next_rank, world_rank, local_res_);
+      } else if (world_rank % 2 == 0 && world_rank > 0) {
+        std::vector<int> received_data;
+        world.recv(prev_rank, prev_rank, received_data);
+        OddEvenMerge(received_data, local_res_);
+        world.send(prev_rank, world_rank, received_data);
+      }
+      if (world_rank % 2 == 1 && next_rank < world_size) {
+        world.recv(next_rank, next_rank, local_res_);
+      }
     }
+  }
 
-    start = world_rank * n_of_send_elements + std::min(world_rank, n_of_proc_with_extra_elements);
-    end = start + n_of_send_elements + (world_rank < n_of_proc_with_extra_elements ? 1 : 0);
+  boost::mpi::gatherv(world, local_res_.data(), local_res_.size(), res_.data(), recv_counts, displacements, 0);
 
-    local_res_.resize(end - start);
-    for (int i = start; i < end; i++) {
-        local_res_[i - start] = res_[i];
-    }
-
-    for (int phase = 0; phase < world_size; ++phase) {
-        int next_rank = world_rank + 1;
-        int prev_rank = world_rank - 1;
-
-        if (phase % 2 == 0) {
-            if (world_rank % 2 == 0 && next_rank < world_size) {
-                world.send(next_rank, world_rank, local_res_);
-            }
-            else if (world_rank % 2 == 1) {
-                std::vector<int> received_data;
-                world.recv(prev_rank, prev_rank, received_data);
-                OddEvenMerge(received_data, local_res_);
-                world.send(prev_rank, world_rank, received_data);
-            }
-            if (world_rank % 2 == 0 && next_rank < world_size) {
-                world.recv(next_rank, next_rank, local_res_);
-            }
-        }
-        else {
-            if (world_rank % 2 == 1 && next_rank < world_size) {
-                world.send(next_rank, world_rank, local_res_);
-            }
-            else if (world_rank % 2 == 0 && world_rank > 0) {
-                std::vector<int> received_data;
-                world.recv(prev_rank, prev_rank, received_data);
-                OddEvenMerge(received_data, local_res_);
-                world.send(prev_rank, world_rank, received_data);
-            }
-            if (world_rank % 2 == 1 && next_rank < world_size) {
-                world.recv(next_rank, next_rank, local_res_);
-            }
-        }
-    }
-
-    boost::mpi::gatherv(world, local_res_.data(), local_res_.size(), res_.data(), recv_counts, displacements, 0);
-
-    return true;
+  return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessing() {
-
-    if (world.rank() == 0) {
-        //budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
-        int* output = reinterpret_cast<int*>(task_data->outputs[0]);
-        for (size_t i = 0; i < res_.size(); i++) {
-            output[i] = res_[i];
-        }
+  if (world.rank() == 0) {
+    // budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
+    int* output = reinterpret_cast<int*>(task_data->outputs[0]);
+    for (size_t i = 0; i < res_.size(); i++) {
+      output[i] = res_[i];
     }
-    return true;
+  }
+  return true;
 }

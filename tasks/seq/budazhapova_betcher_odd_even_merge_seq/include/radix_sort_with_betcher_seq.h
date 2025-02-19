@@ -2,21 +2,22 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "core/task/include/task.hpp"
 
 namespace budazhapova_betcher_odd_even_merge_seq {
 
-	class MergeSequential : public ppc::core::Task {
-	public:
-		explicit MergeSequential(std::shared_ptr<ppc::core::TaskData> task_data_) : Task(std::move(task_data_)) {}
-		bool PreProcessing() override;
-		bool Validation() override;
-		bool Run() override;
-		bool PostProcessing() override;
+class MergeSequential : public ppc::core::Task {
+ public:
+  explicit MergeSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+  bool PreProcessing() override;
+  bool Validation() override;
+  bool Run() override;
+  bool PostProcessing() override;
 
-	private:
-		std::vector<int> res_;
-		int n_el_ = 0;
-	};
+ private:
+  std::vector<int> res_;
+  int n_el_ = 0;
+};
 }  // namespace budazhapova_betcher_odd_even_merge_seq
