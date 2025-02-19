@@ -1,154 +1,71 @@
 #include "mpi/malyshev_v_lent_horizontal/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/serialization/vector.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <vector>
 
-bool malyshev_lent_horizontal::TestTaskSequential::PreProcessingImpl() {
-  InternalOrderTest();
+bool malyshev_v_lent_horizontal::MatVecMultMpi::PreProcessingImpl() {
+  if (world_.rank() == 0) {
+    // Init matrix and vector
+    matrix_ = std::vector<int>(task_data->inputs_count[0]);
+    auto *tmp_matrix = reinterpret_cast<int *>(task_data->inputs[0]);
+    std::copy(tmp_matrix, tmp_matrix + task_data->inputs_count[0], matrix_.begin());
 
-  uint32_t rows = task_data->inputs_count[0];
-  uint32_t cols = task_data->inputs_count[1];
+    vector_ = std::vector<int>(task_data->inputs_count[1]);
+    auto *tmp_vector = reinterpret_cast<int *>(task_data->inputs[1]);
+    std::copy(tmp_vector, tmp_vector + task_data->inputs_count[1], vector_.begin());
 
-  matrix_.resize(rows, std::vector<int32_t>(cols));
-  vector_.resize(cols);
-  result_.resize(rows);
-
-  int32_t* data;
-  for (uint32_t i = 0; i < matrix_.size(); i++) {
-    data = reinterpret_cast<int32_t*>(task_data->inputs[i]);
-    std::copy(data, data + cols, matrix_[i].data());
+    rows_ = task_data->inputs_count[2];
+    cols_ = task_data->inputs_count[3];
   }
-
-  data = reinterpret_cast<int32_t*>(task_data->inputs[rows]);
-  std::copy(data, data + cols, vector_.data());
-
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskSequential::ValidationImpl() {
-  InternalOrderTest();
-
-  uint32_t rows = task_data->inputs_count[0];
-  uint32_t cols = task_data->inputs_count[1];
-  uint32_t vector_size = task_data->inputs_count[2];
-
-  if (task_data->inputs.size() != rows + 1 || task_data->inputs_count.size() < 3) {
-    return false;
+bool malyshev_v_lent_horizontal::MatVecMultMpi::ValidationImpl() {
+  if (world_.rank() == 0) {
+    return (task_data->inputs_count[2] == task_data->outputs_count[0]) &&
+           (task_data->inputs_count[3] == task_data->inputs_count[1]);
   }
-
-  if (cols != vector_size) {
-    return false;
-  }
-
-  return task_data->outputs_count[0] == task_data->inputs_count[0];
+  return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskSequential::RunImpl() {
-  InternalOrderTest();
+bool malyshev_v_lent_horizontal::MatVecMultMpi::RunImpl() {
+  broadcast(world_, rows_, 0);
+  broadcast(world_, cols_, 0);
+  broadcast(world_, vector_, 0);
 
-  for (uint32_t i = 0; i < matrix_.size(); i++) {
-    result_[i] = 0;
-    for (uint32_t j = 0; j < vector_.size(); j++) {
-      result_[i] += matrix_[i][j] * vector_[j];
+  int delta = (int)(rows_ / world_.size());
+  int last_row = (int)(rows_ % world_.size());
+  int local_n = (world_.rank() == world_.size() - 1) ? delta + last_row : delta;
+
+  local_matrix_ = std::vector<int>(local_n * cols_);
+  std::vector<int> send_counts(world_.size());
+  std::vector<int> recv_counts(world_.size());
+  for (int i = 0; i < world_.size(); ++i) {
+    send_counts[i] = (i == world_.size() - 1) ? delta + last_row : delta;
+    send_counts[i] *= (int)(cols_);
+    recv_counts[i] = (i == world_.size() - 1) ? delta + last_row : delta;
+  }
+  boost::mpi::scatterv(world_, matrix_.data(), send_counts, local_matrix_.data(), 0);
+
+  local_result_ = std::vector<int>(local_n, 0);
+  for (int i = 0; i < local_n; ++i) {
+    for (unsigned int j = 0; j < cols_; ++j) {
+      local_result_[i] += local_matrix_[(i * cols_) + j] * vector_[j];
+    }
+  }
+
+  std::vector<int> result(rows_, 0);
+  boost::mpi::gatherv(world_, local_result_.data(), (int)local_result_.size(), result.data(), recv_counts, 0);
+
+  if (world_.rank() == 0) {
+    for (unsigned int i = 0; i < rows_; i++) {
+      reinterpret_cast<int *>(task_data->outputs[0])[i] = result[i];
     }
   }
 
   return true;
 }
 
-bool malyshev_lent_horizontal::TestTaskSequential::PostProcessingImpl() {
-  InternalOrderTest();
-
-  std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(task_data->outputs[0]));
-
-  return true;
-}
-
-bool malyshev_lent_horizontal::TestTaskParallel::PreProcessingImpl() {
-  InternalOrderTest();
-
-  if (world.rank() == 0) {
-    uint32_t rows = task_data->inputs_count[0];
-    uint32_t cols = task_data->inputs_count[1];
-
-    delta_ = rows / world.size();
-    ext_ = rows % world.size();
-
-    matrix_.resize(rows, std::vector<int32_t>(cols));
-    vector_.resize(cols);
-    result_.resize(rows);
-
-    int32_t* data;
-    for (uint32_t i = 0; i < matrix_.size(); i++) {
-      data = reinterpret_cast<int32_t*>(task_data->inputs[i]);
-      std::copy(data, data + cols, matrix_[i].data());
-    }
-
-    data = reinterpret_cast<int32_t*>(task_data->inputs[rows]);
-    std::copy(data, data + cols, vector_.data());
-  }
-
-  return true;
-}
-
-bool malyshev_lent_horizontal::TestTaskParallel::ValidationImpl() {
-  InternalOrderTest();
-
-  if (world.rank() == 0) {
-    uint32_t rows = task_data->inputs_count[0];
-    uint32_t cols = task_data->inputs_count[1];
-    uint32_t vector_size = task_data->inputs_count[2];
-
-    if (task_data->inputs.size() != rows + 1 || task_data->inputs_count.size() < 3) {
-      return false;
-    }
-
-    if (cols != vector_size) {
-      return false;
-    }
-
-    return task_data->outputs_count[0] == task_data->inputs_count[0];
-  }
-
-  return true;
-}
-
-bool malyshev_lent_horizontal::TestTaskParallel::RunImpl() {
-  InternalOrderTest();
-
-  broadcast(world, delta_, 0);
-  broadcast(world, ext_, 0);
-  broadcast(world, vector_, 0);
-
-  std::vector<int32_t> sizes(world.size(), delta_);
-  for (uint32_t i = 0; i < ext_; i++) {
-    sizes[world.size() - i - 1]++;
-  }
-
-  local_matrix_.resize(sizes[world.rank()]);
-  local_result_.resize(sizes[world.rank()]);
-
-  scatterv(world, matrix_, sizes, local_matrix_.data(), 0);
-
-  for (uint32_t i = 0; i < local_matrix_.size(); i++) {
-    local_result_[i] = 0;
-    for (uint32_t j = 0; j < vector_.size(); j++) {
-      local_result_[i] += local_matrix_[i][j] * vector_[j];
-    }
-  }
-
-  gatherv(world, local_result_, result_.data(), sizes, 0);
-
-  return true;
-}
-
-bool malyshev_lent_horizontal::TestTaskParallel::PostProcessingImpl() {
-  InternalOrderTest();
-
-  if (world.rank() == 0) {
-    std::copy(result_.begin(), result_.end(), reinterpret_cast<int32_t*>(task_data->outputs[0]));
-  }
-
-  return true;
-}
+bool malyshev_v_lent_horizontal::MatVecMultMpi::PostProcessingImpl() { return true; }

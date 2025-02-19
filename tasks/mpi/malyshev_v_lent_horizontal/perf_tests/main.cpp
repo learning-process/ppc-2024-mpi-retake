@@ -1,134 +1,129 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
-#include <random>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/malyshev_v_lent_horizontal/include/ops_mpi.hpp"
 
-namespace malyshev_lent_horizontal {
-
-static std::vector<std::vector<int32_t>> generateRandomMatrix(uint32_t rows, uint32_t cols) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::vector<std::vector<int32_t>> data(rows, std::vector<int32_t>(cols));
-
-  for (auto &row : data) {
-    for (auto &el : row) {
-      el = -200 + gen() % (300 + 200 + 1);
-    }
-  }
-
-  return data;
-}
-
-static std::vector<int32_t> generateRandomVector(uint32_t size) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::vector<int32_t> data(size);
-
-  for (auto &el : data) {
-    el = -200 + gen() % (300 + 200 + 1);
-  }
-
-  return data;
-}
-
-}  // namespace malyshev_lent_horizontal
-
-TEST(malyshev_lent_horizontal, test_pipeline_run) {
-  uint32_t rows = 3000;
-  uint32_t cols = 3000;
-
+TEST(malyshev_v_lent_horizontal, test_pipeline_Run) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
+  int cols = 12000;
+  int rows = 12000;
 
-  if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols);
-    mpiResult.resize(rows);
+  // Create data
+  std::vector<int> matrix = malyshev_v_lent_horizontal::GetRandomMatrix(rows, cols);
+  std::vector<int> vector = malyshev_v_lent_horizontal::GetRandomVector(cols);
+  std::vector<int> out(rows, 0);
 
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+  std::vector<int> expect(rows, 0);
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      expect[i] += matrix[(i * cols) + j] * vector[j];
     }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
   }
 
-  auto testMpiTaskParallel = std::make_shared<malyshev_lent_horizontal::TestTaskParallel>(taskDataPar);
+  // Create TaskData
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(vector.data()));
+    task_data_par->inputs_count.emplace_back(vector.size());
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_par->outputs_count.emplace_back(out.size());
+  }
 
-  ASSERT_TRUE(testMpiTaskParallel->ValidationImpl());
-  ASSERT_TRUE(testMpiTaskParallel->PreProcessingImpl());
-  ASSERT_TRUE(testMpiTaskParallel->RunImpl());
-  ASSERT_TRUE(testMpiTaskParallel->PostProcessingImpl());
+  auto test_task_par = std::make_shared<malyshev_v_lent_horizontal::MatVecMultMpi>(task_data_par);
+  ASSERT_EQ(test_task_par->ValidationImpl(), true);
+  test_task_par->PreProcessingImpl();
+  test_task_par->RunImpl();
+  test_task_par->PostProcessingImpl();
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
-  const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  // Create Perf attributes
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  // Create and init perf results
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->PipelineRun(perfAttr, perfResults);
-
-  if (world.rank() == 0) perfAnalyzer->PrintPerfStatistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  if (world.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
+    ASSERT_EQ(expect, out);
+  }
 }
 
-TEST(malyshev_lent_horizontal, test_task_run) {
-  uint32_t rows = 3000;
-  uint32_t cols = 3000;
-
+TEST(malyshev_v_lent_horizontal, test_task_Run) {
   boost::mpi::communicator world;
-  std::vector<std::vector<int32_t>> randomMatrix;
-  std::vector<int32_t> randomVector;
-  std::vector<int32_t> mpiResult;
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  malyshev_lent_horizontal::TestTaskParallel taskMPI(taskDataPar);
+  int cols = 12000;
+  int rows = 12000;
 
-  if (world.rank() == 0) {
-    randomMatrix = malyshev_lent_horizontal::generateRandomMatrix(rows, cols);
-    randomVector = malyshev_lent_horizontal::generateRandomVector(cols);
-    mpiResult.resize(rows);
+  // Create data
+  std::vector<int> matrix = malyshev_v_lent_horizontal::GetRandomMatrix(rows, cols);
+  std::vector<int> vector = malyshev_v_lent_horizontal::GetRandomVector(cols);
+  std::vector<int> out(rows, 0);
 
-    for (auto &row : randomMatrix) {
-      taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
+  std::vector<int> expect(rows, 0);
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      expect[i] += matrix[(i * cols) + j] * vector[j];
     }
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(randomVector.data()));
-    taskDataPar->inputs_count.push_back(rows);
-    taskDataPar->inputs_count.push_back(cols);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(mpiResult.data()));
-    taskDataPar->outputs_count.push_back(rows);
   }
 
-  auto testMpiTaskParallel = std::make_shared<malyshev_lent_horizontal::TestTaskParallel>(taskDataPar);
+  // Create TaskData
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(vector.data()));
+    task_data_par->inputs_count.emplace_back(vector.size());
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_par->outputs_count.emplace_back(out.size());
+  }
 
-  ASSERT_TRUE(testMpiTaskParallel->ValidationImpl());
-  ASSERT_TRUE(testMpiTaskParallel->PreProcessingImpl());
-  ASSERT_TRUE(testMpiTaskParallel->RunImpl());
-  ASSERT_TRUE(testMpiTaskParallel->PostProcessingImpl());
+  auto test_task_par = std::make_shared<malyshev_v_lent_horizontal::MatVecMultMpi>(task_data_par);
+  ASSERT_EQ(test_task_par->ValidationImpl(), true);
+  test_task_par->PreProcessingImpl();
+  test_task_par->RunImpl();
+  test_task_par->PostProcessingImpl();
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
-  const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  // Create Perf attributes
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  // Create and init perf results
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testMpiTaskParallel);
-  perfAnalyzer->TaskRun(perfAttr, perfResults);
-
-  if (world.rank() == 0) perfAnalyzer->PrintPerfStatistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  // Create Perf analyzer
+  if (world.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
+    ASSERT_EQ(expect, out);
+  }
 }

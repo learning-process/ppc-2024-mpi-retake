@@ -1,44 +1,25 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
-namespace malyshev_lent_horizontal {
-
-class TestTaskSequential : public ppc::core::Task {
+namespace malyshev_v_lent_horizontal {
+class MatVecMultMpi : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit MatVecMultMpi(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<std::vector<int32_t>> matrix_;
-  std::vector<int32_t> vector_;
-  std::vector<int32_t> result_;
+  std::vector<int> matrix_, vector_, local_matrix_, local_result_;
+  unsigned int rows_, cols_;
+  boost::mpi::communicator world_;
 };
 
-class TestTaskParallel : public ppc::core::Task {
- public:
-  explicit TestTaskParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
-  bool PreProcessingImpl() override;
-  bool ValidationImpl() override;
-  bool RunImpl() override;
-  bool PostProcessingImpl() override;
-
- private:
-  std::vector<std::vector<int32_t>> matrix_, local_matrix_;
-  std::vector<int32_t> vector_, local_result_;
-  std::vector<int32_t> result_;
-  uint32_t delta_, ext_;
-
-  boost::mpi::communicator world;
-};
-
-}  // namespace malyshev_lent_horizontal
+}  // namespace malyshev_v_lent_horizontal
