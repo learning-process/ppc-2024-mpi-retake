@@ -29,7 +29,7 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_pipeline_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = 
+  auto test_task_sequential =
       std::make_shared<karaseva_e_num_of_alternations_signs_seq::AlternatingSignsSequential>(task_data_seq);
 
   // Create Perf attributes
@@ -80,7 +80,7 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_task_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = 
+  auto test_task_sequential =
       std::make_shared<karaseva_e_num_of_alternations_signs_seq::AlternatingSignsSequential>(task_data_seq);
 
   // Create Perf attributes

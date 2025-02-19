@@ -1,16 +1,18 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_num_of_alternations_signs/include/ops_mpi.hpp"
 
 TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternations) {
-  constexpr size_t kCount = 50;
+  boost::mpi::communicator world;
+
+  size_t kCount = 50;
   std::vector<int> in(kCount, 0);
   std::vector<int> out(1, 0);
 
@@ -19,10 +21,12 @@ TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternations) {
   }
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
+  if (world.rank() == 0) {
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_mpi->inputs_count.emplace_back(in.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_mpi->outputs_count.emplace_back(out.size());
+  }
 
   karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI test_task_mpi(task_data_mpi);
   ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -30,7 +34,9 @@ TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternations) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  EXPECT_EQ(out[0], kCount - 1);
+  if (world.rank() == 0) {
+    EXPECT_EQ(out[0], static_cast<int>(kCount - 1));  // kCount in int
+  }
 }
 
 TEST(karaseva_e_num_of_alternations_signs_mpi, test_10) {
