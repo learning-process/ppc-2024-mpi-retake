@@ -11,7 +11,7 @@
 #include "mpi/malyshev_v_lent_horizontal/include/ops_mpi.hpp"
 
 namespace malyshev_v_lent_horizontal {
-namespace {
+
 std::vector<int> GetRandomMatrix(int rows, int cols) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -31,7 +31,7 @@ std::vector<int> GetRandomVector(int size) {
   }
   return vec;
 }
-}  // namespace
+
 }  // namespace malyshev_v_lent_horizontal
 
 TEST(malyshev_v_lent_horizontal, test_empty_matrix) {
