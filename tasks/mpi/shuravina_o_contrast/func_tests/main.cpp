@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <vector>
 
@@ -32,7 +34,7 @@ TEST(shuravina_o_contrast, test_min_max_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t max_val = *std::ranges::max_element(out);
+  uint8_t max_val = *std::max_element(out.begin(), out.end());
   EXPECT_EQ(max_val, 255);
 }
 
@@ -60,8 +62,8 @@ TEST(shuravina_o_contrast, test_random_values) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  uint8_t min_val = *std::ranges::min_element(out.begin(), out.end());
-  uint8_t max_val = *std::ranges::max_element(out.begin(), out.end());
+  uint8_t min_val = *std::min_element(out.begin(), out.end());
+  uint8_t max_val = *std::max_element(out.begin(), out.end());
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
 }
