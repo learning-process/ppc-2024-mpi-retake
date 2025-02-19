@@ -85,7 +85,9 @@ bool VelievSlaeIterSeq::RunImpl() {
     }
     solution_vector_ = next_solution;
     ++iteration;
-    if (iteration > 10000) return false;
+    if (iteration > 10000) {
+      return false;
+    }
   }
   return true;
 }
