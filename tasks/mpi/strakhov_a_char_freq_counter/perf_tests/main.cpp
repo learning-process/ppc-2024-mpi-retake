@@ -19,8 +19,8 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   std::vector<char> in_string(expectation, 'a');
   std::vector<int32_t> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
- 
-  // Create taskdata 
+
+  // Create taskdata
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));

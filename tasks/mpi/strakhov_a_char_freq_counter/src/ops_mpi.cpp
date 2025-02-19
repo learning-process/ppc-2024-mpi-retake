@@ -12,7 +12,9 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PreProcessingImpl() {
   return true;
 }
 
-bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::ValidationImpl() { return (task_data->inputs_count[1] == 1); }
+bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::ValidationImpl() {
+  return (task_data->inputs_count[1] == 1);
+}
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::RunImpl() {
   result_ = std::count(input_.begin(), input_.end(), target_);
@@ -49,7 +51,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
   int rank_ = world_.rank();
-    int input_length_ = task_data->inputs_count[0];  
+  int input_length_ = task_data->inputs_count[0];
   int world_size_ = world_.size();
   int segment_ = input_length_ / world_size_;
   int excess_ = input_length_ % world_size_;

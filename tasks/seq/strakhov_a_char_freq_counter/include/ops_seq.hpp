@@ -24,4 +24,4 @@ class CharFreqCounterSeq : public ppc::core::Task {
   char target_{};
 };
 
-}  // namespace strakhov_a_char_freq_counter_mpi
+}  // namespace strakhov_a_char_freq_counter_seq

@@ -13,7 +13,7 @@
 #include "core/util/include/util.hpp"
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
- std::vector<char> fill_random_chars(int size, const std::string &charset) {
+std::vector<char> fill_random_chars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, charset.size() - 1);
@@ -148,7 +148,6 @@ TEST(strakhov_a_char_freq_counter_mpi, test_empty_string) {
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_string.size());
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
@@ -246,7 +245,6 @@ TEST(strakhov_a_char_freq_counter_mpi, test_single_character) {
 
 TEST(strakhov_a_char_freq_counter_mpi, random_string) {
   // random generator
- 
 
   boost::mpi::communicator world;
   std::vector<char> in_string =
