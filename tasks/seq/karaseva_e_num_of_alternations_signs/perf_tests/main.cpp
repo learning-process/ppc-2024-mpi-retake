@@ -11,7 +11,7 @@
 #include "seq/karaseva_e_num_of_alternations_signs/include/ops_seq.hpp"
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_pipeline_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 100000000;
 
   // Create data
   std::vector<int> in(kCount, 0);
@@ -62,7 +62,7 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_pipeline_run) {
 }
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_task_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 100000000;
 
   // Create data
   std::vector<int> in(kCount, 0);
