@@ -3,6 +3,7 @@
 #include <mpi.h>
 
 #include <cstddef>
+#include <iostream>
 #include <vector>
 
 bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::PreProcessingImpl() {
@@ -63,22 +64,18 @@ bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::RunImpl() {
   }
 
   int left_neighbor = 0;
-  int right_neighbor = 0;
   if (rank > 0) {
-    MPI_Sendrecv(&local_signs.front(), 1, MPI_INT, rank - 1, 0, &left_neighbor, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD,
-                 MPI_STATUS_IGNORE);
+    MPI_Recv(&left_neighbor, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     if (left_neighbor != local_signs.front()) {
       ++local_count;
     }
   }
-
   if (rank < size - 1) {
-    MPI_Sendrecv(&local_signs.back(), 1, MPI_INT, rank + 1, 0, &right_neighbor, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD,
-                 MPI_STATUS_IGNORE);
-    if (right_neighbor != local_signs.back()) {
-      ++local_count;
-    }
+    MPI_Send(&local_signs.back(), 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
   }
+
+  // Debugging log
+  std::cout << "Rank " << rank << ": local_count = " << local_count << std::endl;
 
   int global_count = 0;
   MPI_Reduce(&local_count, &global_count, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
