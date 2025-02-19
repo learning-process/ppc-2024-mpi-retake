@@ -75,7 +75,7 @@ bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::RunImpl() {
   }
 
   // Debugging log
-  std::cout << "Rank " << rank << ": local_count = " << local_count << std::endl;
+  std::cout << "Rank " << rank << ": local_count = " << local_count << '\n';
 
   int global_count = 0;
   MPI_Reduce(&local_count, &global_count, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
