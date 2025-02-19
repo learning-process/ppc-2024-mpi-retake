@@ -65,7 +65,7 @@ bool shuravina_o_contrast::ContrastTaskMPI::RunImpl() {
   return true;
 }
 
-bool shuravina_o_contrast::ContrastTaskMPI::PostProcessingImpl() {return true;}
+bool shuravina_o_contrast::ContrastTaskMPI::PostProcessingImpl() { return true; }
 
 void shuravina_o_contrast::ContrastTaskMPI::IncreaseContrast() {
   const uint8_t min_val = *std::ranges::min_element(input_);
