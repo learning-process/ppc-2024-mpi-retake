@@ -11,6 +11,30 @@
 #include "core/task/include/task.hpp"
 #include "mpi/malyshev_v_lent_horizontal/include/ops_mpi.hpp"
 
+namespace malyshev_v_lent_horizontal {
+namespace {
+std::vector<int> GetRandomMatrix(int rows, int cols) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::vector<int> vec(rows * cols);
+  for (int i = 0; i < rows * cols; i++) {
+    vec[i] = (int)(gen() % 100);
+  }
+  return vec;
+}
+
+std::vector<int> GetRandomVector(int size) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::vector<int> vec(size);
+  for (int i = 0; i < size; i++) {
+    vec[i] = (int)(gen() % 100);
+  }
+  return vec;
+}
+}  // namespace
+}  // namespace malyshev_v_lent_horizontal
+
 TEST(malyshev_v_lent_horizontal, test_pipeline_Run) {
   boost::mpi::communicator world;
 
