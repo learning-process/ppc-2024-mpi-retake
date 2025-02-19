@@ -32,7 +32,7 @@ std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_mpi::generat
   return std::vector<std::vector<int>>();
 }
 
-TEST(Konstantinov_I_sum_of_vector_elements_parallel, test_pipeline_run) {
+TEST(Konstantinov_I_sum_of_vector_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   int rows = 10000;
   int columns = 10000;
@@ -76,7 +76,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, test_pipeline_run) {
   }
 }
 
-TEST(Konstantinov_I_sum_of_vector_elements_parallel, test_task_run) {
+TEST(Konstantinov_I_sum_of_vector_mpi, test_task_run) {
   boost::mpi::communicator world;
   int rows = 10000;
   int columns = 10000;
