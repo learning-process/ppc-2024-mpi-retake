@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
 
-TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
+TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
   constexpr size_t kMatrixSize = 100;
   std::vector<double> input_matrix_a = std::vector<double>(kMatrixSize * kMatrixSize, 0);
   std::vector<double> input_matrix_b = std::vector<double>(kMatrixSize * kMatrixSize, 0);
@@ -51,7 +51,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   ASSERT_EQ(true_solution, out_matrix_c[0]);
 }
 
-TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
+TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
   constexpr size_t kMatrixSize = 100;
   std::vector<double> input_matrix_a1 = std::vector<double>(kMatrixSize * kMatrixSize, 0);
   std::vector<double> input_matrix_b1 = std::vector<double>(kMatrixSize * kMatrixSize, 0);
