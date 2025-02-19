@@ -9,7 +9,7 @@
 #include "core/util/include/util.hpp"
 #include "seq/Konstantinov_I_sum_of_vector_elements/include/ops_seq.hpp"
 
-std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_bound = 50) {
+std::vector<int> Konstantinov_I_sum_of_vector_elements_seq::generate_rand_vector(int size, int lower_bound, int upper_bound) {
   std::vector<int> result(size);
   for (int i = 0; i < size; i++) {
     result[i] = lower_bound + rand() % (upper_bound - lower_bound + 1);
@@ -17,10 +17,10 @@ std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_b
   return result;
 }
 
-std::vector<std::vector<int>> generate_rand_matrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50) {
+std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(int rows, int columns, int lower_bound, int upper_bound) {
   std::vector<std::vector<int>> result(rows);
   for (int i = 0; i < rows; i++) {
-    result[i] = generate_rand_vector(columns, lower_bound, upper_bound);
+    result[i] = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_vector(columns, lower_bound, upper_bound);
   }
   return result;
   return std::vector<std::vector<int>>();
@@ -35,7 +35,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, EmptyInput) {
 TEST(Konstantinov_I_sum_of_vector_seq, EmptyOutput) {
   int rows = 10;
   int columns = 10;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   taskDataPar->inputs_count.emplace_back(rows);
@@ -52,7 +52,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, Matrix1x1) {
   int rows = 1;
   int columns = 1;
   int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
   for (const std::vector<int> &vec : input) {
     for (int elem : vec) {
@@ -82,7 +82,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, Matrix5x1) {
   int rows = 5;
   int columns = 1;
   int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
   for (const std::vector<int> &vec : input) {
     for (int elem : vec) {
@@ -112,7 +112,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, Matrix10x10) {
   int rows = 10;
   int columns = 10;
   int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
   for (const std::vector<int> &vec : input) {
     for (int elem : vec) {
@@ -142,7 +142,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, Matrix100x100) {
   int rows = 100;
   int columns = 100;
   int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
   for (const std::vector<int> &vec : input) {
     for (int elem : vec) {
@@ -172,7 +172,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, Matrix100x10) {
   int rows = 100;
   int columns = 10;
   int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
   for (const std::vector<int> &vec : input) {
     for (int elem : vec) {
@@ -202,7 +202,7 @@ TEST(Konstantinov_I_sum_of_vector_seq, Matrix10x100) {
   int rows = 10;
   int columns = 100;
   int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
   for (const std::vector<int> &vec : input) {
     for (int elem : vec) {

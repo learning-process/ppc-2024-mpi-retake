@@ -11,7 +11,7 @@
 #include "core/util/include/util.hpp"
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
 
-std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_bound = 50) {
+std::vector<int> Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_vector(int size, int lower_bound, int upper_bound) {
   std::vector<int> result(size);
   for (int i = 0; i < size; i++) {
     result[i] = lower_bound + rand() % (upper_bound - lower_bound + 1);
@@ -19,10 +19,10 @@ std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_b
   return result;
 }
 
-std::vector<std::vector<int>> generate_rand_matrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50) {
+std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(int rows, int columns, int lower_bound, int upper_bound) {
   std::vector<std::vector<int>> result(rows);
   for (int i = 0; i < rows; i++) {
-    result[i] = generate_rand_vector(columns, lower_bound, upper_bound);
+    result[i] = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_vector(columns, lower_bound, upper_bound);
   }
   return result;
   return std::vector<std::vector<int>>();
@@ -41,7 +41,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, EmptyOutput) {
   boost::mpi::communicator world;
   int rows = 10;
   int columns = 10;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     taskDataPar->inputs_count.emplace_back(rows);
@@ -62,7 +62,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix1x1) {
   int rows = 1;
   int columns = 1;
   int result = 0;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -98,7 +98,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix5x1) {
   int rows = 5;
   int columns = 1;
   int result = 0;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -134,7 +134,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x10) {
   int rows = 10;
   int columns = 10;
   int result = 0;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -170,7 +170,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x100) {
   int rows = 100;
   int columns = 100;
   int result = 0;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -206,7 +206,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x10) {
   int rows = 100;
   int columns = 10;
   int result = 0;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -242,7 +242,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x100) {
   int rows = 10;
   int columns = 100;
   int result = 0;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
+  std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_mpi::generate_rand_matrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {

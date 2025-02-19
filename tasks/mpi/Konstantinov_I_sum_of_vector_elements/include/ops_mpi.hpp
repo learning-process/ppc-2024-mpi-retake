@@ -10,6 +10,8 @@
 namespace Konstantinov_I_sum_of_vector_elements_mpi {
 
 int vec_elem_sum(const std::vector<int>& vec);
+std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_bound = 50);
+std::vector<std::vector<int>> generate_rand_matrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50);
 
 class SumVecElemSequential : public ppc::core::Task {
  public:
