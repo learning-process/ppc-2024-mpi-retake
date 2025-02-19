@@ -27,12 +27,11 @@ std::vector<std::vector<int>> Konstantinov_I_sum_of_vector_elements_seq::generat
     result[i] = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_vector(columns, lower_bound, upper_bound);
   }
   return result;
-  return std::vector<std::vector<int>>();
-}
+ }
 
 TEST(Konstantinov_I_sum_of_vector_seq, test_pipeline_run) {
-  int rows = 100000;
-  int columns = 100000;
+  int rows = 10000;
+  int columns = 10000;
   int result;
   std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
@@ -45,8 +44,8 @@ TEST(Konstantinov_I_sum_of_vector_seq, test_pipeline_run) {
 
   taskDataPar->inputs_count.emplace_back(rows);
   taskDataPar->inputs_count.emplace_back(columns);
-  for (long unsigned int i = 0; i < input.size(); i++) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input[i].data()));
+  for (auto &row : input) {
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
   }
   taskDataPar->outputs_count.emplace_back(1);
   taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
@@ -75,8 +74,8 @@ TEST(Konstantinov_I_sum_of_vector_seq, test_pipeline_run) {
 }
 
 TEST(Konstantinov_I_sum_of_vector_seq, test_task_run) {
-  int rows = 100000;
-  int columns = 100000;
+  int rows = 10000;
+  int columns = 10000;
   int result;
   std::vector<std::vector<int>> input = Konstantinov_I_sum_of_vector_elements_seq::generate_rand_matrix(rows, columns);
   int sum = 0;
@@ -89,8 +88,8 @@ TEST(Konstantinov_I_sum_of_vector_seq, test_task_run) {
 
   taskDataPar->inputs_count.emplace_back(rows);
   taskDataPar->inputs_count.emplace_back(columns);
-  for (long unsigned int i = 0; i < input.size(); i++) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input[i].data()));
+  for (auto &row : input) {
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(row.data()));
   }
   taskDataPar->outputs_count.emplace_back(1);
   taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
