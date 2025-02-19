@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -46,15 +45,9 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run) {
   };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
-
-  boost::mpi::communicator world;
-  if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results);
-  }
-
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
   ASSERT_EQ(true_solution, out_matrix_c[0]);
 }
 
@@ -93,14 +86,8 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run) {
   };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);
   perf_analyzer->TaskRun(perf_attr, perf_results);
-
-  boost::mpi::communicator world;
-  if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results);
-  }
-
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
   ASSERT_EQ(true_solution1, out_matrix_c1[0]);
 }
