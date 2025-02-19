@@ -5,7 +5,7 @@
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/skeleton_and_content.hpp>
+#include <boost/serialization/vector.hpp>
 #include <random>
 #include <vector>
 
