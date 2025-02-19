@@ -11,7 +11,7 @@
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
 TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
-  constexpr size_t kSize = 512;
+  constexpr size_t kSize = 2048;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
 
@@ -24,7 +24,7 @@ TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
   auto test_task_mpi = std::make_shared<shuravina_o_contrast::ContrastTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 100;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
