@@ -21,7 +21,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
     for (unsigned short j = 0; j < kMatrixSize; j++) {
       input_matrix_a[j + (i * kMatrixSize)] = i + 1;
       input_matrix_b[j + (i * kMatrixSize)] = j + 1;
-      true_solution[j + (i * kMatrixSize)] = 10 * (i + 1) * (j + 1) * (double)kMatrixSize;
+      true_solution[j + (i * kMatrixSize)] = (i + 1) * (j + 1) * (double)kMatrixSize;
     }
   }
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -62,7 +62,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
     for (unsigned short j = 0; j < kMatrixSize; j++) {
       input_matrix_a1[j + (i * kMatrixSize)] = i + 1;
       input_matrix_b1[j + (i * kMatrixSize)] = j + 1;
-      true_solution1[j + (i * kMatrixSize)] = 11 * (i + 1) * (j + 1) * (double)kMatrixSize;
+      true_solution1[j + (i * kMatrixSize)] = (i + 1) * (j + 1) * (double)kMatrixSize;
     }
   }
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
