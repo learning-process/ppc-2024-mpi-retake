@@ -20,7 +20,7 @@ std::string GetRandomString(int length) {
 
   srand(time(nullptr));
   for (int i = 0; i < length; i++) {
-    result[i] = charset[rand() % charset.length()];
+    result[i] = charset[rand() % charset.size()];
   }
   return result;
 }

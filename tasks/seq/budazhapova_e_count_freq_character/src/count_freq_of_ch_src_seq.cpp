@@ -14,7 +14,7 @@ bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool budazhapova_e_count_freq_chart_seq::TestTaskSequential::RunImpl() {
-  for (unsigned long i = 0; i < input_.length(); i++) {
+  for (unsigned long i = 0; i < input_.size(); i++) {
     if (input_[i] == symb_) {
       res_++;
     }

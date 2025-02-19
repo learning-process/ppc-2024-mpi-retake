@@ -10,7 +10,7 @@
 
 int budazhapova_e_count_freq_chart_mpi::CountingFreq(std::string str, char symb) {
   int resalt = 0;
-  for (unsigned long i = 0; i < str.length(); i++) {
+  for (unsigned long i = 0; i < str.size(); i++) {
     if (str[i] == symb) {
       resalt++;
     }
