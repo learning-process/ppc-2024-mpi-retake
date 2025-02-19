@@ -141,9 +141,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::SendMatr
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::DistributeDataAcrossProcesses() {
   for (unsigned short i = 0; i < block_rows_columns_; ++i) {
     for (unsigned short j = 0; j < block_rows_columns_; ++j) {
-      if (i == 0 && j == 0) {
-        continue;
-      }
       for (unsigned short k = 0; k < block_dimension_; ++k) {
         int destination_proc = (i * block_rows_columns_) + j;
         SendMatrixAData(i, j, k, destination_proc);
@@ -252,6 +249,8 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
   InitializeAndBroadcastParams();
   output_matrix_C_.resize(dimension_ * dimension_, 0.0);
+  local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
+  local_input_matrix_B_.resize(block_dimension_ * block_dimension_, 0.0);
   local_output_matrix_C_.resize(block_dimension_ * block_dimension_, 0.0);
   if (world_.rank() == 0) {
     DistributeDataIfRoot();
