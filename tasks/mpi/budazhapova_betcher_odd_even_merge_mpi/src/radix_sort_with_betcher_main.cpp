@@ -15,7 +15,7 @@
 #include "mpi/budazhapova_betcher_odd_even_merge_mpi/include/radix_sort_with_betcher.h"
 
 namespace budazhapova_betcher_odd_even_merge_mpi {
-
+namespace {
 void CountingSort(std::vector<int>& arr, int exp) {
   int n = arr.size();
   std::vector<int> output(n);
@@ -52,6 +52,7 @@ void OddEvenMerge(std::vector<int>& local_res, std::vector<int>& received_data) 
   local_res.assign(merged.begin(), merged.begin() + local_res.size());
   received_data.assign(merged.begin() + local_res.size(), merged.end());
 }
+}  // namespace
 
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
 bool budazhapova_betcher_OddEvenMerge_mpi::MergeSequential::PreProcessing() {

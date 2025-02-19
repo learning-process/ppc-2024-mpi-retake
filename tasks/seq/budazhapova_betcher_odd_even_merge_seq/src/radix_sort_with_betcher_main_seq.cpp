@@ -1,9 +1,10 @@
 #include <algorithm>
 #include <thread>
 
-#include "seq/budazhapova_betcher_odd_even_merge_seq/include/odd_even_merge.hpp"
+#include "seq/budazhapova_betcher_odd_even_merge_seq/include/radix_sort_with_betcher_seq.h"
 
 namespace budazhapova_betcher_odd_even_merge_seq {
+namespace {
 void CountingSort(std::vector<int>& arr, int exp) {
   int n = arr.size();
   std::vector<int> output(n);
@@ -32,6 +33,7 @@ void RadixSort(std::vector<int>& arr) {
     CountingSort(arr, exp);
   }
 }
+}  // namespace
 }  // namespace budazhapova_betcher_odd_even_merge_seq
 bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::PreProcessing() {
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
