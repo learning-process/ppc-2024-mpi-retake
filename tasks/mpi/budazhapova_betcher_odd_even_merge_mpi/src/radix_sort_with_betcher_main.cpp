@@ -89,7 +89,8 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::ValidationImpl() {
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() std::vector<int> recv_counts(world_.size(), 0);
+bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
+std::vector<int> recv_counts(world_.size(), 0);
 std::vector<int> displacements(world_.size(), 0);
 
 boost::mpi::broadcast(world_, res_, 0);
