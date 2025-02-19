@@ -8,7 +8,7 @@
 #include <numeric>
 #include <vector>
 
-namespace {
+namespace karaseva_e_reduce_mpi {
 
 // Utility function to get MPI datatype based on template type
 template <typename T>
@@ -29,7 +29,7 @@ MPI_Datatype GetMPIType<double>() {
   return MPI_DOUBLE;
 }
 
-}  // namespace
+}  // namespace karaseva_e_reduce_mpi
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
