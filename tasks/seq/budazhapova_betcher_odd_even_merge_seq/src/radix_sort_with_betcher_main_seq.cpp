@@ -30,7 +30,7 @@ void CountingSort(std::vector<int>& arr, int exp) {
 }
 
 void RadixSort(std::vector<int>& arr) {
-  int max_num = std::ranges::max_element(arr);
+  auto max_num = std::ranges::max_element(arr);
   for (int exp = 1; max_num / exp > 0; exp *= 10) {
     CountingSort(arr, exp);
   }

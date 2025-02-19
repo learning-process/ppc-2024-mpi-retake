@@ -12,7 +12,7 @@
 namespace budazhapova_betcher_odd_even_merge_mpi {
 namespace {
 
-void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& data) {
+void SendAndReceive(boost::mpi::communicator& world_, int send_rank, int recv_rank, std::vector<int>& data) {
   if (send_rank >= 0 && send_rank < world_.size()) {
     world_.send(send_rank, world_.rank(), data);
   }
@@ -21,14 +21,14 @@ void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& data) {
   }
 }
 
-void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data) {
+void PerformOddEvenMerge(boost::mpi::communicator& world, int neighbor_rank, std::vector<int>& local_data) {
   std::vector<int> received_data;
   world_.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(received_data, local_data);
   world_.send(neighbor_rank, world_.rank(), received_data);
 }
 
-void OddEvenSortPhase(int phase) {
+void OddEvenSortPhase(boost::mpi::communicator& world, int phase) {
   int next_rank = world_.rank() + 1;
   int prev_rank = world_.rank() - 1;
 
@@ -53,8 +53,8 @@ void OddEvenSortPhase(int phase) {
   }
 }
 
-void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements, int& start, int& end,
-                    std::vector<int>& recv_counts, std::vector<int>& displacements) {
+void DistributeData(boost::mpi::communicator& world, int& n_of_send_elements, int& n_of_proc_with_extra_elements,
+                    int& start, int& end, std::vector<int>& recv_counts, std::vector<int>& displacements) {
   int world_size = world_.size();
   int world_rank = world_.rank();
   int res_size = static_cast<int>(res_.size());
