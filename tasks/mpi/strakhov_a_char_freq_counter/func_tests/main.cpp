@@ -13,7 +13,8 @@
 #include "core/util/include/util.hpp"
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
-std::vector<char> fill_random_chars(int size, const std::string &charset) {
+namespace strakhov_a_char_freq_counter_mpi {
+std::vector<char> FillRandomChars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, charset.size() - 1);
@@ -24,6 +25,7 @@ std::vector<char> fill_random_chars(int size, const std::string &charset) {
   }
   return result;
 }
+}  // namespace strakhov_a_char_freq_counter_mpi
 
 TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {
   boost::mpi::communicator world;
@@ -248,11 +250,11 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
 
   boost::mpi::communicator world;
   std::vector<char> in_string =
-      fill_random_chars(300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      FillRandomChars(300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int32_t> out_par(1, 0);
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target =
-      fill_random_chars(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      FillRandomChars(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
 
   // Parallel
 

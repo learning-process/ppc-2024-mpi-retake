@@ -2,7 +2,6 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -10,10 +9,10 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
-std::vector<char> fill_random_chars(int size, const std::string &charset) {
+namespace strakhov_a_char_freq_counter_seq {
+std::vector<char> FillRandomChars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, charset.size() - 1);
@@ -24,6 +23,7 @@ std::vector<char> fill_random_chars(int size, const std::string &charset) {
   }
   return result;
 }
+}  // namespace strakhov_a_char_freq_counter_seq
 
 TEST(strakhov_a_char_freq_counter_seq, test_same_characters) {
   std::vector<char> in_string;
