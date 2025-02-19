@@ -1,6 +1,7 @@
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
