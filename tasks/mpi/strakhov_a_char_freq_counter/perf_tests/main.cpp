@@ -57,7 +57,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 
-  ASSERT_EQ(expectation, out_par);
+  ASSERT_EQ(out_par, expectation);
 }
 
 TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
@@ -106,5 +106,5 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 
-  ASSERT_EQ(expectation, out_par);
+  ASSERT_EQ(out_par, expectation);
 }
