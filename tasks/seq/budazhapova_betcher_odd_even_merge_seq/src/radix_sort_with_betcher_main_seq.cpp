@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstddef>
+#include <numeric>
 #include <vector>
 
 #include "seq/budazhapova_betcher_odd_even_merge_seq/include/radix_sort_with_betcher_seq.h"
@@ -11,25 +12,25 @@ void CountingSort(std::vector<int>& arr, int exp) {
   std::vector<int> output(n);
   std::vector<int> count(10, 0);
 
-  for (int i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++) {
     int index = (arr[i] / exp) % 10;
     count[index]++;
   }
-  for (int i = 1; i < 10; i++) {
+  for (size_t i = 1; i < 10; i++) {
     count[i] += count[i - 1];
   }
-  for (int i = n - 1; i >= 0; i--) {
+  for (size_t i = n - 1; i >= 0; i--) {
     int index = (arr[i] / exp) % 10;
     output[count[index] - 1] = arr[i];
     count[index]--;
   }
-  for (int i = 0; i < n; i++) {
+  for (size_t = 0; i < n; i++) {
     arr[i] = output[i];
   }
 }
 
 void RadixSort(std::vector<int>& arr) {
-  int max_num = *std::max_element(arr.begin(), arr.end());
+  int max_num = std::ranges::max_element arr;
   for (int exp = 1; max_num / exp > 0; exp *= 10) {
     CountingSort(arr, exp);
   }

@@ -16,51 +16,51 @@ void CountingSort(std::vector<int>& arr, int exp) {
   std::vector<int> output(n);
   std::vector<int> count(10, 0);
 
-  for (int i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++) {
     int index = (arr[i] / exp) % 10;
     count[index]++;
   }
   for (int i = 1; i < 10; i++) {
     count[i] += count[i - 1];
   }
-  for (int i = n - 1; i >= 0; i--) {
+  for (size_t i = n - 1; i >= 0; i--) {
     int index = (arr[i] / exp) % 10;
     output[count[index] - 1] = arr[i];
     count[index]--;
   }
-  for (int i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; i++) {
     arr[i] = output[i];
   }
 }
 
 void RadixSort(std::vector<int>& arr) {
-  int max_num = *std::max_element(arr.begin(), arr.end());
+  int max_num = std::ranges::max_element arr;
   for (int exp = 1; max_num / exp > 0; exp *= 10) {
     CountingSort(arr, exp);
   }
 }
-void OddEvenMerge(std::vector<int>& local_, std::vector<int>& received_data) {
-  std::vector<int> merged(local_.size() + received_data.size());
-  std::copy(local_.begin(), local_.end(), merged.begin());
-  std::copy(received_data.begin(), received_data.end(), merged.begin() + local_.size());
+void OddEvenMerge(std::vector<int>& local, std::vector<int>& received_data) {
+  std::vector<int> merged(local.size() + received_data.size());
+  std::copy(local.begin(), local.end(), merged.begin());
+  std::copy(received_data.begin(), received_data.end(), merged.begin() + local.size());
   budazhapova_betcher_odd_even_merge_mpi::RadixSort(merged);
-  local_.assign(merged.begin(), merged.begin() + local_.size());
-  received_data.assign(merged.begin() + local_.size(), merged.end());
+  local.assign(merged.begin(), merged.begin() + local.size());
+  received_data.assign(merged.begin() + local.size(), merged.end());
 }
 }  // namespace
 
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
-bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PreProcessingImpl(){
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PreProcessingImpl() {
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::ValidationImpl(){
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::ValidationImpl() {
   return task_data->inputs_count[0] > 0;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::Run() {
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::RunImpl() {
   budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
   return true;
 }
@@ -151,7 +151,8 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
     }
   }
 
-  boost::mpi::gatherv(world_, local_res_.data(), local_res_.size(), res_.data(), recv_counts, displacements, 0);
+  boost::mpi::gatherv(world_, local_res_.data(), static_cast<int>(local_res_.size()), res_.data(), recv_counts,
+                      displacements, 0);
 
   return true;
 }
