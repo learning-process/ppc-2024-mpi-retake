@@ -1,8 +1,12 @@
 
+#include <gtest/gtest.h>
+
 #include <cstdlib>
 #include <ctime>
 #include <vector>
 
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
 #include "seq/budazhapova_betcher_odd_even_merge_seq/include/radix_sort_with_betcher_seq.h"
 
 namespace budazhapova_betcher_odd_even_merge_seq {

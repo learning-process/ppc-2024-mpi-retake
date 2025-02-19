@@ -1,9 +1,12 @@
+#include <gtest/gtest.h>
 
 #include <cstdlib>
 #include <ctime>
 #include <random>
 #include <vector>
 
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
 #include "mpi/budazhapova_betcher_odd_even_merge_mpi/include/radix_sort_with_betcher.h"
 
 namespace budazhapova_betcher_odd_even_merge_mpi {
@@ -162,7 +165,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test_3) {
   }
 }
 
-TEST(budazhapova_betcher_odd_even_merge_mpi, Validation_test) {
+TEST(budazhapova_betcher_odd_even_merge_mpi, validation_test) {
   boost::mpi::communicator world;
   std::vector<int> input_vector = {};
   std::vector<int> out(1, 0);

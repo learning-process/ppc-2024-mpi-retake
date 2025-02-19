@@ -7,7 +7,9 @@
 #include <random>
 #include <vector>
 
+#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/budazhapova_betcher_odd_even_merge_mpi/include/radix_sort_with_betcher.h"
 
 namespace budazhapova_betcher_odd_even_merge_mpi {
@@ -44,7 +46,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_pipeline_run) {
   ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
   test_mpi_task_parallel->PreProcessing();
   test_mpi_task_parallel->Run();
-  test_mpi_task_parallel->Post_Processing();
+  test_mpi_task_parallel->PostProcessing();
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
