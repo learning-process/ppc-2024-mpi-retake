@@ -1,8 +1,8 @@
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
+#include <mpi.h>
+
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -48,8 +48,9 @@ bool shuravina_o_contrast::ContrastTaskMPI::RunImpl() {
   if (world_.rank() == 0) {
     IncreaseContrast();
   }
-  world_.barrier();
-  boost::mpi::broadcast(world_, output_.data(), static_cast<int>(output_.size()), 0);
+
+  MPI_Bcast(output_.data(), static_cast<int>(output_.size()), MPI_BYTE, 0, MPI_COMM_WORLD);
+
   return true;
 }
 
