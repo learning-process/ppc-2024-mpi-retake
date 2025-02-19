@@ -230,15 +230,13 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
       world_.send(0, 0, local_output_matrix_C_.data() + (block_row * block_dimension_), block_dimension_);
     }
   } else {
-    for (unsigned short block_row = 0; block_row < block_dimension_; ++block_row) {
-      std::copy(local_output_matrix_C_.begin() + (block_row * block_dimension_),
-                local_output_matrix_C_.begin() + ((block_row + 1) * block_dimension_),
-                output_matrix_C_.begin() +
-                    (((world_.rank() / block_rows_columns_) * block_dimension_ + block_row) * dimension_) +
-                    ((world_.rank() % block_rows_columns_) * block_dimension_));
-    }
     for (int proc = 1; proc < world_.size(); ++proc) {
       for (unsigned short block_row = 0; block_row < block_dimension_; ++block_row) {
+        std::copy(local_output_matrix_C_.begin() + (block_row * block_dimension_),
+            local_output_matrix_C_.begin() + ((block_row + 1) * block_dimension_),
+            output_matrix_C_.begin() +
+                (((world_.rank() / block_rows_columns_) * block_dimension_ + block_row) * dimension_) +
+                ((world_.rank() % block_rows_columns_) * block_dimension_));
         world_.recv(proc, 0,
                     output_matrix_C_.data() +
                         ((((proc / block_rows_columns_) * block_dimension_) + block_row) * dimension_) +
