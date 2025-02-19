@@ -51,29 +51,32 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   T local_sum = std::accumulate(input_.begin(), input_.end(), static_cast<T>(0));
-  T recv_data = 0;
+  T global_sum = 0;
 
   int rank = 0;
   int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  int partner_rank = 0;
   for (int step = 1; step < size; step *= 2) {
-    int partner_rank = rank ^ step;
+    partner_rank = rank ^ step;
 
-    if (partner_rank < size) {
-      if (rank < partner_rank) {
-        MPI_Recv(&recv_data, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        local_sum += recv_data;
-      } else {
-        MPI_Send(&local_sum, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD);
-        break;
-      }
+    if (rank < partner_rank) {
+      MPI_Send(&local_sum, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD);
+      break;
+    }
+
+    if (rank > partner_rank) {
+      T recv_data = 0;
+      MPI_Recv(&recv_data, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      local_sum += recv_data;
     }
   }
 
   if (rank == 0) {
-    output_[0] = local_sum;
+    global_sum = local_sum;
+    output_ = {global_sum};
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -82,7 +85,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
-  if (task_data->outputs_count[0] > 0 && MPI_Comm_rank(MPI_COMM_WORLD, 0) == 0) {
+  if (task_data->outputs_count[0] > 0) {
     std::memcpy(task_data->outputs[0], output_.data(), sizeof(T));
   }
   return true;
