@@ -10,25 +10,8 @@
 
 namespace malyshev_v_lent_horizontal {
 
-std::vector<int> GetRandomMatrix(int rows, int cols) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::vector<int> matrix(rows * cols);
-  for (int i = 0; i < rows * cols; i++) {
-    matrix[i] = gen() % 100;
-  }
-  return matrix;
-}
-
-std::vector<int> GetRandomVector(int size) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::vector<int> vector(size);
-  for (int i = 0; i < size; i++) {
-    vector[i] = gen() % 100;
-  }
-  return vector;
-}
+std::vector<int> GetRandomMatrix(int rows, int cols);
+std::vector<int> GetRandomVector(int size);
 
 class MatVecMultMpi : public ppc::core::Task {
  public:
