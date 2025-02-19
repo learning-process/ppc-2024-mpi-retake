@@ -279,5 +279,6 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PostProc
   if (world_.rank() == 0) {
     reinterpret_cast<std::vector<double>*>(task_data->outputs[0])[0] = output_matrix_C_;
   }
+  output_matrix_C_.clear();
   return true;
 }
