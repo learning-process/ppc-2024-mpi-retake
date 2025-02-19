@@ -112,21 +112,20 @@ size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, si
         max_row_idx = i;
       }
     }
-    if (max_value < 1e-10) {
+    if (max_value < 1e-10 || std::abs(matrix[(max_row_idx * n) + col]) < 1e-10) {
       continue;
     }
 
     if (max_row_idx != row) {
-      std::swap_ranges(matrix.begin() + (row * n), matrix.begin() + (row * n) + col_count,
-                       matrix.begin() + (max_row_idx * n));
+      auto begin1 = matrix.begin() + static_cast<std::vector<double>::difference_type>(row * n);
+      auto end1 = begin1 + static_cast<std::vector<double>::difference_type>(col_count);
+      auto begin2 = matrix.begin() + static_cast<std::vector<double>::difference_type>(max_row_idx * n);
+      std::swap_ranges(begin1, end1, begin2);
     }
 
-    double lead_element = matrix[(row * n) + col];
-    if (std::abs(lead_element) < 1e-10) {
-      continue;
-    }
+    double pivot = matrix[(row * n) + col];
     for (size_t j = col; j < col_count; ++j) {
-      matrix[(row * n) + j] /= lead_element;
+      matrix[(row * n) + j] /= pivot;
     }
 
     for (size_t i = 0; i < row_count; ++i) {
@@ -140,9 +139,6 @@ size_t opolin_d_simple_iteration_method_seq::Rank(std::vector<double> matrix, si
     }
     ++rank;
     ++row;
-    if (rank == n) {
-      break;
-    }
   }
   return rank;
 }
