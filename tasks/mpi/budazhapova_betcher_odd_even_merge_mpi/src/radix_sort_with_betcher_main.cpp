@@ -11,6 +11,73 @@
 
 namespace budazhapova_betcher_odd_even_merge_mpi {
 namespace {
+
+void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& data) {
+  if (send_rank >= 0 && send_rank < world_.size()) {
+    world_.send(send_rank, world_.rank(), data);
+  }
+  if (recv_rank >= 0 && recv_rank < world_.size()) {
+    world_.recv(recv_rank, recv_rank, data);
+  }
+}
+
+void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data) {
+  std::vector<int> received_data;
+  world_.recv(neighbor_rank, neighbor_rank, received_data);
+  OddEvenMerge(received_data, local_data);
+  world_.send(neighbor_rank, world_.rank(), received_data);
+}
+
+void OddEvenSortPhase(int phase) {
+  int next_rank = world_.rank() + 1;
+  int prev_rank = world_.rank() - 1;
+
+  if (phase % 2 == 0) {
+    if (world_.rank() % 2 == 0 && next_rank < world_.size()) {
+      SendAndReceive(next_rank, -1, local_res_);
+    } else if (world_.rank() % 2 == 1) {
+      PerformOddEvenMerge(prev_rank, local_res_);
+    }
+    if (world_.rank() % 2 == 0 && next_rank < world_.size()) {
+      SendAndReceive(-1, next_rank, local_res_);
+    }
+  } else {
+    if (world_.rank() % 2 == 1 && next_rank < world_.size()) {
+      SendAndReceive(next_rank, -1, local_res_);
+    } else if (world_.rank() % 2 == 0 && world_.rank() > 0) {
+      PerformOddEvenMerge(prev_rank, local_res_);
+    }
+    if (world_.rank() % 2 == 1 && next_rank < world_.size()) {
+      SendAndReceive(-1, next_rank, local_res_);
+    }
+  }
+}
+
+void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements, int& start, int& end,
+                    std::vector<int>& recv_counts, std::vector<int>& displacements) {
+  int world_size = world_.size();
+  int world_rank = world_.rank();
+  int res_size = static_cast<int>(res_.size());
+
+  n_of_send_elements = res_size / world_size;
+  n_of_proc_with_extra_elements = res_size % world_size;
+
+  for (int i = 0; i < world_size; i++) {
+    start = i * n_of_send_elements + std::min(i, n_of_proc_with_extra_elements);
+    end = start + n_of_send_elements + (i < n_of_proc_with_extra_elements ? 1 : 0);
+    recv_counts[i] = end - start;
+    displacements[i] = (i == 0) ? 0 : displacements[i - 1] + recv_counts[i - 1];
+  }
+
+  start = world_rank * n_of_send_elements + std::min(world_rank, n_of_proc_with_extra_elements);
+  end = start + n_of_send_elements + (world_rank < n_of_proc_with_extra_elements ? 1 : 0);
+
+  local_res_.resize(end - start);
+  for (int i = start; i < end; i++) {
+    local_res_[i - start] = res_[i];
+  }
+}
+
 void CountingSort(std::vector<int>& arr, int exp) {
   size_t n = arr.size();
   std::vector<int> output(n);
@@ -34,18 +101,20 @@ void CountingSort(std::vector<int>& arr, int exp) {
 }
 
 void RadixSort(std::vector<int>& arr) {
-  int max_num = std::ranges::max_element arr;
+  int max_num = std::ranges::max_element(arr);
   for (int exp = 1; max_num / exp > 0; exp *= 10) {
     CountingSort(arr, exp);
   }
 }
 void OddEvenMerge(std::vector<int>& local, std::vector<int>& received_data) {
   std::vector<int> merged(local.size() + received_data.size());
-  std::copy(local.begin(), local.end(), merged.begin());
-  std::copy(received_data.begin(), received_data.end(), merged.begin() + local.size());
+  std::ranges::copy(local, merged.begin());
+  std::ranges::copy(received_data, merged.begin() + local.size());
   budazhapova_betcher_odd_even_merge_mpi::RadixSort(merged);
-  local.assign(merged.begin(), merged.begin() + local.size());
-  received_data.assign(merged.begin() + local.size(), merged.end());
+  // local.assign(merged.begin(), merged.begin() + local.size());
+  local.assign(merged.begin(), merged.begin() + static_cast<long>(local.size()));
+  // received_data.assign(merged.begin() + local.size(), merged.end());
+  received_data.assign(merged.begin() + static_cast<long>(local.size()), merged.end());
 }
 }  // namespace
 
@@ -89,6 +158,31 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::ValidationImpl() {
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
+  std::vector<int> recv_counts(world_.size(), 0);
+  std::vector<int> displacements(world_.size(), 0);
+
+  boost::mpi::broadcast(world_, res_, 0);
+
+  int n_of_send_elements = 0;
+  int n_of_proc_with_extra_elements = 0;
+  int start = 0;
+  int end = 0;
+
+  DistributeData(n_of_send_elements, n_of_proc_with_extra_elements, start, end, recv_counts, displacements);
+
+  int world_size = world_.size();  // Переменная используется только здесь, поэтому выносим из DistributeData
+
+  for (int phase = 0; phase < world_size; ++phase) {
+    OddEvenSortPhase(phase);
+  }
+
+  boost::mpi::gatherv(world_, local_res_.data(), static_cast<int>(local_res_.size()), res_.data(), recv_counts,
+                      displacements, 0);
+
+  return true;
+}
+
+/* bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
   std::vector<int> recv_counts(world_.size(), 0);
   std::vector<int> displacements(world_.size(), 0);
 
@@ -155,7 +249,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
                       displacements, 0);
 
   return true;
-}
+}*/
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {

@@ -62,7 +62,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_pipeline_run) {
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_par);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
   if (world.rank() == 0) {
@@ -103,7 +103,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_par);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_par);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   // Create Perf analyzer
   if (world.rank() == 0) {
