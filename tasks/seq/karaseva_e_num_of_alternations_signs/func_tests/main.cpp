@@ -9,12 +9,12 @@
 #include "seq/karaseva_e_num_of_alternations_signs/include/ops_seq.hpp"
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_alternation) {
-  constexpr size_t kCount = 50;
+  constexpr size_t k_count = 50;
 
-  std::vector<int> in(kCount, 0);
+  std::vector<int> in(k_count, 0);
   std::vector<int> out(1, 0);
 
-  for (size_t i = 0; i < kCount; i++) {
+  for (size_t i = 0; i < k_count; i++) {
     in[i] = (i % 2 == 0) ? 1 : -1;
   }
 
@@ -30,16 +30,16 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_alternation) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(static_cast<long>(out[0]), kCount - 1);  // Converting out[0] long
+  EXPECT_EQ(static_cast<long>(out[0]), static_cast<long>(k_count - 1));
 }
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_alternations_every_two) {
-  constexpr size_t kCount = 50;
+  constexpr size_t k_count = 50;
 
-  std::vector<int> in(kCount, 0);
+  std::vector<int> in(k_count, 0);
   std::vector<int> out(1, 0);
 
-  for (size_t i = 0; i < kCount; i++) {
+  for (size_t i = 0; i < k_count; i++) {
     in[i] = (i / 2 % 2 == 0) ? 1 : -1;
   }
 
@@ -55,13 +55,13 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_alternations_every_two) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(static_cast<long>(out[0]), (kCount / 2) - 1);  // Converting out[0] long
+  EXPECT_EQ(static_cast<long>(out[0]), static_cast<long>((k_count / 2) - 1));
 }
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_no_alternations) {
-  constexpr size_t kCount = 50;
+  constexpr size_t k_count = 50;
 
-  std::vector<int> in(kCount, 1);
+  std::vector<int> in(k_count, 1);
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -76,5 +76,5 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_no_alternations) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(static_cast<long>(out[0]), 0);  // Converting out[0] long ( if (lhs == rhs))
+  EXPECT_EQ(static_cast<long>(out[0]), static_cast<long>(0));
 }

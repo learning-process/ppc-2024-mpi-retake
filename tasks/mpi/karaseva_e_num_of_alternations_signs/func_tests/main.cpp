@@ -12,11 +12,11 @@
 TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternations) {
   boost::mpi::communicator world;
 
-  size_t kCount = 50;
-  std::vector<int> in(kCount, 0);
+  size_t k_count= 50;
+  std::vector<int> in(k_count, 0);
   std::vector<int> out(1, 0);
 
-  for (size_t i = 0; i < kCount; i++) {
+  for (size_t i = 0; i < k_count; i++) {
     in[i] = (i % 2 == 0) ? 1 : -1;
   }
 
@@ -35,7 +35,7 @@ TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternations) {
   test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
-    EXPECT_EQ(out[0], static_cast<int>(kCount - 1));  // kCount in int
+    EXPECT_EQ(out[0], static_cast<int>(k_count- 1));  // k_countin int
   }
 }
 

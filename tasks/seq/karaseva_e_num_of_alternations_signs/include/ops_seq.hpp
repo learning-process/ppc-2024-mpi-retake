@@ -17,7 +17,6 @@ class AlternatingSignsSequential : public ppc::core::Task {
 
  private:
   std::vector<int> input_, output_;
-  int total_{};
   int alternations_count_{0};
 };
 
