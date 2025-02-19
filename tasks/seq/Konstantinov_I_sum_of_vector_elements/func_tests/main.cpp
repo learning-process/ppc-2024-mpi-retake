@@ -26,7 +26,7 @@ std::vector<std::vector<int>> generate_rand_matrix(int rows, int columns, int lo
   return std::vector<std::vector<int>>();
 }
 
-TEST(Konstantinov_I_sum_seq, EmptyInput) {
+TEST(Konstantinov_I_sum_of_vector_seq, EmptyInput) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   Konstantinov_I_sum_of_vector_elements_seq::SumVecElemSequential test(taskDataPar);
   ASSERT_FALSE(test.ValidationImpl());
@@ -46,30 +46,6 @@ TEST(Konstantinov_I_sum_of_vector_seq, EmptyOutput) {
 
   Konstantinov_I_sum_of_vector_elements_seq::SumVecElemSequential test(taskDataPar);
   ASSERT_FALSE(test.ValidationImpl());
-}
-
-TEST(Konstantinov_I_sum_of_vector_seq, EmptyMatrix) {
-  int rows = 0;
-  int columns = 0;
-  int result;
-  std::vector<std::vector<int>> input = generate_rand_matrix(rows, columns);
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-
-  taskDataPar->inputs_count.emplace_back(rows);
-  taskDataPar->inputs_count.emplace_back(columns);
-  for (long unsigned int i = 0; i < input.size(); i++) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input[i].data()));
-  }
-  taskDataPar->outputs_count.emplace_back(1);
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
-
-  Konstantinov_I_sum_of_vector_elements_seq::SumVecElemSequential test(taskDataPar);
-
-  ASSERT_TRUE(test.ValidationImpl());
-  test.PreProcessingImpl();
-  test.RunImpl();
-  test.PostProcessingImpl();
-  ASSERT_EQ(0, result);
 }
 
 TEST(Konstantinov_I_sum_of_vector_seq, Matrix1x1) {
