@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "mpi/karaseva_e_num_of_alternations_signs/include/ops_mpi.hpp"
