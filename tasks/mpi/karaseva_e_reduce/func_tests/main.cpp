@@ -39,7 +39,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on int vector: " << duration.count() << " seconds\n";
 
-  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected comparison
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);
 }
 
 // MPI_DOUBLE
@@ -71,7 +71,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on double vector: " << duration.count() << " seconds\n";
 
-  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected comparison
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);
 }
 
 // MPI_FLOAT
@@ -103,5 +103,5 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   std::chrono::duration<double> duration = end - start;
   std::cout << "Time taken for reduce operation on float vector: " << duration.count() << " seconds\n";
 
-  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);  // Corrected comparison
+  EXPECT_EQ(static_cast<size_t>(out[0]), kCount);
 }
