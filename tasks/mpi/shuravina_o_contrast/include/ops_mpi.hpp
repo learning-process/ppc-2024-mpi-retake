@@ -2,7 +2,6 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/smart_ptr/detail/atomic_count.hpp>
 #include <cstdint>
 #include <utility>
 #include <vector>

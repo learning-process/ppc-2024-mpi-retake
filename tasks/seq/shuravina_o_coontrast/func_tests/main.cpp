@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <memory>
 #include <vector>
+#include <ranges>
 
 #include "core/task/include/task.hpp"
 #include "seq/shuravina_o_coontrast/include/ops_seq.hpp"
@@ -55,8 +56,9 @@ TEST(shuravina_o_contrast, test_contrast_stretching_random_image) {
   contrast_task_sequential.Run();
   contrast_task_sequential.PostProcessing();
 
-  uint8_t min_val = *std::min_element(out.begin(), out.end());
-  uint8_t max_val = *std::max_element(out.begin(), out.end());
+  uint8_t min_val = *std::ranges::min_element(out);
+  uint8_t max_val = *std::ranges::max_element(out);
+
   EXPECT_EQ(min_val, 0);
   EXPECT_EQ(max_val, 255);
 }
