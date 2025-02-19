@@ -9,6 +9,7 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
+
 TEST(shuravina_o_contrast_mpi, test_min_max_values) {
   constexpr size_t kCount = 256;
 
