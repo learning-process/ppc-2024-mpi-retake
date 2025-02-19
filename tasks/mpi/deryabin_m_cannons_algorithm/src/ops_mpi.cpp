@@ -249,8 +249,6 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::GatherRe
 void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PerformCannonAlgorithm() {
   InitializeAndBroadcastParams();
   output_matrix_C_.resize(dimension_ * dimension_, 0.0);
-  local_input_matrix_A_.resize(block_dimension_ * block_dimension_, 0.0);
-  local_input_matrix_B_.resize(block_dimension_ * block_dimension_, 0.0);
   local_output_matrix_C_.resize(block_dimension_ * block_dimension_, 0.0);
   if (world_.rank() == 0) {
     DistributeDataIfRoot();
