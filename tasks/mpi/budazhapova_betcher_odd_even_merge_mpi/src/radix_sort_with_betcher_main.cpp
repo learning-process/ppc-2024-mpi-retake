@@ -50,20 +50,22 @@ void OddEvenMerge(std::vector<int>& local_, std::vector<int>& received_data) {
 }  // namespace
 
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
-bool budazhapova_betcher_oddEvenMerge_mpi::MergeSequential::PreProcessing() {
+bool budazhapova_betcher_oddEvenMerge_mpi::MergeSequential::PreProcessingImpl(){
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::Validation() { return task_data->inputs_count[0] > 0; }
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::ValidationImpl(){
+  return task_data->inputs_count[0] > 0;
+}
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::Run() {
   budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PostProcessing() {
+bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PostProcessingImpl() {
   int* output = reinterpret_cast<int*>(task_data->outputs[0]);
   for (size_t i = 0; i < res_.size(); i++) {
     output[i] = res_[i];
@@ -71,7 +73,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PostProcessing() {
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PreProcessing() {
+bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
     res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
                             reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
@@ -79,14 +81,14 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PreProcessing() {
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::Validation() {
+bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::ValidationImpl() {
   if (world_.rank() == 0) {
     return task_data->inputs_count[0] > 0;
   }
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::Run() {
+bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
   std::vector<int> recv_counts(world_.size(), 0);
   std::vector<int> displacements(world_.size(), 0);
 
@@ -154,7 +156,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::Run() {
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessing() {
+bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     // budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
     int* output = reinterpret_cast<int*>(task_data->outputs[0]);

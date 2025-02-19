@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <thread>
+#include <cstddef>
 #include <vector>
 
 #include "seq/budazhapova_betcher_odd_even_merge_seq/include/radix_sort_with_betcher_seq.h"
@@ -7,7 +7,7 @@
 namespace budazhapova_betcher_odd_even_merge_seq {
 namespace {
 void CountingSort(std::vector<int>& arr, int exp) {
-  int n = arr.size();
+  size_t n = arr.size();
   std::vector<int> output(n);
   std::vector<int> count(10, 0);
 
@@ -36,20 +36,22 @@ void RadixSort(std::vector<int>& arr) {
 }
 }  // namespace
 }  // namespace budazhapova_betcher_odd_even_merge_seq
-bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::PreProcessing() {
+bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::PreProcessingImpl() {
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::Validation() { return task_data->inputs_count[0] > 0; }
+bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::ValidationImpl() {
+  return task_data->inputs_count[0] > 0;
+}
 
-bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::Run() {
+bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::RunImpl() {
   RadixSort(res_);
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::PostProcessing() {
+bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::PostProcessingImpl() {
   int* output = reinterpret_cast<int*>(task_data->outputs[0]);
   for (size_t i = 0; i < res_.size(); i++) {
     output[i] = res_[i];

@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
+#include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -35,8 +39,9 @@ TEST(budazhapova_betcher_odd_even_merge_seq, test_pipeline_run) {
 
   auto test_task_sequential = std::make_shared<budazhapova_betcher_odd_even_merge_seq::MergeSequential>(task_data_seq);
 
+  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 100;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -44,11 +49,14 @@ TEST(budazhapova_betcher_odd_even_merge_seq, test_pipeline_run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
+  // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
+  // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
+  ASSERT_EQ(input_vector, out);
 }
 
 TEST(budazhapova_betcher_odd_even_merge_seq, test_task_run) {
@@ -64,8 +72,9 @@ TEST(budazhapova_betcher_odd_even_merge_seq, test_task_run) {
 
   auto test_task_sequential = std::make_shared<budazhapova_betcher_odd_even_merge_seq::MergeSequential>(task_data_seq);
 
+  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 100;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -73,8 +82,12 @@ TEST(budazhapova_betcher_odd_even_merge_seq, test_task_run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
+  // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
+
+  // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
+  ASSERT_EQ(input_vector, out);
 }
