@@ -2,7 +2,7 @@
 
 #include <mpi.h>
 
-#include <iostream>
+#include <cstddef>
 #include <vector>
 
 bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::PreProcessingImpl() {
@@ -32,7 +32,7 @@ bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::RunImpl() {
   }
   MPI_Bcast(&input_size, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
-  std::vector<int> recv_counts(size, input_size / size);
+  std::vector<int> recv_counts(size, static_cast<int>(input_size / size));
   for (int i = 0; i < static_cast<int>(input_size % size); ++i) {
     recv_counts[i]++;
   }
@@ -50,13 +50,11 @@ bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::RunImpl() {
     MPI_Recv(local_input.data(), recv_counts[rank], MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
-  // Converting the data into an array of features
   std::vector<int> local_signs(local_input.size());
   for (size_t i = 0; i < local_input.size(); ++i) {
     local_signs[i] = (local_input[i] >= 0) ? 1 : -1;
   }
 
-   // Counting alternating characters
   int local_count = 0;
   for (size_t i = 1; i < local_signs.size(); ++i) {
     if (local_signs[i - 1] != local_signs[i]) {
@@ -64,17 +62,19 @@ bool karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI::RunImpl() {
     }
   }
 
-  // Processing neighbors for correctness on the border
-  int left_neighbor = 0, right_neighbor = 0;
+  int left_neighbor = 0;
+  int right_neighbor = 0;
   if (rank > 0) {
-    MPI_Sendrecv(&local_signs.front(), 1, MPI_INT, rank - 1, 0, &left_neighbor, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Sendrecv(&local_signs.front(), 1, MPI_INT, rank - 1, 0, &left_neighbor, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD,
+                 MPI_STATUS_IGNORE);
     if (left_neighbor != local_signs.front()) {
       ++local_count;
     }
   }
 
   if (rank < size - 1) {
-    MPI_Sendrecv(&local_signs.back(), 1, MPI_INT, rank + 1, 0, &right_neighbor, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Sendrecv(&local_signs.back(), 1, MPI_INT, rank + 1, 0, &right_neighbor, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD,
+                 MPI_STATUS_IGNORE);
     if (right_neighbor != local_signs.back()) {
       ++local_count;
     }

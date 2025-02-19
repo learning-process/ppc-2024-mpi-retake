@@ -20,7 +20,7 @@ bool karaseva_e_num_of_alternations_signs_seq::AlternatingSignsSequential::Valid
 }
 
 bool karaseva_e_num_of_alternations_signs_seq::AlternatingSignsSequential::RunImpl() {
-    alternations_count = 0;
+  alternations_count = 0;
 
   for (size_t i = 1; i < input_.size(); ++i) {
     if (input_[i] * input_[i - 1] < 0) {

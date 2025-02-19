@@ -2,13 +2,10 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/karaseva_e_num_of_alternations_signs/include/ops_seq.hpp"
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_alternation) {
@@ -65,7 +62,6 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_alternations_every_two) {
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_no_alternations) {
   constexpr size_t kCount = 50;
-
 
   std::vector<int> in(kCount, 1);
   std::vector<int> out(1, 0);

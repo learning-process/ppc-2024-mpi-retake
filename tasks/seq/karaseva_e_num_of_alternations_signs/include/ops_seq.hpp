@@ -18,7 +18,7 @@ class AlternatingSignsSequential : public ppc::core::Task {
  private:
   std::vector<int> input_, output_;
   int total_{};
-  int alternations_count{0};
+  int alternations_count_{0};
 };
 
 }  // namespace karaseva_e_num_of_alternations_signs_seq
