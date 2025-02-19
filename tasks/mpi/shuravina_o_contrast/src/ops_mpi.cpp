@@ -23,6 +23,17 @@ bool shuravina_o_contrast::ContrastTaskMPI::PreProcessingImpl() {
 
     width_ = height_ = static_cast<int>(std::sqrt(input_size));
   }
+
+  MPI_Bcast(&width_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&height_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (world_.rank() != 0) {
+    input_.resize(width_ * height_);
+    output_.resize(width_ * height_);
+  }
+
+  MPI_Bcast(input_.data(), static_cast<int>(input_.size()), MPI_BYTE, 0, MPI_COMM_WORLD);
+
   return true;
 }
 
@@ -54,9 +65,12 @@ bool shuravina_o_contrast::ContrastTaskMPI::RunImpl() {
   return true;
 }
 
-bool shuravina_o_contrast::ContrastTaskMPI::PostProcessingImpl() {
+bool shuravina_o_contrast::ContrastTaskMPI::RunImpl() {
   if (world_.rank() == 0) {
-    std::ranges::copy(output_, reinterpret_cast<uint8_t *>(task_data->outputs[0]));
+    IncreaseContrast();
   }
+
+  MPI_Bcast(output_.data(), static_cast<int>(output_.size()), MPI_BYTE, 0, MPI_COMM_WORLD);
+
   return true;
 }
