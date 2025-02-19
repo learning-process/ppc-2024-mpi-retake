@@ -30,7 +30,7 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_alternation) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(static_cast<long>(out[0]), kCount - 1);  // Converting out[0] ê long
+  EXPECT_EQ(static_cast<long>(out[0]), kCount - 1);  // Converting out[0] long
 }
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_alternations_every_two) {
@@ -55,7 +55,7 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_alternations_every_two) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(static_cast<long>(out[0]), (kCount / 2) - 1);  // Converting out[0] ê long
+  EXPECT_EQ(static_cast<long>(out[0]), (kCount / 2) - 1);  // Converting out[0] long
 }
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_no_alternations) {
@@ -76,5 +76,5 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_no_alternations) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  EXPECT_EQ(static_cast<long>(out[0]), 0);  // Converting out[0] ê long ( if (lhs == rhs))
+  EXPECT_EQ(static_cast<long>(out[0]), 0);  // Converting out[0] long ( if (lhs == rhs))
 }
