@@ -12,7 +12,7 @@
 namespace budazhapova_betcher_odd_even_merge_mpi {
 namespace {
 
-void SendAndReceive(boost::mpi::communicator& world_, int send_rank, int recv_rank, std::vector<int>& data) {
+/* void SendAndReceive(boost::mpi::communicator& world_, int send_rank, int recv_rank, std::vector<int>& data) {
   if (send_rank >= 0 && send_rank < world_.size()) {
     world_.send(send_rank, world_.rank(), data);
   }
@@ -24,7 +24,7 @@ void SendAndReceive(boost::mpi::communicator& world_, int send_rank, int recv_ra
 void PerformOddEvenMerge(boost::mpi::communicator& world, int neighbor_rank, std::vector<int>& local_data) {
   std::vector<int> received_data;
   world_.recv(neighbor_rank, neighbor_rank, received_data);
-  OddEvenMerge(received_data, local_data);
+  OddEvenMerge(&received_data, &local_data);
   world_.send(neighbor_rank, world_.rank(), received_data);
 }
 
@@ -76,7 +76,7 @@ void DistributeData(boost::mpi::communicator& world, int& n_of_send_elements, in
   for (int i = start; i < end; i++) {
     local_res_[i - start] = res_[i];
   }
-}
+}*/
 
 void CountingSort(std::vector<int>& arr, int exp) {
   size_t n = arr.size();
@@ -157,7 +157,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::ValidationImpl() {
   return true;
 }
 
-bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
+/* bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
   std::vector<int> recv_counts(world_.size(), 0);
   std::vector<int> displacements(world_.size(), 0);
 
@@ -181,8 +181,8 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
 
   return true;
 }
-
-/* bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
+*/
+bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
   std::vector<int> recv_counts(world_.size(), 0);
   std::vector<int> displacements(world_.size(), 0);
 
@@ -249,7 +249,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
                       displacements, 0);
 
   return true;
-}*/
+}
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {

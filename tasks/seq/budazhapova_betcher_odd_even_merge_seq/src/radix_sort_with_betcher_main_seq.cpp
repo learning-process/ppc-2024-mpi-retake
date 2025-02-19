@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstddef>
-#include <numeric>
 #include <vector>
 
 #include "seq/budazhapova_betcher_odd_even_merge_seq/include/radix_sort_with_betcher_seq.h"
