@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/shuravina_o_contrast/include/ops_mpi.hpp"
 
-TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
+TEST(shuravina_o_contrast, test_pipeline_run) {
   constexpr size_t kSize = 512;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -21,7 +21,7 @@ TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shuravina_o_contrast::ContrastTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -38,7 +38,7 @@ TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
 
-TEST(shuravina_o_contrast_mpi, test_task_run) {
+TEST(shuravina_o_contrast, test_task_run) {
   constexpr size_t kSize = 512;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
@@ -49,7 +49,7 @@ TEST(shuravina_o_contrast_mpi, test_task_run) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shuravina_o_contrast::ContrastTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;

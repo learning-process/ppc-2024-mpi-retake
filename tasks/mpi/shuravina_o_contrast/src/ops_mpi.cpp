@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <vector>
 
-bool shuravina_o_contrast::TestTaskMPI::PreProcessingImpl() {
+bool shuravina_o_contrast::ContrastTaskMPI::PreProcessingImpl() {
   const unsigned int input_size = task_data->inputs_count[0];
   auto *in_ptr = reinterpret_cast<uint8_t *>(task_data->inputs[0]);
   if (in_ptr == nullptr) {
@@ -24,11 +24,11 @@ bool shuravina_o_contrast::TestTaskMPI::PreProcessingImpl() {
   return true;
 }
 
-bool shuravina_o_contrast::TestTaskMPI::ValidationImpl() {
+bool shuravina_o_contrast::ContrastTaskMPI::ValidationImpl() {
   return task_data->inputs_count[0] == task_data->outputs_count[0];
 }
 
-void shuravina_o_contrast::TestTaskMPI::IncreaseContrast() {
+void shuravina_o_contrast::ContrastTaskMPI::IncreaseContrast() {
   const uint8_t min_val = *std::ranges::min_element(input_);
   const uint8_t max_val = *std::ranges::max_element(input_);
 
@@ -42,7 +42,7 @@ void shuravina_o_contrast::TestTaskMPI::IncreaseContrast() {
   }
 }
 
-bool shuravina_o_contrast::TestTaskMPI::RunImpl() {
+bool shuravina_o_contrast::ContrastTaskMPI::RunImpl() {
   if (world_.rank() == 0) {
     IncreaseContrast();
   }
@@ -51,7 +51,7 @@ bool shuravina_o_contrast::TestTaskMPI::RunImpl() {
   return true;
 }
 
-bool shuravina_o_contrast::TestTaskMPI::PostProcessingImpl() {
+bool shuravina_o_contrast::ContrastTaskMPI::PostProcessingImpl() {
   std::ranges::copy(output_, reinterpret_cast<uint8_t *>(task_data->outputs[0]));
   return true;
 }

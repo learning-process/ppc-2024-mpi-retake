@@ -10,9 +10,9 @@
 
 namespace shuravina_o_contrast {
 
-class TestTaskMPI : public ppc::core::Task {
+class ContrastTaskMPI : public ppc::core::Task {
  public:
-  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data);
+  explicit ContrastTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
