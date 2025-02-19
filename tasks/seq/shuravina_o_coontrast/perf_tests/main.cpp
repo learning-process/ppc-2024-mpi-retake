@@ -11,7 +11,7 @@
 #include "seq/shuravina_o_coontrast/include/ops_seq.hpp"
 
 TEST(shuravina_o_contrast_seq, test_pipeline_run) {
-  constexpr size_t kSize = 512;
+  constexpr size_t kSize = 4096;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
 
@@ -24,7 +24,7 @@ TEST(shuravina_o_contrast_seq, test_pipeline_run) {
   auto contrast_task_sequential = std::make_shared<shuravina_o_contrast::ContrastTaskSequential>(task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 100;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -39,7 +39,7 @@ TEST(shuravina_o_contrast_seq, test_pipeline_run) {
 }
 
 TEST(shuravina_o_contrast_seq, test_task_run) {
-  constexpr size_t kSize = 512;
+  constexpr size_t kSize = 4096;
   std::vector<uint8_t> in(kSize * kSize, 128);
   std::vector<uint8_t> out(kSize * kSize, 0);
 
@@ -52,7 +52,7 @@ TEST(shuravina_o_contrast_seq, test_task_run) {
   auto contrast_task_sequential = std::make_shared<shuravina_o_contrast::ContrastTaskSequential>(task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 100;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
