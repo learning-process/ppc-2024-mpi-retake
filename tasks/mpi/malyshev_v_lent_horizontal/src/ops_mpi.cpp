@@ -5,7 +5,7 @@
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <random>
+#include <boost/serialization/vector.hpp>
 #include <vector>
 
 bool malyshev_v_lent_horizontal::MatVecMultMpi::PreProcessingImpl() {
