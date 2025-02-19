@@ -1,34 +1,14 @@
 #include "mpi/malyshev_v_lent_horizontal/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
+#include <random>
 #include <vector>
 
-namespace malyshev_v_lent_horizontal {
-
-std::vector<int> GetRandomMatrix(int rows, int cols) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::vector<int> vec(rows * cols);
-  for (int i = 0; i < rows * cols; i++) {
-    vec[i] = (int)(gen() % 100);
-  }
-  return vec;
-}
-
-std::vector<int> GetRandomVector(int size) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::vector<int> vec(size);
-  for (int i = 0; i < size; i++) {
-    vec[i] = (int)(gen() % 100);
-  }
-  return vec;
-}
-
-bool MatVecMultMpi::PreProcessingImpl() {
+bool malyshev_v_lent_horizontal::MatVecMultMpi::PreProcessingImpl() {
   if (world_.rank() == 0) {
     // Init matrix and vector
     matrix_ = std::vector<int>(task_data->inputs_count[0]);
@@ -45,7 +25,7 @@ bool MatVecMultMpi::PreProcessingImpl() {
   return true;
 }
 
-bool MatVecMultMpi::ValidationImpl() {
+bool malyshev_v_lent_horizontal::MatVecMultMpi::ValidationImpl() {
   if (world_.rank() == 0) {
     return (task_data->inputs_count[2] == task_data->outputs_count[0]) &&
            (task_data->inputs_count[3] == task_data->inputs_count[1]);
@@ -53,7 +33,7 @@ bool MatVecMultMpi::ValidationImpl() {
   return true;
 }
 
-bool MatVecMultMpi::RunImpl() {
+bool malyshev_v_lent_horizontal::MatVecMultMpi::RunImpl() {
   broadcast(world_, rows_, 0);
   broadcast(world_, cols_, 0);
   broadcast(world_, vector_, 0);
@@ -91,6 +71,4 @@ bool MatVecMultMpi::RunImpl() {
   return true;
 }
 
-bool MatVecMultMpi::PostProcessingImpl() { return true; }
-
-}  // namespace malyshev_v_lent_horizontal
+bool malyshev_v_lent_horizontal::MatVecMultMpi::PostProcessingImpl() { return true; }
