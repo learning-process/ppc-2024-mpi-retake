@@ -1,0 +1,120 @@
+#include <gtest/gtest.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <fstream>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
+#include "mpi/karaseva_e_num_of_alternations_signs/include/ops_mpi.hpp"
+
+TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternations) {
+  constexpr size_t kCount = 50;
+  std::vector<int> in(kCount, 0);
+  std::vector<int> out(1, 0);
+
+  for (size_t i = 0; i < kCount; i++) {
+    in[i] = (i % 2 == 0) ? 1 : -1;
+  }
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_mpi->inputs_count.emplace_back(in.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs_count.emplace_back(out.size());
+
+  karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  EXPECT_EQ(out[0], kCount - 1);
+}
+
+TEST(karaseva_e_num_of_alternations_signs_mpi, test_10) {
+  boost::mpi::communicator world;
+
+  std::vector<int> in = {-1, 2,  -3, 4, -5,  6,  -7, 8,  9, -10};
+  std::vector<int> out(1, 0);
+
+  // Create task_data
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_mpi->inputs_count.emplace_back(in.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_mpi->outputs_count.emplace_back(out.size());
+  }
+
+  // Create Task
+  karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
+
+  // Check the output if rank is 0 (since it's the root process)
+  if (world.rank() == 0) {
+    ASSERT_EQ(out[0], 8);
+  }
+}
+
+TEST(karaseva_e_num_of_alternations_signs_mpi, test_all_positive) {
+  boost::mpi::communicator world;
+
+  // Create data
+  std::vector<int> in = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  std::vector<int> out(1, 0);
+
+  // Create task_data
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_mpi->inputs_count.emplace_back(in.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_mpi->outputs_count.emplace_back(out.size());
+  }
+
+  // Create Task
+  karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(0, out[0]);
+  }
+}
+
+TEST(karaseva_e_num_of_alternations_signs_mpi, test_alternating_signs) {
+  boost::mpi::communicator world;
+
+  // Create data
+  std::vector<int> in = {1, -2, 3, -4, 5, -6, 7, -8, 9, -10};
+  std::vector<int> out(1, 0);
+
+  // Create task_data
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_mpi->inputs_count.emplace_back(in.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_mpi->outputs_count.emplace_back(out.size());
+  }
+
+  // Create Task
+  karaseva_e_num_of_alternations_signs_mpi::AlternatingSignsMPI num_of_alternations_signs_mpi(task_data_mpi);
+  ASSERT_EQ(num_of_alternations_signs_mpi.ValidationImpl(), true);
+  num_of_alternations_signs_mpi.PreProcessingImpl();
+  num_of_alternations_signs_mpi.RunImpl();
+  num_of_alternations_signs_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(9, out[0]);
+  }
+}
