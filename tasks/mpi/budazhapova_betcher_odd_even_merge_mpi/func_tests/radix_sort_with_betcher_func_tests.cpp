@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstdlib>
 #include <ctime>
+#include <memory>
 #include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/budazhapova_betcher_odd_even_merge_mpi/include/radix_sort_with_betcher.h"
 
 namespace budazhapova_betcher_odd_even_merge_mpi {
@@ -50,11 +51,11 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, ordinary_test) {
     task_data_seq->inputs_count.emplace_back(input_vector.size());
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_seq.data()));
 
-    budazhapova_betcher_odd_even_merge_mpi::MergeSequential testTaskSequential(task_data_seq);
-    ASSERT_EQ(testTaskSequential.Validation(), true);
-    testTaskSequential.PreProcessing();
-    testTaskSequential.Run();
-    testTaskSequential.PostProcessing();
+    budazhapova_betcher_odd_even_merge_mpi::MergeSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
 
     ASSERT_EQ(out, out_seq);
   }
@@ -85,11 +86,11 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test) {
     task_data_seq->inputs_count.emplace_back(input_vector.size());
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_seq.data()));
 
-    budazhapova_betcher_odd_even_merge_mpi::MergeSequential testTaskSequential(task_data_seq);
-    ASSERT_EQ(testTaskSequential.Validation(), true);
-    testTaskSequential.PreProcessing();
-    testTaskSequential.Run();
-    testTaskSequential.PostProcessing();
+    budazhapova_betcher_odd_even_merge_mpi::MergeSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
 
     ASSERT_EQ(out, out_seq);
   }
@@ -120,11 +121,11 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test_2) {
     task_data_seq->inputs_count.emplace_back(input_vector.size());
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_seq.data()));
 
-    budazhapova_betcher_odd_even_merge_mpi::MergeSequential testTaskSequential(task_data_seq);
-    ASSERT_EQ(testTaskSequential.Validation(), true);
-    testTaskSequential.PreProcessing();
-    testTaskSequential.Run();
-    testTaskSequential.PostProcessing();
+    budazhapova_betcher_odd_even_merge_mpi::MergeSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
 
     ASSERT_EQ(out, out_seq);
   }
@@ -155,11 +156,11 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test_3) {
     task_data_seq->inputs_count.emplace_back(input_vector.size());
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out_seq.data()));
 
-    budazhapova_betcher_odd_even_merge_mpi::MergeSequential testTaskSequential(task_data_seq);
-    ASSERT_EQ(testTaskSequential.Validation(), true);
-    testTaskSequential.PreProcessing();
-    testTaskSequential.Run();
-    testTaskSequential.PostProcessing();
+    budazhapova_betcher_odd_even_merge_mpi::MergeSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
 
     ASSERT_EQ(out, out_seq);
   }

@@ -47,8 +47,8 @@ TEST(budazhapova_betcher_odd_even_merge_seq, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
-  perf_analyzer->pipeline_run(perf_attr, perf_results);
-  ppc::core::Perf::print_perf_statistic(perf_results);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
 
 TEST(budazhapova_betcher_odd_even_merge_seq, test_task_run) {
@@ -75,6 +75,6 @@ TEST(budazhapova_betcher_odd_even_merge_seq, test_task_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
-  perf_analyzer->task_run(perf_attr, perf_results);
-  ppc::core::Perf::print_perf_statistic(perf_results);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 }

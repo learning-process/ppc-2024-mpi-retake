@@ -3,10 +3,10 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/budazhapova_betcher_odd_even_merge_seq/include/radix_sort_with_betcher_seq.h"
 
 namespace budazhapova_betcher_odd_even_merge_seq {
@@ -44,7 +44,7 @@ TEST(budazhapova_betcher_odd_even_merge_seq, ordinary_test) {
 }
 
 TEST(budazhapova_betcher_odd_even_merge_seq, random_vector_test) {
-  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_seq::generateRandomVector(100, 5, 100);
+  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_seq::GenerateRandomVector(100, 5, 100);
   std::vector<int> out(100, 0);
 
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();

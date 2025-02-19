@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
@@ -50,9 +51,9 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_pipeline_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
-  perf_analyzer->pipeline_run(perf_attr, perf_results);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perf_results);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }
 TEST(budazhapova_betcher_odd_even_merge_mpi, test_task_run) {
@@ -80,8 +81,8 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, test_task_run) {
   perf_attr->current_timer = [&] { return current_timer.elapsed(); };
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
-  perf_analyzer->task_run(perf_attr, perf_results);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perf_results);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }

@@ -39,7 +39,6 @@ void RadixSort(std::vector<int>& arr) {
 bool budazhapova_betcher_odd_even_merge_seq::MergeSequential::PreProcessing() {
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
-  n_el_ = task_data->inputs_count[0];
   return true;
 }
 
