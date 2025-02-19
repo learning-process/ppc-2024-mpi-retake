@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/collectives.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +21,7 @@ TEST(shuravina_o_contrast_mpi, test_pipeline_run) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto test_task_mpi = std::make_shared<shuravina_o_contrast::ContrastTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -50,7 +49,7 @@ TEST(shuravina_o_contrast_mpi, test_task_run) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto test_task_mpi = std::make_shared<shuravina_o_contrast::ContrastTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shuravina_o_contrast::TestTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
