@@ -1,9 +1,9 @@
+#include <gtest/gtest.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
-
-#include <gtest/gtest.h>
 
 #include "core/task/include/task.hpp"
 #include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"

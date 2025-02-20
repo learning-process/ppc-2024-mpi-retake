@@ -1,8 +1,8 @@
+#include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"
+
 #include <cstddef>
 #include <cstdlib>
 #include <vector>
-
-#include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"
 
 namespace malyshev_v_lent_horizontal_seq {
 
