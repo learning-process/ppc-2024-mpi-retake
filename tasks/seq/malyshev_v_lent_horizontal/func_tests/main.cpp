@@ -22,7 +22,6 @@ TEST(malyshev_v_lent_horizontal_seq, Validation_Test) {
   task_data->inputs_count.emplace_back(cols);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
-  task_data->inputs_count.emplace_back(vector.size());
 
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
@@ -46,7 +45,6 @@ TEST(malyshev_v_lent_horizontal_seq, Simple_Test) {
   task_data->inputs_count.emplace_back(cols);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
-  task_data->inputs_count.emplace_back(vector.size());
 
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
@@ -75,10 +73,13 @@ TEST(malyshev_v_lent_horizontal_seq, Random_Test) {
   }
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
+
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(matrix.data()));
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
   task_data->inputs_count.emplace_back(rows);
   task_data->inputs_count.emplace_back(cols);
+
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
+
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
