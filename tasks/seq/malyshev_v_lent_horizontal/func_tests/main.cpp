@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "seq/malyshev_v_matrix_vector/include/ops_seq.hpp"
+#include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"
 
 namespace malyshev_v_matrix_vector_seq {
 namespace {
