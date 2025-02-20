@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 
+#include "core/task/include/task.hpp"
+
 namespace malyshev_v_lent_horizontal_seq {
 
 std::vector<double> GetRandomMatrix(size_t rows, size_t cols);
