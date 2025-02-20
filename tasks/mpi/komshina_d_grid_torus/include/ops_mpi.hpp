@@ -12,7 +12,8 @@
 #include "core/task/include/task.hpp"
 
 namespace komshina_d_grid_torus_mpi {
-int GridTorus(int current_rank, int target_rank, int grid_columns, int grid_rows);
+int GridTorus(int sourceRank, int targetRank, int gridSizeX, int gridSizeY,
+                                         bool isHorizontalClosed, bool isVerticalClosed);
 class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}

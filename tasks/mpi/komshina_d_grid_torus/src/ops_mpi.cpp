@@ -30,9 +30,8 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
     if (reinterpret_cast<int *>(task_data->inputs[0])[1] < world.size()) {
       return true;
     }
-    
+
     return false;
-    
   }
 
   return true;
@@ -43,7 +42,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     routing_packet.routing_path = {world.rank()};
 
     if (routing_packet.target_rank != 0) {
-      const int next_hop = GridTorus(0, routing_packet.target_rank, grid_columns, grid_rows);
+      const int next_hop = GridTorus(0, routing_packet.target_rank, grid_columns, grid_rows, true, true);
       world.send(next_hop, 0, routing_packet);
     } else {
       routing_packet.is_routing_complete = true;
@@ -58,14 +57,13 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
         routing_packet.is_routing_complete = true;
         world.send(0, 0, routing_packet);
       } else {
-        const int next_hop = GridTorus(world.rank(), routing_packet.target_rank, grid_columns, grid_rows);
+        const int next_hop = GridTorus(world.rank(), routing_packet.target_rank, grid_columns, grid_rows, true, true);
         world.send(next_hop, 0, routing_packet);
       }
     }
   }
   return true;
 }
-
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
   world.barrier();
@@ -74,24 +72,35 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
     int *output_data = reinterpret_cast<int *>(task_data->outputs[0]);
     output_data[0] = routing_packet.message_payload;
 
-     int *output_path = reinterpret_cast<int *>(task_data->outputs[1]);
+    int *output_path = reinterpret_cast<int *>(task_data->outputs[1]);
     std::copy(routing_packet.routing_path.begin(), routing_packet.routing_path.end(), output_path);
   }
   return true;
 }
 
-int komshina_d_grid_torus_mpi::GridTorus(int sourceRank, int targetRank, int gridSizeX, int gridSizeY) {
+int komshina_d_grid_torus_mpi::GridTorus(int sourceRank, int targetRank, int gridSizeX, int gridSizeY,
+                                         bool isHorizontalClosed, bool isVerticalClosed) {
   int sourceX = sourceRank % gridSizeX;
   int sourceY = sourceRank / gridSizeX;
   int targetX = targetRank % gridSizeX;
   int targetY = targetRank / gridSizeX;
 
-  int dx = (targetX - sourceX + gridSizeX) % gridSizeX;
-  int dy = (targetY - sourceY + gridSizeY) % gridSizeY;
+  int dx = targetX - sourceX;
+  int dy = targetY - sourceY;
 
-  if (dx > gridSizeX / 2) dx -= gridSizeX;
-  if (dy > gridSizeY / 2) dy -= gridSizeY;
+  // Учет замкнутости горизонтальных краев
+  if (isHorizontalClosed) {
+    if (dx > gridSizeX / 2) dx -= gridSizeX;
+    if (dx < -gridSizeX / 2) dx += gridSizeX;
+  }
 
+  // Учет замкнутости вертикальных краев
+  if (isVerticalClosed) {
+    if (dy > gridSizeY / 2) dy -= gridSizeY;
+    if (dy < -gridSizeY / 2) dy += gridSizeY;
+  }
+
+  // Выбор направления
   if (std::abs(dx) > std::abs(dy)) {
     return (dx > 0) ? sourceRank + 1 : sourceRank - 1;
   } else {

@@ -175,16 +175,38 @@ TEST(komshina_d_grid_torus_mpi, Test_Validation_Fail) {
   }
 }
 
-TEST(komshina_d_grid_torus_mpi, Test_CalculateNextHop) {
+TEST(komshina_d_grid_torus_mpi, Test_Transfer_Distant_Closed_Edges) {
   boost::mpi::communicator world;
 
-  int gridSizeX = 2;
-  int gridSizeY = 2;
+  int sqrtN = static_cast<int>(std::sqrt(world.size()));
+  if (sqrtN * sqrtN == world.size() && world.size() >= 4) {
+    int target_rank = world.size() - 1;
+    std::vector<int> input{256, target_rank};
+    std::vector<int> expectedPath{0, 1, 2, 3};
 
-  if (world.size() == 4) {
-    ASSERT_EQ(komshina_d_grid_torus_mpi::calculateNextHop(0, 1, gridSizeX, gridSizeY), 1);
-    ASSERT_EQ(komshina_d_grid_torus_mpi::calculateNextHop(0, 2, gridSizeX, gridSizeY), 2);
-    ASSERT_EQ(komshina_d_grid_torus_mpi::calculateNextHop(1, 0, gridSizeX, gridSizeY), 0);
-    ASSERT_EQ(komshina_d_grid_torus_mpi::calculateNextHop(2, 0, gridSizeX, gridSizeY), 0);
+    std::vector<int> output(1, 0);
+    std::vector<int> outputPath(world.size(), -1);
+
+    std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+    if (world.rank() == 0) {
+      task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(input.data()));
+      task_data_mpi->inputs_count.emplace_back(input.size());
+      task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
+      task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(outputPath.data()));
+      task_data_mpi->outputs_count.emplace_back(output.size());
+      task_data_mpi->outputs_count.emplace_back(outputPath.size());
+    }
+
+    komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+    ASSERT_EQ(test_task_mpi.Validation(), true);
+    test_task_mpi.PreProcessing();
+    test_task_mpi.Run();
+    test_task_mpi.PostProcessing();
+
+    if (world.rank() == 0) {
+      outputPath.erase(std::remove(outputPath.begin(), outputPath.end(), -1), outputPath.end());
+      ASSERT_EQ(output[0], input[0]);
+      ASSERT_EQ(outputPath, expectedPath);
+    }
   }
 }
