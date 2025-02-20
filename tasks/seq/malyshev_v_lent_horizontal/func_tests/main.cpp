@@ -5,7 +5,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"
 
-namespace malyshev_v_matrix_vector_seq {
+namespace malyshev_v_lent_horizontal_seq {
 namespace {
 std::vector<double> GetRandomMatrix(size_t rows, size_t cols) {
   std::vector<double> matrix(rows * cols);
@@ -25,9 +25,9 @@ std::vector<double> GetRandomVector(size_t size) {
   return vector;
 }
 }  // namespace
-}  // namespace malyshev_v_matrix_vector_seq
+}  // namespace malyshev_v_lent_horizontal_seq
 
-TEST(malyshev_v_matrix_vector_seq, Validation_Test) {
+TEST(malyshev_v_lent_horizontal_seq, Validation_Test) {
   const size_t rows = 2;
   const size_t cols = 3;
 
@@ -43,11 +43,11 @@ TEST(malyshev_v_matrix_vector_seq, Validation_Test) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
-  malyshev_v_matrix_vector_seq::MatrixVectorMultiplication task(task_data);
+  malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication task(task_data);
   ASSERT_TRUE(task.ValidationImpl());
 }
 
-TEST(malyshev_v_matrix_vector_seq, Simple_Test) {
+TEST(malyshev_v_lent_horizontal_seq, Simple_Test) {
   const size_t rows = 2;
   const size_t cols = 3;
 
@@ -64,7 +64,7 @@ TEST(malyshev_v_matrix_vector_seq, Simple_Test) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
-  malyshev_v_matrix_vector_seq::MatrixVectorMultiplication task(task_data);
+  malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication task(task_data);
   ASSERT_TRUE(task.ValidationImpl());
   task.PreProcessingImpl();
   task.RunImpl();
@@ -72,12 +72,12 @@ TEST(malyshev_v_matrix_vector_seq, Simple_Test) {
   ASSERT_EQ(result, expected);
 }
 
-TEST(malyshev_v_matrix_vector_seq, Random_Test) {
+TEST(malyshev_v_lent_horizontal_seq, Random_Test) {
   const size_t rows = 100;
   const size_t cols = 100;
 
-  auto matrix = malyshev_v_matrix_vector_seq::GetRandomMatrix(rows, cols);
-  auto vector = malyshev_v_matrix_vector_seq::GetRandomVector(cols);
+  auto matrix = malyshev_v_lent_horizontal_seq::GetRandomMatrix(rows, cols);
+  auto vector = malyshev_v_lent_horizontal_seq::GetRandomVector(cols);
   std::vector<double> result(rows, 0.0);
 
   std::vector<double> expected(rows, 0.0);
@@ -95,7 +95,7 @@ TEST(malyshev_v_matrix_vector_seq, Random_Test) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
-  malyshev_v_matrix_vector_seq::MatrixVectorMultiplication task(task_data);
+  malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication task(task_data);
   ASSERT_TRUE(task.ValidationImpl());
   task.PreProcessingImpl();
   task.RunImpl();

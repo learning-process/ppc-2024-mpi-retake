@@ -7,12 +7,12 @@
 #include "core/task/include/task.hpp"
 #include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"
 
-TEST(malyshev_v_matrix_vector_seq, Pipeline_Run) {
+TEST(malyshev_v_lent_horizontal_seq, Pipeline_Run) {
   const size_t rows = 1000;
   const size_t cols = 1000;
 
-  auto matrix = malyshev_v_matrix_vector_seq::GetRandomMatrix(rows, cols);
-  auto vector = malyshev_v_matrix_vector_seq::GetRandomVector(cols);
+  auto matrix = malyshev_v_lent_horizontal_seq::GetRandomMatrix(rows, cols);
+  auto vector = malyshev_v_lent_horizontal_seq::GetRandomVector(cols);
   std::vector<double> result(rows, 0.0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -23,7 +23,7 @@ TEST(malyshev_v_matrix_vector_seq, Pipeline_Run) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
-  auto task = std::make_shared<malyshev_v_matrix_vector_seq::MatrixVectorMultiplication>(task_data);
+  auto task = std::make_shared<malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication>(task_data);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -41,12 +41,12 @@ TEST(malyshev_v_matrix_vector_seq, Pipeline_Run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
 
-TEST(malyshev_v_matrix_vector_seq, Task_Run) {
+TEST(malyshev_v_lent_horizontal_seq, Task_Run) {
   const size_t rows = 1000;
   const size_t cols = 1000;
 
-  auto matrix = malyshev_v_matrix_vector_seq::GetRandomMatrix(rows, cols);
-  auto vector = malyshev_v_matrix_vector_seq::GetRandomVector(cols);
+  auto matrix = malyshev_v_lent_horizontal_seq::GetRandomMatrix(rows, cols);
+  auto vector = malyshev_v_lent_horizontal_seq::GetRandomVector(cols);
   std::vector<double> result(rows, 0.0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -57,7 +57,7 @@ TEST(malyshev_v_matrix_vector_seq, Task_Run) {
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
-  auto task = std::make_shared<malyshev_v_matrix_vector_seq::MatrixVectorMultiplication>(task_data);
+  auto task = std::make_shared<malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication>(task_data);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;

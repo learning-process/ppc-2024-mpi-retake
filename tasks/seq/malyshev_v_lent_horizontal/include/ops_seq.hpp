@@ -3,7 +3,7 @@
 
 #include "core/task/include/task.hpp"
 
-namespace malyshev_v_matrix_vector_seq {
+namespace malyshev_v_lent_horizontal_seq {
 
 class MatrixVectorMultiplication : public ppc::core::Task {
  public:
@@ -20,4 +20,4 @@ class MatrixVectorMultiplication : public ppc::core::Task {
   size_t rows_, cols_;
 };
 
-}  // namespace malyshev_v_matrix_vector_seq
+}  // namespace malyshev_v_lent_horizontal_seq
