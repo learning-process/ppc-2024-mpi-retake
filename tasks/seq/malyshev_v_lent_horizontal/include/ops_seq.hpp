@@ -5,6 +5,9 @@
 
 namespace malyshev_v_lent_horizontal_seq {
 
+std::vector<double> GetRandomMatrix(size_t rows, size_t cols);
+std::vector<double> GetRandomVector(size_t size);
+
 class MatrixVectorMultiplication : public ppc::core::Task {
  public:
   explicit MatrixVectorMultiplication(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
@@ -19,8 +22,5 @@ class MatrixVectorMultiplication : public ppc::core::Task {
   std::vector<double> result_;
   size_t rows_, cols_;
 };
-
-std::vector<double> GetRandomMatrix(size_t rows, size_t cols);
-std::vector<double> GetRandomVector(size_t size);
 
 }  // namespace malyshev_v_lent_horizontal_seq

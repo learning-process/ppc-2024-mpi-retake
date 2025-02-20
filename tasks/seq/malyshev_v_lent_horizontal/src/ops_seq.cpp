@@ -3,6 +3,26 @@
 #include <algorithm>
 #include <vector>
 
+namespace malyshev_v_lent_horizontal_seq {
+
+    std::vector<double> GetRandomMatrix(size_t rows, size_t cols) {
+  std::vector<double> matrix(rows * cols);
+  for (size_t i = 0; i < rows; ++i) {
+    for (size_t j = 0; j < cols; ++j) {
+      matrix[i * cols + j] = static_cast<double>(rand()) / RAND_MAX * 100.0;
+    }
+  }
+  return matrix;
+}
+
+std::vector<double> GetRandomVector(size_t size) {
+  std::vector<double> vector(size);
+  for (size_t i = 0; i < size; ++i) {
+    vector[i] = static_cast<double>(rand()) / RAND_MAX * 100.0;
+  }
+  return vector;
+}
+
 bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::PreProcessingImpl() {
   auto* matrix_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
   auto* vector_ptr = reinterpret_cast<double*>(task_data->inputs[1]);
@@ -34,3 +54,5 @@ bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::PostProcessingI
   std::copy(result_.begin(), result_.end(), output_ptr);
   return true;
 }
+
+}  // namespace malyshev_v_lent_horizontal_seq
