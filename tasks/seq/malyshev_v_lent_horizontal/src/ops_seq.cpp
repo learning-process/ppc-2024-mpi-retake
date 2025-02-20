@@ -36,7 +36,11 @@ bool MatrixVectorMultiplication::PreProcessingImpl() {
   return true;
 }
 
-bool MatrixVectorMultiplication::ValidationImpl() { return cols_ == vector_.size(); }
+bool MatrixVectorMultiplication::ValidationImpl() {
+  const size_t cols = task_data->inputs_count[1];
+  const size_t vector_size = task_data->inputs_count[2];
+  return cols == vector_size;
+}
 
 bool MatrixVectorMultiplication::RunImpl() {
   for (size_t i = 0; i < rows_; ++i) {
