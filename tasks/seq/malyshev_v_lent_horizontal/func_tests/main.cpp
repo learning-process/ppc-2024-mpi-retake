@@ -6,7 +6,6 @@
 #include "seq/malyshev_v_lent_horizontal/include/ops_seq.hpp"
 
 namespace malyshev_v_lent_horizontal_seq {
-namespace {
 std::vector<double> GetRandomMatrix(size_t rows, size_t cols) {
   std::vector<double> matrix(rows * cols);
   for (size_t i = 0; i < rows; ++i) {
@@ -24,7 +23,6 @@ std::vector<double> GetRandomVector(size_t size) {
   }
   return vector;
 }
-}  // namespace
 }  // namespace malyshev_v_lent_horizontal_seq
 
 TEST(malyshev_v_lent_horizontal_seq, Validation_Test) {

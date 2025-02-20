@@ -20,4 +20,7 @@ class MatrixVectorMultiplication : public ppc::core::Task {
   size_t rows_, cols_;
 };
 
+std::vector<double> GetRandomMatrix(size_t rows, size_t cols);
+std::vector<double> GetRandomVector(size_t size);
+
 }  // namespace malyshev_v_lent_horizontal_seq
