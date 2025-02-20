@@ -24,20 +24,24 @@ std::vector<double> GetRandomVector(size_t size) {
   return vector;
 }
 
-bool MatrixVectorMultiplication::PreProcessingImpl() {
-  auto* matrix_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-  auto* vector_ptr = reinterpret_cast<double*>(task_data->inputs[1]);
+bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::PreProcessingImpl() {
   rows_ = task_data->inputs_count[0];
   cols_ = task_data->inputs_count[1];
+  size_t vector_size = task_data->inputs_count[2];
+
+  auto* matrix_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
+  auto* vector_ptr = reinterpret_cast<double*>(task_data->inputs[1]);
 
   matrix_.assign(matrix_ptr, matrix_ptr + (rows_ * cols_));
-  vector_.assign(vector_ptr, vector_ptr + cols_);
+  vector_.assign(vector_ptr, vector_ptr + vector_size);
   result_.resize(rows_, 0.0);
 
   return true;
 }
 
-bool MatrixVectorMultiplication::ValidationImpl() { return cols_ == vector_.size(); }
+bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::ValidationImpl() {
+  return cols_ == vector_.size();
+}
 
 bool MatrixVectorMultiplication::RunImpl() {
   for (size_t i = 0; i < rows_; ++i) {

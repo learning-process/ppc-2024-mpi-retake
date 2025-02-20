@@ -11,16 +11,19 @@
 TEST(malyshev_v_lent_horizontal_seq, Validation_Test) {
   const size_t rows = 2;
   const size_t cols = 3;
-
   std::vector<double> matrix = {1, 2, 3, 4, 5, 6};
   std::vector<double> vector = {1, 2, 3};
   std::vector<double> result(rows, 0.0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
+
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(matrix.data()));
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
   task_data->inputs_count.emplace_back(rows);
   task_data->inputs_count.emplace_back(cols);
+
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
+  task_data->inputs_count.emplace_back(vector.size());
+
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
@@ -31,17 +34,20 @@ TEST(malyshev_v_lent_horizontal_seq, Validation_Test) {
 TEST(malyshev_v_lent_horizontal_seq, Simple_Test) {
   const size_t rows = 2;
   const size_t cols = 3;
-
   std::vector<double> matrix = {1, 2, 3, 4, 5, 6};
   std::vector<double> vector = {1, 2, 3};
   std::vector<double> result(rows, 0.0);
   std::vector<double> expected = {14, 32};
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
+
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(matrix.data()));
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
   task_data->inputs_count.emplace_back(rows);
   task_data->inputs_count.emplace_back(cols);
+
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
+  task_data->inputs_count.emplace_back(vector.size());
+
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.data()));
   task_data->outputs_count.emplace_back(rows);
 
