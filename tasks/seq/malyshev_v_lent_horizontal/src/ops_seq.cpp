@@ -5,7 +5,7 @@
 
 namespace malyshev_v_lent_horizontal_seq {
 
-    std::vector<double> GetRandomMatrix(size_t rows, size_t cols) {
+std::vector<double> GetRandomMatrix(size_t rows, size_t cols) {
   std::vector<double> matrix(rows * cols);
   for (size_t i = 0; i < rows; ++i) {
     for (size_t j = 0; j < cols; ++j) {
