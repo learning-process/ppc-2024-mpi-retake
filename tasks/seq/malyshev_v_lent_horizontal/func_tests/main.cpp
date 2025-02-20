@@ -60,8 +60,8 @@ TEST(malyshev_v_lent_horizontal_seq, Random_Test) {
   auto matrix = malyshev_v_lent_horizontal_seq::GetRandomMatrix(rows, cols);
   auto vector = malyshev_v_lent_horizontal_seq::GetRandomVector(cols);
   std::vector<double> result(rows, 0.0);
+  std::vector<double> expected(rows, 0.0);
 
-  expected[i] += matrix[(i * cols) + j] * vector[j];
   for (size_t i = 0; i < rows; ++i) {
     for (size_t j = 0; j < cols; ++j) {
       expected[i] += matrix[i * cols + j] * vector[j];
@@ -81,5 +81,8 @@ TEST(malyshev_v_lent_horizontal_seq, Random_Test) {
   task.PreProcessingImpl();
   task.RunImpl();
   task.PostProcessingImpl();
-  ASSERT_EQ(result, expected);
+
+  for (size_t i = 0; i < rows; ++i) {
+    ASSERT_NEAR(result[i], expected[i], 1e-6);
+  }
 }
