@@ -36,9 +36,7 @@ bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::PreProcessingIm
   return true;
 }
 
-bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::ValidationImpl() {
-  return task_data->inputs_count[1] == task_data->inputs_count[2];
-}
+bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::ValidationImpl() { return cols_ == vector_.size(); }
 
 bool malyshev_v_lent_horizontal_seq::MatrixVectorMultiplication::RunImpl() {
   for (size_t i = 0; i < rows_; ++i) {
