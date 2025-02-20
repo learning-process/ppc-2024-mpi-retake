@@ -1,7 +1,8 @@
-#define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES /
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
