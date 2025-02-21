@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <vector>
 
-#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
