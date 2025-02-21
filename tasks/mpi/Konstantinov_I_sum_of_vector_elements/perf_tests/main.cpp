@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi/timer.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
