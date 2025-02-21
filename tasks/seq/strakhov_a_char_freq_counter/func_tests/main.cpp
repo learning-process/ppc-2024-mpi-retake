@@ -9,21 +9,21 @@
 #include "core/task/include/task.hpp"
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
-namespace strakhov_a_char_freq_counter_seq {
-namespace {
-std::vector<char> FillRandomChars(int size, const std::string &charset) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
-
-  std::vector<char> result(size);
-  for (char &c : result) {
-    c = charset[dist(gen)];
-  }
-  return result;
-}
-}  // namespace
-}  // namespace strakhov_a_char_freq_counter_seq
+// namespace strakhov_a_char_freq_counter_seq {
+// namespace {
+// std::vector<char> FillRandomChars(int size, const std::string &charset) {
+//   std::random_device rd;
+//   std::mt19937 gen(rd());
+//   std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
+//
+//   std::vector<char> result(size);
+//   for (char &c : result) {
+//     c = charset[dist(gen)];
+//   }
+//   return result;
+// }
+// }  // namespace
+// }  // namespace strakhov_a_char_freq_counter_seq
 
 TEST(strakhov_a_char_freq_counter_seq, test_same_characters) {
   std::vector<char> in_string;

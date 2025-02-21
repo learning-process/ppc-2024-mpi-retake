@@ -16,7 +16,7 @@ class CharFreqCounterSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_;
+  std::vector<signed char> input_;
   int result_{};
   char target_{};
 };

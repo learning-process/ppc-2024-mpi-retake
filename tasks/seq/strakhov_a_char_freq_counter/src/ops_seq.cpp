@@ -5,7 +5,7 @@
 //  Sequential
 
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::PreProcessingImpl() {
-  char **tmp = reinterpret_cast<char *>(task_data->inputs[0]);
+  char *tmp = reinterpret_cast<char *>(task_data->inputs[0]);
   for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp[i];
   }
