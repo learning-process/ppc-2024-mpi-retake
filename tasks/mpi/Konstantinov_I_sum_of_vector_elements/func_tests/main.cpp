@@ -9,7 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
 
-std::vector<int> konstantinov_I_sum_of_vector_elements_mpi::GenerateRandVector(int size, int lower_bound,
+std::vector<int> konstantinov_i_sum_of_vector_elements_mpi::GenerateRandVector(int size, int lower_bound,
                                                                                int upper_bound) {
   std::vector<int> result(size);
   for (int i = 0; i < size; i++) {
@@ -18,12 +18,12 @@ std::vector<int> konstantinov_I_sum_of_vector_elements_mpi::GenerateRandVector(i
   return result;
 }
 
-std::vector<std::vector<int>> konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(int rows, int columns,
+std::vector<std::vector<int>> konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(int rows, int columns,
                                                                                             int lower_bound,
                                                                                             int upper_bound) {
   std::vector<std::vector<int>> result(rows);
   for (int i = 0; i < rows; i++) {
-    result[i] = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandVector(columns, lower_bound, upper_bound);
+    result[i] = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandVector(columns, lower_bound, upper_bound);
   }
   return result;
 }
@@ -31,7 +31,7 @@ std::vector<std::vector<int>> konstantinov_I_sum_of_vector_elements_mpi::Generat
 TEST(Konstantinov_I_sum_of_vector_elements_parallel, EmptyInput) {
   boost::mpi::communicator world;
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   if (world.rank() == 0) {
     ASSERT_FALSE(test.ValidationImpl());
   }
@@ -41,7 +41,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, EmptyOutput) {
   boost::mpi::communicator world;
   int rows = 10;
   int columns = 10;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs_count.emplace_back(rows);
@@ -50,7 +50,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, EmptyOutput) {
       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input[i].data()));
     }
   }
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   if (world.rank() == 0) {
     ASSERT_FALSE(test.ValidationImpl());
   }
@@ -62,7 +62,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix1x1) {
   int rows = 1;
   int columns = 1;
   int result = 0;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -75,7 +75,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix1x1) {
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
   }
 
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   test.ValidationImpl();
   test.PreProcessingImpl();
   test.RunImpl();
@@ -83,7 +83,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix1x1) {
 
   if (world.rank() == 0) {
     int respar = result;
-    konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
+    konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
     testseq.ValidationImpl();
     testseq.PreProcessingImpl();
     testseq.RunImpl();
@@ -98,7 +98,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix5x1) {
   int rows = 5;
   int columns = 1;
   int result = 0;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -111,7 +111,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix5x1) {
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
   }
 
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   test.ValidationImpl();
   test.PreProcessingImpl();
   test.RunImpl();
@@ -119,7 +119,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix5x1) {
 
   if (world.rank() == 0) {
     int respar = result;
-    konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
+    konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
     testseq.ValidationImpl();
     testseq.PreProcessingImpl();
     testseq.RunImpl();
@@ -134,7 +134,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x10) {
   int rows = 10;
   int columns = 10;
   int result = 0;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -147,7 +147,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x10) {
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
   }
 
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   test.ValidationImpl();
   test.PreProcessingImpl();
   test.RunImpl();
@@ -155,7 +155,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x10) {
 
   if (world.rank() == 0) {
     int respar = result;
-    konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
+    konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
     testseq.ValidationImpl();
     testseq.PreProcessingImpl();
     testseq.RunImpl();
@@ -170,7 +170,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x100) {
   int rows = 100;
   int columns = 100;
   int result = 0;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -183,7 +183,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x100) {
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
   }
 
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   test.ValidationImpl();
   test.PreProcessingImpl();
   test.RunImpl();
@@ -191,7 +191,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x100) {
 
   if (world.rank() == 0) {
     int respar = result;
-    konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
+    konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
     testseq.ValidationImpl();
     testseq.PreProcessingImpl();
     testseq.RunImpl();
@@ -206,7 +206,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x10) {
   int rows = 100;
   int columns = 10;
   int result = 0;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -219,7 +219,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x10) {
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
   }
 
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   test.ValidationImpl();
   test.PreProcessingImpl();
   test.RunImpl();
@@ -227,7 +227,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix100x10) {
 
   if (world.rank() == 0) {
     int respar = result;
-    konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
+    konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
     testseq.ValidationImpl();
     testseq.PreProcessingImpl();
     testseq.RunImpl();
@@ -242,7 +242,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x100) {
   int rows = 10;
   int columns = 100;
   int result = 0;
-  std::vector<std::vector<int>> input = konstantinov_I_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
+  std::vector<std::vector<int>> input = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandMatrix(rows, columns);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
@@ -255,7 +255,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x100) {
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
   }
 
-  konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
+  konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel test(task_data_par);
   test.ValidationImpl();
   test.PreProcessingImpl();
   test.RunImpl();
@@ -263,7 +263,7 @@ TEST(Konstantinov_I_sum_of_vector_elements_parallel, Matrix10x100) {
 
   if (world.rank() == 0) {
     int respar = result;
-    konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
+    konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential testseq(task_data_par);
     testseq.ValidationImpl();
     testseq.PreProcessingImpl();
     testseq.RunImpl();

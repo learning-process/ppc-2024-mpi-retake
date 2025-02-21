@@ -1,11 +1,13 @@
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include "boost/mpi/communicator.hpp"
 #include <boost/mpi/collectives.hpp>
+#include <functional>
 #include <cmath>
 #include <vector>
 
-int konstantinov_I_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>& vec) {
+int konstantinov_i_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>& vec) {
   int result = 0;
   for (int elem : vec) {
     result += elem;
@@ -13,7 +15,7 @@ int konstantinov_I_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>
   return result;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential::PreProcessingImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential::PreProcessingImpl() {
   int rows = static_cast<int>(task_data->inputs_count[0]);
   int columns = static_cast<int>(task_data->inputs_count[1]);
 
@@ -29,22 +31,22 @@ bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential::PreProcess
   return true;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential::ValidationImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential::ValidationImpl() {
   return (task_data->inputs_count.size() == 2 && task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0 &&
           task_data->outputs_count.size() == 1 && task_data->outputs_count[0] == 1);
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential::RunImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential::RunImpl() {
   result_ = VecElemSum(input_);
   return true;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemSequential::PostProcessingImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemSequential::PostProcessingImpl() {
   reinterpret_cast<int*>(task_data->outputs[0])[0] = result_;
   return true;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::PreProcessingImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
     int rows = static_cast<int>(task_data->inputs_count[0]);
     int columns = static_cast<int>(task_data->inputs_count[1]);
@@ -62,7 +64,7 @@ bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::PreProcessin
   return true;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::ValidationImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel::ValidationImpl() {
   if (world_.rank() == 0) {
     return (task_data->inputs_count.size() == 2 && task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0 &&
             task_data->outputs_count.size() == 1 && task_data->outputs_count[0] == 1);
@@ -70,7 +72,7 @@ bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::ValidationIm
   return true;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::RunImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel::RunImpl() {
   unsigned int input_size = 0;
   int local_rank = world_.rank();
   int world_size = world_.size();
@@ -79,8 +81,8 @@ bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::RunImpl() {
   }
   boost::mpi::broadcast(world_, input_size, 0);
 
-  int elem_per_procces = input_size / world_size;
-  int residual_elements = input_size % world_size;
+  int elem_per_procces = static_cast<int>(input_size / world_size);
+  int residual_elements = static_cast<int>(input_size % world_size);
 
   int process_count = elem_per_procces + (local_rank < residual_elements ? 1 : 0);
 
@@ -101,7 +103,7 @@ bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::RunImpl() {
   return true;
 }
 
-bool konstantinov_I_sum_of_vector_elements_mpi::SumVecElemParallel::PostProcessingImpl() {
+bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     reinterpret_cast<int*>(task_data->outputs[0])[0] = result_;
   }

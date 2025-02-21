@@ -5,7 +5,7 @@
 
 #include "core/task/include/task.hpp"
 
-namespace konstantinov_I_sum_of_vector_elements_seq {
+namespace konstantinov_i_sum_of_vector_elements_seq {
 
 int VecElemSum(const std::vector<int>& vec);
 std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int upper_bound = 50);
@@ -23,4 +23,4 @@ class SumVecElemSequential : public ppc::core::Task {
   std::vector<int> input_;
   int result_{};
 };
-}  // namespace konstantinov_I_sum_of_vector_elements_seq
+}  // namespace konstantinov_i_sum_of_vector_elements_seq

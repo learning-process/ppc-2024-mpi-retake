@@ -8,7 +8,7 @@
 
 #include "core/task/include/task.hpp"
 
-namespace konstantinov_I_sum_of_vector_elements_mpi {
+namespace konstantinov_i_sum_of_vector_elements_mpi {
 
 int VecElemSum(const std::vector<int>& vec);
 std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int upper_bound = 50);
@@ -41,4 +41,4 @@ class SumVecElemParallel : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
-}  // namespace konstantinov_I_sum_of_vector_elements_mpi
+}  // namespace konstantinov_i_sum_of_vector_elements_mpi
