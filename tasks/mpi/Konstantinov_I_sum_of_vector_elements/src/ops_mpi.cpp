@@ -2,11 +2,15 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <functional>
 #include <vector>
 
-#include "boost/mpi/communicator.hpp"
+
 
 int konstantinov_i_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>& vec) {
   int result = 0;
@@ -80,7 +84,7 @@ bool konstantinov_i_sum_of_vector_elements_mpi::SumVecElemParallel::RunImpl() {
   if (local_rank == 0) {
     input_size = input_.size();
   }
-  boost::mpi::broadcast(world_, input_size, 0);
+  broadcast(world_, input_size, 0);
 
   int elem_per_procces = static_cast<int>(input_size / world_size);
   int residual_elements = static_cast<int>(input_size % world_size);
