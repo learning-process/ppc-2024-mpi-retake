@@ -1,11 +1,12 @@
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include "boost/mpi/communicator.hpp"
 #include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <functional>
 #include <vector>
+
+#include "boost/mpi/communicator.hpp"
 
 int konstantinov_i_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>& vec) {
   int result = 0;
