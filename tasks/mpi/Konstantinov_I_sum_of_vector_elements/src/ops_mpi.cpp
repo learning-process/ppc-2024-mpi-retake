@@ -10,8 +10,6 @@
 #include <functional>
 #include <vector>
 
-
-
 int konstantinov_i_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>& vec) {
   int result = 0;
   for (int elem : vec) {
