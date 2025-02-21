@@ -13,10 +13,11 @@
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
 namespace strakhov_a_char_freq_counter_mpi {
+namespace {
 std::vector<char> FillRandomChars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, charset.size() - 1);
+  std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
 
   std::vector<char> result(size);
   for (char &c : result) {
@@ -24,6 +25,7 @@ std::vector<char> FillRandomChars(int size, const std::string &charset) {
   }
   return result;
 }
+}  // namespace
 }  // namespace strakhov_a_char_freq_counter_mpi
 
 TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {

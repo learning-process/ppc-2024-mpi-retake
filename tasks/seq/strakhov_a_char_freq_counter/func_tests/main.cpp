@@ -10,10 +10,11 @@
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
 namespace strakhov_a_char_freq_counter_seq {
+namespace {
 std::vector<char> FillRandomChars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, charset.size() - 1);
+  std::uniform_int_distribution<> dist(0, static_cast<int>((charset.size()) - 1);
 
   std::vector<char> result(size);
   for (char &c : result) {
@@ -21,13 +22,14 @@ std::vector<char> FillRandomChars(int size, const std::string &charset) {
   }
   return result;
 }
+}  // namespace
 }  // namespace strakhov_a_char_freq_counter_seq
 
 TEST(strakhov_a_char_freq_counter_seq, test_same_characters) {
   std::vector<char> in_string;
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
-  int expectation = 1000;
+  int32_t expectation = 1000;
 
   // Sequential
 
@@ -54,7 +56,7 @@ TEST(strakhov_a_char_freq_counter_seq, test_same_characters) {
 
 TEST(strakhov_a_char_freq_counter_seq, test_no_characters) {
   std::vector<char> in_string;
-
+  int32_t expectation = 0;
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
@@ -78,12 +80,12 @@ TEST(strakhov_a_char_freq_counter_seq, test_no_characters) {
   test_task_seq.RunImpl();
   test_task_seq.PostProcessingImpl();
 
-  ASSERT_EQ(out_seq[0], 0);
+  ASSERT_EQ(out_seq[0], expectation);
 }
 
 TEST(strakhov_a_char_freq_counter_seq, test_empty_string) {
   std::vector<char> in_string{};
-
+  int32_t expectation = 0;
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
@@ -106,7 +108,7 @@ TEST(strakhov_a_char_freq_counter_seq, test_empty_string) {
   test_task_seq.RunImpl();
   test_task_seq.PostProcessingImpl();
 
-  ASSERT_EQ(out_seq[0], 0);
+  ASSERT_EQ(out_seq[0], expectation);
 }
 
 TEST(strakhov_a_char_freq_counter_seq, test_single_character) {
@@ -118,7 +120,7 @@ TEST(strakhov_a_char_freq_counter_seq, test_single_character) {
   // Sequential
 
   // Create task_data
-
+  int32_t expectation = 1;
   in_string = std::vector<char>(1000, 'a');
   in_string[500] = 'b';
   auto task_data_mpi_seq = std::make_shared<ppc::core::TaskData>();
@@ -136,12 +138,12 @@ TEST(strakhov_a_char_freq_counter_seq, test_single_character) {
   test_task_seq.RunImpl();
   test_task_seq.PostProcessingImpl();
 
-  ASSERT_EQ(out_seq[0], 1);
+  ASSERT_EQ(out_seq[0], expectation);
 }
 
 TEST(strakhov_a_char_freq_counter_seq, simple_test_1) {
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-
+  int32_t expectation = 1;
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'H');
 
@@ -163,11 +165,11 @@ TEST(strakhov_a_char_freq_counter_seq, simple_test_1) {
   test_task_seq.RunImpl();
   test_task_seq.PostProcessingImpl();
 
-  ASSERT_EQ(out_seq[0], 1);
+  ASSERT_EQ(out_seq[0], expectation);
 }
 TEST(strakhov_a_char_freq_counter_seq, simple_test_2) {
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-
+  int32_t expectation = 0;
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'h');
 
@@ -189,11 +191,11 @@ TEST(strakhov_a_char_freq_counter_seq, simple_test_2) {
   test_task_seq.RunImpl();
   test_task_seq.PostProcessingImpl();
 
-  ASSERT_EQ(out_seq[0], 0);
+  ASSERT_EQ(out_seq[0], expectation);
 }
 TEST(strakhov_a_char_freq_counter_seq, simple_test_3) {
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-
+  int32_t expectation = 2;
   std::vector<int32_t> out_seq(1, 0);
   std::vector<char> in_target(1, 'l');
 
@@ -215,5 +217,5 @@ TEST(strakhov_a_char_freq_counter_seq, simple_test_3) {
   test_task_seq.RunImpl();
   test_task_seq.PostProcessingImpl();
 
-  ASSERT_EQ(out_seq[0], 2);
+  ASSERT_EQ(out_seq[0], expectation);
 }

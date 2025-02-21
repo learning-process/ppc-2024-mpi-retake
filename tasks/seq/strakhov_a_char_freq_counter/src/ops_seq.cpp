@@ -1,9 +1,11 @@
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
+#include <algoritm>
+#include <csddef>
 //  Sequential
 
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::PreProcessingImpl() {
-  auto *tmp = reinterpret_cast<char *>(task_data->inputs[0]);
+  char **tmp = reinterpret_cast<char *>(task_data->inputs[0]);
   for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp[i];
   }
@@ -15,7 +17,7 @@ bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::PreProcessingImpl() {
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::ValidationImpl() { return task_data->inputs_count[1] == 1; }
 
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::RunImpl() {
-  result_ = std::count(input_.begin(), input_.end(), target_);
+  result_ = static_cast<int>(std::count(input_.begin(), input_.end(), target_));
   return true;
 }
 
