@@ -4,18 +4,19 @@
 #include <boost/mpi/communicator.hpp>
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "core/task/include/task.hpp"
 
-namespace Konstantinov_I_sum_of_vector_elements_mpi {
+namespace konstantinov_I_sum_of_vector_elements_mpi {
 
-int vec_elem_sum(const std::vector<int>& vec);
-std::vector<int> generate_rand_vector(int size, int lower_bound = 0, int upper_bound = 50);
-std::vector<std::vector<int>> generate_rand_matrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50);
+int VecElemSum(const std::vector<int>& vec);
+std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int upper_bound = 50);
+std::vector<std::vector<int>> GenerateRandMatrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50);
 
 class SumVecElemSequential : public ppc::core::Task {
  public:
-  explicit SumVecElemSequential(std::shared_ptr<ppc::core::TaskData> taskData) : Task(std::move(taskData)) {}
+  explicit SumVecElemSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -40,4 +41,4 @@ class SumVecElemParallel : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
-}  // namespace Konstantinov_I_sum_of_vector_elements_mpi
+}  // namespace konstantinov_I_sum_of_vector_elements_mpi
