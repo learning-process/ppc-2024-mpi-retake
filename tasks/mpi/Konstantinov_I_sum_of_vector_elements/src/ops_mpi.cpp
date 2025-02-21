@@ -3,8 +3,8 @@
 #include <algorithm>
 #include "boost/mpi/communicator.hpp"
 #include <boost/mpi/collectives.hpp>
-#include <functional>
 #include <cmath>
+#include <functional>
 #include <vector>
 
 int konstantinov_i_sum_of_vector_elements_mpi::VecElemSum(const std::vector<int>& vec) {
