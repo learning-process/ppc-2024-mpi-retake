@@ -1,7 +1,7 @@
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
-#include <algoritm>
-#include <csddef>
+#include <algorithm>
+#include <cstddef>
 //  Sequential
 
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::PreProcessingImpl() {

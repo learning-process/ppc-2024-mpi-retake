@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
 namespace strakhov_a_char_freq_counter_mpi {

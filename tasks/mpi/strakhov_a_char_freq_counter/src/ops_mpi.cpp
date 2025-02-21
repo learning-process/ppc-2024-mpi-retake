@@ -9,7 +9,7 @@
 //  Sequential
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PreProcessingImpl() {
-  signed char *tmp = reinterpret_cast<signed char *>(task_data->inputs[0]);
+  auto *tmp = reinterpret_cast<signed char *>(task_data->inputs[0]);
   for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp[i];
   }
@@ -36,7 +36,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PostProcessingImpl() 
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    signed char *tmp = reinterpret_cast<signed char *>(task_data->inputs[0]);
+    auto *tmp = reinterpret_cast<signed char *>(task_data->inputs[0]);
     for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
       input_[i] = tmp[i];
     }
@@ -60,7 +60,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
   unsigned int input_length = task_data->inputs_count[0];
   int world_size = world_.size();
   int segment = input_length / world_size;
-  int excess = input_length % world_size;
+  auto excess = input_length % world_size;
   std::vector<int> send_counts(world_size, segment);
   for (int i = 0; i < excess; i++) {
     send_counts[i]++;

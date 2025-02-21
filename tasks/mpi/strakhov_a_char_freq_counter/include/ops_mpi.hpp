@@ -18,7 +18,7 @@ class CharFreqCounterSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_;
+  std::vector<signed char> input_;
   int result_{};
   char target_{};
   boost::mpi::communicator world_;
@@ -33,7 +33,7 @@ class CharFreqCounterPar : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_, local_input_;
+  std::vector<signed char> input_, local_input_;
   int result_{}, local_result_{};
   char target_{};
   boost::mpi::communicator world_;

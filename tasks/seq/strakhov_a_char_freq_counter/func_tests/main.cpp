@@ -14,7 +14,7 @@ namespace {
 std::vector<char> FillRandomChars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, static_cast<int>((charset.size()) - 1);
+  std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
 
   std::vector<char> result(size);
   for (char &c : result) {
