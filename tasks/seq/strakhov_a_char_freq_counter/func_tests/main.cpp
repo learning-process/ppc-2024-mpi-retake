@@ -26,9 +26,9 @@
 
 TEST(strakhov_a_char_freq_counter_seq, test_same_characters) {
   std::vector<char> in_string;
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
-  int32_t expectation = 1000;
+  int expectation = 1000;
 
   // Sequential
 
@@ -55,8 +55,8 @@ TEST(strakhov_a_char_freq_counter_seq, test_same_characters) {
 
 TEST(strakhov_a_char_freq_counter_seq, test_no_characters) {
   std::vector<char> in_string;
-  int32_t expectation = 0;
-  std::vector<int32_t> out_seq(1, 0);
+  int expectation = 0;
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Sequential
@@ -84,8 +84,8 @@ TEST(strakhov_a_char_freq_counter_seq, test_no_characters) {
 
 TEST(strakhov_a_char_freq_counter_seq, test_empty_string) {
   std::vector<char> in_string{};
-  int32_t expectation = 0;
-  std::vector<int32_t> out_seq(1, 0);
+  int expectation = 0;
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Sequential
@@ -113,13 +113,13 @@ TEST(strakhov_a_char_freq_counter_seq, test_empty_string) {
 TEST(strakhov_a_char_freq_counter_seq, test_single_character) {
   std::vector<char> in_string{};
 
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'b');
 
   // Sequential
 
   // Create task_data
-  int32_t expectation = 1;
+  int expectation = 1;
   in_string = std::vector<char>(1000, 'a');
   in_string[500] = 'b';
   auto task_data_mpi_seq = std::make_shared<ppc::core::TaskData>();
@@ -142,8 +142,8 @@ TEST(strakhov_a_char_freq_counter_seq, test_single_character) {
 
 TEST(strakhov_a_char_freq_counter_seq, simple_test_1) {
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-  int32_t expectation = 1;
-  std::vector<int32_t> out_seq(1, 0);
+  int expectation = 1;
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'H');
 
   // Sequential
@@ -168,8 +168,8 @@ TEST(strakhov_a_char_freq_counter_seq, simple_test_1) {
 }
 TEST(strakhov_a_char_freq_counter_seq, simple_test_2) {
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-  int32_t expectation = 0;
-  std::vector<int32_t> out_seq(1, 0);
+  int expectation = 0;
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'h');
 
   // Sequential
@@ -194,8 +194,8 @@ TEST(strakhov_a_char_freq_counter_seq, simple_test_2) {
 }
 TEST(strakhov_a_char_freq_counter_seq, simple_test_3) {
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-  int32_t expectation = 2;
-  std::vector<int32_t> out_seq(1, 0);
+  int expectation = 2;
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'l');
 
   // Sequential

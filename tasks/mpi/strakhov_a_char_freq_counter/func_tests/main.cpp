@@ -30,8 +30,8 @@ std::vector<char> FillRandomChars(int size, const std::string &charset) {
 TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {
   boost::mpi::communicator world;
   std::vector<char> in_string;
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Parallel
@@ -85,8 +85,8 @@ TEST(strakhov_a_char_freq_counter_mpi, test_same_characters) {
 TEST(strakhov_a_char_freq_counter_mpi, test_no_characters) {
   boost::mpi::communicator world;
   std::vector<char> in_string;
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Parallel
@@ -140,8 +140,8 @@ TEST(strakhov_a_char_freq_counter_mpi, test_no_characters) {
 TEST(strakhov_a_char_freq_counter_mpi, test_empty_string) {
   boost::mpi::communicator world;
   std::vector<char> in_string{};
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Parallel
@@ -192,8 +192,8 @@ TEST(strakhov_a_char_freq_counter_mpi, test_empty_string) {
 TEST(strakhov_a_char_freq_counter_mpi, test_single_character) {
   boost::mpi::communicator world;
   std::vector<char> in_string{};
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'b');
 
   // Parallel
@@ -251,8 +251,8 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
   boost::mpi::communicator world;
   std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
 
@@ -302,8 +302,8 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
 TEST(strakhov_a_char_freq_counter_mpi, simple_test_1) {
   boost::mpi::communicator world;
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'H');
   // Parallel
 
@@ -350,8 +350,8 @@ TEST(strakhov_a_char_freq_counter_mpi, simple_test_1) {
 TEST(strakhov_a_char_freq_counter_mpi, simple_test_2) {
   boost::mpi::communicator world;
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'h');
   // Parallel
 
@@ -398,8 +398,8 @@ TEST(strakhov_a_char_freq_counter_mpi, simple_test_2) {
 TEST(strakhov_a_char_freq_counter_mpi, simple_test_3) {
   boost::mpi::communicator world;
   std::vector<char> in_string = {'H', 'e', 'l', 'l', 'o'};
-  std::vector<int32_t> out_par(1, 0);
-  std::vector<int32_t> out_seq(1, 0);
+  std::vector<int> out_par(1, 0);
+  std::vector<int> out_seq(1, 0);
   std::vector<char> in_target(1, 'l');
   // Parallel
 

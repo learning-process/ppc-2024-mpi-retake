@@ -16,7 +16,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   // Create data
   int expectation = 1000;
   std::vector<char> in_string(expectation, 'a');
-  std::vector<int32_t> out_par(1, 0);
+  std::vector<int> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Create taskdata
@@ -65,7 +65,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
   // Create data
   int expectation = 1000;
   std::vector<char> in_string(expectation, 'a');
-  std::vector<int32_t> out_par(1, 0);
+  std::vector<int> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
 
   // Create task_data
