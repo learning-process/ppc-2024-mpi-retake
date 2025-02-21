@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -37,7 +38,6 @@ TEST(malyshev_v_lent_horizontal_seq, Pipeline_Run) {
   };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);

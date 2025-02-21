@@ -56,11 +56,13 @@ TEST(malyshev_v_lent_horizontal_seq, Random_Test) {
   auto vector = malyshev_v_lent_horizontal_seq::GetRandomVector(cols);
   std::vector<double> result(rows, 0.0);
   std::vector<double> expected(rows, 0.0);
+
   for (size_t i = 0; i < rows; ++i) {
     for (size_t j = 0; j < cols; ++j) {
-      expected[i] += matrix[i * cols + j] * vector[j];
+      expected[i] += matrix[(i * cols) + j] * vector[j];
     }
   }
+
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(matrix.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(vector.data()));
