@@ -2,7 +2,6 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -249,12 +248,12 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
   // random generator
 
   boost::mpi::communicator world;
-  std::vector<char> in_string =
-      FillRandomChars(300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+  std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int32_t> out_par(1, 0);
   std::vector<int32_t> out_seq(1, 0);
-  std::vector<char> in_target =
-      FillRandomChars(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+  std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
 
   // Parallel
 
