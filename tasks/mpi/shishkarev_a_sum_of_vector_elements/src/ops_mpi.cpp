@@ -9,6 +9,8 @@
 #include <vector>
 
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
 
 std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::GetRandomVector(int vector_size) {
