@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <chrono>
 #include <memory>
 #include <numeric>
@@ -39,7 +40,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_ru
   task_data_seq->outputs_count.emplace_back(res.size());
 
   auto gauss_seq = std::make_shared<
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(task_data_seq);
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(
+          task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -72,7 +74,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_task_run) {
   task_data_seq->outputs_count.emplace_back(res.size());
 
   auto gauss_seq = std::make_shared<
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(task_data_seq);
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(
+          task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;

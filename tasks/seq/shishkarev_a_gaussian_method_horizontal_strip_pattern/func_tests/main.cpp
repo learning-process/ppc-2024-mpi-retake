@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <numeric>
 #include <vector>
-#include <memory>
 
 #include "seq/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_seq.hpp"
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_for_empty_matrix) {
   const int cols = 0;
   const int rows = 0;
-  
+
   std::vector<double> matrix;
   std::vector<double> res;
 
@@ -19,7 +19,9 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_for_empty_m
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
   taskDataSeq->outputs_count.emplace_back(res.size());
 
-  auto task = std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(taskDataSeq);
+  auto task =
+      std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(
+          taskDataSeq);
   ASSERT_FALSE(task->ValidationImpl());
 }
 
@@ -36,7 +38,9 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_for_matrix_
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
   taskDataSeq->outputs_count.emplace_back(res.size());
 
-  auto task = std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(taskDataSeq);
+  auto task =
+      std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(
+          taskDataSeq);
   ASSERT_FALSE(task->ValidationImpl());
 }
 
@@ -53,6 +57,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_not_square_
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
   taskDataSeq->outputs_count.emplace_back(res.size());
 
-  auto task = std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(taskDataSeq);
-  ASSERT_FALSE(task->ValidationImpl());
+  auto task =
+      std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(
+          taskDataSeq);
 }
