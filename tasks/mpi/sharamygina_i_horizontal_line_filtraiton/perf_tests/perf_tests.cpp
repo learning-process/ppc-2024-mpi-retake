@@ -14,6 +14,7 @@
 #include "mpi/sharamygina_i_horizontal_line_filtraiton/include/ops_mpi.h"
 
 namespace sharamygina_i_horizontal_line_filtration_mpi {
+namespace {
 std::vector<unsigned int> GetImage(int rows, int cols) {
   std::vector<unsigned int> temporaryIm(rows * cols);
   std::random_device rd;
@@ -49,7 +50,7 @@ std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int 
     }
   return final_image;
 }
-
+}  // namespace
 }  // namespace sharamygina_i_horizontal_line_filtration_mpi
 
 TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_pipeline_run) {
