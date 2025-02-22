@@ -1,12 +1,9 @@
 // Copyright 2023 Nesterov Alexander
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
-#include <numeric>
 #include <string>
 #include <utility>
 #include <vector>
@@ -15,7 +12,7 @@
 
 namespace shishkarev_a_sum_of_vector_elements_mpi {
 
-std::vector<int> getRandomVector(int vector_size);
+std::vector<int> GetRandomVector(int vector_size);
 
 class MPIVectorSumSequential : public ppc::core::Task {
  public:
@@ -26,9 +23,9 @@ class MPIVectorSumSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_vector;
-  int result{};
-  std::string operation;
+  std::vector<int> input_vector_;
+  int result_{};
+  std::string operation_;
 };
 
 class MPIVectorSumParallel : public ppc::core::Task {
@@ -40,10 +37,10 @@ class MPIVectorSumParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> input_vector, local_vector;
-  int result{}, local_sum;
-  std::string operation;
-  boost::mpi::communicator world;
+  std::vector<int> input_vector_, local_vector_;
+  int result_{}, local_sum_;
+  std::string operation_;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace shishkarev_a_sum_of_vector_elements_mpi

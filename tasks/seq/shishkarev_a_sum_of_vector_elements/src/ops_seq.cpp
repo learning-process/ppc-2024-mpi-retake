@@ -1,6 +1,7 @@
 // Copyright 2024 Nesterov Alexander
 #include "seq/shishkarev_a_sum_of_vector_elements/include/ops_seq.hpp"
 
+#include <cstdint>
 #include <numeric>
 
 template <class InOutType>
@@ -17,7 +18,6 @@ bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::Pr
 
 template <class InOutType>
 bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::ValidationImpl() {
-
   const bool is_input_valid = task_data->inputs_count[0] > 0;
   const bool is_output_valid = task_data->outputs_count[0] == 1;
   return is_input_valid && is_output_valid;
@@ -25,14 +25,12 @@ bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::Va
 
 template <class InOutType>
 bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::RunImpl() {
-
   result = std::accumulate(input_data.begin(), input_data.end(), InOutType{});
   return true;
 }
 
 template <class InOutType>
 bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::PostProcessingImpl() {
-
   auto output_ptr = reinterpret_cast<InOutType*>(task_data->outputs[0]);
   output_ptr[0] = result;
   return true;

@@ -2,7 +2,10 @@
 #include <gtest/gtest.h>
 
 #include <vector>
+#include <memory>
+#include <cstdint>
 
+#include "core/task/include/task.hpp"
 #include "seq/shishkarev_a_sum_of_vector_elements/include/ops_seq.hpp"
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_int) {
@@ -27,8 +30,8 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_int) {
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_float) {
 
-  std::vector<float> input_data(1, 1.f);
-  std::vector<float> output_data(1, 0.f);
+  std::vector<float> input_data(1, 1.0F);
+  std::vector<float> output_data(1, 0.0F);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
@@ -42,7 +45,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_float) {
   ASSERT_TRUE(task.RunImpl());
   ASSERT_TRUE(task.PostProcessingImpl());
 
-  EXPECT_NEAR(output_data[0], 1.0f, 1e-3f);
+  EXPECT_NEAR(output_data[0], 1.0F, 1e-3F);
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_double) {

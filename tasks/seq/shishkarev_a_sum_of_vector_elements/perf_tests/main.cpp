@@ -1,12 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
 #include <memory>
 #include <vector>
 #include <numeric>
+#include <cstdint>
 
+#include "core/task/include/task.hpp"
 #include "core/perf/include/perf.hpp"
 #include "seq/shishkarev_a_sum_of_vector_elements/include/ops_seq.hpp"
+
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_pipeline_run) {
   constexpr int kCount = 10000000;
