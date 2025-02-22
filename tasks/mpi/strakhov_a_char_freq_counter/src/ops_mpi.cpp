@@ -1,6 +1,7 @@
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstddef>
@@ -56,7 +57,10 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
-  unsigned int input_size;
+  unsigned int input_size = 0;
+  std::vector<int> send_counts{};
+
+  std::vector<int> displacements{};
   broadcast(world_, target_, 0);
   int rank = world_.rank();
 
@@ -70,7 +74,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
       send_counts[i]++;
     }
     input_size = (segment + 1);
-    std::vector<int> displacements(world_size, 0);
+    displacements = std::vector<int>(world_size, 0);
     for (unsigned int i = 1; i < world_size; i++) {
       displacements[i] = displacements[(i - 1)] + send_counts[(i - 1)];
     }
