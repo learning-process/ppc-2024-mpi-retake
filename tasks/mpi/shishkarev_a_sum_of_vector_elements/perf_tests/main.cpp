@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-
 #include "mpi/shishkarev_a_sum_of_vector_elements/include/ops_mpi.hpp"
 
 TEST(shishkarev_a_sum_of_vector_elements_mpi, test_pipeline_run) {
