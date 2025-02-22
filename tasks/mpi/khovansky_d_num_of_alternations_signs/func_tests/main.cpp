@@ -173,7 +173,7 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, random_test) {
   std::vector<int> in(size);
 
   for (int i = 0; i < size; i++) {
-    in[i] = gen() % 2001 - 1000;
+    in[i] = static_cast<int>(gen() % 2001 - 1000);
   }
 
   std::vector<int> out_mpi(1, 0);
