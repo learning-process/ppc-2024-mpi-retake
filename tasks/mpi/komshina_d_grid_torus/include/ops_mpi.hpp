@@ -12,36 +12,36 @@
 #include "core/task/include/task.hpp"
 
 namespace komshina_d_grid_torus_mpi {
-int GridTorus(int sourceRank, int targetRank, int gridSizeX, int gridSizeY,
-                                         bool isHorizontalClosed, bool isVerticalClosed);
 class TestTaskMPI : public ppc::core::Task {
  public:
+ struct InputData {
+    std::vector<int> path;
+    std::vector<char> payload;
+    int target;
+
+    InputData() = default;
+    InputData(const std::string& str, int dest) : payload(str.begin(), str.end()), target(dest) {}
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned int) {
+      ar & target;
+      ar & payload;
+      ar & path;
+    }
+  };
+
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
-
-  struct RoutingPacket {
-    int message_payload;
-    bool is_routing_complete;
-    int target_rank;
-    std::vector<int> routing_path;
-
-    template <class Archive>
-    void serialize(Archive& ar, unsigned int version) {
-      ar & message_payload;
-      ar & is_routing_complete;
-      ar & target_rank;
-      ar & routing_path;
-    }
-  };
+  
+  static std::vector<int> calculate_route(int dest, int sizeX, int sizeY);
 
  private:
-  RoutingPacket routing_packet;
-  int grid_columns;
-  int grid_rows;
   boost::mpi::communicator world;
+  InputData inputData;
+  int sizeX{}, sizeY{};
 };
 
 }  // namespace komshina_d_grid_torus_mpi

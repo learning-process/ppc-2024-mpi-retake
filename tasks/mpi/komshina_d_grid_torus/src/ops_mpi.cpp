@@ -1,65 +1,64 @@
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
-#include <algorithm>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
+#include <cmath>
+#include <memory>
 #include <vector>
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
-    grid_columns = static_cast<int>(std::sqrt(world.size()));
-    grid_rows = grid_columns;
-
-    int *input_data = reinterpret_cast<int *>(task_data->inputs[0]);
-    routing_packet.message_payload = input_data[0];
-    routing_packet.target_rank = input_data[1];
-    routing_packet.is_routing_complete = false;
-    routing_packet.routing_path.clear();
+    auto *in_ptr = reinterpret_cast<InputData *>(task_data->inputs[0]);
+    inputData = *in_ptr;
+    inputData.path.clear();
+    inputData.path.shrink_to_fit();
   }
   return true;
 }
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
+  int worldSize = world.size();
+
+  if (worldSize < 4) return false;
+
+  int gridDim = static_cast<int>(std::sqrt(worldSize));
+  if (gridDim * gridDim != worldSize) return false;
+
   if (world.rank() == 0) {
-    int sqrtN = static_cast<int>(std::sqrt(world.size()));
 
-    if (sqrtN * sqrtN == world.size()) {
-      return true;
+    if (task_data->inputs.size() != 1 || task_data->outputs_count.size() != 1) return false;
+
+    auto *in_ptr = reinterpret_cast<InputData *>(task_data->inputs[0]);
+    if (in_ptr->target >= worldSize || in_ptr->target < 0) {
+      return false;
     }
-
-    if (reinterpret_cast<int *>(task_data->inputs[0])[1] < world.size()) {
-      return true;
-    }
-
-    return false;
   }
+
+  sizeX = gridDim;
+  sizeY = gridDim;
 
   return true;
 }
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
+  int my_rank = world.rank();
+  auto route = calculate_route(inputData.target, sizeX, sizeY);
+
   if (world.rank() == 0) {
-    routing_packet.routing_path = {world.rank()};
-
-    if (routing_packet.target_rank != 0) {
-      const int next_hop = GridTorus(0, routing_packet.target_rank, grid_columns, grid_rows, true, true);
-      world.send(next_hop, 0, routing_packet);
-    } else {
-      routing_packet.is_routing_complete = true;
-    }
+    inputData.path.push_back(0);
+    world.send(route[1], 0, inputData);
+    world.recv(boost::mpi::any_source, 0, inputData);
   } else {
-    world.recv(boost::mpi::any_source, 0, routing_packet);
-
-    if (!routing_packet.is_routing_complete) {
-      routing_packet.routing_path.push_back(world.rank());
-
-      if (world.rank() == routing_packet.target_rank) {
-        routing_packet.is_routing_complete = true;
-        world.send(0, 0, routing_packet);
-      } else {
-        const int next_hop = GridTorus(world.rank(), routing_packet.target_rank, grid_columns, grid_rows, true, true);
-        world.send(next_hop, 0, routing_packet);
+    world.recv(boost::mpi::any_source, 0, inputData);
+    if (inputData.path[0] == -1) return true;
+    inputData.path.push_back(my_rank);
+    if (my_rank != inputData.target) {
+      auto it = std::find(route.begin(), route.end(), my_rank);
+      if (it != route.end() && std::next(it) != route.end()) {
+        world.send(*std::next(it), 0, inputData);
       }
+    } else {
+      world.send(0, 0, inputData);
     }
   }
   return true;
@@ -67,43 +66,28 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
   world.barrier();
-
   if (world.rank() == 0) {
-    int *output_data = reinterpret_cast<int *>(task_data->outputs[0]);
-    output_data[0] = routing_packet.message_payload;
-
-    int *output_path = reinterpret_cast<int *>(task_data->outputs[1]);
-    std::copy(routing_packet.routing_path.begin(), routing_packet.routing_path.end(), output_path);
+    *reinterpret_cast<InputData *>(task_data->outputs[0]) = inputData;
   }
   return true;
 }
 
-int komshina_d_grid_torus_mpi::GridTorus(int sourceRank, int targetRank, int gridSizeX, int gridSizeY,
-                                         bool isHorizontalClosed, bool isVerticalClosed) {
-  int sourceX = sourceRank % gridSizeX;
-  int sourceY = sourceRank / gridSizeX;
-  int targetX = targetRank % gridSizeX;
-  int targetY = targetRank / gridSizeX;
+namespace komshina_d_grid_torus_mpi {
 
-  int dx = targetX - sourceX;
-  int dy = targetY - sourceY;
+std::vector<int> TestTaskMPI::calculate_route(int dest, int sizeX, int sizeY) {
+  std::vector<int> route;
+  int current = 0;
+  int destX = dest % sizeX, destY = dest / sizeX;
+  int curX = current % sizeX, curY = current / sizeX;
 
-  // Учет замкнутости горизонтальных краев
-  if (isHorizontalClosed) {
-    if (dx > gridSizeX / 2) dx -= gridSizeX;
-    if (dx < -gridSizeX / 2) dx += gridSizeX;
+  while (curX != destX) {
+    curX = (curX + 1) % sizeX;
+    route.push_back(curY * sizeX + curX);
   }
-
-  // Учет замкнутости вертикальных краев
-  if (isVerticalClosed) {
-    if (dy > gridSizeY / 2) dy -= gridSizeY;
-    if (dy < -gridSizeY / 2) dy += gridSizeY;
+  while (curY != destY) {
+    curY = (curY + 1) % sizeY;
+    route.push_back(curY * sizeX + curX);
   }
-
-  // Выбор направления
-  if (std::abs(dx) > std::abs(dy)) {
-    return (dx > 0) ? sourceRank + 1 : sourceRank - 1;
-  } else {
-    return (dy > 0) ? sourceRank + gridSizeX : sourceRank - gridSizeX;
-  }
+  return route;
 }
+}  // namespace komshina_d_grid_torus_mpi
