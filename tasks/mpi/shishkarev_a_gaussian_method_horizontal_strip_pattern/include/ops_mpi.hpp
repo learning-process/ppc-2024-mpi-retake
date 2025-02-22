@@ -18,6 +18,10 @@ int matrix_rank(int n, int m, std::vector<double> a);
 
 int determinant(int n, int m, std::vector<double> a);
 
+std::vector<double> getRandomMatrix(int sz);
+
+double Ax_b(int n, int m, std::vector<double> a, std::vector<double> res);
+
 class MPIGaussHorizontalSequential : public ppc::core::Task {
  public:
   explicit MPIGaussHorizontalSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
