@@ -167,7 +167,7 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, random_test) {
   boost::mpi::communicator world;
   // Create data
   int size = 1000;
-  
+
   auto dev = std::random_device();
   auto gen = std::mt19937(dev());
   std::vector<int> in(size);
