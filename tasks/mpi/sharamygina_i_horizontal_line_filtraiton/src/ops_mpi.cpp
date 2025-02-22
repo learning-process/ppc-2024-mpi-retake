@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "mpi\sharamygina_i_horizontal_line_filtraiton\include\ops_mpi.h"
+#include "mpi/sharamygina_i_horizontal_line_filtraiton/include/ops_mpi.h"
 
 bool sharamygina_i_horizontal_line_filtration_mpi::horizontal_line_filtration_mpi::PreProcessingImpl() {
   rows_ = task_data->inputs_count[0];
