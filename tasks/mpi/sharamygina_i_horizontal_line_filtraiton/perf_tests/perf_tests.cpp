@@ -30,7 +30,7 @@ std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int 
   for (int x = 0; x < rows; x++)
     for (int y = 0; y < cols; y++) {
       if (x < 1 || x >= rows - 1 || y < 1 || y >= cols - 1) {
-        final_image[x * cols + y] = 0;  // ¬озвращаем 0, если x или y наход€тс€ на кра€х матрицы
+        final_image[x * cols + y] = 0;  
         continue;
       }
       unsigned int sum = 0;
