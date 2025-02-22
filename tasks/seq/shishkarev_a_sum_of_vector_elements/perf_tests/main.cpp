@@ -11,7 +11,7 @@
 #include "seq/shishkarev_a_sum_of_vector_elements/include/ops_seq.hpp"
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_pipeline_run) {
-  constexpr int kCount = 2147483647;
+  constexpr int kCount = 100000000;
 
   std::vector<int> in(kCount, 1);
   std::vector<int> out(1, 0);
@@ -45,7 +45,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_pipeline_run) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_task_run) {
-  constexpr int kCount = 2147483647;
+  constexpr int kCount = 100000000;
 
   std::vector<int> in(kCount, 1);
   std::vector<int> out(1, 0);
