@@ -15,7 +15,7 @@ TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
   std::vector<char> in_string(expectation, 'a');
   std::vector<int> out(1, 0);
   std::vector<char> in_target(1, 'a');
-
+  
   // Create task_data
   auto task_data = std::make_shared<ppc::core::TaskData>();
 

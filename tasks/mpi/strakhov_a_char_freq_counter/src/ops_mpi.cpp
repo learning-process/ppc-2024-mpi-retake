@@ -56,21 +56,29 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
+  unsigned int input_size;
+  broadcast(world_, target_, 0);
   int rank = world_.rank();
-  unsigned int input_length = task_data->inputs_count[0];
-  unsigned int world_size = world_.size();
-  unsigned int segment = input_length / world_size;
-  auto excess = input_length % world_size;
-  std::vector<int> send_counts(world_size, static_cast<signed int>(segment));
-  for (unsigned int i = 0; i < excess; i++) {
-    send_counts[i]++;
+
+  if (rank == 0) {
+    unsigned int input_length = task_data->inputs_count[0];
+    unsigned int world_size = world_.size();
+    unsigned int segment = input_length / world_size;
+    auto excess = input_length % world_size;
+    send_counts = std::vector<int>(world_size, static_cast<signed int>(segment));
+    for (unsigned int i = 0; i < excess; i++) {
+      send_counts[i]++;
+    }
+    input_size = (segment + 1);
+    std::vector<int> displacements(world_size, 0);
+    for (unsigned int i = 1; i < world_size; i++) {
+      displacements[i] = displacements[(i - 1)] + send_counts[(i - 1)];
+    }
   }
-  std::vector<int> displacements(world_size, 0);
-  for (unsigned int i = 1; i < world_size; i++) {
-    displacements[i] = displacements[(i - 1)] + send_counts[(i - 1)];
-  }
-  local_input_ = std::vector<signed char>(send_counts[rank]);
+  broadcast(world_, input_size, 0);
+  local_input_ = std::vector<signed char>(input_size);
   boost::mpi::scatterv(world_, input_.data(), send_counts, displacements, local_input_.data(), send_counts[rank], 0);
+
   local_result_ = static_cast<unsigned char>(std::count(local_input_.begin(), local_input_.end(), target_));
   reduce(world_, local_result_, result_, std::plus(), 0);
   return true;
