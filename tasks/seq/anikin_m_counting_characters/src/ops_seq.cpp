@@ -29,7 +29,7 @@ bool anikin_m_counting_characters_seq::TestTaskSequential::PreProcessingImpl() {
   int input2_size = task_data->inputs_count[1];
 
   res = input1_size - input2_size;
-  
+
   if (res <= 0) {
     auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
     input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input2_size);
