@@ -28,7 +28,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_for_empty_m
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_for_matrix_with_one_element) {
   const int cols = 1;
   const int rows = 1;
-  
+
   std::vector<double> matrix = {1};
   std::vector<double> res;
 
