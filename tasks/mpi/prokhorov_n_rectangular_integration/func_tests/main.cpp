@@ -1,49 +1,53 @@
-#define _USE_MATH_DEFINES
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cmath>
+#include <cstdint>
 #include <functional>
+#include <memory>
 #include <vector>
 
 #include "mpi/prokhorov_n_rectangular_integration/include/ops_mpi.hpp"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 TEST(prokhorov_n_rectangular_integration_mpi, test_integration_cos_x) {
   boost::mpi::communicator world;
   std::vector<double> global_input = {0.0, M_PI / 2.0, 1000.0};
   std::vector<double> global_result(1, 0.0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
-  taskDataPar->inputs_count.emplace_back(global_input.size());
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  taskDataPar->outputs_count.emplace_back(global_result.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
+  task_data_par->inputs_count.emplace_back(global_input.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
+  task_data_par->outputs_count.emplace_back(global_result.size());
 
-  auto testMpiTaskParallel = std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskMPI>(taskDataPar);
-  testMpiTaskParallel->SetFunction([](double x) { return std::cos(x); });
+  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskMPI>(task_data_par);
+  test_mpi_task_parallel->SetFunction([](double x) { return std::cos(x); });
 
-  ASSERT_EQ(testMpiTaskParallel->ValidationImpl(), true);
-  testMpiTaskParallel->PreProcessingImpl();
-  testMpiTaskParallel->RunImpl();
-  testMpiTaskParallel->PostProcessingImpl();
+  ASSERT_EQ(test_mpi_task_parallel->ValidationImpl(), true);
+  test_mpi_task_parallel->PreProcessingImpl();
+  test_mpi_task_parallel->RunImpl();
+  test_mpi_task_parallel->PostProcessingImpl();
 
   if (world.rank() == 0) {
     std::vector<double> reference_result(1, 0.0);
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
-    taskDataSeq->inputs_count.emplace_back(global_input.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_result.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
+    task_data_seq->inputs_count.emplace_back(global_input.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
+    task_data_seq->outputs_count.emplace_back(reference_result.size());
 
-    auto testMpiTaskSequential =
-        std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskSequential>(taskDataSeq);
-    testMpiTaskSequential->SetFunction([](double x) { return std::cos(x); });
+    auto test_mpi_task_sequential =
+        std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskSequential>(task_data_seq);
+    test_mpi_task_sequential->SetFunction([](double x) { return std::cos(x); });
 
-    ASSERT_EQ(testMpiTaskSequential->ValidationImpl(), true);
-    testMpiTaskSequential->PreProcessingImpl();
-    testMpiTaskSequential->RunImpl();
-    testMpiTaskSequential->PostProcessingImpl();
+    ASSERT_EQ(test_mpi_task_sequential->ValidationImpl(), true);
+    test_mpi_task_sequential->PreProcessingImpl();
+    test_mpi_task_sequential->RunImpl();
+    test_mpi_task_sequential->PostProcessingImpl();
 
     ASSERT_NEAR(reference_result[0], global_result[0], 1e-3);
   }
@@ -54,36 +58,36 @@ TEST(prokhorov_n_rectangular_integration_mpi, test_integration_x_cubed) {
   std::vector<double> global_input = {0.0, 1.0, 1000.0};
   std::vector<double> global_result(1, 0.0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
-  taskDataPar->inputs_count.emplace_back(global_input.size());
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  taskDataPar->outputs_count.emplace_back(global_result.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
+  task_data_par->inputs_count.emplace_back(global_input.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
+  task_data_par->outputs_count.emplace_back(global_result.size());
 
-  auto testMpiTaskParallel = std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskMPI>(taskDataPar);
-  testMpiTaskParallel->SetFunction([](double x) { return x * x * x; });
+  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskMPI>(task_data_par);
+  test_mpi_task_parallel->SetFunction([](double x) { return x * x * x; });
 
-  ASSERT_EQ(testMpiTaskParallel->ValidationImpl(), true);
-  testMpiTaskParallel->PreProcessingImpl();
-  testMpiTaskParallel->RunImpl();
-  testMpiTaskParallel->PostProcessingImpl();
+  ASSERT_EQ(test_mpi_task_parallel->ValidationImpl(), true);
+  test_mpi_task_parallel->PreProcessingImpl();
+  test_mpi_task_parallel->RunImpl();
+  test_mpi_task_parallel->PostProcessingImpl();
 
   if (world.rank() == 0) {
     std::vector<double> reference_result(1, 0.0);
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
-    taskDataSeq->inputs_count.emplace_back(global_input.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_result.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
+    task_data_seq->inputs_count.emplace_back(global_input.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
+    task_data_seq->outputs_count.emplace_back(reference_result.size());
 
-    auto testMpiTaskSequential =
-        std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskSequential>(taskDataSeq);
-    testMpiTaskSequential->SetFunction([](double x) { return x * x * x; });
+    auto test_mpi_task_sequential =
+        std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskSequential>(task_data_seq);
+    test_mpi_task_sequential->SetFunction([](double x) { return x * x * x; });
 
-    ASSERT_EQ(testMpiTaskSequential->ValidationImpl(), true);
-    testMpiTaskSequential->PreProcessingImpl();
-    testMpiTaskSequential->RunImpl();
-    testMpiTaskSequential->PostProcessingImpl();
+    ASSERT_EQ(test_mpi_task_sequential->ValidationImpl(), true);
+    test_mpi_task_sequential->PreProcessingImpl();
+    test_mpi_task_sequential->RunImpl();
+    test_mpi_task_sequential->PostProcessingImpl();
 
     ASSERT_NEAR(reference_result[0], global_result[0], 1e-3);
   }
@@ -94,36 +98,36 @@ TEST(prokhorov_n_rectangular_integration_mpi, test_integration_one_over_x) {
   std::vector<double> global_input = {1.0, 2.0, 1000.0};
   std::vector<double> global_result(1, 0.0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
-  taskDataPar->inputs_count.emplace_back(global_input.size());
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  taskDataPar->outputs_count.emplace_back(global_result.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
+  task_data_par->inputs_count.emplace_back(global_input.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
+  task_data_par->outputs_count.emplace_back(global_result.size());
 
-  auto testMpiTaskParallel = std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskMPI>(taskDataPar);
-  testMpiTaskParallel->SetFunction([](double x) { return 1.0 / x; });
+  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskMPI>(task_data_par);
+  test_mpi_task_parallel->SetFunction([](double x) { return 1.0 / x; });
 
-  ASSERT_EQ(testMpiTaskParallel->ValidationImpl(), true);
-  testMpiTaskParallel->PreProcessingImpl();
-  testMpiTaskParallel->RunImpl();
-  testMpiTaskParallel->PostProcessingImpl();
+  ASSERT_EQ(test_mpi_task_parallel->ValidationImpl(), true);
+  test_mpi_task_parallel->PreProcessingImpl();
+  test_mpi_task_parallel->RunImpl();
+  test_mpi_task_parallel->PostProcessingImpl();
 
   if (world.rank() == 0) {
     std::vector<double> reference_result(1, 0.0);
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
-    taskDataSeq->inputs_count.emplace_back(global_input.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_result.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_input.data()));
+    task_data_seq->inputs_count.emplace_back(global_input.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
+    task_data_seq->outputs_count.emplace_back(reference_result.size());
 
-    auto testMpiTaskSequential =
-        std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskSequential>(taskDataSeq);
-    testMpiTaskSequential->SetFunction([](double x) { return 1.0 / x; });
+    auto test_mpi_task_sequential =
+        std::make_shared<prokhorov_n_rectangular_integration_mpi::TestTaskSequential>(task_data_seq);
+    test_mpi_task_sequential->SetFunction([](double x) { return 1.0 / x; });
 
-    ASSERT_EQ(testMpiTaskSequential->ValidationImpl(), true);
-    testMpiTaskSequential->PreProcessingImpl();
-    testMpiTaskSequential->RunImpl();
-    testMpiTaskSequential->PostProcessingImpl();
+    ASSERT_EQ(test_mpi_task_sequential->ValidationImpl(), true);
+    test_mpi_task_sequential->PreProcessingImpl();
+    test_mpi_task_sequential->RunImpl();
+    test_mpi_task_sequential->PostProcessingImpl();
 
     ASSERT_NEAR(reference_result[0], global_result[0], 1e-3);
   }

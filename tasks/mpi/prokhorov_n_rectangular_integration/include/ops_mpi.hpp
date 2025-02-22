@@ -2,8 +2,8 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <functional>
 #include <utility>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 
@@ -40,13 +40,13 @@ class TestTaskMPI : public ppc::core::Task {
   void SetFunction(const std::function<double(double)>& func);
 
  private:
-  double Parallel_Integrate(const std::function<double(double)>& f, double lower_bound, double upper_bound, int n);
+  double ParallelIntegrate(const std::function<double(double)>& f, double lower_bound, double upper_bound, int n);
   double lower_bound_{};
   double upper_bound_{};
   int n_{};
   double result_{};
   std::function<double(double)> f_;
-  boost::mpi::communicator world;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace prokhorov_n_rectangular_integration_mpi

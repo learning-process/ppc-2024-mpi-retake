@@ -1,11 +1,10 @@
 #include "mpi/prokhorov_n_rectangular_integration/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <functional>
-#include <random>
-#include <thread>
 #include <vector>
 
 using namespace std::chrono_literals;
@@ -25,13 +24,7 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskSequential::PreProcessingI
     return false;
   }
 
-  if (n_ <= 0) {
-    return false;
-  }
-
-  result_ = 0.0;
-
-  return true;
+  return n_ > 0;
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskSequential::ValidationImpl() {
@@ -51,11 +44,7 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskSequential::ValidationImpl
   }
 
   int n = static_cast<int>(inputs[2]);
-  if (n <= 0) {
-    return false;
-  }
-
-  return true;
+  return n > 0;
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskSequential::RunImpl() {
@@ -80,7 +69,7 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskSequential::Integrate(co
   double area = 0.0;
 
   for (int i = 0; i < n; ++i) {
-    double x = lower_bound + (i + 0.5) * step;
+    double x = lower_bound + ((i + 0.5) * step);
     area += f(x) * step;
   }
 
@@ -88,7 +77,7 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskSequential::Integrate(co
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PreProcessingImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     if (task_data->inputs.empty() || task_data->inputs_count[0] != 3) {
       return false;
     }
@@ -103,22 +92,18 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PreProcessingImpl() {
       return false;
     }
 
-    if (n_ <= 0) {
-      return false;
-    }
-
-    result_ = 0.0;
+    return n_ > 0;
   }
 
-  boost::mpi::broadcast(world, lower_bound_, 0);
-  boost::mpi::broadcast(world, upper_bound_, 0);
-  boost::mpi::broadcast(world, n_, 0);
+  boost::mpi::broadcast(world_, lower_bound_, 0);
+  boost::mpi::broadcast(world_, upper_bound_, 0);
+  boost::mpi::broadcast(world_, n_, 0);
 
   return true;
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ValidationImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     if (task_data->inputs_count[0] != 3) {
       return false;
     }
@@ -135,21 +120,19 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ValidationImpl() {
     }
 
     int n = static_cast<int>(inputs[2]);
-    if (n <= 0) {
-      return false;
-    }
+    return n > 0;
   }
 
   return true;
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::RunImpl() {
-  result_ = Parallel_Integrate(f_, lower_bound_, upper_bound_, n_);
+  result_ = ParallelIntegrate(f_, lower_bound_, upper_bound_, n_);
   return true;
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     reinterpret_cast<double*>(task_data->outputs[0])[0] = result_;
   }
   return true;
@@ -159,11 +142,11 @@ void prokhorov_n_rectangular_integration_mpi::TestTaskMPI::SetFunction(const std
   f_ = func;
 }
 
-double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::Parallel_Integrate(const std::function<double(double)>& f,
-                                                                                double lower_bound, double upper_bound,
-                                                                                int n) {
-  int rank = world.rank();
-  int size = world.size();
+double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ParallelIntegrate(const std::function<double(double)>& f,
+                                                                               double lower_bound, double upper_bound,
+                                                                               int n) {
+  int rank = world_.rank();
+  int size = world_.size();
 
   double step = (upper_bound - lower_bound) / n;
   double local_area = 0.0;
@@ -171,16 +154,16 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::Parallel_Integrate(
   int local_n = n / size;
   int remainder = n % size;
 
-  int start = rank * local_n + std::min(rank, remainder);
+  int start = (rank * local_n) + std::min(rank, remainder);
   int end = start + local_n + (rank < remainder ? 1 : 0);
 
   for (int i = start; i < end; ++i) {
-    double x = lower_bound + (i + 0.5) * step;
+    double x = lower_bound + ((i + 0.5) * step);
     local_area += f(x) * step;
   }
 
   double global_area = 0.0;
-  boost::mpi::reduce(world, local_area, global_area, std::plus<double>(), 0);
+  boost::mpi::reduce(world_, local_area, global_area, std::plus<>(), 0);
 
   return global_area;
 }

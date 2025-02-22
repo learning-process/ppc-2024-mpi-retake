@@ -1,7 +1,7 @@
 #include "seq/prokhorov_n_rectangular_integration/include/ops_seq.hpp"
 
 #include <cmath>
-#include <cstddef>
+#include <functional>
 #include <vector>
 
 bool prokhorov_n_rectangular_integration_seq::TestTaskSequential::PreProcessingImpl() {
@@ -19,13 +19,7 @@ bool prokhorov_n_rectangular_integration_seq::TestTaskSequential::PreProcessingI
     return false;
   }
 
-  if (n_ <= 0) {
-    return false;
-  }
-
-  result_ = 0.0;
-
-  return true;
+  return n_ > 0;
 }
 
 bool prokhorov_n_rectangular_integration_seq::TestTaskSequential::ValidationImpl() {
@@ -45,11 +39,7 @@ bool prokhorov_n_rectangular_integration_seq::TestTaskSequential::ValidationImpl
   }
 
   int n = static_cast<int>(inputs[2]);
-  if (n <= 0) {
-    return false;
-  }
-
-  return true;
+  return n > 0;
 }
 
 bool prokhorov_n_rectangular_integration_seq::TestTaskSequential::RunImpl() {
@@ -74,7 +64,7 @@ double prokhorov_n_rectangular_integration_seq::TestTaskSequential::Integrate(co
   double area = 0.0;
 
   for (int i = 0; i < n; ++i) {
-    double x = lower_bound + (i + 0.5) * step;
+    double x = lower_bound + ((i + 0.5) * step);
     area += f(x) * step;
   }
 

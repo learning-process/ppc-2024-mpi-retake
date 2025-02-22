@@ -1,9 +1,7 @@
-#define _USE_MATH_DEFINES /
 #include <gtest/gtest.h>
 
 #include <chrono>
 #include <cmath>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -13,10 +11,17 @@
 #include "core/task/include/task.hpp"
 #include "mpi/prokhorov_n_rectangular_integration/include/ops_mpi.hpp"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 TEST(prokhorov_n_rectangular_integration_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
-  std::vector<double> global_input = {0.0, M_PI / 2.0, 1000000.0};
+  const double lower_bound = 0.0;
+  const double upper_bound = M_PI / 2.0;
+  const int n = 1000000;
+  std::vector<double> global_input = {lower_bound, upper_bound, static_cast<double>(n)};
   std::vector<double> global_result(1, 0.0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -44,13 +49,18 @@ TEST(prokhorov_n_rectangular_integration_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+    const double expected_result = 1.0;
+    ASSERT_NEAR(global_result[0], expected_result, 1e-3);
   }
 }
 
 TEST(prokhorov_n_rectangular_integration_mpi, test_task_run) {
   boost::mpi::communicator world;
 
-  std::vector<double> global_input = {0.0, M_PI / 2.0, 1000000.0};
+  const double lower_bound = 0.0;
+  const double upper_bound = M_PI / 2.0;
+  const int n = 1000000;
+  std::vector<double> global_input = {lower_bound, upper_bound, static_cast<double>(n)};
   std::vector<double> global_result(1, 0.0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -78,5 +88,7 @@ TEST(prokhorov_n_rectangular_integration_mpi, test_task_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+    const double expected_result = 1.0;
+    ASSERT_NEAR(global_result[0], expected_result, 1e-3);
   }
 }
