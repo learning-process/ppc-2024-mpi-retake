@@ -11,10 +11,10 @@
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
 
 TEST(khovansky_d_num_of_alternations_signs_mpi, test_pipeline_run) {
-  constexpr int kCount = 12000;
+  constexpr int kCount = 200000000;
 
   // Create data
-  std::vector<int> in(kCount * kCount, 0);
+  std::vector<int> in(kCount, 0);
   std::vector<int> out(1, 0);
 
   // Create task_data
@@ -49,10 +49,10 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, test_pipeline_run) {
 }
 
 TEST(khovansky_d_num_of_alternations_signs_mpi, test_task_run) {
-  constexpr int kCount = 17000;
+  constexpr int kCount = 200000000;
 
   // Create data
-  std::vector<int> in(kCount * kCount, 0);
+  std::vector<int> in(kCount, 0);
   std::vector<int> out(1, 0);
 
   // Create task_data

@@ -69,19 +69,8 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::PrePr
     }
 
     auto input_size = task_data->inputs_count[0];
-    auto start_size = input_size / world_.size();
     auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
     input_ = std::vector<int>(in_ptr, in_ptr + input_size);
-    start_ = std::vector<int>(in_ptr, in_ptr + start_size + uint32_t(world_.size() > 1));
-
-    for (int process = 1; process < world_.size(); process++) {
-      auto local_start = process * start_size;
-      auto is_last_proc = (process == world_.size() - 1);
-      auto size = is_last_proc ? (input_size - local_start) : (start_size + 1);
-      world_.send(process, 0, std::vector<int>(in_ptr + local_start, in_ptr + local_start + size));
-    }
-  } else {
-    world_.recv(0, 0, start_);
   }
 
   res_ = 0;
@@ -110,6 +99,24 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::Valid
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::RunImpl() {
+
+  if (world_.rank() == 0) {
+    auto input_size = task_data->inputs_count[0];
+    auto start_size = input_size / world_.size();
+    auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+    input_ = std::vector<int>(in_ptr, in_ptr + input_size);
+    start_ = std::vector<int>(in_ptr, in_ptr + start_size + uint32_t(world_.size() > 1));
+
+    for (int process = 1; process < world_.size(); process++) {
+      auto local_start = process * start_size;
+      auto is_last_proc = (process == world_.size() - 1);
+      auto size = is_last_proc ? (input_size - local_start) : (start_size + 1);
+      world_.send(process, 0, std::vector<int>(in_ptr + local_start, in_ptr + local_start + size));
+    }
+  } else {
+    world_.recv(0, 0, start_);
+  }
+
   auto process_res = 0;
   auto start_size = start_.size();
   for (size_t i = 0; i < start_size - 1; i++) {
