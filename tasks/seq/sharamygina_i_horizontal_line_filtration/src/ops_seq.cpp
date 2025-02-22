@@ -39,7 +39,7 @@ bool sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_se
 unsigned int sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq::InputAnotherPixel(
     const std::vector<unsigned int>& image, int x, int y, int rows, int cols) {
   if (x < 1 || x >= rows - 1 || y < 1 || y >= cols - 1) {
-    return 0;  
+    return 0;
   }
   unsigned int sum = 0;
   for (int i = 0; i < 3; i++)
