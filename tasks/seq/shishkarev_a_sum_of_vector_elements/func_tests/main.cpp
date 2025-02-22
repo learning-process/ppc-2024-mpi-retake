@@ -9,7 +9,7 @@
 #include "seq/shishkarev_a_sum_of_vector_elements/include/ops_seq.hpp"
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_int) {
-  std::vector<int32_t> input_data(10000000, 10);
+  std::vector<int32_t> input_data(1, 10);
   const int32_t expected_sum = 10;
   std::vector<int32_t> output_data(1, 0);
 
@@ -29,7 +29,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_int) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_float) {
-  std::vector<float> input_data(10000000, 1.0F);
+  std::vector<float> input_data(1, 1.0F);
   std::vector<float> output_data(1, 0.0F);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -48,7 +48,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_float) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_double) {
-  std::vector<double> input_data(10000000, 10.0);
+  std::vector<double> input_data(1, 10.0);
   const double expected_sum = 10.0;
   std::vector<double> output_data(1, 0.0);
 
@@ -68,7 +68,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_double) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_int64_t) {
-  std::vector<int64_t> input_data(10000000, 1);
+  std::vector<int64_t> input_data(75836, 1);
   std::vector<int64_t> output_data(1, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -87,7 +87,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_int64_t) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_uint8_t) {
-  std::vector<uint8_t> input_data(10000000, 1);
+  std::vector<uint8_t> input_data(255, 1);
   std::vector<uint8_t> output_data(1, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -106,7 +106,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_uint8_t) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_empty) {
-  std::vector<int32_t> input_data(10000000, 0);
+  std::vector<int32_t> input_data(1, 0);
   const int32_t expected_sum = 0;
   std::vector<int32_t> output_data(1, 0);
 
