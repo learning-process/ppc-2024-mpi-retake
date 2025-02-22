@@ -2,15 +2,15 @@
 #include "seq/anikin_m_counting_characters/include/ops_seq.hpp"
 
 #include <cmath>
-#include <vector>
 #include <random>
+#include <vector>
 
 void anikin_m_counting_characters_seq::create_data_vector(std::vector<char> *invec, std::string str) {
   for (auto a : str) {
     invec->push_back(a);
   }
 }
-void anikin_m_counting_characters_seq::create_randdata_vector(std::vector<char>* invec, int count) {
+void anikin_m_counting_characters_seq::create_randdata_vector(std::vector<char> *invec, int count) {
   for (int i = 0; i < count; i++) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -21,9 +21,7 @@ void anikin_m_counting_characters_seq::create_randdata_vector(std::vector<char>*
 }
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::ValidationImpl() {
-  return (task_data->inputs.size() == 2) && 
-         (task_data->inputs_count.size() == 2) &&
-         (task_data->outputs.size() == 1);
+  return (task_data->inputs.size() == 2) && (task_data->inputs_count.size() == 2) && (task_data->outputs.size() == 1);
 }
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::PreProcessingImpl() {
@@ -50,7 +48,7 @@ bool anikin_m_counting_characters_seq::TestTaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool anikin_m_counting_characters_seq::TestTaskSequential::RunImpl() { 
+bool anikin_m_counting_characters_seq::TestTaskSequential::RunImpl() {
   auto b = input_1.begin();
   for (auto a : input_2) {
     if ((a) != (*b)) res++;
@@ -59,7 +57,7 @@ bool anikin_m_counting_characters_seq::TestTaskSequential::RunImpl() {
   return true;
 }
 
-bool anikin_m_counting_characters_seq::TestTaskSequential::PostProcessingImpl() { 
+bool anikin_m_counting_characters_seq::TestTaskSequential::PostProcessingImpl() {
   reinterpret_cast<int *>(task_data->outputs[0])[0] = res;
   return true;
 }

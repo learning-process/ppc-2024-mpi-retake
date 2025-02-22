@@ -2,16 +2,16 @@
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
 #include <cmath>
-#include <vector>
 #include <random>
+#include <vector>
 
-void anikin_m_counting_characters_mpi::create_data_vector(std::vector<char>* invec, std::string str) {
+void anikin_m_counting_characters_mpi::create_data_vector(std::vector<char> *invec, std::string str) {
   for (auto a : str) {
     invec->push_back(a);
   }
 }
 
-void anikin_m_counting_characters_mpi::create_randdata_vector(std::vector<char>* invec, int count) {
+void anikin_m_counting_characters_mpi::create_randdata_vector(std::vector<char> *invec, int count) {
   for (int i = 0; i < count; i++) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -21,38 +21,35 @@ void anikin_m_counting_characters_mpi::create_randdata_vector(std::vector<char>*
   }
 }
 
-bool anikin_m_counting_characters_mpi::TestTaskMPI::ValidationImpl() { 
+bool anikin_m_counting_characters_mpi::TestTaskMPI::ValidationImpl() {
   if (world_.rank() == 0) {
-      return (task_data->inputs.size() == 2) && 
-             (task_data->inputs_count.size() == 2) && 
-             (task_data->outputs.size() == 1);
+    return (task_data->inputs.size() == 2) && (task_data->inputs_count.size() == 2) && (task_data->outputs.size() == 1);
   }
   return true;
 }
 bool anikin_m_counting_characters_mpi::TestTaskMPI::PreProcessingImpl() {
-    int input1_size = task_data->inputs_count[0];
-    int input2_size = task_data->inputs_count[1];
+  int input1_size = task_data->inputs_count[0];
+  int input2_size = task_data->inputs_count[1];
 
-    res = input1_size - input2_size;
+  res = input1_size - input2_size;
 
-    if (res <= 0) {
-      auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
-      input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input2_size);
+  if (res <= 0) {
+    auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
+    input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input2_size);
 
-      auto *insmall_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
-      input_2 = std::vector<char>(insmall_ptr, insmall_ptr + input1_size);
+    auto *insmall_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
+    input_2 = std::vector<char>(insmall_ptr, insmall_ptr + input1_size);
 
-      res = abs(res);
-    } else {
-      auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
-      input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input1_size);
+    res = abs(res);
+  } else {
+    auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
+    input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input1_size);
 
-      auto *insmall_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
-      input_2 = std::vector<char>(insmall_ptr, insmall_ptr + input2_size);
-    }
-    return true;
+    auto *insmall_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
+    input_2 = std::vector<char>(insmall_ptr, insmall_ptr + input2_size);
+  }
+  return true;
 }
-
 
 bool anikin_m_counting_characters_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> counts(world_.size());
@@ -70,12 +67,10 @@ bool anikin_m_counting_characters_mpi::TestTaskMPI::RunImpl() {
   std::vector<char> local_data(local_size);
   std::vector<char> cmp_local_data(local_size);
 
-  MPI_Scatterv(input_2.data(), counts.data(), displs.data(),
-               MPI_CHAR, local_data.data(), local_size, 
-               MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Scatterv(input_1.data(), counts.data(), displs.data(), 
-               MPI_CHAR, cmp_local_data.data(), local_size,
-               MPI_CHAR, 0, MPI_COMM_WORLD);
+  MPI_Scatterv(input_2.data(), counts.data(), displs.data(), MPI_CHAR, local_data.data(), local_size, MPI_CHAR, 0,
+               MPI_COMM_WORLD);
+  MPI_Scatterv(input_1.data(), counts.data(), displs.data(), MPI_CHAR, cmp_local_data.data(), local_size, MPI_CHAR, 0,
+               MPI_COMM_WORLD);
   auto b = local_data.begin();
   for (auto a : cmp_local_data) {
     if ((a) != (*b)) local_res++;
