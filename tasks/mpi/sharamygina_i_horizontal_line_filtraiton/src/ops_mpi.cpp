@@ -1,9 +1,9 @@
-#include "mpi\sharamygina_i_horizontal_line_filtraiton\include\ops_mpi.h"
-
 #include <gtest/gtest.h>
 #include <mpi.h>
 
 #include <iostream>
+#include "mpi\sharamygina_i_horizontal_line_filtraiton\include\ops_mpi.h"
+
 
 bool sharamygina_i_horizontal_line_filtration_mpi::horizontal_line_filtration_mpi::PreProcessingImpl() {
   rows_ = task_data->inputs_count[0];
@@ -101,7 +101,7 @@ bool sharamygina_i_horizontal_line_filtration_mpi::horizontal_line_filtration_mp
 unsigned int sharamygina_i_horizontal_line_filtration_mpi::horizontal_line_filtration_mpi::InputAnotherPixel(
     const std::vector<unsigned int>& image, int x, int y, int rows, int cols) {
   if (x < 1 || x >= rows - 1 || y < 1 || y >= cols - 1) {
-    return 0;  
+    return 0;
   }
   unsigned int sum = 0;
   for (int i = 0; i < 3; i++)
