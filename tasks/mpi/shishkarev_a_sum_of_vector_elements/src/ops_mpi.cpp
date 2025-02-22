@@ -2,17 +2,16 @@
 #include "mpi/shishkarev_a_sum_of_vector_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <cstring>
-#include <functional>
-#include <numeric>
-#include <random>
-#include <vector>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <cstring>
+#include <functional>
+#include <numeric>
+#include <random>
+#include <vector>
 
 std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::GetRandomVector(int vector_size) {
   std::mt19937 generator(std::random_device{}());
@@ -78,7 +77,8 @@ bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel::PreProcessin
   auto local_vector_size = static_cast<unsigned int>(send_counts[world_id]);
   local_vector_.resize(local_vector_size);
 
-  boost::mpi::scatterv(world_, input_vector_.data(), send_counts, disp, local_vector_.data(), static_cast<int>(local_vector_size), 0);
+  boost::mpi::scatterv(world_, input_vector_.data(), send_counts, disp, local_vector_.data(),
+                       static_cast<int>(local_vector_size), 0);
 
   local_sum_ = 0;
   result_ = 0;

@@ -29,7 +29,6 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_int) {
 }
 
 TEST(shishkarev_a_sum_of_vector_elements_seq, test_float) {
-
   std::vector<float> input_data(1, 1.0F);
   std::vector<float> output_data(1, 0.0F);
 

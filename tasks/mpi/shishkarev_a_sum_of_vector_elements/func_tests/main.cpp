@@ -18,7 +18,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_empty_sum) {
   std::vector<int> global_vec;
   std::vector<int32_t> global_sum(1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();  // Исправлено имя
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(nullptr);
     task_data_par->inputs_count.emplace_back(0);
@@ -26,7 +26,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_empty_sum) {
     task_data_par->outputs_count.emplace_back(global_sum.size());
   }
 
-  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);  // Исправлено имя
+  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);
   ASSERT_TRUE(parallel.ValidationImpl());
   parallel.PreProcessingImpl();
   parallel.RunImpl();
@@ -44,7 +44,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_single_element_sum) {
   std::vector<int> global_vec(1, 42);
   std::vector<int32_t> global_sum(1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();  // Исправлено имя
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_par->inputs_count.emplace_back(global_vec.size());
@@ -52,7 +52,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_single_element_sum) {
     task_data_par->outputs_count.emplace_back(global_sum.size());
   }
 
-  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);  // Исправлено имя
+  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);
   ASSERT_TRUE(parallel.ValidationImpl());
   parallel.PreProcessingImpl();
   parallel.RunImpl();
@@ -70,7 +70,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_large_vector_sum) {
   std::vector<int> global_vec;
   std::vector<int32_t> global_sum(1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();  // Исправлено имя
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   const int vector_size = 1000000;
   if (world.rank() == 0) {
     global_vec = shishkarev_a_sum_of_vector_elements_mpi::GetRandomVector(vector_size);
@@ -80,7 +80,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_large_vector_sum) {
     task_data_par->outputs_count.emplace_back(global_sum.size());
   }
 
-  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);  // Исправлено имя
+  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);
   ASSERT_TRUE(parallel.ValidationImpl());
   parallel.PreProcessingImpl();
   parallel.RunImpl();
@@ -99,7 +99,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_zero_vector_sum) {
   std::vector<int> global_vec(100, 0);
   std::vector<int32_t> global_sum(1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();  // Исправлено имя
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_par->inputs_count.emplace_back(global_vec.size());
@@ -107,7 +107,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_zero_vector_sum) {
     task_data_par->outputs_count.emplace_back(global_sum.size());
   }
 
-  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);  // Исправлено имя
+  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);
   ASSERT_TRUE(parallel.ValidationImpl());
   parallel.PreProcessingImpl();
   parallel.RunImpl();
@@ -125,7 +125,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_negative_vector_sum) {
   std::vector<int> global_vec(100, -1);
   std::vector<int32_t> global_sum(1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();  // Исправлено имя
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_par->inputs_count.emplace_back(global_vec.size());
@@ -133,7 +133,7 @@ TEST(shishkarev_a_sum_of_vector_elements_mpi, test_negative_vector_sum) {
     task_data_par->outputs_count.emplace_back(global_sum.size());
   }
 
-  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);  // Исправлено имя
+  shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel parallel(task_data_par);
   ASSERT_TRUE(parallel.ValidationImpl());
   parallel.PreProcessingImpl();
   parallel.RunImpl();

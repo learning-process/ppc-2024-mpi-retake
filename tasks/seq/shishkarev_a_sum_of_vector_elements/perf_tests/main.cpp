@@ -22,7 +22,8 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_pipeline_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  auto vector_sum_seq = std::make_shared<shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<int>>(task_data_seq);
+  auto vector_sum_seq =
+      std::make_shared<shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<int>>(task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -38,7 +39,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(vector_sum_seq);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  
+
   const int expected_sum = std::accumulate(in.begin(), in.end(), 0);
   ASSERT_EQ(out[0], expected_sum);
 }
@@ -55,7 +56,8 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_task_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  auto vector_sum_seq = std::make_shared<shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<int>>(task_data_seq);
+  auto vector_sum_seq =
+      std::make_shared<shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<int>>(task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -71,7 +73,7 @@ TEST(shishkarev_a_sum_of_vector_elements_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(vector_sum_seq);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  
+
   const int expected_sum = std::accumulate(in.begin(), in.end(), 0);
   ASSERT_EQ(out[0], expected_sum);
 }

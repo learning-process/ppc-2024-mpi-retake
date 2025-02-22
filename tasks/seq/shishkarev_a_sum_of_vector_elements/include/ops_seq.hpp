@@ -11,8 +11,7 @@ namespace shishkarev_a_sum_of_vector_elements_seq {
 template <class InOutType>
 class VectorSumSequential : public ppc::core::Task {
  public:
-  explicit VectorSumSequential(std::shared_ptr<ppc::core::TaskData> task_data) 
-      : Task(std::move(task_data)) {}
+  explicit VectorSumSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
 
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
