@@ -2,15 +2,15 @@
 #include "mpi/shishkarev_a_sum_of_vector_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <cstring>  // Добавлено для memcpy
-#include <functional>
+#include <cstring>
 #include <numeric>
 #include <random>
 #include <vector>
 
-#include <boost/mpi/collectives.hpp>  // Добавлено для broadcast, scatterv, reduce
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives.hpp>
 
-std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::getRandomVector(int vector_size) {
+std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::GetRandomVector(int vector_size) {
   std::mt19937 generator(std::random_device{}());
   std::uniform_int_distribution<int> distribution(0, 99);
   std::vector<int> random_vector(vector_size);
@@ -19,14 +19,14 @@ std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::getRandomVector(int ve
 }
 
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumSequential::PreProcessingImpl() {
-  input_vector = std::vector<int>(task_data->inputs_count[0]);
+  input_vector_ = std::vector<int>(task_data->inputs_count[0]);
   int* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   for (unsigned i = 0; i < task_data->inputs_count[0]; i++) {
-    input_vector[i] = input_ptr[i];
+    input_vector_[i] = input_ptr[i];
   }
 
   // Инициализация результата
-  result = 0;
+  result_ = 0;
   return true;
 }
 
@@ -35,12 +35,12 @@ bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumSequential::Validation
 }
 
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumSequential::RunImpl() {
-  result = std::accumulate(input_vector.cbegin(), input_vector.cend(), 0);
+  result_ = std::accumulate(input_vector_.cbegin(), input_vector_.cend(), 0);
   return true;
 }
 
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumSequential::PostProcessingImpl() {
-  *reinterpret_cast<int*>(task_data->outputs[0]) = result;
+  *reinterpret_cast<int*>(task_data->outputs[0]) = result_;
   return true;
 }
 
@@ -51,9 +51,9 @@ bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel::PreProcessin
 
   if (world_id == 0) {
     n = task_data->inputs_count[0];
-    input_vector = std::vector<int>(n);
+    input_vector_ = std::vector<int>(n);
     int* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
-    std::memcpy(input_vector.data(), input_ptr, sizeof(int) * n);  // Исправлено на std::memcpy
+    std::memcpy(input_vector_.data(), input_ptr, sizeof(int) * n);  // Исправлено на std::memcpy
   }
 
   boost::mpi::broadcast(world, n, 0);
@@ -73,12 +73,12 @@ bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel::PreProcessin
   }
 
   auto local_vector_size = static_cast<unsigned int>(send_counts[world_id]);
-  local_vector.resize(local_vector_size);
+  local_vector_.resize(local_vector_size);
 
-  boost::mpi::scatterv(world, input_vector.data(), send_counts, disp, local_vector.data(), static_cast<int>(local_vector_size), 0);  // Исправлено на static_cast
+  boost::mpi::scatterv(world, input_vector_.data(), send_counts, disp, local_vector_.data(), static_cast<int>(local_vector_size), 0);  // Исправлено на static_cast
 
-  local_sum = 0;
-  result = 0;
+  local_sum_ = 0;
+  result_ = 0;
   return true;
 }
 
@@ -90,15 +90,15 @@ bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel::ValidationIm
 }
 
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel::RunImpl() {
-  local_sum = std::accumulate(local_vector.begin(), local_vector.end(), 0);
+  local_sum_ = std::accumulate(local_vector_.begin(), local_vector_.end(), 0);
 
-  boost::mpi::reduce(world, local_sum, result, std::plus<>(), 0);
+  boost::mpi::reduce(world, local_sum_, result_, std::plus<>(), 0);
   return true;
 }
 
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumParallel::PostProcessingImpl() {
   if (world.rank() == 0) {
-    *reinterpret_cast<int*>(task_data->outputs[0]) = result;
+    *reinterpret_cast<int*>(task_data->outputs[0]) = result_;
   }
 
   return true;
