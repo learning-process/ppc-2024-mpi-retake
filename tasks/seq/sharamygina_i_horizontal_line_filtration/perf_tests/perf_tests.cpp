@@ -9,6 +9,7 @@
 #include "seq/sharamygina_i_horizontal_line_filtration/include/ops_seq.h"
 
 namespace sharamygina_i_horizontal_line_filtration_seq {
+namespace {
 std::vector<unsigned int> GetImage(int rows, int cols) {
   std::vector<unsigned int> temporaryIm(rows * cols);
   std::random_device rd;
@@ -18,6 +19,7 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
     for (int j = 0; j < cols; j++) temporaryIm[i * cols + j] = dist(gen);
   return temporaryIm;
 }
+}  // namespace
 }  // namespace sharamygina_i_horizontal_line_filtration_seq
 
 TEST(sharamygina_i_horizontal_line_filtration_seq, LargeImage) {

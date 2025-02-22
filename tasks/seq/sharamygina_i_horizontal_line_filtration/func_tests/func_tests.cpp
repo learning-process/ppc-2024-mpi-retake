@@ -6,6 +6,7 @@
 #include "seq/sharamygina_i_horizontal_line_filtration/include/ops_seq.h"
 
 namespace sharamygina_i_horizontal_line_filtration_seq {
+namespace {
 void ToFiltSeq(const std::vector<unsigned int>& input, int rows, int cols, std::vector<unsigned int>& output) {
   const int kernel[3][3] = {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
   output.assign(rows * cols, 0);
@@ -32,7 +33,7 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
     for (int j = 0; j < cols; j++) temporaryIm[i * cols + j] = dist(gen);
   return temporaryIm;
 }
-
+}  // namespace
 }  // namespace sharamygina_i_horizontal_line_filtration_seq
 
 TEST(sharamygina_i_horizontal_line_filtration, SampleImageTest) {
