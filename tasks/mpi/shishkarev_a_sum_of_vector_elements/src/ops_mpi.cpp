@@ -2,6 +2,7 @@
 #include "mpi/shishkarev_a_sum_of_vector_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>
 #include <cstring>
 #include <functional>
 #include <numeric>
