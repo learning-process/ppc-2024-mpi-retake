@@ -8,7 +8,8 @@
 #include <random>
 #include <vector>
 
-#include <boost/mpi.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 
 std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::GetRandomVector(int vector_size) {
   std::mt19937 generator(std::random_device{}());
