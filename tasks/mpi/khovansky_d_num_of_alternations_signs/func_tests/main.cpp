@@ -9,17 +9,6 @@
 #include "core/task/include/task.hpp"
 #include "mpi/khovansky_d_num_of_alternations_signs/include/ops_mpi.hpp"
 
-std::vector<int> getRandomVector(int size) {
-  auto dev = std::random_device();
-  auto gen = std::mt19937(dev());
-  std::vector<int> result(size);
-
-  for (int i = 0; i < size; i++) {
-    result[i] = gen() % 2001 - 1000;
-  }
-  return result;
-}
-
 TEST(khovansky_d_num_of_alternations_signs_mpi, test_10) {
   boost::mpi::communicator world;
   // Create data
@@ -178,7 +167,15 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, random_test) {
   boost::mpi::communicator world;
   // Create data
   int size = 1000;
-  std::vector<int> in = getRandomVector(size);
+  
+  auto dev = std::random_device();
+  auto gen = std::mt19937(dev());
+  std::vector<int> in(size);
+
+  for (int i = 0; i < size; i++) {
+    in[i] = gen() % 2001 - 1000;
+  }
+
   std::vector<int> out_mpi(1, 0);
 
   // Create task_data
