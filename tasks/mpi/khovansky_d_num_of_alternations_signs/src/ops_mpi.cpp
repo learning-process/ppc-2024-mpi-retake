@@ -99,7 +99,6 @@ bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::Valid
 }
 
 bool khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsMpi::RunImpl() {
-
   if (world_.rank() == 0) {
     auto input_size = task_data->inputs_count[0];
     auto start_size = input_size / world_.size();
