@@ -1,9 +1,9 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
-#include <vector>
-#include <memory>
 #include <cstdint>
+#include <memory>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 #include "seq/shishkarev_a_sum_of_vector_elements/include/ops_seq.hpp"

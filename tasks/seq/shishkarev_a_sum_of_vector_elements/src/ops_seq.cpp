@@ -7,12 +7,12 @@
 template <class InOutType>
 bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::PreProcessingImpl() {
   const auto input_size = task_data->inputs_count[0];
-  input_data = std::vector<InOutType>(input_size);
+  input_data_ = std::vector<InOutType>(input_size);
 
   auto input_ptr = reinterpret_cast<InOutType*>(task_data->inputs[0]);
-  std::copy(input_ptr, input_ptr + input_size, input_data.begin());
+  std::copy(input_ptr, input_ptr + input_size, input_data_.begin());
 
-  result = InOutType{};
+  result_ = InOutType{};
   return true;
 }
 
@@ -25,14 +25,14 @@ bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::Va
 
 template <class InOutType>
 bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::RunImpl() {
-  result = std::accumulate(input_data.begin(), input_data.end(), InOutType{});
+  result_ = std::accumulate(input_data_.begin(), input_data_.end(), InOutType{});
   return true;
 }
 
 template <class InOutType>
 bool shishkarev_a_sum_of_vector_elements_seq::VectorSumSequential<InOutType>::PostProcessingImpl() {
   auto output_ptr = reinterpret_cast<InOutType*>(task_data->outputs[0]);
-  output_ptr[0] = result;
+  output_ptr[0] = result_;
   return true;
 }
 
