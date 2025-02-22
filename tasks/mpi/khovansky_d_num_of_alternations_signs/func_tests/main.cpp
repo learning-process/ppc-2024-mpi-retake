@@ -205,7 +205,7 @@ TEST(khovansky_d_num_of_alternations_signs_mpi, random_test) {
     task_data_seq->inputs_count.emplace_back(in.size());
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_seq.data()));
     task_data_seq->outputs_count.emplace_back(out_seq.size());
-  
+
     // Create Task
     khovansky_d_num_of_alternations_signs_mpi::NumOfAlternationsSignsSeq num_of_alternations_signs_seq(task_data_seq);
     ASSERT_EQ(num_of_alternations_signs_seq.ValidationImpl(), true);
