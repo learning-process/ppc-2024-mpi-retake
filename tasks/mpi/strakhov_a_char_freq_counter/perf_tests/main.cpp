@@ -14,7 +14,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
   // Create data
-  int expectation = 1000;
+  int expectation = 1000000000;
   std::vector<char> in_string(expectation, 'a');
   std::vector<int> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
@@ -63,7 +63,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
   boost::mpi::communicator world;
 
   // Create data
-  int expectation = 1000;
+  int expectation = 1000000000;
   std::vector<char> in_string(expectation, 'a');
   std::vector<int> out_par(1, 0);
   std::vector<char> in_target(1, 'a');
