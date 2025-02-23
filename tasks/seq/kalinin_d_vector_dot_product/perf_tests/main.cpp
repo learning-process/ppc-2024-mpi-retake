@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <ctime>
 #include <memory>
 #include <random>
 #include <vector>
@@ -12,10 +13,12 @@
 #include "core/task/include/task.hpp"
 #include "seq/kalinin_d_vector_dot_product/include/ops_seq.hpp"
 
-static int offset = 0;
+namespace {
+int offset = 0;
+}
 
 namespace {
-std::vector<int> createRandomVector(int v_size) {
+std::vector<int> CreateRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
   gen.seed((unsigned)time(nullptr) + ++offset);
@@ -29,8 +32,8 @@ TEST(kalinin_d_vector_dot_product_seq, test_pipeline_run) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = CreateRandomVector(count);
+  std::vector<int> v2 = CreateRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -45,7 +48,7 @@ TEST(kalinin_d_vector_dot_product_seq, test_pipeline_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto testTaskSequential = std::make_shared<kalinin_d_vector_dot_product_seq::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<kalinin_d_vector_dot_product_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -61,11 +64,11 @@ TEST(kalinin_d_vector_dot_product_seq, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  int answer = kalinin_d_vector_dot_product_seq::vectorDotProduct(v1, v2);
+  int answer = kalinin_d_vector_dot_product_seq::VectorDotProduct(v1, v2);
   ASSERT_EQ(answer, out[0]);
 }
 
@@ -74,8 +77,8 @@ TEST(kalinin_d_vector_dot_product_seq, test_task_run) {
   // Create data
   std::vector<int> out(1, 0);
 
-  std::vector<int> v1 = createRandomVector(count);
-  std::vector<int> v2 = createRandomVector(count);
+  std::vector<int> v1 = CreateRandomVector(count);
+  std::vector<int> v2 = CreateRandomVector(count);
 
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -109,6 +112,6 @@ TEST(kalinin_d_vector_dot_product_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  int answer = kalinin_d_vector_dot_product_seq::vectorDotProduct(v1, v2);
+  int answer = kalinin_d_vector_dot_product_seq::VectorDotProduct(v1, v2);
   ASSERT_EQ(answer, out[0]);
 }

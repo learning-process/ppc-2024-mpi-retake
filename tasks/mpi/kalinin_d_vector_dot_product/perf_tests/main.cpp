@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -14,11 +13,13 @@
 #include "core/task/include/task.hpp"
 #include "mpi/kalinin_d_vector_dot_product/include/ops_mpi.hpp"
 
-static int offset = 0;
-const int count_size_vector = 42000000;
+namespace {
+int offset = 0;
+}
+const int kCountSizeVector = 42000000;
 
 namespace {
-std::vector<int> createRandomVector(int v_size) {
+std::vector<int> CreateRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
   gen.seed((unsigned)time(nullptr) + ++offset);
@@ -28,26 +29,26 @@ std::vector<int> createRandomVector(int v_size) {
 }  // namespace
 
 TEST(kalinin_d_vector_dot_product_mpi, test_pipeline_run) {
-  boost::mpi::communicator world;
+  boost::mpi::communicator world_;
   std::vector<std::vector<int>> global_vec;
 
-  std::vector<int> v1 = createRandomVector(count_size_vector);
-  std::vector<int> v2 = createRandomVector(count_size_vector);
+  std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
+  std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
 
-  std::vector<int32_t> res(1, 0);
+  std::vector<int32_t> res_(1, 0);
   global_vec = {v1, v2};
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     for (size_t i = 0; i < global_vec.size(); i++) {
       task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
     }
     task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
     task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
-    task_data_mpi->outputs_count.emplace_back(res.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res_.data()));
+    task_data_mpi->outputs_count.emplace_back(res_.size());
   }
 
   auto test_task_mpi = std::make_shared<kalinin_d_vector_dot_product_mpi::TestMPITaskParallel>(task_data_mpi);
@@ -64,37 +65,37 @@ TEST(kalinin_d_vector_dot_product_mpi, test_pipeline_run) {
 
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-  int answer = kalinin_d_vector_dot_product_mpi::vectorDotProduct(v1, v2);
+  int answer = kalinin_d_vector_dot_product_mpi::VectorDotProduct(v1, v2);
 
   //  Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
 
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(answer, res[0]);
+    ASSERT_EQ(answer, res_[0]);
   }
 }
 
 TEST(kalinin_d_vector_dot_product_mpi, test_task_run) {
-  boost::mpi::communicator world;
+  boost::mpi::communicator world_;
   std::vector<std::vector<int>> global_vec;
-  std::vector<int32_t> res(1, 0);
-  std::vector<int> v1 = createRandomVector(count_size_vector);
-  std::vector<int> v2 = createRandomVector(count_size_vector);
+  std::vector<int32_t> res_(1, 0);
+  std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
+  std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   global_vec = {v1, v2};
 
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     for (size_t i = 0; i < global_vec.size(); i++) {
       task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec[i].data()));
     }
     task_data_mpi->inputs_count.emplace_back(global_vec[0].size());
     task_data_mpi->inputs_count.emplace_back(global_vec[1].size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res.data()));
-    task_data_mpi->outputs_count.emplace_back(res.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(res_.data()));
+    task_data_mpi->outputs_count.emplace_back(res_.size());
   }
 
   auto test_task_mpi = std::make_shared<kalinin_d_vector_dot_product_mpi::TestMPITaskParallel>(task_data_mpi);
@@ -112,13 +113,13 @@ TEST(kalinin_d_vector_dot_product_mpi, test_task_run) {
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  // int answer = res[0];
+  // int answer = res_[0];
   //   Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
 
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res_[0]);
   }
 }

@@ -8,7 +8,7 @@
 #include "core/task/include/task.hpp"
 
 namespace kalinin_d_vector_dot_product_seq {
-int vectorDotProduct(const std::vector<int>& v1, const std::vector<int>& v2);
+int VectorDotProduct(const std::vector<int>& v1, const std::vector<int>& v2);
 
 class TestTaskSequential : public ppc::core::Task {
  public:
@@ -19,7 +19,7 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  int res{};
+  int res_{};
   std::vector<std::vector<int>> input_;
 };
 
