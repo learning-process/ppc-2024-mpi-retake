@@ -84,21 +84,13 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
     }
   }
 
-  // Scatter send_counts to get local_input_size
   boost::mpi::scatter(world_, send_counts, local_input_size, 0);
-
-  // Resize buffer to match the expected input size
   local_input_.resize(local_input_size);
-
-  // Scatterv with root-specific parameters
   boost::mpi::scatterv(world_, (rank == 0) ? input_.data() : nullptr, (rank == 0) ? send_counts : std::vector<int>(),
                        (rank == 0) ? displacements : std::vector<int>(), local_input_.data(), local_input_size, 0);
+  local_result = std::count(local_input_.begin(), local_input_.end(), target_);
 
-  // Compute local count
-  int local_result = std::count(local_input_.begin(), local_input_.end(), target_);
-
-  // Reduce results to root
-  boost::mpi::reduce(world_, local_result, result_, std::plus<int>(), 0);
+  boost::mpi::reduce(world_, local_result, result_, std::plus<>(), 0);
 
   return true;
 }
