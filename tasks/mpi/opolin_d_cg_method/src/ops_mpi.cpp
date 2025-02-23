@@ -52,24 +52,23 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
   boost::mpi::broadcast(world_, n_, 0);
   boost::mpi::broadcast(world_, epsilon_, 0);
 
-  size_t local_n = n_ / size + (rank < static_cast<int>(n_ % size) ? 1 : 0);
+  std::vector<int> send_counts(size);
+  std::vector<int> displs(size);
+  size_t offset = 0;
+  for (int i = 0; i < size; ++i) {
+    size_t rows = n_ / size + (i < static_cast<int>(n_ % size) ? 1 : 0);
+    send_counts[i] = static_cast<int>(rows);
+    displs[i] = static_cast<int>(offset);
+    offset += rows;
+  }
 
+  size_t local_n = static_cast<size_t>(send_counts[rank]);
   std::vector<double> local_A(local_n * n_);
   std::vector<double> local_b(local_n);
   std::vector<double> local_x(local_n, 0.0);
   std::vector<double> local_r(local_n);
   std::vector<double> local_p(local_n);
   std::vector<double> local_Ap(local_n);
-
-  std::vector<int> send_counts(size);
-  std::vector<int> displs(size);
-  size_t offset = 0;
-  for (int i = 0; i < size; ++i) {
-    size_t rows = n_ / size + (i < static_cast<int>(n_ % size) ? 1 : 0);
-    send_counts[i] = static_cast<int>(rows * n_);
-    displs[i] = static_cast<int>(offset);
-    offset += rows * n_;
-  }
 
   if (rank == 0) {
     boost::mpi::scatterv(world_, A_.data(), send_counts, displs, local_A.data(), static_cast<int>(local_n * n_), 0);
@@ -94,7 +93,8 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
   local_p = local_r;
 
   double rsquare_prev = 0.0;
-  while (true) {
+  bool end = false;
+  while (!end) {
     double local_rsquare = opolin_d_cg_method_mpi::scalarProduct(local_r, local_r);
     double rsquare_k = 0.0;
     boost::mpi::reduce(world_, local_rsquare, rsquare_k, std::plus<double>(), 0);
@@ -102,7 +102,13 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
 
     if (rank == 0) {
       rsquare_prev = rsquare_k;
+      end = (sqrt(rsquare_k) < epsilon_);
     }
+    boost::mpi::broadcast(world_, end, 0);
+    if (end) {
+      break;
+    }
+    boost::mpi::broadcast(world_, rsquare_k, 0);
 
     for (size_t i = 0; i < local_n; ++i) {
       local_Ap[i] = 0.0;
@@ -133,11 +139,16 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     local_rsquare = opolin_d_cg_method_mpi::scalarProduct(local_r, local_r);
     rsquare_k = 0.0;
     boost::mpi::reduce(world_, local_rsquare, rsquare_k, std::plus<double>(), 0);
-    boost::mpi::broadcast(world_, rsquare_k, 0);
+    if (rank == 0) {
+      end = (sqrt(rsquare_k) < epsilon_);
+    }
 
-    if (sqrt(rsquare_k) < epsilon_) {
+    boost::mpi::broadcast(world_, end, 0);
+    if (end) {
       break;
     }
+    boost::mpi::broadcast(world_, rsquare_k, 0);
+
     double beta_k = rsquare_k / rsquare_prev;
 
     for (size_t i = 0; i < local_n; ++i) {
