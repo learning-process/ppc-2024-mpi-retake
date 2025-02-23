@@ -1,6 +1,5 @@
-#include <mpi.h>
 #include <gtest/gtest.h>
-
+#include <mpi.h>
 #include "mpi/konkov_i_task_dining_philosophers/include/ops_mpi.hpp"
 
 TEST(konkov_i_DiningPhilosophersTest, ValidNumberOfPhilosophers) {
