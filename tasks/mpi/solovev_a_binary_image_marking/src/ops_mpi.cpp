@@ -8,7 +8,7 @@
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <queue>
-#include <ranges>  // NOLINT 
+#include <ranges>  // NOLINT
 #include <vector>
 
 bool solovev_a_binary_image_marking::TestMPITaskSequential::PreProcessingImpl() {
