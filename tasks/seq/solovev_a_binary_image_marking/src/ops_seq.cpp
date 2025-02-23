@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <queue>
 #include <ranges>  // NOLINT
-#include <utility>
 #include <vector>
 
 #include "seq/solovev_a_binary_image_marking/include/ops_sec.hpp"
