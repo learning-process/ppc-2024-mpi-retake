@@ -64,7 +64,7 @@ void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const 
   std::vector<int> received_data;
   world.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(local_data, received_data);
-  world.send(neighbor_rank, world_.rank(), received_data);
+  world.send(neighbor_rank, world.rank(), received_data);
 }
 
 void OddEvenSortPhase(int phase, std::vector<int>& local_data, const boost::mpi::communicator& world) {
