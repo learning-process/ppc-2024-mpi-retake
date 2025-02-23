@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
+#include <cmath>
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <vector>
 
@@ -13,21 +17,21 @@ std::vector<double> GetRandomMatrix(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_real_distribution<double> dis(-1000, 1000);
-  std::vector<double> matrix_(sz);
+  std::vector<double> matrix(sz);
   for (int i = 0; i < sz; ++i) {
-    matrix_[i] = dis(gen);
+    matrix[i] = dis(gen);
   }
-  return matrix_;
+  return matrix;
 }
 
-double AxB(int n, int m, std::vector<double> a, std::vector<double> res_) {
+double AxB(int n, int m, std::vector<double> a, std::vector<double> res) {
   std::vector<double> tmp(m, 0);
 
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < n - 1; ++j) {
-      tmp[i] += a[i * n + j] * res[j];
+      tmp[i] += a[(i * n) + j] * res[j];
     }
-    tmp[i] -= a[i * n + m];
+    tmp[i] -= a[(i * n) + m];
   }
 
   double tmp_norm = 0;
@@ -42,19 +46,19 @@ double AxB(int n, int m, std::vector<double> a, std::vector<double> res_) {
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_pipeline_run) {
   boost::mpi::communicator world_;
 
-  const int cols_ = 101;
-  const int rows_ = 100;
-  std::vector<double> global_matrix(cols_ * rows_);
-  std::vector<double> global_res(cols_ - 1, 0);
+  const int cols = 101;
+  const int rows = 100;
+  std::vector<double> global_matrix(cols * rows);
+  std::vector<double> global_res(cols - 1, 0);
 
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world_.rank() == 0) {
-    global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols_ * rows_);
+    global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
     taskDataPar->inputs_count.emplace_back(global_matrix.size());
-    taskDataPar->inputs_count.emplace_back(cols_);
-    taskDataPar->inputs_count.emplace_back(rows_);
+    taskDataPar->inputs_count.emplace_back(cols);
+    taskDataPar->inputs_count.emplace_back(rows);
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
     taskDataPar->outputs_count.emplace_back(global_res.size());
   }
@@ -78,7 +82,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_pipeline_ru
   perfAnalyzer->PipelineRun(perfAttr, perfResults);
   if (world_.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perfResults);
-    ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols_, rows_, global_matrix, global_res),
+    ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols, rows, global_matrix, global_res),
                 0, 1e-6);
   }
 }
@@ -86,19 +90,19 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_pipeline_ru
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_task_run) {
   boost::mpi::communicator world_;
 
-  const int cols_ = 101;
-  const int rows_ = 100;
-  std::vector<double> global_matrix(cols_ * rows_);
-  std::vector<double> global_res(cols_ - 1, 0);
+  const int cols = 101;
+  const int rows = 100;
+  std::vector<double> global_matrix(cols * rows);
+  std::vector<double> global_res(cols - 1, 0);
 
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world_.rank() == 0) {
-    global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols_ * rows_);
+    global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
     taskDataPar->inputs_count.emplace_back(global_matrix.size());
-    taskDataPar->inputs_count.emplace_back(cols_);
-    taskDataPar->inputs_count.emplace_back(rows_);
+    taskDataPar->inputs_count.emplace_back(cols);
+    taskDataPar->inputs_count.emplace_back(rows);
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
     taskDataPar->outputs_count.emplace_back(global_res.size());
   }
@@ -122,7 +126,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_task_run) {
   perfAnalyzer->TaskRun(perfAttr, perfResults);
   if (world_.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perfResults);
-    ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols_, rows_, global_matrix, global_res),
+    ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols, rows, global_matrix, global_res),
                 0, 1e-6);
   }
 }
