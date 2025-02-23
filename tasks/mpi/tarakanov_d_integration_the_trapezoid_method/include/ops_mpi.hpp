@@ -1,13 +1,16 @@
 // Copyright 2025 Tarakanov Denis
 #pragma once
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+
 #include "core/task/include/task.hpp"
 
 namespace tarakanov_d_integration_the_trapezoid_method_mpi {
 
-class IntegrationTheTrapezoidMethodSequential : public ppc::core::Task {
+class IntegrationTheTrapezoidMethodMPI : public ppc::core::Task {
  public:
-  explicit IntegrationTheTrapezoidMethodSequential(std::shared_ptr<ppc::core::TaskData> taskData_)
+  explicit IntegrationTheTrapezoidMethodMPI(std::shared_ptr<ppc::core::TaskData> taskData_)
       : Task(std::move(taskData_)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
@@ -20,4 +23,4 @@ class IntegrationTheTrapezoidMethodSequential : public ppc::core::Task {
   boost::mpi::communicator world;
 };
 
-}  // namespace tarakanov_d_integration_the_trapezoid_method_seq
+}  // namespace tarakanov_d_integration_the_trapezoid_method_mpi

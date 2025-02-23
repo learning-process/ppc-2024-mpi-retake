@@ -1,9 +1,9 @@
 // Copyright 2025 Tarakanov Denis
-#include "seq/tarakanov_d_integration_the_trapezoid_method/include/ops_seq.hpp"
+#include "mpi/tarakanov_d_integration_the_trapezoid_method/include/ops_mpi.hpp"
 
 #include <vector>
 
-bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::PreProcessingImpl() {
+bool tarakanov_d_integration_the_trapezoid_method_mpi::IntegrationTheTrapezoidMethodMPI::PreProcessingImpl() {
   // Init value for input and output
   if (world.rank() == 0) {
     a = *reinterpret_cast<double*>(task_data->inputs[0]);
@@ -11,20 +11,21 @@ bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMe
     h = *reinterpret_cast<double*>(task_data->inputs[2]);
     res = 0.0;
   }
-  
+
   return true;
 }
 
-bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::ValidationImpl() {
+bool tarakanov_d_integration_the_trapezoid_method_mpi::IntegrationTheTrapezoidMethodMPI::ValidationImpl() {
   if (world.rank() == 0) {
-    bool res = task_data->inputs_count[0] == 3 && task_data->outputs_count[2] > 0 && task_data->outputs_count[0] == 1;
-    return res;
+    bool result =
+        task_data->inputs_count[0] == 3 && task_data->outputs_count[0] > 0 && task_data->outputs_count[0] == 1;
+    return result;
   }
 
   return true;
 }
 
-bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::RunImpl() {
+bool tarakanov_d_integration_the_trapezoid_method_mpi::IntegrationTheTrapezoidMethodMPI::RunImpl() {
   boost::mpi::broadcast(world, a, 0);
   boost::mpi::broadcast(world, b, 0);
   boost::mpi::broadcast(world, h, 0);
@@ -38,19 +39,19 @@ bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMe
   uint32_t end = (rank == size - 1) ? partsCount : start + localPartsCount;
 
   double local_res = 0.0;
-  for (int i = start; i < end; ++i) {
+  for (uint32_t i = start; i < end; ++i) {
     double x0 = a + i * h;
     double x1 = (rank == size - 1) ? b : a + (i + 1) * h;
     local_res += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * (x1 - x0);
   }
 
-  boost::mpi::reduce(world, local_res, res, std::plus<double>(), 0)
+  boost::mpi::reduce(world, local_res, res, std::plus<double>(), 0);
 
   return true;
 }
 
-bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::PostProcessingImpl() {
-  if(world.rank == 0) {
+bool tarakanov_d_integration_the_trapezoid_method_mpi::IntegrationTheTrapezoidMethodMPI::PostProcessingImpl() {
+  if (world.rank() == 0) {
     *reinterpret_cast<double*>(task_data->outputs[0]) = res;
   }
   return true;

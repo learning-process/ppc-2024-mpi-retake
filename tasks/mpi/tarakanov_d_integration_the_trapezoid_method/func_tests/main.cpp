@@ -3,12 +3,12 @@
 
 #include <memory>
 
-#include "seq/tarakanov_d_integration_the_trapezoid_method/include/ops_mpi.hpp"
+#include "mpi/tarakanov_d_integration_the_trapezoid_method/include/ops_mpi.hpp"
 
 namespace tarakanov_d_integration_the_trapezoid_method_mpi {
-auto createTaskData(double* a, double* b, double* h, double* res) {
+static auto createTaskData(double* a, double* b, double* h, double* res) {
   auto data = std::make_shared<ppc::core::TaskData>();
-  
+
   data->inputs.push_back(reinterpret_cast<uint8_t*>(a));
   data->inputs.push_back(reinterpret_cast<uint8_t*>(b));
   data->inputs.push_back(reinterpret_cast<uint8_t*>(h));
@@ -19,7 +19,7 @@ auto createTaskData(double* a, double* b, double* h, double* res) {
 
   return data;
 }
-} // tarakanov_d_integration_the_trapezoid_method_seq
+}  // namespace tarakanov_d_integration_the_trapezoid_method_mpi
 
 using namespace tarakanov_d_integration_the_trapezoid_method_mpi;
 
@@ -30,7 +30,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationPositiveC
   double res = 0.0;
   auto data = createTaskData(&a, &b, &h, &res);
 
-  IntegrationTheTrapezoidMethodSequential task(data);
+  IntegrationTheTrapezoidMethodMPI task(data);
 
   EXPECT_TRUE(task.ValidationImpl());
 }
@@ -42,7 +42,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationStepNegat
   double res = 0.0;
   auto data = createTaskData(&a, &b, &h, &res);
 
-  IntegrationTheTrapezoidMethodSequential task(data);
+  IntegrationTheTrapezoidMethodMPI task(data);
 
   EXPECT_TRUE(task.ValidationImpl());
 }
@@ -54,7 +54,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PreProcessingPositi
   double res = 0.0;
   auto data = createTaskData(&a, &b, &h, &res);
 
-  IntegrationTheTrapezoidMethodSequential task(data);
+  IntegrationTheTrapezoidMethodMPI task(data);
 
   EXPECT_TRUE(task.ValidationImpl());
   EXPECT_TRUE(task.PreProcessingImpl());
@@ -67,7 +67,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PostProcessingCheck
   double res = 0.0;
   auto data = createTaskData(&a, &b, &h, &res);
 
-  IntegrationTheTrapezoidMethodSequential task(data);
+  IntegrationTheTrapezoidMethodMPI task(data);
 
   EXPECT_TRUE(task.ValidationImpl());
   EXPECT_TRUE(task.PreProcessingImpl());
