@@ -1,7 +1,7 @@
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
-#include <cstdint>
 
 #include "core/task/include/task.hpp"
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
