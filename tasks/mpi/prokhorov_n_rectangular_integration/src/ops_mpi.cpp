@@ -95,9 +95,9 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PreProcessingImpl() {
     return n_ > 0;
   }
 
-  boost::mpi::broadcast(world_, lower_bound_, 0);
-  boost::mpi::broadcast(world_, upper_bound_, 0);
-  boost::mpi::broadcast(world_, n_, 0);
+  broadcast(world_, lower_bound_, 0);
+  broadcast(world_, upper_bound_, 0);
+  broadcast(world_, n_, 0);
 
   return true;
 }
@@ -163,7 +163,7 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ParallelIntegrate(c
   }
 
   double global_area = 0.0;
-  boost::mpi::reduce(world_, local_area, global_area, std::plus<>(), 0);
+  reduce(world_, local_area, global_area, std::plus<>(), 0);
 
   return global_area;
 }

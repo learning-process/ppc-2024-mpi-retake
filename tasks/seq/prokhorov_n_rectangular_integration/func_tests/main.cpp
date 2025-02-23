@@ -6,6 +6,7 @@
 #include <numbers>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "seq/prokhorov_n_rectangular_integration/include/ops_seq.hpp"
 
 TEST(prokhorov_n_rectangular_integration_seq, test_integration_cos_x) {
@@ -174,7 +175,7 @@ TEST(prokhorov_n_rectangular_integration_seq, test_integration_log_x) {
   const double lower_bound = 1.0;
   const double upper_bound = 2.0;
   const int n = 1000;
-  const double expected_result = 2.0 * std::numbers::ln2 - 1.0;
+  const double expected_result = (2.0 * std::numbers::ln2) - 1.0;
 
   std::vector<double> in = {lower_bound, upper_bound, static_cast<double>(n)};
   std::vector<double> out(1, 0.0);
@@ -228,7 +229,7 @@ TEST(prokhorov_n_rectangular_integration_seq, test_integration_atan_x) {
   const double lower_bound = 0.0;
   const double upper_bound = 1.0;
   const int n = 1000;
-  const double expected_result = std::numbers::pi / 4.0 - 0.5 * std::numbers::ln2;
+  const double expected_result = (std::numbers::pi / 4.0) - (0.5 * std::numbers::ln2);
 
   std::vector<double> in = {lower_bound, upper_bound, static_cast<double>(n)};
   std::vector<double> out(1, 0.0);

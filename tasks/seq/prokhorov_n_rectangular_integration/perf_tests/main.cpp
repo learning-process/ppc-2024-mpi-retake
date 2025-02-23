@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <functional>
+#include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/prokhorov_n_rectangular_integration/include/ops_seq.hpp"
 
 TEST(prokhorov_n_rectangular_integration_seq, test_pipeline_run) {
