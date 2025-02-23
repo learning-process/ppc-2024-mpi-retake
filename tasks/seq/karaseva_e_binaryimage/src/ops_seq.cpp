@@ -119,8 +119,7 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::RunImpl() {
 }
 
 bool karaseva_e_binaryimage_seq::TestTaskSequential::PostProcessingImpl() {
-  auto* output_ptr =
-      reinterpret_cast<int*>(task_data->outputs[0]);
+  auto* output_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
   std::ranges::copy(labeled_image_, output_ptr);
   return true;
 }
