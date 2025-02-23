@@ -172,7 +172,7 @@ TEST(solovev_a_binary_image_marking, Whole_image) {
   }
 
   solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_mpi(task_data_par);
-  ASSERT_EQ(binary_marker_MPI.ValidationImpl(), true);
+  ASSERT_EQ(binary_marker_mpi.ValidationImpl(), true);
   binary_marker_mpi.PreProcessingImpl();
   binary_marker_mpi.RunImpl();
   binary_marker_mpi.PostProcessingImpl();
