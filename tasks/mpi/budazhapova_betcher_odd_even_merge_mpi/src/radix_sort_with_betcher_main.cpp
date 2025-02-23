@@ -167,7 +167,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
   std::vector<int> recv_counts(world_.size(), 0);
   std::vector<int> displacements(world_.size(), 0);
 
-  boost::mpi::broadcast(world_, res_, 0);
+  broadcast(world_, res_, 0);
 
   int n_of_send_elements = 0;
   int n_of_proc_with_extra_elements = 0;
@@ -185,6 +185,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
 
   boost::mpi::gatherv(world_, local_res_.data(), static_cast<int>(local_res_.size()), res_.data(), recv_counts,
                       displacements, 0);
+  return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessingImpl() {
