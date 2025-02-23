@@ -8,8 +8,7 @@
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <queue>
-#include <ranges>
-#include <utility>
+#include <ranges> // NOLINT 
 #include <vector>
 
 bool solovev_a_binary_image_marking::TestMPITaskSequential::PreProcessingImpl() {
@@ -74,8 +73,8 @@ bool solovev_a_binary_image_marking::TestMPITaskSequential::RunImpl() {
 }
 // NOLINTEND
 bool solovev_a_binary_image_marking::TestMPITaskSequential::PostProcessingImpl() {
-  int* output_ = reinterpret_cast<int*>(task_data->outputs[0]);
-  std::ranges::copy(labels_seq_, output_);
+  int* output = reinterpret_cast<int*>(task_data->outputs[0]);
+  std::ranges::copy(labels_seq_, output);
 
   return true;
 }
@@ -96,7 +95,7 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::ValidationImpl() {
   if (world_.rank() == 0) {
     int m_check = *reinterpret_cast<int*>(task_data->inputs[0]);
     int n_check = *reinterpret_cast<int*>(task_data->inputs[1]);
-    int input_check_size = task_data->inputs_count[2];
+    int input_check_size = static_cast<int>(task_data->inputs_count[2]);
     return (m_check > 0 && n_check > 0 && input_check_size > 0);
   }
   return true;
@@ -207,8 +206,8 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
 // NOLINTEND
 bool solovev_a_binary_image_marking::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
-    int* output_ = reinterpret_cast<int*>(task_data->outputs[0]);
-    std::ranges::copy(labels_, output_);
+    int* output = reinterpret_cast<int*>(task_data->outputs[0]);
+    std::ranges::copy(labels_, output);
   }
   return true;
 }

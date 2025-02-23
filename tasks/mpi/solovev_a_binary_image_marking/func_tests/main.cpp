@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -170,11 +171,11 @@ TEST(solovev_a_binary_image_marking, Whole_image) {
     expected_result = std::move(result_seq);
   }
 
-  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_MPI(task_data_par);
+  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_mpi(task_data_par);
   ASSERT_EQ(binary_marker_MPI.ValidationImpl(), true);
-  binary_marker_MPI.PreProcessingImpl();
-  binary_marker_MPI.RunImpl();
-  binary_marker_MPI.PostProcessingImpl();
+  binary_marker_mpi.PreProcessingImpl();
+  binary_marker_mpi.RunImpl();
+  binary_marker_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
     for (size_t i = 0; i < result_mpi.size(); ++i) {

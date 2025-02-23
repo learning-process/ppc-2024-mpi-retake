@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <queue>
-#include <ranges>
+#include <ranges> // NOLINT
+#include <utility>
 #include <vector>
 
 #include "seq/solovev_a_binary_image_marking/include/ops_sec.hpp"
@@ -79,8 +80,8 @@ bool solovev_a_binary_image_marking::TestTaskSequential::RunImpl() {
 }
 // NOLINTEND
 bool solovev_a_binary_image_marking::TestTaskSequential::PostProcessingImpl() {
-  int *output_ = reinterpret_cast<int *>(task_data->outputs[0]);
-  std::ranges::copy(labels_, output_);
+  int *output = reinterpret_cast<int *>(task_data->outputs[0]);
+  std::ranges::copy(labels_, output);
 
   return true;
 }
