@@ -2,18 +2,22 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <utility>
+
+#include "core/task/include/task.hpp"
 #include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
 namespace muradov_k_trap_integral_mpi {
 
-TrapezoidalIntegral::TrapezoidalIntegral(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+TrapezoidalIntegral::TrapezoidalIntegral(std::shared_ptr<ppc::core::TaskData> task_data)
+    : Task(std::move(task_data)) {}
 
 bool TrapezoidalIntegral::PreProcessingImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
-    auto input = reinterpret_cast<double*>(task_data->inputs[0]);
+    auto* input = reinterpret_cast<double*>(task_data->inputs[0]);
     a_ = input[0];
     b_ = input[1];
     n_ = *reinterpret_cast<int*>(task_data->inputs[1]);
@@ -33,18 +37,19 @@ bool TrapezoidalIntegral::ValidationImpl() {
 }
 
 bool TrapezoidalIntegral::RunImpl() {
-  int rank = 0, size = 1;
+  int rank = 0;
+  int size = 1;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   const double h = (b_ - a_) / n_;
-  const int local_n = n_ / size + ((rank < n_ % size) ? 1 : 0);
+  const int local_n = (n_ / size) + ((rank < (n_ % size)) ? 1 : 0);
   const double local_a = a_ + h * (rank * (n_ / size) + std::min(rank, n_ % size));
-  const double local_b = local_a + h * local_n;
+  const double local_b = local_a + (h * local_n);
 
   double local_sum = 0.5 * (Func(local_a) + Func(local_b));
   for (int i = 1; i < local_n; ++i) {
-    local_sum += Func(local_a + static_cast<double>(i) * h);
+    local_sum += Func(local_a + (static_cast<double>(i) * h));
   }
   local_sum *= h;
 

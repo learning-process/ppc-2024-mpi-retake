@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
+#include <cstdint>
+
 #include "core/task/include/task.hpp"
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 
@@ -27,9 +29,8 @@ TEST(muradov_k_trap_integral_seq, Test_x2_0_2) {
 }
 
 TEST(muradov_k_trap_integral_seq, Invalid_Parameters) {
-  std::vector<double> input{5.0, 1.0}; // b < a
+  std::vector<double> input{5.0, 1.0};
   int n = -100;
-  double result = 0.0;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));

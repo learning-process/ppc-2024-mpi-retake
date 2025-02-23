@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "core/task/include/task.hpp"
 
 namespace muradov_k_trap_integral_seq {

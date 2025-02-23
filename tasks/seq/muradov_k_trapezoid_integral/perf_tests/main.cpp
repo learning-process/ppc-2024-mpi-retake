@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include <chrono>
 #include <memory>
+#include <vector>
+#include <cstdint>
+
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
@@ -11,9 +14,8 @@ TEST(muradov_k_trap_integral_seq, Perf_Test_Large_N) {
   double result = 0.0;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs = {
-    reinterpret_cast<uint8_t*>(input.data()),
-    reinterpret_cast<uint8_t*>(&n)};
+  task_data->inputs = {reinterpret_cast<uint8_t*>(input.data()),
+                      reinterpret_cast<uint8_t*>(&n)};
   task_data->outputs = {reinterpret_cast<uint8_t*>(&result)};
 
   auto task = std::make_shared<muradov_k_trap_integral_seq::TrapezoidalIntegral>(task_data);
