@@ -1,6 +1,7 @@
 // Anikin Maksim 2025
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
+#include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <functional>
 #include <mpi.h>
