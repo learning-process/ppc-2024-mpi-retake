@@ -26,6 +26,7 @@ bool IsSingular(const std::vector<double>& matrix, int rows, int cols) {
   Matrix mat;
   mat.rows = rows;
   mat.cols = cols;
+  mat.delta = 0;
   return Determinant(mat, matrix) == 0;
 }
 
