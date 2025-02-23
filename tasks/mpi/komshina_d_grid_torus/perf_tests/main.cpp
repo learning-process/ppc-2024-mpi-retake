@@ -4,25 +4,32 @@
 #include <boost/mpi/environment.hpp>
 #include <string>
 #include <vector>
+#include <chrono>
+#include <cstdint>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
 TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
+  if (world.size() < (2^2)) return;
 
-  if (world.size() < 4) return;
-  komshina_d_grid_torus_mpi::TestTaskMPI::InputData data_in_struct(std::string(10247, 'y'), world.size() - 1);
-  komshina_d_grid_torus_mpi::TestTaskMPI::InputData data_out_struct;
+  const std::string data_input(16381, 'a');
+  int destination_rank  = world.size() - 1;
+  komshina_d_grid_torus_mpi::TestTaskMPI::InputData in(data_input, destination_rank);
+  komshina_d_grid_torus_mpi::TestTaskMPI::InputData out;
 
+  int size = static_cast<int>(std::sqrt(world.size()));
   std::vector<int> route_expected =
-      komshina_d_grid_torus_mpi::TestTaskMPI::calculate_route((world.size() - 1), world.size(), world.size());
+      komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(destination_rank, size, size);
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&data_in_struct));
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&in));
     task_data_mpi->inputs_count.emplace_back(1);
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&data_out_struct));
+
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&out));
     task_data_mpi->outputs_count.emplace_back(1);
   }
 
@@ -35,7 +42,7 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
- 
+
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
 
@@ -43,26 +50,29 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(data_out_struct.payload, data_in_struct.payload);
-    ASSERT_EQ(data_out_struct.path, route_expected);
+    ASSERT_EQ(out.payload, in.payload);
+    ASSERT_EQ(out.path, route_expected);
   }
 }
 
 TEST(komshina_d_grid_torus_mpi, test_task_run) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
-  komshina_d_grid_torus_mpi::TestTaskMPI::InputData data_in_struct(std::string(10247, 'y'), world.size() - 1);
-  komshina_d_grid_torus_mpi::TestTaskMPI::InputData data_out_struct;
+  if (world.size() < (2 ^ 2)) return;
 
-  std::vector<int> route_expected =
-      komshina_d_grid_torus_mpi::TestTaskMPI::calculate_route((world.size() - 1 ), world.size(), world.size());
+  const std::string data_input(16381, 'a');
+  int destination_rank = world.size() - 1;
+  komshina_d_grid_torus_mpi::TestTaskMPI::InputData in(data_input, destination_rank);
+  komshina_d_grid_torus_mpi::TestTaskMPI::InputData out;
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
+      destination_rank, std::sqrt(world.size()), std::sqrt(world.size()));
+
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&data_in_struct));
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&in));
     task_data_mpi->inputs_count.emplace_back(1);
 
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&data_out_struct));
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&out));
     task_data_mpi->outputs_count.emplace_back(1);
   }
 
@@ -79,12 +89,11 @@ TEST(komshina_d_grid_torus_mpi, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
 
-  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
 
-  // 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(data_out_struct.payload, data_in_struct.payload);
-    ASSERT_EQ(data_out_struct.path, route_expected);
+    ASSERT_EQ(out.payload, in.payload);
+    ASSERT_EQ(out.path, route_expected);
   }
 }

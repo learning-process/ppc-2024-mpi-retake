@@ -1,12 +1,10 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
+#include <string>
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -36,12 +34,12 @@ class TestTaskMPI : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
   
-  static std::vector<int> calculate_route(int dest, int sizeX, int sizeY);
+  static std::vector<int> CalculateRoute(int dest, int sizeX, int sizeY);
 
  private:
-  boost::mpi::communicator world;
-  InputData inputData;
-  int sizeX{}, sizeY{};
+  boost::mpi::communicator world_;
+  InputData input_data_;
+  int size_x{}, size_y{};
 };
 
 }  // namespace komshina_d_grid_torus_mpi
