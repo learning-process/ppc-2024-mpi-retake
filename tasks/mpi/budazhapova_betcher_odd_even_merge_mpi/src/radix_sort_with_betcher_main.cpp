@@ -49,52 +49,62 @@ void OddEvenMerge(std::vector<int>& local_data, std::vector<int>& received_data)
   // received_data.assign(merged.begin() + local.size(), merged.end());
   received_data.assign(merged.begin() + static_cast<long>(local_data.size()), merged.end());
 }
-void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data) {
-  if (send_rank >= 0 && send_rank < world_size()) {
-    world_.send(send_rank, world_.rank(), local_data);
+void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data, bost::mpi::communicator world) {
+  if (send_rank >= 0 && send_rank < world.size()) {
+    world.send(send_rank, world.rank(), local_data);
   }
-  if (recv_rank >= 0 && recv_rank < world_.size()) {
-    world_.recv(recv_rank, recv_rank, local_data);
+  if (recv_rank >= 0 && recv_rank < world.size()) {
+    world.recv(recv_rank, recv_rank, local_data);
   }
 }
 
-void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data) {
+void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, bost::mpi::communicator world) {
   std::vector<int> received_data;
-  world_.recv(neighbor_rank, neighbor_rank, received_data);
+  world.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(local_data, received_data);
-  world_.send(neighbor_rank, world_.rank(), received_data);
+  world.send(neighbor_rank, world_.rank(), received_data);
 }
 
-void OddEvenSortPhase(int phase, std::vector<int>& local_data) {
-  int next_rank = world_.rank() + 1;
-  int prev_rank = world_.rank() - 1;
+void OddEvenSortPhase(int phase, std::vector<int>& local_data, bost::mpi::communicator world) {
+  int next_rank = world.rank() + 1;
+  int prev_rank = world.rank() - 1;
 
   if (phase % 2 == 0) {
-    if (world_.rank() % 2 == 0 && next_rank < world_.size()) {
-      SendAndReceive(next_rank, -1, local_data);
-    } else if (world_.rank() % 2 == 1) {
-      PerformOddEvenMerge(prev_rank, local_data);
+    if (world.rank() % 2 == 0 && next_rank < world.size()) {
+      SendAndReceive(next_rank, -1, local_data, world);
+    } else if (world.rank() % 2 == 1) {
+      PerformOddEvenMerge(prev_rank, local_data, world);
     }
-    if (world_.rank() % 2 == 0 && next_rank < world_.size()) {
-      SendAndReceive(-1, next_rank, local_data);
+    if (world.rank() % 2 == 0 && next_rank < world.size()) {
+      SendAndReceive(-1, next_rank, local_data, world);
     }
   } else {
-    if (world_.rank() % 2 == 1 && next_rank < world_.size()) {
-      SendAndReceive(next_rank, -1, local_data);
-    } else if (world_.rank() % 2 == 0 && world_.rank() > 0) {
-      PerformOddEvenMerge(prev_rank, local_data);
+    if (world.rank() % 2 == 1 && next_rank < world.size()) {
+      SendAndReceive(next_rank, -1, local_data, world);
+    } else if (world.rank() % 2 == 0 && world.rank() > 0) {
+      PerformOddEvenMerge(prev_rank, local_data, world);
     }
-    if (world_.rank() % 2 == 1 && next_rank < world_.size()) {
-      SendAndReceive(-1, next_rank, local_data);
+    if (world.rank() % 2 == 1 && next_rank < world.size()) {
+      SendAndReceive(-1, next_rank, local_data, world);
     }
   }
 }
 
 void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements, int& start, int& end,
-                    std::vector<int>& recv_counts, std::vector<int>& displacements, std::vector<int>& local_data) {
-  int world_size = world_.size();
-  int world_rank = world_.rank();
-  int res_size = static_cast<int>(res_.size());
+                    std::vector<int>& recv_counts, std::vector<int>& displacements, std::vector<int>& local_data,
+                    bost::mpi::communicator world) {
+  int world_size = 0;
+  int world_rank = 0;
+  int res_size = 0;
+
+  if (!world_.empty()) {
+    world_size = world.size();
+    world_rank = world.rank();
+  }
+
+  if (!res_.empty()) {
+    res_size = static_cast<int>(res_.size());
+  }
 
   n_of_send_elements = res_size / world_size;
   n_of_proc_with_extra_elements = res_size % world_size;
@@ -118,7 +128,7 @@ void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements,
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PreProcessingImpl() {
   res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
-                         reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
+                          reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   return true;
 }
 
@@ -142,7 +152,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PostProcessingImpl
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
     res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
-                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
+                            reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   }
   return true;
 }
@@ -164,12 +174,13 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
   int start = 0;
   int end = 0;
 
-  DistributeData(n_of_send_elements, n_of_proc_with_extra_elements, start, end, recv_counts, displacements);
+  DistributeData(n_of_send_elements, n_of_proc_with_extra_elements, start, end, recv_counts, displacements, local_res_,
+                 world_);
 
   int world_size = world_.size();
 
   for (int phase = 0; phase < world_size; ++phase) {
-    OddEvenSortPhase(phase, local_res_);
+    OddEvenSortPhase(phase, local_res_, world_);
   }
 
   boost::mpi::gatherv(world_, local_res_.data(), static_cast<int>(local_res_.size()), res.data(), recv_counts,
