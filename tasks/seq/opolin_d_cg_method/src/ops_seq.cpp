@@ -21,7 +21,7 @@ bool opolin_d_cg_method_seq::CGMethodSequential::ValidationImpl() {
   if (task_data->inputs_count.empty() || task_data->inputs.size() != 3) return false;
 
   if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
-  task_data->outputs.empty())
+      task_data->outputs.empty())
     return false;
 
   n_ = task_data->inputs_count[0];

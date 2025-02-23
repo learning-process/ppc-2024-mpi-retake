@@ -35,7 +35,7 @@ void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b
 
   b.assign(size, 0.0);
   for (int i = 0; i < size; i++)
-  for (int j = 0; j < size; j++) b[i] += A[i * size + j] * expectedX[j];
+    for (int j = 0; j < size; j++) b[i] += A[i * size + j] * expectedX[j];
 }
 }  // namespace
 }  // namespace opolin_d_cg_method_seq
