@@ -5,10 +5,9 @@
 #include <random>
 #include <vector>
 #include <string>
-#include <boost/mpi.hpp>
 #include <mpi.h>
 
-void anikin_m_counting_characters_mpi::CreateDataVector(std::vector<char> *invec, std::string str) {
+void anikin_m_counting_characters_mpi::CreateDataVector(std::vector<char> *invec, const std::string& str) {
   for (auto a : str) {
     invec->push_back(a);
   }
@@ -19,8 +18,8 @@ void anikin_m_counting_characters_mpi::CreateRanddataVector(std::vector<char> *i
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis('A', 'Z');
-    char random_ñhar = static_cast<char>(dis(gen));
-    invec->push_back(random_ñhar);
+    char random_har_ar = static_cast<char>(dis(gen));
+    invec->push_back(random_har_ar);
   }
 }
 
@@ -76,7 +75,9 @@ bool anikin_m_counting_characters_mpi::TestTaskMPI::RunImpl() {
                world_);
   auto b = local_data.begin();
   for (auto a : cmp_local_data) {
-    if ((a) != (*b)) local_res++;
+    if ((a) != (*b)) {
+      local_res++;
+    }
     b++;
   }
   int all_res = 0;

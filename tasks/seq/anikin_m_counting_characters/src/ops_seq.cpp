@@ -3,10 +3,10 @@
 
 #include <cmath>
 #include <random>
-#include <vector>
 #include <string>
+#include <vector>
 
-void anikin_m_counting_characters_seq::CreateDataVector(std::vector<char> *invec, std::string str) {
+void anikin_m_counting_characters_seq::CreateDataVector(std::vector<char> *invec, const std::string &str) {
   for (auto a : str) {
     invec->push_back(a);
   }
@@ -16,8 +16,8 @@ void anikin_m_counting_characters_seq::CreateRanddataVector(std::vector<char> *i
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis('A', 'Z');
-    char random_сhar = static_cast<char>(dis(gen));
-    invec->push_back(random_сhar);
+    char random_har_ar = static_cast<char>(dis(gen));
+    invec->push_back(random_har_ar);
   }
 }
 
@@ -52,7 +52,9 @@ bool anikin_m_counting_characters_seq::TestTaskSequential::PreProcessingImpl() {
 bool anikin_m_counting_characters_seq::TestTaskSequential::RunImpl() {
   auto b = input_1_.begin();
   for (auto a : input_2_) {
-    if ((a) != (*b)) res_++;
+    if ((a) != (*b)) {
+      res_++;
+    }
     b++;
   }
   return true;

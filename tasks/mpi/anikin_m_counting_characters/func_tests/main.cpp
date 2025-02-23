@@ -1,14 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
 TEST(anikin_m_counting_characters_seq, one_char_dif) {
