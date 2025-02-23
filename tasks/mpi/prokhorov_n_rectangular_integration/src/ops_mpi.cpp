@@ -162,7 +162,7 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ParallelIntegrate(c
   int local_n = n / size;
   int remainder = n % size;
 
-  int start = rank * local_n + std::min(rank, remainder);
+  int start = (rank * local_n) + std::min(rank, remainder);
   int end = start + local_n + (rank < remainder ? 1 : 0);
 
   for (int i = start; i < end; ++i) {
