@@ -27,7 +27,7 @@ class CGMethodSequential : public ppc::core::Task {
   std::vector<double> b_;
   std::vector<double> x_;
   size_t n_;
-  double epsilon_;  
+  double epsilon_;
 };
 
 }  // namespace opolin_d_cg_method_seq
