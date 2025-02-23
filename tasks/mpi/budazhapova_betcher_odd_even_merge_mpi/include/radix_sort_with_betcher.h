@@ -21,22 +21,17 @@ class MergeSequential : public ppc::core::Task {
  private:
   std::vector<int> res_;
   std::vector<int> local_res_;
-  int n_el_ = 0;
 };
 class MergeParallel : public ppc::core::Task {
  public:
+  boost::mpi::communicator world_;
   explicit MergeParallel(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
- private:
-  std::vector<int> res_;
   std::vector<int> local_res_;
-  std::vector<int> fin_res_;
-  int n_el_ = 0;
-
-  boost::mpi::communicator world_;
+  std::vector<int> res_;
 };
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
