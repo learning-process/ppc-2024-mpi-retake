@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
+#include "core/perf/include/perf.hpp"
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
