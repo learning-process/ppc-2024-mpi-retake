@@ -103,13 +103,11 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   if (world_.rank() == 0) {
-    size_t offset_remainder = counts_[0];
+    int offset_remainder = counts_[0];
     for (unsigned int proc = 1; proc < num_processes_; proc++) {
-      size_t current_count = counts_[proc];
-      world_.send(proc, 0, input_[0].data() + static_cast<unsigned int>(offset_remainder),
-                  static_cast<unsigned int>(current_count));
-      world_.send(proc, 1, input_[1].data() + static_cast<unsigned int>(offset_remainder),
-                  static_cast<unsigned int>(current_count));
+      int current_count = counts_[proc];
+      world_.send(proc, 0, input_[0].data() + offset_remainder, current_count);
+      world_.send(proc, 1, input_[1].data() + offset_remainder, current_count);
       offset_remainder += current_count;
     }
   }

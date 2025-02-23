@@ -24,8 +24,9 @@ std::vector<int> CreateRandomVector(int v_size) {
   }
   return vec;
 }
-}
+}  // namespace
 
+namespace {
 std::shared_ptr<ppc::core::TaskData> CreateTaskData(const std::vector<int>& v1, const std::vector<int>& v2,
                                                     std::vector<int32_t>& res) {
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -37,7 +38,9 @@ std::shared_ptr<ppc::core::TaskData> CreateTaskData(const std::vector<int>& v1, 
   task_data->outputs_count.emplace_back(res.size());
   return task_data;
 }
+}  // namespace
 
+namespace {
 void RunTest(const std::vector<int>& v1, const std::vector<int>& v2, std::vector<int32_t>& res,
              boost::mpi::communicator& world) {
   auto task_data_mpi = CreateTaskData(v1, v2, res);
