@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives.hpp>
 #include <cstddef>
 #include <vector>
 
