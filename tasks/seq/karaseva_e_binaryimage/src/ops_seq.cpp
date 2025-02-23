@@ -1,7 +1,7 @@
 #include "seq/karaseva_e_binaryimage/include/ops_seq.hpp"
 
 #include <algorithm>
-#include <ranges>  // Added for std::ranges::min_element
+#include <ranges>
 #include <unordered_map>
 #include <vector>
 

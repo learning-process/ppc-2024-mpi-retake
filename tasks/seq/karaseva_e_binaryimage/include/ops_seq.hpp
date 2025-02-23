@@ -1,7 +1,9 @@
 #pragma once
 
-#include <map>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <unordered_map>
+#include <map>
 #include <utility>
 #include <vector>
 
