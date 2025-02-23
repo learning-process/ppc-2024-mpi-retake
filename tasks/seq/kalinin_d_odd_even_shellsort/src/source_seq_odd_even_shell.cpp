@@ -1,6 +1,6 @@
 #include <algorithm>
+#include <cstddef>
 #include <random>
-#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -9,8 +9,8 @@ namespace kalinin_d_odd_even_shell_seq {
 
 void OddEvenShellSeq::ShellSort(std::vector<int> &vec) {
   std::size_t n = vec.size();
-  for (int gap = n / 2; gap > 0; gap /= 2) {
-    for (int i = gap; i < n; i++) {
+  for (std::size_t gap = n / 2; gap > 0; gap /= 2) {
+    for (std::size_t i = gap; i < n; i++) {
       int temp = vec[i];
       int j = 0;
       for (j = i; j >= gap && vec[j - gap] > temp; j -= gap) {
@@ -23,7 +23,7 @@ void OddEvenShellSeq::ShellSort(std::vector<int> &vec) {
 
 bool OddEvenShellSeq::PreProcessingImpl() {
   // Init vectors
-  int n = task_data->inputs_count[0];
+  std::size_t n = task_data->inputs_count[0];
   input_ = std::vector<int>(n);
   std::ranges::copy(reinterpret_cast<int *>(task_data->inputs[0]), reinterpret_cast<int *>(task_data->inputs[0]) + n,
                     input_.begin());

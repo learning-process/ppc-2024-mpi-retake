@@ -4,7 +4,6 @@
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
-#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -146,7 +145,6 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1021) {
 
   task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    std::sort(arr.begin(), arr.end());
-    ASSERT_EQ(arr, out);
+    std::ranges::sort(arr) ASSERT_EQ(arr, out);
   }
 }
