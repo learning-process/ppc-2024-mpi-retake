@@ -27,6 +27,8 @@ void BroadcastMatrixSize();
 
 std::vector<int> ComputeRowDistribution();
 
+void DistributeMatrix(const std::vector<int>& row_num);
+
 void ReceiveMatrix(int delta);
 
 void ForwardElimination(std::vector<double>& row);

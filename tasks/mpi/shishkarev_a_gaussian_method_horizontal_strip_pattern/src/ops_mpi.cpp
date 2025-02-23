@@ -2,9 +2,7 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
-#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
-#include <cstddef>
 #include <cstdlib>
 #include <vector>
 
@@ -145,39 +143,41 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BroadcastMatrixSize() {
-    broadcast(world, cols, 0);
-    broadcast(world, rows, 0);
+    broadcast(world_, cols_, 0);
+    broadcast(world_, rows_, 0);
 }
 
 std::vector<int> shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ComputeRowDistribution() {
-    std::vector<int> row_num(world.size());
-    int delta = rows / world.size();
-    int remainder = rows % world.size();
-    if (world.rank() < remainder) delta++;
-    boost::mpi::gather(world, delta, row_num, 0);
+    std::vector<int> row_num(world_.size());
+    int delta = rows_ / world_.size();
+    int remainder = rows_ % world_.size();
+    if (world_.rank() < remainder) {
+      delta++;
+    }
+    boost::mpi::gather(world_, delta, row_num, 0);
     return row_num;
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::DistributeMatrix(const std::vector<int>& row_num) {
-    if (world.rank() == 0) {
-        std::vector<double> SendMatrix(delta * cols);
-        for (int proc = 1; proc < world.size(); ++proc) {
+    if (world_.rank() == 0) {
+        std::vector<double> SendMatrix{delta * cols};
+        for (int proc = 1; proc < world_.size(); ++proc) {
             for (int i = 0; i < row_num[proc]; ++i)
                 for (int j = 0; j < cols; ++j)
-                    SendMatrix[(i * cols) + j] = matrix_[((proc + (world.size() * i)) * cols_) + j];
-            world.send(proc, 0, SendMatrix.data(), row_num[proc] * cols);
+                    SendMatrix[(i * cols) + j] = matrix_[((proc + (world_.size() * i)) * cols_) + j];
+            world_.send(proc, 0, SendMatrix.data(), row_num[proc] * cols);
         }
     }
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(int delta) {
     local_matrix_.resize(delta * cols);
-    if (world.rank() == 0) {
+    if (world_.rank() == 0) {
         for (int i = 0; i < delta; ++i)
             for (int j = 0; j < cols; ++j)
-                local_matrix_[(i * cols) + j] = matrix_[(i * cols_ * world.size()) + j];
+                local_matrix_[(i * cols) + j] = matrix_[(i * cols_ * world_.size()) + j];
     } else {
-        world.recv(0, 0, local_matrix_.data(), delta * cols);
+        world_.recv(0, 0, local_matrix_.data(), delta * cols);
     }
 }
 
@@ -188,10 +188,10 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ForwardEliminati
         if (i == row[r]) {
             for (int j = 0; j < cols; ++j)
                 Pivot[j] = local_matrix_[(r * cols) + j];
-            broadcast(world, Pivot.data(), cols, world.rank());
+            broadcast(world_, Pivot.data(), cols, world_.rank());
             r++;
         } else {
-            broadcast(world, Pivot.data(), cols, i % world.size());
+            broadcast(world_, Pivot.data(), cols, i % world_.size());
         }
         for (int k = r; k < delta; ++k) {
             double m = local_matrix_[(k * cols) + i] / Pivot[i];
@@ -206,17 +206,17 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BackSubstitution
     for (int i = rows - 1; i > 0; --i) {
         if (r >= 0 && i == row[r]) {
             local_res_[i] /= local_matrix_[(r * cols) + i];
-            broadcast(world, local_res_[i], world.rank());
+            broadcast(world_, local_res_[i], world_.rank());
             r--;
         } else {
-            broadcast(world, local_res_[i], i % world.size());
+            broadcast(world_, local_res_[i], i % world_.size());
         }
         if (r >= 0) {
             for (int j = 0; j <= r; ++j)
                 local_res_[static_cast<size_t>(row[j])] -= local_matrix_[(j * cols) + i] * local_res_[i];
         }
     }
-    if (world.rank() == 0) {
+    if (world_.rank() == 0) {
         local_res_[0] /= local_matrix_[0];
         res = local_res_;
     }
