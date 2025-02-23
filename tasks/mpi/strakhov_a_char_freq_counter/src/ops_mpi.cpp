@@ -80,9 +80,11 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
     }
 
     displacements.resize(world_size);
-    displacements[0] = 0;
-    for (int i = 1; i < world_size; ++i) {
-      displacements[i] = displacements[i - 1] + send_counts[i - 1];
+    if (displacements.size() > 0) {
+      displacements[0] = 0;
+      for (int i = 1; i < world_size; ++i) {
+        displacements[i] = displacements[i - 1] + send_counts[i - 1];
+      }
     }
   } else {
     input_.clear();
