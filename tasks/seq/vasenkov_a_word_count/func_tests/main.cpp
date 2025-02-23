@@ -28,7 +28,6 @@ TEST(vasenkov_a_word_count_seq, test_0_word) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   EXPECT_EQ(out, expect);
-  
 }
 
 TEST(vasenkov_a_word_count_seq, test_1_word) {
