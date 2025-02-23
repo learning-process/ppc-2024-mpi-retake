@@ -60,6 +60,7 @@ bool GridTorusTopologyParallel::ValidationImpl() {
   bool global_valid = false;
   // NOLINTNEXTLINE(misc-include-cleaner)
   boost::mpi::all_reduce(world_, local_valid, global_valid, std::logical_and<>());
+  // NOLINTNEXTLINE(misc-include-cleaner)
   return global_valid;
 }
 
