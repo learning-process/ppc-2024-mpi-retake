@@ -35,7 +35,7 @@ bool DiningPhilosophers::Run() {
   return true;
 }
 
-bool DiningPhilosophers::PostProcessing() { return !IsDeadlock(); }
+bool DiningPhilosophers::PostProcessing() { return IsDeadlock() == 0; }
 
 int DiningPhilosophers::CheckDeadlock() { return IsDeadlock(); }
 
