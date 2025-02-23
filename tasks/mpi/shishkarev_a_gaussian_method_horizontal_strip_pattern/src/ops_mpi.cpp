@@ -1,6 +1,7 @@
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
 #include <cstdlib>
@@ -173,13 +174,12 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
       }
     }
   } else {
-      world_.recv(0, 0, local_matrix_.data(), delta * cols_);
+    world_.recv(0, 0, local_matrix_.data(), delta * cols_);
   }
-
 
   std::vector<double> row(delta);
   for (int i = 0; i < delta; ++i) {
-    row[i] = world.rank() + world.size() * i;
+    row[i] = world_.rank() + world_.size() * i;
   }
 
   std::vector<double> pivot(cols_);
