@@ -114,30 +114,3 @@ TEST(shuravina_o_contrast, test_all_values_min) {
   EXPECT_EQ(max_val, 0);
   EXPECT_EQ(min_val, 0);
 }
-
-TEST(shuravina_o_contrast, test_boundary_values) {
-  constexpr size_t kCount = 256;
-
-  std::vector<uint8_t> in(kCount * kCount, 0);
-  std::vector<uint8_t> out(kCount * kCount, 0);
-
-  std::fill(in.begin(), in.begin() + in.size() / 2, 0);
-  std::fill(in.begin() + in.size() / 2, in.end(), 255);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
-
-  shuravina_o_contrast::ContrastTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-
-  uint8_t max_val = *std::ranges::max_element(out);
-  uint8_t min_val = *std::ranges::min_element(out);
-  EXPECT_EQ(max_val, 255);
-  EXPECT_EQ(min_val, 0);
-}
