@@ -63,7 +63,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
   int local_input_size = 0;
   std::vector<int> send_counts;
-  std::vector<int> displacements;
+  std::vector<int> displacements{};
   int rank = world_.rank();
 
   broadcast(world_, target_, 0);
