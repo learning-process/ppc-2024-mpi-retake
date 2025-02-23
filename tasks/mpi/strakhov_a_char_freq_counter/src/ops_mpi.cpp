@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
+#include <boost/mpi/collectives/scatter.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstddef>
 #include <functional>
