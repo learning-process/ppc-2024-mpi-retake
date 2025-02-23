@@ -159,7 +159,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::PostProcessingImpl() {
   return true;
 }
 
-bool opolin_d_cg_method_mpi::IsPositiveDefinite(const std::vector<double>& mat, size_t size) {
+bool opolin_d_cg_method_mpi::isPositiveDefinite(const std::vector<double>& mat, size_t size) {
   std::vector<double> L(size * size, 0);
 
   for (size_t i = 0; i < size; i++) {
@@ -179,7 +179,7 @@ bool opolin_d_cg_method_mpi::IsPositiveDefinite(const std::vector<double>& mat, 
   return true;
 }
 
-bool opolin_d_cg_method_mpi::IsSimmetric(const std::vector<double>& mat, size_t size) {
+bool opolin_d_cg_method_mpi::isSimmetric(const std::vector<double>& mat, size_t size) {
   bool simetric = true;
   for (size_t i = 0; i < size; i++) {
     for (size_t j = 0; j < size; j++) {
@@ -193,7 +193,7 @@ bool opolin_d_cg_method_mpi::IsSimmetric(const std::vector<double>& mat, size_t 
   return simetric;
 }
 
-double opolin_d_cg_method_mpi::ScalarProduct(const std::vector<double>& a_, const std::vector<double>& b_) {
+double opolin_d_cg_method_mpi::scalarProduct(const std::vector<double>& a_, const std::vector<double>& b_) {
   size_t size = a_.size();
   double result = 0.0;
   for (size_t i = 0; i < size; i++) {
@@ -202,7 +202,7 @@ double opolin_d_cg_method_mpi::ScalarProduct(const std::vector<double>& a_, cons
   return result;
 }
 
-std::vector<double> opolin_d_cg_method_mpi::MultiplyVecMat(const std::vector<double>& vec,
+std::vector<double> opolin_d_cg_method_mpi::multiplyVecMat(const std::vector<double>& vec,
                                                            const std::vector<double>& mat) {
   size_t size = vec.size();
   std::vector<double> result(size, 0.0);
