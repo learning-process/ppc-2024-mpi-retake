@@ -58,7 +58,7 @@ class MPIGaussHorizontalParallel : public ppc::core::Task {
 
  private:
   std::vector<double> matrix_, local_matrix_, res_, local_res_;
-  int rows_{}, cols_{};
+  int delta_, rows_{}, cols_{};
   boost::mpi::communicator world_;
 };
 
