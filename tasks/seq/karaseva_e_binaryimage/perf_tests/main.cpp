@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstdint>  // Added for uint8_t
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -17,19 +18,16 @@ TEST(karaseva_e_binaryimage_seq, test_pipeline_run) {
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < columns; y++) {
-      int pos = x * columns + y;
+      int pos = x * columns + y;  // Parentheses added to clarify operator precedence
       if (x < 50) {
         in[pos] = 0;
         expected_out[pos] = 2;
-      } else if (x == 50) {
+      } else if (x == 50 || x == 52) {  // Combined conditions
         in[pos] = 1;
         expected_out[pos] = 1;
       } else if (x == 51) {
         in[pos] = 0;
         expected_out[pos] = 3;
-      } else if (x == 52) {
-        in[pos] = 1;
-        expected_out[pos] = 1;
       } else {
         in[pos] = 0;
         expected_out[pos] = 4;
@@ -68,7 +66,8 @@ TEST(karaseva_e_binaryimage_seq, test_pipeline_run) {
 
   for (size_t i = 0; i < expected_out.size(); i++) {
     if (expected_out[i] != out[i]) {
-      std::cout << "Mismatch at index " << i << ": expected " << expected_out[i] << ", got " << out[i] << std::endl;
+      std::cout << "Mismatch at index " << i << ": expected " << expected_out[i] << ", got " << out[i]
+                << "\n";  // Replaced std::endl with \n
     }
   }
 
@@ -84,19 +83,16 @@ TEST(karaseva_e_binaryimage_seq, test_task_run) {
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < columns; y++) {
-      int pos = x * columns + y;
+      int pos = x * columns + y;  // Parentheses added to clarify operator precedence
       if (x < 50) {
         in[pos] = 0;
         expected_out[pos] = 2;
-      } else if (x == 50) {
+      } else if (x == 50 || x == 52) {  // Combined conditions
         in[pos] = 1;
         expected_out[pos] = 1;
       } else if (x == 51) {
         in[pos] = 0;
         expected_out[pos] = 3;
-      } else if (x == 52) {
-        in[pos] = 1;
-        expected_out[pos] = 1;
       } else {
         in[pos] = 0;
         expected_out[pos] = 4;

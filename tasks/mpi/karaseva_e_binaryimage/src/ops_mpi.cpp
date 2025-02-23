@@ -112,14 +112,14 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   // Prepare "ghost" cells for boundary synchronization
-  std::vector<int> ghost_cells_left(rows, 0);
-  std::vector<int> ghost_cells_right(rows, 0);
+  std::vector<int> ghost_cells_left(cols, 0);
+  std::vector<int> ghost_cells_right(cols, 0);
 
-  if (rank > 0) {  // Check that rank is greater than 0 before sending
+  if (rank > 0) {  // Send left boundary to the previous rank
     MPI_Send(labeled_image.data() + start_row * cols, cols, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
   }
 
-  if (rank < num_procs - 1) {  // Check that rank is less than num_procs - 1 before sending
+  if (rank < num_procs - 1) {  // Send right boundary to the next rank
     MPI_Send(labeled_image.data() + (end_row - 1) * cols, cols, MPI_INT, rank + 1, 1, MPI_COMM_WORLD);
   }
 
@@ -132,6 +132,15 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   }
 
   // Recalculate labels considering "ghost" cells (boundary pixels)
+  for (int i = 0; i < cols; ++i) {
+    if (start_row > 0 && labeled_image[start_row * cols + i] > 1) {
+      UnionLabels(label_parent, labeled_image[start_row * cols + i], ghost_cells_left[i]);
+    }
+    if (end_row < rows && labeled_image[(end_row - 1) * cols + i] > 1) {
+      UnionLabels(label_parent, labeled_image[(end_row - 1) * cols + i], ghost_cells_right[i]);
+    }
+  }
+
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   // Gather labels from all processes

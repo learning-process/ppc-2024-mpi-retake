@@ -11,18 +11,22 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-static std::vector<uint8_t> generate_random_bin_img(size_t rows, size_t cols) {
+// Function to generate a random binary image of given size
+static std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
-  for (auto &px : img) px = rand() % 2;
+  for (auto &px : img) {
+    px = rand() % 2;
+  }
   return img;
 }
 
+// Test for the pipeline run
 TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
   constexpr int kRows = 10000;
   constexpr int kCols = 10000;
 
   // Create binary image data
-  std::vector<uint8_t> image = generate_random_bin_img(kRows, kCols);
+  std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
   std::vector<uint32_t> output(kRows * kCols, 0);
 
   // Create task_data
@@ -47,12 +51,13 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
-  // Create and init perf results
+  // Create and initialize perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer and run the pipeline
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
+
   // Create Perf analyzer for MPI
   boost::mpi::communicator world;
   if (world.rank() == 0) {
@@ -60,12 +65,13 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
   }
 }
 
+// Test for the task run
 TEST(karaseva_e_binaryimage_mpi, test_task_run) {
   constexpr int kRows = 10000;
   constexpr int kCols = 10000;
 
   // Create binary image data
-  std::vector<uint8_t> image = generate_random_bin_img(kRows, kCols);
+  std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
   std::vector<uint32_t> output(kRows * kCols, 0);
 
   // Create task_data
@@ -90,12 +96,13 @@ TEST(karaseva_e_binaryimage_mpi, test_task_run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
-  // Create and init perf results
+  // Create and initialize perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer and run the task
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
+
   // Create Perf analyzer for MPI
   boost::mpi::communicator world;
   if (world.rank() == 0) {
