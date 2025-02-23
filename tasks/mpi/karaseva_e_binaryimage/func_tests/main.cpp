@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi.hpp>
-#include <cstdint>  // Для uint8_t
-#include <memory>   // Для std::shared_ptr и std::make_shared
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <vector>
 
