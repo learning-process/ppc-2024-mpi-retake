@@ -1,17 +1,23 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 
 #include "core/task/include/task.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {
 
-int MatrixRank(int n, int m, std::vector<double> a);
+  struct Matrix {
+  int rows;
+  int cols;
+  int delta;
+};
 
-int Determinant(int n, int m, std::vector<double> a);
+int MatrixRank(Matrix matrix, std::vector<double> a);
+
+int Determinant(Matrix matrix, std::vector<double> a);
 
 template <class InOutType>
 class MPIGaussHorizontalSequential : public ppc::core::Task {
@@ -25,7 +31,7 @@ class MPIGaussHorizontalSequential : public ppc::core::Task {
 
  private:
   std::vector<double> matrix_, res_;
-  int rows_{}, cols_{};
+  int delta_, rows_{}, cols_{};
 };
 
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq
