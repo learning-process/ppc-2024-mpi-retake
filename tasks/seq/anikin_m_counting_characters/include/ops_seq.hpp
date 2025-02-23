@@ -1,9 +1,9 @@
 // Anikin Maksim 2025
 #pragma once
 
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 #include "core/task/include/task.hpp"
 
