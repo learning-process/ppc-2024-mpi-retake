@@ -5,52 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-// Function moved to anonymous namespace as per the error message
-namespace {
-void FixLabels(std::vector<int>& labeled_image, int rows, int cols) {
-  std::unordered_map<int, int> label_map;
-  int next_label = 2;
-
-  for (int i = 0; i < rows * cols; ++i) {
-    if (labeled_image[i] > 1) {
-      if (label_map.find(labeled_image[i]) == label_map.end()) {
-        label_map[labeled_image[i]] = next_label++;
-      }
-      labeled_image[i] = label_map[labeled_image[i]];
-    }
-  }
-}
-
-bool IsValidNeighbor(int nx, int ny, int rows, int columns, const std::vector<int>& labeled_image) {
-  return nx >= 0 && ny >= 0 && nx < rows && ny < columns && labeled_image[(nx * columns) + ny] > 1;
-}
-
-void ProcessNeighbors(int x, int y, int rows, int columns, const std::vector<int>& labeled_image,
-                      std::vector<int>& neighbors, int dx[], int dy[]) {
-  for (int i = 0; i < 3; ++i) {
-    int nx = x + dx[i];
-    int ny = y + dy[i];
-    if (IsValidNeighbor(nx, ny, rows, columns, labeled_image)) {
-      neighbors.push_back(labeled_image[(nx * columns) + ny]);
-    }
-  }
-}
-
-void AssignLabel(int position, int& current_label, std::vector<int>& labeled_image, const std::vector<int>& neighbors,
-                 LabelUnionFind& label_union) {
-  if (neighbors.empty()) {
-    labeled_image[position] = current_label++;
-  } else {
-    int min_label = *std::ranges::min_element(neighbors);
-    labeled_image[position] = min_label;
-
-    for (int label : neighbors) {
-      label_union.Unite(min_label, label);
-    }
-  }
-}
-}  // namespace
-
+// LabelUnionFind class defined at the top to avoid errors
 class LabelUnionFind {
  public:
   int Find(int label) {
@@ -74,6 +29,51 @@ class LabelUnionFind {
  private:
   std::unordered_map<int, int> parent_;
 };
+
+namespace {
+void FixLabels(std::vector<int>& labeled_image, int rows, int cols) {
+  std::unordered_map<int, int> label_map;
+  int next_label = 2;
+
+  for (int i = 0; i < rows * cols; ++i) {
+    if (labeled_image[i] > 1) {
+      if (label_map.find(labeled_image[i]) == label_map.end()) {
+        label_map[labeled_image[i]] = next_label++;
+      }
+      labeled_image[i] = label_map[labeled_image[i]];
+    }
+  }
+}
+
+bool IsValidNeighbor(int nx, int ny, int rows, int columns, const std::vector<int>& labeled_image) {
+  return nx >= 0 && ny >= 0 && nx < rows && ny < columns && labeled_image[(nx * columns) + ny] > 1;
+}
+
+void ProcessNeighbors(int x, int y, int rows, int columns, const std::vector<int>& labeled_image,
+                      std::vector<int>& neighbors, const int dx[], const int dy[]) {
+  for (int i = 0; i < 3; ++i) {
+    int nx = x + dx[i];
+    int ny = y + dy[i];
+    if (IsValidNeighbor(nx, ny, rows, columns, labeled_image)) {
+      neighbors.push_back(labeled_image[(nx * columns) + ny]);
+    }
+  }
+}
+
+void AssignLabel(int position, int& current_label, std::vector<int>& labeled_image, const std::vector<int>& neighbors,
+                 LabelUnionFind& label_union) {
+  if (neighbors.empty()) {
+    labeled_image[position] = current_label++;
+  } else {
+    int min_label = *std::ranges::min_element(neighbors);
+    labeled_image[position] = min_label;
+
+    for (int label : neighbors) {
+      label_union.Unite(min_label, label);
+    }
+  }
+}
+}  // namespace
 
 bool karaseva_e_binaryimage_seq::TestTaskSequential::PreProcessingImpl() {
   rows_ = static_cast<int>(task_data->inputs_count[0]);
@@ -105,8 +105,8 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::ValidationImpl() {
 bool karaseva_e_binaryimage_seq::TestTaskSequential::RunImpl() {
   int current_label = 2;
   LabelUnionFind label_union;
-  int dx[] = {-1, 0, -1};
-  int dy[] = {0, -1, 1};
+  const int dx[] = {-1, 0, -1};
+  const int dy[] = {0, -1, 1};
 
   for (int x = 0; x < rows_; ++x) {
     for (int y = 0; y < columns_; ++y) {
