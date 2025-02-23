@@ -6,9 +6,9 @@
 #include "seq/tarakanov_d_integration_the_trapezoid_method/include/ops_seq.hpp"
 
 namespace tarakanov_d_integration_the_trapezoid_method_seq {
-auto createTaskData(double* a, double* b, double* h, double* res) {
+static auto createTaskData(double* a, double* b, double* h, double* res) {
   auto data = std::make_shared<ppc::core::TaskData>();
-  
+
   data->inputs.push_back(reinterpret_cast<uint8_t*>(a));
   data->inputs.push_back(reinterpret_cast<uint8_t*>(b));
   data->inputs.push_back(reinterpret_cast<uint8_t*>(h));
@@ -19,7 +19,7 @@ auto createTaskData(double* a, double* b, double* h, double* res) {
 
   return data;
 }
-} // tarakanov_d_integration_the_trapezoid_method_seq
+}  // namespace tarakanov_d_integration_the_trapezoid_method_seq
 
 using namespace tarakanov_d_integration_the_trapezoid_method_seq;
 
