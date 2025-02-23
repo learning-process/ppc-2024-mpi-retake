@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -9,9 +8,9 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-namespace karaseva_e_binaryimage_mpi {
-
-static std::vector<int> GetRandomBinImage(int r, int c) {
+// Move the function to an anonymous namespace to avoid the static warning
+namespace {
+std::vector<int> GetRandomBinImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(0, 1);
@@ -21,8 +20,7 @@ static std::vector<int> GetRandomBinImage(int r, int c) {
   }
   return vec;
 }
-
-}  // namespace karaseva_e_binaryimage_mpi
+}  // namespace
 
 TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
   boost::mpi::communicator world;
@@ -36,7 +34,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::GetRandomBinImage(rows, cols);
+    image = GetRandomBinImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);
@@ -145,7 +143,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::GetRandomBinImage(rows, cols);
+    image = GetRandomBinImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);

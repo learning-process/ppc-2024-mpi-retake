@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/karaseva_e_binaryimage/include/ops_seq.hpp"
 
 TEST(karaseva_e_binaryimage_seq, test_pipeline_run) {

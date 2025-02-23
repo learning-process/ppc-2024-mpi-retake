@@ -15,7 +15,7 @@
 namespace karaseva_e_binaryimage_mpi {
 
 // Function to generate a random binary image of given size
-std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
+static std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (auto &px : img) {
     px = rand() % 2;
