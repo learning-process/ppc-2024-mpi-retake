@@ -1,4 +1,4 @@
-#include "muradov_k_trap_integral/mpi/include/ops_mpi.hpp"
+#include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 #include <mpi.h>
 #include <cmath>
 #include <algorithm>

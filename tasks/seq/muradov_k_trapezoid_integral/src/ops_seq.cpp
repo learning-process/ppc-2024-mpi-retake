@@ -1,4 +1,4 @@
-#include "muradov_k_trap_integral/seq/include/ops_seq.hpp"
+#include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 #include <cmath>
 
 namespace muradov_k_trap_integral_seq {
