@@ -1,62 +1,59 @@
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <functional>
-#include <string>
-#include <thread>
+#include <cstdlib>
 #include <vector>
 
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(int n, int m, std::vector<double> a) {
-  int rank = m;
-  for (int i = 0; i < m; ++i) {
-    int j;
-    for (j = 0; j < n; ++j) {
-      if (std::abs(a[j * n + i]) > 1e-6) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(int rows, int cols, std::vector<double> a) {
+  int rank = cols;
+  for (int i = 0; i < cols; ++i) {
+    int j = 0;
+    for (j = 0; j < rows; ++j) {
+      if (std::abs(a[(j * rows) + i]) > 1e-6) {
         break;
       }
     }
-    if (j == n) {
+    if (j == rows) {
       --rank;
     } else {
-      for (int k = i + 1; k < m; ++k) {
-        double ml = a[k * n + i] / a[i * n + i];
-        for (j = i; j < n - 1; ++j) {
-          a[k * n + j] -= a[i * n + j] * ml;
+      for (int k = i + 1; k < cols; ++k) {
+        double ml = a[(k * rows) + i] / a[(i * rows) + i];
+        for (j = i; j < rows - 1; ++j) {
+          a[(k * rows) + j] -= a[(i * rows) + j] * ml;
         }
       }
     }
   }
   return rank;
 }
-
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(int n, int m, std::vector<double> a) {
+double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(int rows, int cols, std::vector<double> a) {
   double det = 1;
 
-  for (int i = 0; i < m; ++i) {
+  for (int i = 0; i < cols; ++i) {
     int idx = i;
-    for (int k = i + 1; k < m; ++k) {
-      if (std::abs(a[k * n + i]) > std::abs(a[idx * n + i])) {
+    for (int k = i + 1; k < cols; ++k) {
+      if (std::abs(a[(k * rows) + i]) > std::abs(a[(idx * rows) + i])) {
         idx = k;
       }
     }
-    if (std::abs(a[idx * n + i]) < 1e-6) {
+    if (std::abs(a[(idx * rows) + i]) < 1e-6) {
       return 0;
     }
     if (idx != i) {
-      for (int j = 0; j < n - 1; ++j) {
-        double tmp = a[i * n + j];
-        a[i * n + j] = a[idx * n + j];
-        a[idx * n + j] = tmp;
+      for (int j = 0; j < rows - 1; ++j) {
+        double tmp = a[(i * rows) + j];
+        a[(i * rows) + j] = a[(idx * rows) + j];
+        a[(idx * rows) + j] = tmp;
       }
       det *= -1;
     }
-    det *= a[i * n + i];
-    for (int k = i + 1; k < m; ++k) {
-      double ml = a[k * n + i] / a[i * n + i];
-      for (int j = i; j < n - 1; ++j) {
-        a[k * n + j] -= a[i * n + j] * ml;
+    det *= a[(i * rows) + i];
+    for (int k = i + 1; k < cols; ++k) {
+      double ml = a[(k * rows) + i] / a[(i * rows) + i];
+      for (int j = i; j < rows - 1; ++j) {
+        a[(k * rows) + j] -= a[(i * rows) + j] * ml;
       }
     }
   }
@@ -88,18 +85,18 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::RunImpl() {
   for (int i = 0; i < rows_ - 1; ++i) {
     for (int k = i + 1; k < rows_; ++k) {
-      double m = matrix_[k * cols_ + i] / matrix_[i * cols_ + i];
+      double m = matrix_[(k * cols_) + i] / matrix_[(i * cols_) + i];
       for (int j = i; j < cols_; ++j) {
-        matrix_[k * cols_ + j] -= matrix_[i * cols_ + j] * m;
+        matrix_[(k * cols_) + j] -= matrix_[(i * cols_) + j] * m;
       }
     }
   }
   for (int i = rows_ - 1; i >= 0; --i) {
-    double sum = matrix_[i * cols_ + rows_];
+    double sum = matrix_[(i * cols_) + rows_];
     for (int j = i + 1; j < cols_ - 1; ++j) {
-      sum -= matrix_[i * cols_ + j] * res_[j];
+      sum -= matrix_[(i * cols_) + j] * res_[j];
     }
-    res_[i] = sum / matrix_[i * cols_ + i];
+    res_[i] = sum / matrix_[(i * cols_) + i];
   }
   return true;
 }
@@ -158,7 +155,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
     for (int proc = 1; proc < world_.size(); ++proc) {
       for (int i = 0; i < row_num[proc]; ++i) {
         for (int j = 0; j < cols_; ++j) {
-          send_matrix[i * cols_ + j] = matrix_[(proc + world_.size() * i) * cols_ + j];
+          send_matrix[(i * cols_) + j] = matrix_[((proc + (world_.size() * i)) * cols_) + j];
         }
       }
       world_.send(proc, 0, send_matrix.data(), row_num[proc] * cols_);
@@ -170,7 +167,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   if (world_.rank() == 0) {
     for (int i = 0; i < delta; ++i) {
       for (int j = 0; j < cols_; ++j) {
-        local_matrix_[i * cols_ + j] = matrix_[i * cols_ * world_.size() + j];
+        local_matrix_[(i * cols_) + j] = matrix_[i * cols_ * world_.size() + j];
       }
     }
   } else {
@@ -187,7 +184,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   for (int i = 0; i < rows_ - 1; ++i) {
     if (i == row[r]) {
       for (int j = 0; j < cols_; ++j) {
-        pivot[j] = local_matrix_[r * cols_ + j];
+        pivot[j] = local_matrix_[(r * cols_) + j];
       }
       broadcast(world_, pivot.data(), cols_, world_.rank());
       r++;
@@ -195,9 +192,9 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
       broadcast(world_, pivot.data(), cols_, i % world_.size());
     }
     for (int k = r; k < delta; ++k) {
-      double m = local_matrix_[k * cols_ + i] / pivot[i];
+      double m = local_matrix_[(k * cols_) + i] / pivot[i];
       for (int j = i; j < cols_; ++j) {
-        local_matrix_[k * cols_ + j] -= pivot[j] * m;
+        local_matrix_[(k * cols_) + j] -= pivot[j] * m;
       }
     }
   }
@@ -206,7 +203,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   r = 0;
   for (int i = 0; i < rows_; ++i) {
     if (i == row[r]) {
-      local_res_[i] = local_matrix_[r * cols_ + rows_];
+      local_res_[i] = local_matrix_[(r * cols_) + rows_];
       r++;
     }
   }
@@ -215,7 +212,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   for (int i = rows_ - 1; i > 0; --i) {
     if (r >= 0) {
       if (i == row[r]) {
-        local_res_[i] /= local_matrix_[r * cols_ + i];
+        local_res_[i] /= local_matrix_[(r * cols_) + i];
         broadcast(world_, local_res_[i], world_.rank());
         r--;
       } else {
@@ -226,7 +223,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
     }
     if (r >= 0) {
       for (int j = 0; j <= r; ++j) {
-        local_res_[row[j]] -= local_matrix_[j * cols_ + i] * local_res_[i];
+        local_res_[row[j]] -= local_matrix_[(j * cols_) + i] * local_res_[i];
       }
     }
   }

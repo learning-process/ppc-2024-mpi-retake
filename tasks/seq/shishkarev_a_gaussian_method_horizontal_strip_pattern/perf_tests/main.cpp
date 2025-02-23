@@ -28,7 +28,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_ru
   constexpr int cols_ = 101;
   constexpr int rows_ = 100;
 
-  std::vector<double> matrix_ = shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols_ * rows_);
+  std::vector<double> matrix_ =
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols_ * rows_);
   std::vector<double> res_(cols_ - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -62,7 +63,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_task_run) {
   constexpr int cols_ = 101;
   constexpr int rows_ = 100;
 
-  std::vector<double> matrix_ = shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols_ * rows_);
+  std::vector<double> matrix_ =
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols_ * rows_);
   std::vector<double> res_(cols_ - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();

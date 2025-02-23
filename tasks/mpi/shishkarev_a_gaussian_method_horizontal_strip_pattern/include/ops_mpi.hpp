@@ -16,7 +16,7 @@ int Determinant(int n, int m, std::vector<double> a);
 
 std::vector<double> GetRandomMatrix(int sz);
 
-double AxB(int n, int m, std::vector<double> a, std::vector<double> res_);
+double AxB(int n, int m, std::vector<double> a, std::vector<double> res);
 
 class MPIGaussHorizontalSequential : public ppc::core::Task {
  public:
