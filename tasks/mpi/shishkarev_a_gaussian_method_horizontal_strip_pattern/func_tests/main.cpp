@@ -25,7 +25,7 @@ std::vector<double> GetRandomMatrix(int sz) {
 bool IsSingular(const std::vector<double>& matrix, int rows, int cols) {
   Matrix mat;
   mat.rows = rows;
-  mat.cols = cols
+  mat.cols = cols;
   return Determinant(mat, matrix) == 0; 
 }
 
