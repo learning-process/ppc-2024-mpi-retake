@@ -106,10 +106,10 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
     size_t offset_remainder = counts_[0];
     for (size_t proc = 1; proc < num_processes_; proc++) {
       size_t current_count = counts_[proc];
-      world_.send(static_cast<int> proc, 0, input_[0].data() + static_cast<int>(offset_remainder),
+      world_.send(static_cast<int>(proc), 0, input_[0].data() + static_cast<int>(offset_remainder),
                   static_cast<int>(current_count));
 
-      world_.send(static_cast<int> proc, 1, input_[1].data() + static_cast<int>(offset_remainder),
+      world_.send(static_cast<int>(proc), 1, input_[1].data() + static_cast<int>(offset_remainder),
                   static_cast<int>(current_count));
     }
   }
