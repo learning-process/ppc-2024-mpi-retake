@@ -4,7 +4,6 @@
 #include <utility>
 #include <vector>
 
-
 #include "core/task/include/task.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {

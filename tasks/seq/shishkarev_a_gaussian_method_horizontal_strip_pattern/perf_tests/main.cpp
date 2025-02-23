@@ -21,7 +21,7 @@ std::vector<double> GetRandomMatrix(int sz) {
   }
   return matrix;
 }
-} // namespace
+}  // namespace
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_run) {
   constexpr int kCols = 101;

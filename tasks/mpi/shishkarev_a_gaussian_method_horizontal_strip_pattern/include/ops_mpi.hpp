@@ -35,9 +35,11 @@ void BroadcastMatrixSize(boost::mpi::communicator& world, int& rows, int& cols);
 
 std::vector<int> ComputeRowDistribution(boost::mpi::communicator& world, int rows);
 
-void DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int delta, int cols, std::vector<double>& matrix);
+void DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int delta, int cols,
+                      std::vector<double>& matrix);
 
-void ReceiveMatrix(boost::mpi::communicator& world, int delta, int cols, std::vector<double>& local_matrix, std::vector<double>& matrix);
+void ReceiveMatrix(boost::mpi::communicator& world, int delta, int cols, std::vector<double>& local_matrix,
+                   std::vector<double>& matrix);
 
 void ForwardElimination(boost::mpi::communicator& world, Matrix matrix, Vector& vector);
 
