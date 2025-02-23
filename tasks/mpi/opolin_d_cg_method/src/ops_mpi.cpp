@@ -15,10 +15,10 @@
 bool opolin_d_cg_method_mpi::CGMethodkMPI::PreProcessingImpl() {
   // init data
   if (world_.rank() == 0) {
-    auto* ptr = reinterpret_cast<double*>(taskData->inputs[1]);
+    auto* ptr = reinterpret_cast<double*>(task_data->inputs[1]);
     b_.assign(ptr, ptr + n_);
 
-    epsilon_ = *reinterpret_cast<double*>(taskData->inputs[2]);
+    epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
   }
   return true;
 }
@@ -26,16 +26,16 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::PreProcessingImpl() {
 bool opolin_d_cg_method_mpi::CGMethodkMPI::ValidationImpl() {
   // check input and output
   if (world_.rank() == 0) {
-    if (taskData->inputs_count.empty() || taskData->inputs.size() != 3) return false;
+    if (task_data->inputs_count.empty() || task_data->inputs.size() != 3) return false;
 
-    if (taskData->outputs_count.empty() || taskData->inputs_count[0] != taskData->outputs_count[0] ||
-        taskData->outputs.empty())
+    if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
+    task_data->outputs.empty())
       return false;
 
-    n_ = taskData->inputs_count[0];
+    n_ = task_data->inputs_count[0];
     if (n_ <= 0) return false;
 
-    auto* ptr = reinterpret_cast<double*>(taskData->inputs[0]);
+    auto* ptr = reinterpret_cast<double*>(task_data->inputs[0]);
     A_.assign(ptr, ptr + n_ * n_);
 
     if (!isSimmetric(A_, n_)) return false;
