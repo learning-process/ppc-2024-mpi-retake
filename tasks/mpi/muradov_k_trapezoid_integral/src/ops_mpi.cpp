@@ -12,7 +12,7 @@ bool TrapezoidalIntegral::PreProcessingImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
-    auto input = reinterpret_cast<double*>(taskData->inputs[0]);
+    auto input = reinterpret_cast<double*>(task_data->inputs[0]);
     a = input[0];
     b = input[1];
     n = *reinterpret_cast<int*>(taskData->inputs[1]);
