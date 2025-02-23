@@ -1,13 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
 #include <vector>
 
-#include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
@@ -150,20 +149,20 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_101x100) {
   if (world.rank() == 0) {
     std::vector<double> reference_res(cols - 1, 0);
 
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(global_matrix.size());
-    taskDataSeq->inputs_count.emplace_back(cols);
-    taskDataSeq->inputs_count.emplace_back(rows);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_res.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
+    task_data_seq->inputs_count.emplace_back(global_matrix.size());
+    task_data_seq->inputs_count.emplace_back(cols);
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
 
     shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential
-        MPIGaussHorizontalSequential(taskDataSeq);
-    ASSERT_EQ(MPIGaussHorizontalSequential.ValidationImpl(), true);
-    MPIGaussHorizontalSequential.PreProcessingImpl();
-    MPIGaussHorizontalSequential.RunImpl();
-    MPIGaussHorizontalSequential.PostProcessingImpl();
+        mpi_gauss_horizontal_sequential(task_data_seq);
+    ASSERT_EQ(mpi_gauss_horizontal_sequential.ValidationImpl(), true);
+    mpi_gauss_horizontal_sequential.PreProcessingImpl();
+    mpi_gauss_horizontal_sequential.RunImpl();
+    mpi_gauss_horizontal_sequential.PostProcessingImpl();
 
     for (int i = 0; i < cols - 1; ++i) {
       ASSERT_NEAR(global_res[i], reference_res[i], 1e-6);
@@ -201,20 +200,20 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_201x200) {
   if (world.rank() == 0) {
     std::vector<double> reference_res(cols - 1, 0);
 
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(global_matrix.size());
-    taskDataSeq->inputs_count.emplace_back(cols);
-    taskDataSeq->inputs_count.emplace_back(rows);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_res.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
+    task_data_seq->inputs_count.emplace_back(global_matrix.size());
+    task_data_seq->inputs_count.emplace_back(cols);
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_res.data()));
+    task_data_seq->outputs_count.emplace_back(reference_res.size());
 
     shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential
-        MPIGaussHorizontalSequential(taskDataSeq);
-    ASSERT_EQ(MPIGaussHorizontalSequential.ValidationImpl(), true);
-    MPIGaussHorizontalSequential.PreProcessingImpl();
-    MPIGaussHorizontalSequential.RunImpl();
-    MPIGaussHorizontalSequential.PostProcessingImpl();
+        mpi_gauss_horizontal_sequential(task_data_seq);
+    ASSERT_EQ(mpi_gauss_horizontal_sequential.ValidationImpl(), true);
+    mpi_gauss_horizontal_sequential.PreProcessingImpl();
+    mpi_gauss_horizontal_sequential.RunImpl();
+    mpi_gauss_horizontal_sequential.PostProcessingImpl();
 
     for (int i = 0; i < cols - 1; ++i) {
       ASSERT_NEAR(global_res[i], reference_res[i], 1e-6);

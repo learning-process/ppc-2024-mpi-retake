@@ -8,7 +8,7 @@
 #include <random>
 #include <vector>
 
-#include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
@@ -44,88 +44,88 @@ double AxB(int n, int m, std::vector<double> a, std::vector<double> res) {
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_pipeline_run) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
 
   const int cols = 101;
   const int rows = 100;
   std::vector<double> global_matrix(cols * rows);
   std::vector<double> global_res(cols - 1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    taskDataPar->inputs_count.emplace_back(global_matrix.size());
-    taskDataPar->inputs_count.emplace_back(cols);
-    taskDataPar->inputs_count.emplace_back(rows);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
-    taskDataPar->outputs_count.emplace_back(global_res.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
+    task_data_par->inputs_count.emplace_back(global_matrix.size());
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
+    task_data_par->outputs_count.emplace_back(global_res.size());
   }
 
-  auto MPIGaussHorizontalParallel =
+  auto mpi_gauss_horizontal_parallel =
       std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel>(
-          taskDataPar);
-  ASSERT_EQ(MPIGaussHorizontalParallel->ValidationImpl(), true);
-  MPIGaussHorizontalParallel->PreProcessingImpl();
-  MPIGaussHorizontalParallel->RunImpl();
-  MPIGaussHorizontalParallel->PostProcessingImpl();
+          task_data_par);
+  ASSERT_EQ(mpi_gauss_horizontal_parallel->ValidationImpl(), true);
+  mpi_gauss_horizontal_parallel->PreProcessingImpl();
+  mpi_gauss_horizontal_parallel->RunImpl();
+  mpi_gauss_horizontal_parallel->PostProcessingImpl();
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(MPIGaussHorizontalParallel);
-  perfAnalyzer->PipelineRun(perfAttr, perfResults);
-  if (world_.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perfResults);
+  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(mpi_gauss_horizontal_parallel);
+  perfAnalyzer->PipelineRun(perf_attr, perf_results);
+  if (world.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols, rows, global_matrix, global_res),
                 0, 1e-6);
   }
 }
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_task_run) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
 
   const int cols = 101;
   const int rows = 100;
   std::vector<double> global_matrix(cols * rows);
   std::vector<double> global_res(cols - 1, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    taskDataPar->inputs_count.emplace_back(global_matrix.size());
-    taskDataPar->inputs_count.emplace_back(cols);
-    taskDataPar->inputs_count.emplace_back(rows);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
-    taskDataPar->outputs_count.emplace_back(global_res.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
+    task_data_par->inputs_count.emplace_back(global_matrix.size());
+    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
+    task_data_par->outputs_count.emplace_back(global_res.size());
   }
 
-  auto MPIGaussHorizontalParallel =
+  auto mpi_gauss_horizontal_parallel =
       std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel>(
-          taskDataPar);
-  ASSERT_EQ(MPIGaussHorizontalParallel->ValidationImpl(), true);
-  MPIGaussHorizontalParallel->PreProcessingImpl();
-  MPIGaussHorizontalParallel->RunImpl();
-  MPIGaussHorizontalParallel->PostProcessingImpl();
+          task_data_par);
+  ASSERT_EQ(mpi_gauss_horizontal_parallel->ValidationImpl(), true);
+  mpi_gauss_horizontal_parallel->PreProcessingImpl();
+  mpi_gauss_horizontal_parallel->RunImpl();
+  mpi_gauss_horizontal_parallel->PostProcessingImpl();
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
-  perfAttr->current_timer = [&] { return current_timer.elapsed(); };
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(MPIGaussHorizontalParallel);
-  perfAnalyzer->TaskRun(perfAttr, perfResults);
-  if (world_.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perfResults);
+  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(mpi_gauss_horizontal_parallel);
+  perfAnalyzer->TaskRun(perf_attr, perf_results);
+  if (world.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols, rows, global_matrix, global_res),
                 0, 1e-6);
   }
