@@ -1,6 +1,4 @@
 #include <gtest/gtest.h>
-#include <chrono>
-#include <memory>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
