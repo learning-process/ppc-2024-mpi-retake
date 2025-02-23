@@ -11,11 +11,11 @@
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
 
 struct Matrix{
-  std::int rows;
-  std::int cols;
+  int rows;
+  int cols;
 }
 
-int MatrixRank(Matrix matrix, std::vector<double> a);
+int MatrixRank(Matrix matrix, const std::vector<double>& a);
 
 double Determinant(Matrix matrix, std::vector<double> a);
 
