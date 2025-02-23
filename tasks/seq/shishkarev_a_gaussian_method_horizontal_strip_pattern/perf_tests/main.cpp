@@ -10,9 +10,8 @@
 #include "core/task/include/task.hpp"
 #include "seq/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_seq.hpp"
 
-namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {
-
-static std::vector<double> GetRandomMatrix(int sz) {
+namespace {
+std::vector<double> GetRandomMatrix(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_real_distribution<double> dis(-1000, 1000);
@@ -22,8 +21,7 @@ static std::vector<double> GetRandomMatrix(int sz) {
   }
   return matrix;
 }
-
-}  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq
+}
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_run) {
   constexpr int kCols = 101;
