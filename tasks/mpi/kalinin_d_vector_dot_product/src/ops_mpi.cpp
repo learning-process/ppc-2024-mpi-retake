@@ -97,7 +97,10 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
     }
   }
 
-  boost::mpi::broadcast(world_, input_, 0);
+  local_input1_.resize(counts_[world_.rank()]);
+  local_input2_.resize(counts_[world_.rank()]);
+  boost::mpi::scatter(world_, input_[0], local_input1_.data(), counts_[world_.rank()], 0);
+  boost::mpi::scatter(world_, input_[1], local_input2_.data(), counts_[world_.rank()], 0);
 
   res_ = 0;
   return true;
