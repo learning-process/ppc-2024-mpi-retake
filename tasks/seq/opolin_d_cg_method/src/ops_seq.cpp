@@ -46,16 +46,16 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
     double alpha_k = rsquare_prev / opolin_d_cg_method_seq::ScalarProduct(p_k, Ap);
 
     // x_k+1
-    for (int i = 0; i < n_; i++) {
+    for (int i = 0; i < static_cast<int>n_; i++) {
       x_[i] += alpha_k * p_k[i];
     }
 
     // r_k+1
-    for (int i = 0; i < n_; i++) {
+    for (int i = 0; i < static_cast<int>n_; i++) {
       r_k[i] -= alpha_k * Ap[i];
     }
 
-    double rsquare_k = opolin_d_cg_method_seq::scalarProduct(r_k, r_k);
+    double rsquare_k = opolin_d_cg_method_seq::ScalarProduct(r_k, r_k);
     // right accuracy is achieved
     if (sqrt(rsquare_k) < epsilon_) {
       break;
@@ -64,32 +64,32 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
     double beta_k = rsquare_k / rsquare_prev;
     rsquare_prev = rsquare_k;
     // p_k+1
-    for (int i = 0; i < n_; i++) {
+    for (int i = 0; i < static_cast<int>n_; i++) {
       p_k[i] = r_k[i] + beta_k * p_k[i];
     }
   }
   return true;
 }
 
-bool opolin_d_cg_method_seq::TestTaskSequential::PostProcessingImpl() {
+bool opolin_d_cg_method_seq::CGMethodSequential::PostProcessingImpl() {
   auto* out = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::ranges::copy(Xnew_, out);
+  std::ranges::copy(x_, out);
   return true;
 }
 
 bool opolin_d_cg_method_seq::IsPositiveDefinite(const std::vector<double>& mat, size_t size) {
   std::vector<double> L(size * size, 0);
 
-  for (int i = 0; i < size; i++) {
-    for (int j = 0; j <= i; j++) {
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j <= i; j++) {
       double sum = 0;
       if (j == i) {
-        for (int k = 0; k < j; k++) sum += L[j * size + k] * L[j * size + k];
+        for (size_t k = 0; k < j; k++) sum += L[j * size + k] * L[j * size + k];
         double val = mat[j * size + j] - sum;
         if (val <= 0) return false;
         L[j * size + j] = std::sqrt(val);
       } else {
-        for (int k = 0; k < j; k++) sum += L[i * size + k] * L[j * size + k];
+        for (size_t k = 0; k < j; k++) sum += L[i * size + k] * L[j * size + k];
         L[i * size + j] = (mat[i * size + j] - sum) / L[j * size + j];
       }
     }
@@ -99,8 +99,8 @@ bool opolin_d_cg_method_seq::IsPositiveDefinite(const std::vector<double>& mat, 
 
 bool opolin_d_cg_method_seq::IsSimmetric(const std::vector<double>& mat, size_t size) {
   bool simetric = true;
-  for (int i = 0; i < size; i++) {
-    for (int j = 0; j < size; j++) {
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j < size; j++) {
       if (j != i) {
         if (mat[i * size + j] != mat[j * size + i]) {
           simetric = false;
@@ -124,8 +124,8 @@ std::vector<double> opolin_d_cg_method_seq::MultiplyVecMat(const std::vector<dou
                                                            const std::vector<double>& mat) {
   size_t size = vec.size();
   std::vector<double> result(size, 0.0);
-  for (int i = 0; i < size; i++) {
-    for (int j = 0; j < size; j++) {
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j < size; j++) {
       result[i] += mat[i * size + j] * vec[j];
     }
   }
