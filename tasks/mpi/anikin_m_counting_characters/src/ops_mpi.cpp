@@ -1,15 +1,16 @@
 // Anikin Maksim 2025
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
+#include <mpi.h>
+
 #include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <functional>
-#include <mpi.h>
 #include <random>
 #include <string>
 #include <vector>
 
-void anikin_m_counting_characters_mpi::CreateDataVector(std::vector<char> *invec, const std::string& str) {
+void anikin_m_counting_characters_mpi::CreateDataVector(std::vector<char> *invec, const std::string &str) {
   for (auto a : str) {
     invec->push_back(a);
   }
@@ -83,7 +84,7 @@ bool anikin_m_counting_characters_mpi::TestTaskMPI::RunImpl() {
     b++;
   }
   int all_res = 0;
-  boost::mpi::reduce(world_, local_res, all_res, std::plus(), 0);
+  boost::mpi::reduce(world_, local_res, all_res, std::plus(), 0); // NOLINT
   if (world_.rank() == 0) {
     res_ = res_ + all_res;
   }
