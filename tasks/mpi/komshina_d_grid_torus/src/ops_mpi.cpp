@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <boost/serialization/vector.hpp>
 #include <cmath>
-#include <ranges>
 #include <vector>
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -79,21 +78,21 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
 
 namespace komshina_d_grid_torus_mpi {
 
-std::vector<int> TestTaskMPI::CalculateRoute(int dest, int sizeX, int sizeY) {
+std::vector<int> TestTaskMPI::CalculateRoute(int dest, int size_x, int size_y) {
   std::vector<int> route;
   int current = 0;
-  int dest_x = dest % sizeX;
-  int dest_y = dest / sizeX;
-  int cur_x = current % sizeX;
-  int cur_y = current / sizeX;
+  int dest_x = dest % size_x;
+  int dest_y = dest / size_x;
+  int cur_x = current % size_y;
+  int cur_y = current / size_y;
 
   while (cur_x != dest_x) {
-    cur_x = (cur_x + 1) % sizeX;
-    route.push_back((cur_y * sizeX) + cur_x);
+    cur_x = (cur_x + 1) % size_x;
+    route.push_back((cur_y * size_x) + cur_x);
   }
   while (cur_y != dest_y) {
-    cur_y = (cur_y + 1) % sizeY;
-    route.push_back((cur_y)*sizeX + cur_x);
+    cur_y = (cur_y + 1) % size_y;
+    route.push_back((cur_y)*size_x + cur_x);
   }
   return route;
 }

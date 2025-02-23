@@ -6,6 +6,8 @@
 #include <vector>
 #include <chrono>
 #include <cstdint>
+#include <cmath>
+#include <memory>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
@@ -13,16 +15,18 @@
 
 TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  if (world.size() < (2^2)) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   const std::string data_input(16381, 'a');
-  int destination_rank  = world.size() - 1;
-  komshina_d_grid_torus_mpi::TestTaskMPI::InputData in(data_input, destination_rank);
+  int dest = world.size() - 1;
+  komshina_d_grid_torus_mpi::TestTaskMPI::InputData in(data_input, dest);
   komshina_d_grid_torus_mpi::TestTaskMPI::InputData out;
 
   int size = static_cast<int>(std::sqrt(world.size()));
   std::vector<int> route_expected =
-      komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(destination_rank, size, size);
+      komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(dest, size, size);
 
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
@@ -57,15 +61,19 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
 
 TEST(komshina_d_grid_torus_mpi, test_task_run) {
   boost::mpi::communicator world;
-  if (world.size() < (2 ^ 2)) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   const std::string data_input(16381, 'a');
-  int destination_rank = world.size() - 1;
-  komshina_d_grid_torus_mpi::TestTaskMPI::InputData in(data_input, destination_rank);
+  int dest = world.size() - 1;
+  komshina_d_grid_torus_mpi::TestTaskMPI::InputData in(data_input, dest);
   komshina_d_grid_torus_mpi::TestTaskMPI::InputData out;
 
-  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
-      destination_rank, std::sqrt(world.size()), std::sqrt(world.size()));
+  int size = static_cast<int>(std::sqrt(world.size()));
+  std::vector<int> route_expected =
+      komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(dest, size, size);
+
 
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {

@@ -2,17 +2,15 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <cmath>
 #include <string>
 #include <memory>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace komshina_d_grid_torus_mpi {
 class TestTaskMPI : public ppc::core::Task {
  public:
- struct InputData {
+  struct InputData {
     std::vector<int> path;
     std::vector<char> payload;
     int target;
@@ -33,8 +31,8 @@ class TestTaskMPI : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
-  
-  static std::vector<int> CalculateRoute(int dest, int sizeX, int sizeY);
+
+  static std::vector<int> CalculateRoute(int dest, int size_x, int size_y);
 
  private:
   boost::mpi::communicator world_;
