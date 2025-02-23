@@ -13,7 +13,15 @@ namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
 struct Matrix {
   int rows;
   int cols;
+  int delta;
 };
+
+struct Vector {
+  std::vector<double> local_matrix;
+  std::vector<double> local_res;
+  std::vector<double> res;
+  std::vector<double> row;
+}
 
 int MatrixRank(Matrix matrix, std::vector<double> a);
 
@@ -31,9 +39,9 @@ void DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& r
 
 void ReceiveMatrix(boost::mpi::communicator& world, int delta, int cols, std::vector<double>& local_matrix, std::vector<double>& matrix);
 
-void ForwardElimination(boost::mpi::communicator& world, int rows, int cols, int delta, std::vector<double>& local_matrix, std::vector<double>& row);
+void ForwardElimination(boost::mpi::communicator& world, Matrix matrix, std::vector<double>& local_matrix, std::vector<double>& row);
 
-void BackSubstitution(boost::mpi::communicator& world, int rows, int cols, int delta, std::vector<double>& local_matrix, std::vector<double>& local_res, std::vector<double>& res, std::vector<double>& row);
+void BackSubstitution(boost::mpi::communicator& world, Matrix matrix, Vector& vector);
 
 class MPIGaussHorizontalSequential : public ppc::core::Task {
  public:
