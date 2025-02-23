@@ -5,13 +5,13 @@
 using namespace std::chrono_literals;
 
 int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MatrixRank(int n, int m, std::vector<double> a) {
-  const double EPS = 1e-6;
+  const double eps = 1e-6;
 
   int rank = m;
   for (int i = 0; i < m; ++i) {
     int j;
     for (j = 0; j < n; ++j) {
-      if (std::abs(a[j * n + i]) > EPS) {
+      if (std::abs(a[j * n + i]) > eps) {
         break;
       }
     }
@@ -30,7 +30,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MatrixRank(int n,
 }
 
 int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::Determinant(int n, int m, std::vector<double> a) {
-  const double EPS = 1e-6;
+  const double eps = 1e-6;
   double det = 1;
 
   for (int i = 0; i < m; ++i) {
@@ -40,7 +40,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::Determinant(int n
         idx = k;
       }
     }
-    if (std::abs(a[idx * n + i]) < EPS) {
+    if (std::abs(a[idx * n + i]) < eps) {
       return 0;
     }
     if (idx != i) {

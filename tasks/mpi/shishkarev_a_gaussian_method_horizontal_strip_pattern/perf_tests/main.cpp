@@ -8,8 +8,8 @@
 #include <random>
 #include <vector>
 
-#include "core/task/include/task.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
@@ -79,8 +79,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_pipeline_ru
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(mpi_gauss_horizontal_parallel);
-  perfAnalyzer->PipelineRun(perf_attr, perf_results);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(mpi_gauss_horizontal_parallel);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols, rows, global_matrix, global_res),
@@ -123,8 +123,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_task_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(mpi_gauss_horizontal_parallel);
-  perfAnalyzer->TaskRun(perf_attr, perf_results);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(mpi_gauss_horizontal_parallel);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_NEAR(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::AxB(cols, rows, global_matrix, global_res),
