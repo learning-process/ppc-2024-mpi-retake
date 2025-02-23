@@ -1,9 +1,13 @@
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 #include <cmath>
 #include <vector>
+#include <ranges>
+#include <utility>
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
@@ -29,7 +33,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
 
   if (world_.rank() == 0) {
     if (task_data->inputs.size() != 1 || task_data->outputs_count.size() != 1) {
-      return true;
+      return false;
     }
 
     auto *in_ptr = reinterpret_cast<InputData *>(task_data->inputs[0]);
@@ -38,15 +42,15 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
     }
   }
 
-  size_x = grid_dim;
-  size_y = grid_dim;
+  size_x_ = grid_dim;
+  size_y_ = grid_dim;
 
   return false;
 }
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
   int my_rank = world_.rank();
-  auto route = CalculateRoute(input_data_.target, size_x, size_y);
+  auto route = CalculateRoute(input_data_.target, size_x_, size_y_);
 
   if (world_.rank() == 0) {
     input_data_.path.push_back(0);
@@ -54,7 +58,9 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     world_.recv(boost::mpi::any_source, 0, input_data_);
   } else {
     world_.recv(boost::mpi::any_source, 0, input_data_);
-    if (input_data_.path[0] == -1) return true;
+    if (input_data_.path[0] == -1) {
+      return true;
+    }
     input_data_.path.push_back(my_rank);
     if (my_rank != input_data_.target) {
       auto it = std::ranges::find(route, my_rank);
@@ -86,13 +92,13 @@ std::vector<int> TestTaskMPI::CalculateRoute(int dest, int size_x, int size_y) {
   int cur_x = current % size_y;
   int cur_y = current / size_y;
 
-  while (cur_x != dest_x) {
+ while (cur_x != dest_x) {
     cur_x = (cur_x + 1) % size_x;
     route.push_back((cur_y * size_x) + cur_x);
   }
   while (cur_y != dest_y) {
     cur_y = (cur_y + 1) % size_y;
-    route.push_back((cur_y)*size_x + cur_x);
+    route.push_back((cur_y * size_x) + cur_x);
   }
   return route;
 }

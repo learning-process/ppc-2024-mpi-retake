@@ -3,7 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
-#include <memory>
 
 #include "core/task/include/task.hpp"
 
@@ -37,7 +36,7 @@ class TestTaskMPI : public ppc::core::Task {
  private:
   boost::mpi::communicator world_;
   InputData input_data_;
-  int size_x{}, size_y{};
+  int size_x_{}, size_y_{};
 };
 
 }  // namespace komshina_d_grid_torus_mpi
