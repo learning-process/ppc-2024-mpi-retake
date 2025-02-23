@@ -80,7 +80,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
     }
 
     displacements.resize(world_size);
-    if (displacements.size() > 0) {
+    if (!(displacements.empty())) {
       displacements[0] = 0;
       for (int i = 1; i < world_size; ++i) {
         displacements[i] = displacements[i - 1] + send_counts[i - 1];
