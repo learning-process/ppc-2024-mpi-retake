@@ -84,7 +84,7 @@ bool anikin_m_counting_characters_mpi::TestTaskMPI::RunImpl() {
     b++;
   }
   int all_res = 0;
-  boost::mpi::reduce(world_, local_res, all_res, std::plus(), 0); // NOLINT
+  boost::mpi::reduce(world_, local_res, all_res, std::plus(), 0);  // NOLINT
   if (world_.rank() == 0) {
     res_ = res_ + all_res;
   }
