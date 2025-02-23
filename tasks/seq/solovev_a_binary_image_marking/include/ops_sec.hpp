@@ -20,8 +20,8 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> data;
-  std::vector<int> labels;
-  int m, n;
+  std::vector<int> data_;
+  std::vector<int> labels_;
+  int m_, n_;
 };
 }  // namespace solovev_a_binary_image_marking

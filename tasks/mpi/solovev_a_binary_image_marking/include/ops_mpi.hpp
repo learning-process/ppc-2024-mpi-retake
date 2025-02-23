@@ -1,9 +1,9 @@
-
 #pragma once
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstring>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -17,16 +17,16 @@ struct Point {
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
-  explicit TestMPITaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit TestMPITaskSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> data_seq;
-  std::vector<int> labels_seq;
-  int m_seq, n_seq;
+  std::vector<int> data_seq_;
+  std::vector<int> labels_seq_;
+  int m_seq_, n_seq_;
 };
 
 class TestMPITaskParallel : public ppc::core::Task {
@@ -38,9 +38,9 @@ class TestMPITaskParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> data;
-  std::vector<int> labels;
-  int m, n;
-  boost::mpi::communicator world;
+  std::vector<int> data_;
+  std::vector<int> labels_;
+  int m_, n_;
+  boost::mpi::communicator world_;
 };
 }  // namespace solovev_a_binary_image_marking

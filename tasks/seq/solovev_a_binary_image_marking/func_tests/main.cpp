@@ -1,41 +1,41 @@
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <random>
 #include <vector>
+#include <utility>
 
 #include "seq/solovev_a_binary_image_marking/include/ops_sec.hpp"
 
 namespace {
 
 void TestBodyFunction(const int m, const int n, std::vector<int> data, std::vector<int> exp_image) {
-  std::vector<int> labledImage(m * n);
+  std::vector<int> labled_image(m * n);
 
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
-  taskDataSeq->inputs_count.emplace_back(data.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
+  task_data_seq->inputs_count.emplace_back(data.size());
 
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labledImage.data()));
-  taskDataSeq->outputs_count.emplace_back(labledImage.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labled_image.data()));
+  task_data_seq->outputs_count.emplace_back(labled_image.size());
 
-  solovev_a_binary_image_marking::TestTaskSequential BinaryImage(taskDataSeq);
+  solovev_a_binary_image_marking::TestTaskSequential binary_image(task_data_seq);
 
-  ASSERT_TRUE(BinaryImage.ValidationImpl());
-  ASSERT_TRUE(BinaryImage.PreProcessingImpl());
-  ASSERT_TRUE(BinaryImage.RunImpl());
-  ASSERT_TRUE(BinaryImage.PostProcessingImpl());
+  ASSERT_TRUE(binary_image.ValidationImpl());
+  ASSERT_TRUE(binary_image.PreProcessingImpl());
+  ASSERT_TRUE(binary_image.RunImpl());
+  ASSERT_TRUE(binary_image.PostProcessingImpl());
 
-  std::cout << std::endl;
   for (size_t i = 0; i < exp_image.size(); ++i) {
-    ASSERT_EQ(labledImage[i], exp_image[i]);
+    ASSERT_EQ(labled_image[i], exp_image[i]);
   }
 }
 }  // namespace
@@ -141,25 +141,25 @@ TEST(solovev_a_binary_image_marking, validation_false_1) {
   int n = 1;
 
   std::vector<int> data = {1};
-  std::vector<int> labledImage = {1};
+  std::vector<int> labled_image = {1};
 
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&m));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
-  taskDataSeq->inputs_count.emplace_back(data.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(data.data()));
+  task_data_seq->inputs_count.emplace_back(data.size());
 
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labledImage.data()));
-  taskDataSeq->outputs_count.emplace_back(labledImage.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labled_image.data()));
+  task_data_seq->outputs_count.emplace_back(labled_image.size());
 
-  solovev_a_binary_image_marking::TestTaskSequential BinaryImage(taskDataSeq);
+  solovev_a_binary_image_marking::TestTaskSequential binary_image(task_data_seq);
 
-  ASSERT_FALSE(BinaryImage.ValidationImpl());
+  ASSERT_FALSE(binary_image.ValidationImpl());
 }
 
 TEST(solovev_a_binary_image_marking, validation_false_2) {
@@ -167,25 +167,25 @@ TEST(solovev_a_binary_image_marking, validation_false_2) {
   int n = -1;
 
   std::vector<int> data = {1};
-  std::vector<int> labledImage = {1};
+  std::vector<int> labled_image = {1};
 
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&m));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
-  taskDataSeq->inputs_count.emplace_back(data.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(data.data()));
+  task_data_seq->inputs_count.emplace_back(data.size());
 
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labledImage.data()));
-  taskDataSeq->outputs_count.emplace_back(labledImage.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labled_image.data()));
+  task_data_seq->outputs_count.emplace_back(labled_image.size());
 
-  solovev_a_binary_image_marking::TestTaskSequential BinaryImage(taskDataSeq);
+  solovev_a_binary_image_marking::TestTaskSequential binary_image(task_data_seq);
 
-  ASSERT_FALSE(BinaryImage.ValidationImpl());
+  ASSERT_FALSE(binary_image.ValidationImpl());
 }
 
 TEST(solovev_a_binary_image_marking, validation_false_3) {
@@ -193,23 +193,23 @@ TEST(solovev_a_binary_image_marking, validation_false_3) {
   int n = 1;
 
   std::vector<int> data = {};
-  std::vector<int> labledImage = {};
+  std::vector<int> labled_image = {};
 
-  auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&m));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
-  taskDataSeq->inputs_count.emplace_back(data.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(data.data()));
+  task_data_seq->inputs_count.emplace_back(data.size());
 
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labledImage.data()));
-  taskDataSeq->outputs_count.emplace_back(labledImage.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(labled_image.data()));
+  task_data_seq->outputs_count.emplace_back(labled_image.size());
 
-  solovev_a_binary_image_marking::TestTaskSequential BinaryImage(taskDataSeq);
+  solovev_a_binary_image_marking::TestTaskSequential binary_image(task_data_seq);
 
-  ASSERT_FALSE(BinaryImage.ValidationImpl());
+  ASSERT_FALSE(binary_image.ValidationImpl());
 }

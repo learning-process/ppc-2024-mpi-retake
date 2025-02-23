@@ -4,11 +4,13 @@
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
+
 #include "mpi/solovev_a_binary_image_marking/include/ops_mpi.hpp"
 
 TEST(solovev_a_binary_image_marking_mpi, pipeline_run) {
@@ -17,42 +19,42 @@ TEST(solovev_a_binary_image_marking_mpi, pipeline_run) {
   const int n = 2500;
 
   std::vector<int> data(m * n, 1);
-  std::vector<int> labledImage(m * n);
+  std::vector<int> labled_image(m * n);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
-  taskDataPar->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
+  task_data_par->inputs_count.emplace_back(1);
 
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
-  taskDataPar->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
+  task_data_par->inputs_count.emplace_back(1);
 
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
-  taskDataPar->inputs_count.emplace_back(data.size());
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
+  task_data_par->inputs_count.emplace_back(data.size());
 
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(labledImage.data()));
-  taskDataPar->outputs_count.emplace_back(labledImage.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(labled_image.data()));
+  task_data_par->outputs_count.emplace_back(labled_image.size());
 
-  auto TaskParallel = std::make_shared<solovev_a_binary_image_marking::TestMPITaskParallel>(taskDataPar);
+  auto task_parallel = std::make_shared<solovev_a_binary_image_marking::TestMPITaskParallel>(task_data_par);
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
-  perfAttr->current_timer = [&] {
+  perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(TaskParallel);
-  perfAnalyzer->PipelineRun(perfAttr, perfResults);
-  ppc::core::Perf::PrintPerfStatistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_parallel);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   if (world.rank() == 0) {
-    for (size_t i = 0; i < labledImage.size(); ++i) {
-      ASSERT_EQ(data[i], labledImage[i]);
+    for (size_t i = 0; i < labled_image.size(); ++i) {
+      ASSERT_EQ(data[i], labled_image[i]);
     }
   }
 }
@@ -63,42 +65,42 @@ TEST(solovev_a_binary_image_marking_mpi, task_run) {
   const int n = 2500;
 
   std::vector<int> data(m * n, 1);
-  std::vector<int> labledImage(m * n);
+  std::vector<int> labled_image(m * n);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
-  taskDataPar->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&m)));
+  task_data_par->inputs_count.emplace_back(1);
 
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
-  taskDataPar->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&n)));
+  task_data_par->inputs_count.emplace_back(1);
 
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
-  taskDataPar->inputs_count.emplace_back(data.size());
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(data.data())));
+  task_data_par->inputs_count.emplace_back(data.size());
 
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(labledImage.data()));
-  taskDataPar->outputs_count.emplace_back(labledImage.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(labled_image.data()));
+  task_data_par->outputs_count.emplace_back(labled_image.size());
 
-  auto TaskParallel = std::make_shared<solovev_a_binary_image_marking::TestMPITaskParallel>(taskDataPar);
+  auto task_parallel = std::make_shared<solovev_a_binary_image_marking::TestMPITaskParallel>(task_data_par);
 
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
-  perfAttr->current_timer = [&] {
+  perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(TaskParallel);
-  perfAnalyzer->TaskRun(perfAttr, perfResults);
-  ppc::core::Perf::PrintPerfStatistic(perfResults);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_parallel);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   if (world.rank() == 0) {
-    for (size_t i = 0; i < labledImage.size(); ++i) {
-      ASSERT_EQ(data[i], labledImage[i]);
+    for (size_t i = 0; i < labled_image.size(); ++i) {
+      ASSERT_EQ(data[i], labled_image[i]);
     }
   }
 }

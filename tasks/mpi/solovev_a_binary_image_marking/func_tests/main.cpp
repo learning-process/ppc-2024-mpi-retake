@@ -3,6 +3,7 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <random>
 #include <vector>
@@ -11,7 +12,7 @@
 #include "mpi/solovev_a_binary_image_marking/include/ops_mpi.hpp"
 
 namespace {
-std::vector<int> randomImg(int height, int width) {
+std::vector<int> RandomImg(int height, int width) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dis(0, 1);
@@ -28,54 +29,54 @@ std::vector<int> randomImg(int height, int width) {
 void TestBodyFunction(int height, int width) {
   boost::mpi::communicator world;
 
-  std::vector<int> resultMPI(height * width);
-  std::vector<int> resultSEQ(height * width);
+  std::vector<int> result_mpi(height * width);
+  std::vector<int> result_seq(height * width);
 
   std::vector<int> expected_result(height * width, 0);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  std::vector<int> img = randomImg(height, width);
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&height)));
-  taskDataPar->inputs_count.emplace_back(1);
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&width)));
-  taskDataPar->inputs_count.emplace_back(1);
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(img.data())));
-  taskDataPar->inputs_count.emplace_back(img.size());
+  std::vector<int> img = RandomImg(height, width);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&height));
+  task_data_par->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&width));
+  task_data_par->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(img.data()));
+  task_data_par->inputs_count.emplace_back(img.size());
 
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(resultMPI.data()));
-  taskDataPar->outputs_count.emplace_back(resultMPI.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_mpi.data()));
+  task_data_par->outputs_count.emplace_back(result_mpi.size());
 
   if (world.rank() == 0) {
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&height)));
-    taskDataSeq->inputs_count.emplace_back(1);
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&width)));
-    taskDataSeq->inputs_count.emplace_back(1);
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(img.data())));
-    taskDataSeq->inputs_count.emplace_back(img.size());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&height));
+    task_data_seq->inputs_count.emplace_back(1);
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&width));
+    task_data_seq->inputs_count.emplace_back(1);
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(img.data()));
+    task_data_seq->inputs_count.emplace_back(img.size());
 
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(resultSEQ.data()));
-    taskDataSeq->outputs_count.emplace_back(resultSEQ.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_seq.data()));
+    task_data_seq->outputs_count.emplace_back(result_seq.size());
 
-    solovev_a_binary_image_marking::TestMPITaskSequential BinaryMarkerSeq(taskDataSeq);
-    ASSERT_EQ(BinaryMarkerSeq.ValidationImpl(), true);
-    BinaryMarkerSeq.PreProcessingImpl();
-    BinaryMarkerSeq.RunImpl();
-    BinaryMarkerSeq.PostProcessingImpl();
+    solovev_a_binary_image_marking::TestMPITaskSequential binary_marker_seq(task_data_seq);
+    ASSERT_EQ(binary_marker_seq.ValidationImpl(), true);
+    binary_marker_seq.PreProcessingImpl();
+    binary_marker_seq.RunImpl();
+    binary_marker_seq.PostProcessingImpl();
 
-    expected_result = std::move(resultSEQ);
+    expected_result = std::move(result_seq);
   }
 
-  solovev_a_binary_image_marking::TestMPITaskParallel BinaryMarkerMPI(taskDataPar);
-  ASSERT_EQ(BinaryMarkerMPI.ValidationImpl(), true);
-  BinaryMarkerMPI.PreProcessingImpl();
-  BinaryMarkerMPI.RunImpl();
-  BinaryMarkerMPI.PostProcessingImpl();
+  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_mpi(task_data_par);
+  ASSERT_EQ(binary_marker_mpi.ValidationImpl(), true);
+  binary_marker_mpi.PreProcessingImpl();
+  binary_marker_mpi.RunImpl();
+  binary_marker_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    for (size_t i = 0; i < resultMPI.size(); ++i) {
-      ASSERT_EQ(resultMPI[i], expected_result[i]);
+    for (size_t i = 0; i < result_mpi.size(); ++i) {
+      ASSERT_EQ(result_mpi[i], expected_result[i]);
     }
   }
 }
@@ -84,25 +85,25 @@ void ValidationFalseTest(int height, int width) {
   boost::mpi::communicator world;
 
   std::vector<int> img{};
-  std::vector<int> resultMPI;
+  std::vector<int> result_mpi;
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&height)));
-    taskDataPar->inputs_count.emplace_back(1);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&width)));
-    taskDataPar->inputs_count.emplace_back(1);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(img.data())));
-    taskDataPar->inputs_count.emplace_back(img.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&height));
+    task_data_par->inputs_count.emplace_back(1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&width));
+    task_data_par->inputs_count.emplace_back(1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(img.data()));
+    task_data_par->inputs_count.emplace_back(img.size());
 
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(resultMPI.data()));
-    taskDataPar->outputs_count.emplace_back(resultMPI.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_mpi.data()));
+    task_data_par->outputs_count.emplace_back(result_mpi.size());
   }
 
-  solovev_a_binary_image_marking::TestMPITaskParallel BinaryMarkerMPI(taskDataPar);
+  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_mpi(task_data_par);
   if (world.rank() == 0) {
-    ASSERT_EQ(BinaryMarkerMPI.ValidationImpl(), false);
+    ASSERT_EQ(binary_marker_mpi.ValidationImpl(), false);
   }
 }
 
@@ -130,50 +131,54 @@ TEST(solovev_a_binary_image_marking, Whole_image) {
   int height = 77;
   int width = 77;
 
-  std::vector<int> img(height * width, 1);
-  std::vector<int> resultMPI(height * width);
-  std::vector<int> resultSEQ(height * width);
+  std::vector<int> result_mpi(height * width);
+  std::vector<int> result_seq(height * width);
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::vector<int> expected_result(height * width, 0);
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<int> img(height * height, 1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&height));
+  task_data_par->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&width));
+  task_data_par->inputs_count.emplace_back(1);
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(img.data()));
+  task_data_par->inputs_count.emplace_back(img.size());
+
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_mpi.data()));
+  task_data_par->outputs_count.emplace_back(result_mpi.size());
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&height)));
-    taskDataPar->inputs_count.emplace_back(1);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&width)));
-    taskDataPar->inputs_count.emplace_back(1);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(img.data())));
-    taskDataPar->inputs_count.emplace_back(img.size());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&height));
+    task_data_seq->inputs_count.emplace_back(1);
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&width));
+    task_data_seq->inputs_count.emplace_back(1);
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(img.data()));
+    task_data_seq->inputs_count.emplace_back(img.size());
 
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(resultMPI.data()));
-    taskDataPar->outputs_count.emplace_back(resultMPI.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_seq.data()));
+    task_data_seq->outputs_count.emplace_back(result_seq.size());
 
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&height)));
-    taskDataSeq->inputs_count.emplace_back(1);
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(&width)));
-    taskDataSeq->inputs_count.emplace_back(1);
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<int*>(img.data())));
-    taskDataSeq->inputs_count.emplace_back(img.size());
+    solovev_a_binary_image_marking::TestMPITaskSequential binary_marker_seq(task_data_seq);
+    ASSERT_EQ(binary_marker_seq.ValidationImpl(), true);
+    binary_marker_seq.PreProcessingImpl();
+    binary_marker_seq.RunImpl();
+    binary_marker_seq.PostProcessingImpl();
 
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(resultSEQ.data()));
-    taskDataSeq->outputs_count.emplace_back(resultSEQ.size());
+    expected_result = std::move(result_seq);
   }
 
-  solovev_a_binary_image_marking::TestMPITaskParallel BinaryMarkerMPI(taskDataPar);
-  ASSERT_EQ(BinaryMarkerMPI.ValidationImpl(), true);
-  BinaryMarkerMPI.PreProcessingImpl();
-  BinaryMarkerMPI.RunImpl();
-  BinaryMarkerMPI.PostProcessingImpl();
+  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_MPI(task_data_par);
+  ASSERT_EQ(binary_marker_MPI.ValidationImpl(), true);
+  binary_marker_MPI.PreProcessingImpl();
+  binary_marker_MPI.RunImpl();
+  binary_marker_MPI.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    solovev_a_binary_image_marking::TestMPITaskSequential BinaryMarkerSeq(taskDataSeq);
-    ASSERT_EQ(BinaryMarkerSeq.ValidationImpl(), true);
-    BinaryMarkerSeq.PreProcessingImpl();
-    BinaryMarkerSeq.RunImpl();
-    BinaryMarkerSeq.PostProcessingImpl();
-
-    for (size_t i = 0; i < resultMPI.size(); ++i) {
-      ASSERT_EQ(resultMPI[i], resultSEQ[i]);
+    for (size_t i = 0; i < result_mpi.size(); ++i) {
+      ASSERT_EQ(result_mpi[i], expected_result[i]);
     }
   }
 }
