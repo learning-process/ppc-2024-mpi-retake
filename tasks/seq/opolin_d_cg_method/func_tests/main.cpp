@@ -190,7 +190,7 @@ TEST(opolin_d_cg_method_seq, test_simple_element) {
   int size = 1;
   double epsilon = 1e-9;
   std::vector<double> expectedX, A, b;
-  genDataCGMethod(size, A, b, expectedX);
+  opolin_d_cg_method_seq::genDataCGMethod(size, A, b, expectedX);
 
   std::vector<double> out(size, 0.0);
 
