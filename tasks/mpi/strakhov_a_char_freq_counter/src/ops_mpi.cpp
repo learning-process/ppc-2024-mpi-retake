@@ -88,9 +88,9 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
   local_input_.resize(local_input_size);
   boost::mpi::scatterv(world_, (rank == 0) ? input_.data() : nullptr, (rank == 0) ? send_counts : std::vector<int>(),
                        (rank == 0) ? displacements : std::vector<int>(), local_input_.data(), local_input_size, 0);
-  local_result = std::count(local_input_.begin(), local_input_.end(), target_);
+  local_result_ = std::count(local_input_.begin(), local_input_.end(), target_);
 
-  boost::mpi::reduce(world_, local_result, result_, std::plus<>(), 0);
+  boost::mpi::reduce(world_, local_result_, result_, std::plus<>(), 0);
 
   return true;
 }
