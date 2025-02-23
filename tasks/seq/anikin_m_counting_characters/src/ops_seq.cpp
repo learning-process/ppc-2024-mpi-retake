@@ -16,8 +16,8 @@ void anikin_m_counting_characters_seq::CreateRanddataVector(std::vector<char> *i
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis('A', 'Z');
-    char random_ñhar = static_cast<char>(dis(gen));
-    invec->push_back(random_ñhar);
+    char random_Ñhar = static_cast<char>(dis(gen));
+    invec->push_back(random_Ñhar);
   }
 }
 
