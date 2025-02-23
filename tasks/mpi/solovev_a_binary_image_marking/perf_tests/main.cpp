@@ -9,7 +9,6 @@
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-
 #include "mpi/solovev_a_binary_image_marking/include/ops_mpi.hpp"
 
 TEST(solovev_a_binary_image_marking_mpi, pipeline_run) {
