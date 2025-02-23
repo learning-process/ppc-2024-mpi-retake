@@ -11,7 +11,7 @@
 #include "seq/anikin_m_counting_characters/include/ops_seq.hpp"
 
 TEST(anikin_m_counting_characters_seq, test_pipeline_run) {
-  constexpr int kCount = 10000000;
+  constexpr int kCount = 20000000;
   // Create data
   std::vector<char> in1;
   anikin_m_counting_characters_seq::CreateRanddataVector(&in1, kCount);
@@ -50,7 +50,7 @@ TEST(anikin_m_counting_characters_seq, test_pipeline_run) {
 }
 
 TEST(anikin_m_counting_characters_seq, test_task_run) {
-  constexpr int kCount = 10000000;
+  constexpr int kCount = 20000000;
   // Create data
   std::vector<char> in1;
   anikin_m_counting_characters_seq::CreateRanddataVector(&in1, kCount);
