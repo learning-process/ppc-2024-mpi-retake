@@ -2,6 +2,8 @@
 #include "mpi/kalinin_d_vector_dot_product/include/ops_mpi.hpp"
 
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -11,7 +13,7 @@ int kalinin_d_vector_dot_product_mpi::VectorDotProduct(const std::vector<int>& v
   for (size_t i = 0; i < v1.size(); i++) {
     result += v1[i] * v2[i];
   }
-  return static_cast<int>(result);
+  return result;
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskSequential::ValidationImpl() {
@@ -82,7 +84,7 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
       counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
     }
   }
-  boost::mpi::broadcast(world_, counts_.data(), num_processes_, 0);
+  boost::mpi::broadcast(world_, counts_.data(), static_cast<int>(num_processes_), 0);
 
   if (world_.rank() == 0) {
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
@@ -104,8 +106,10 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
     size_t offset_remainder = counts_[0];
     for (unsigned int proc = 1; proc < num_processes_; proc++) {
       size_t current_count = counts_[proc];
-      world_.send(proc, 0, input_[0].data() + static_cast<int>(offset_remainder), static_cast<int>(current_count));
-      world_.send(proc, 1, input_[1].data() + static_cast<int>(offset_remainder), static_cast<int>(current_count));
+      world_.send(proc, 0, input_[0].data() + static_cast<unsigned int>(offset_remainder),
+                  static_cast<unsigned int>(current_count));
+      world_.send(proc, 1, input_[1].data() + static_cast<unsigned int>(offset_remainder),
+                  static_cast<unsigned int>(current_count));
       offset_remainder += current_count;
     }
   }

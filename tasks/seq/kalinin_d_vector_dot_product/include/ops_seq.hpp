@@ -1,7 +1,7 @@
 // Copyright 2023 Nesterov Alexander
 #pragma once
 
-#include <string>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -12,7 +12,7 @@ int VectorDotProduct(const std::vector<int>& v1, const std::vector<int>& v2);
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

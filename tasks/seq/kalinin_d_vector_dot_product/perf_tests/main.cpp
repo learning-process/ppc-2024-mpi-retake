@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <ctime>
 #include <memory>
@@ -15,14 +14,16 @@
 
 namespace {
 int offset = 0;
-}
+}  // namespace
 
 namespace {
 std::vector<int> CreateRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
   gen.seed((unsigned)time(nullptr) + ++offset);
-  for (int i = 0; i < v_size; i++) vec[i] = gen() % 100;
+  for (int i = 0; i < v_size; i++) {
+    vec[i] = static_cast<int>(gen() % 100);
+  }
   return vec;
 }
 }  // namespace

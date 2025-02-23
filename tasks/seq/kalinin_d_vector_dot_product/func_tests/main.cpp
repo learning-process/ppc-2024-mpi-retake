@@ -6,16 +6,21 @@
 #include <random>
 #include <vector>
 
-#include "core/util/include/util.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/kalinin_d_vector_dot_product/include/ops_seq.hpp"
-static int offset = 0;
+
+namespace {
+int offset = 0;
+}  // namespace
 
 namespace {
 std::vector<int> CreateRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
   gen.seed((unsigned)time(nullptr) + ++offset);
-  for (int i = 0; i < v_size; i++) vec[i] = gen() % 100;
+  for (int i = 0; i < v_size; i++) {
+    vec[i] = static_cast<int>(gen() % 100);
+  }
   return vec;
 }
 }  // namespace

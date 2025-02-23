@@ -1,29 +1,29 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
+#include <ctime>
 #include <memory>
 #include <random>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/kalinin_d_vector_dot_product/include/ops_mpi.hpp"
 
 namespace {
 int offset = 0;
-}
+}  // namespace
 
 namespace {
 std::vector<int> CreateRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
   gen.seed((unsigned)time(nullptr) + ++offset);
-  for (int i = 0; i < v_size; i++) vec[i] = gen() % 100;
+  for (int i = 0; i < v_size; i++) {
+    vec[i] = static_cast<int>(gen() % 100);
+  }
   return vec;
+}
 }
 
 std::shared_ptr<ppc::core::TaskData> CreateTaskData(const std::vector<int>& v1, const std::vector<int>& v2,
@@ -65,9 +65,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_125) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 125;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 125;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
@@ -76,9 +76,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_300) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 300;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 300;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
@@ -87,9 +87,9 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_not_equal) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 120;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector + 5);
+    const int k_count_size_vector = 120;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector + 5);
     auto task_data_mpi = CreateTaskData(v1, v2, res);
     kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
     ASSERT_EQ(test_task_mpi.Validation(), false);
@@ -100,9 +100,9 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_equal_true) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 120;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 120;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     auto task_data_mpi = CreateTaskData(v1, v2, res);
     kalinin_d_vector_dot_product_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
     ASSERT_EQ(test_task_mpi.Validation(), true);
@@ -159,9 +159,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_50) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 50;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 50;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
@@ -170,9 +170,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_75) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 75;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 75;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
@@ -181,9 +181,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_150) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 150;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 150;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
@@ -192,9 +192,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_200) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 200;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 200;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
@@ -203,9 +203,9 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_250) {
   boost::mpi::communicator world;
   std::vector<int32_t> res(1, 0);
   if (world.rank() == 0) {
-    const int kCountSizeVector = 250;
-    std::vector<int> v1 = CreateRandomVector(kCountSizeVector);
-    std::vector<int> v2 = CreateRandomVector(kCountSizeVector);
+    const int k_count_size_vector = 250;
+    std::vector<int> v1 = CreateRandomVector(k_count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(k_count_size_vector);
     RunTest(v1, v2, res, world);
   }
 }
