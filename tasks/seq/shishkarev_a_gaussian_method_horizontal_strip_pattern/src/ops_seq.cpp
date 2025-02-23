@@ -1,6 +1,6 @@
 #include "seq/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_seq.hpp"
 
-#include "core/task/include/task.hpp"
+#include <cstdint>
 #include <cstdlib>
 #include <vector>
 
@@ -61,7 +61,8 @@ double shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::Determinant(Ma
   return det;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::PreProcessingImpl() {
+template <typename InOutType>
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<InOutType>::PreProcessingImpl() {
   matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
   std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
@@ -72,7 +73,8 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizont
   return true;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::ValidationImpl() {
+template <typename InOutType>
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<InOutType>::ValidationImpl() {
   matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
   std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
@@ -86,7 +88,8 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizont
          MatrixRank(matrix, matrix_) == rows_;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::RunImpl() {
+template <typename InOutType>
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<InOutType>::RunImpl() {
   for (int i = 0; i < rows_ - 1; ++i) {
     for (int k = i + 1; k < rows_; ++k) {
       double m = matrix_[(k * cols_) + i] / matrix_[(i * cols_) + i];
@@ -105,7 +108,8 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizont
   return true;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::PostProcessingImpl() {
+template <typename InOutType>
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<InOutType>::PostProcessingImpl() {
   auto *this_matrix = reinterpret_cast<double *>(task_data->outputs[0]);
   std::ranges::copy(res_.begin(), res_.end(), this_matrix);
   return true;

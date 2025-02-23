@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
-#include <numeric>
 #include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_seq.hpp"
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {
@@ -15,30 +16,30 @@ std::vector<double> GetRandomMatrix(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_real_distribution<double> dis(-1000, 1000);
-  std::vector<double> matrix_(sz);
+  std::vector<double> matrix(sz);
   for (int i = 0; i < sz; ++i) {
-    matrix_[i] = dis(gen);
+    matrix[i] = dis(gen);
   }
-  return matrix_;
+  return matrix;
 }
 
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_run) {
-  constexpr int cols_ = 101;
-  constexpr int rows_ = 100;
+  constexpr int cols = 101;
+  constexpr int rows = 100;
 
-  std::vector<double> matrix_ =
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols_ * rows_);
-  std::vector<double> res_(cols_ - 1, 0);
+  std::vector<double> matrix =
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols * rows);
+  std::vector<double> res(cols - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix_.data()));
-  task_data_seq->inputs_count.emplace_back(matrix_.size());
-  task_data_seq->inputs_count.emplace_back(cols_);
-  task_data_seq->inputs_count.emplace_back(rows_);
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_.data()));
-  task_data_seq->outputs_count.emplace_back(res_.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(cols);
+  task_data_seq->inputs_count.emplace_back(rows);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   auto gauss_seq =
       std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(
@@ -60,20 +61,20 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_ru
 }
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_task_run) {
-  constexpr int cols_ = 101;
-  constexpr int rows_ = 100;
+  constexpr int cols = 101;
+  constexpr int rows = 100;
 
-  std::vector<double> matrix_ =
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols_ * rows_);
-  std::vector<double> res_(cols_ - 1, 0);
+  std::vector<double> matrix =
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols * rows);
+  std::vector<double> res(cols - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix_.data()));
-  task_data_seq->inputs_count.emplace_back(matrix_.size());
-  task_data_seq->inputs_count.emplace_back(cols_);
-  task_data_seq->inputs_count.emplace_back(rows_);
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_.data()));
-  task_data_seq->outputs_count.emplace_back(res_.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(cols);
+  task_data_seq->inputs_count.emplace_back(rows);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   auto gauss_seq =
       std::make_shared<shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<double>>(

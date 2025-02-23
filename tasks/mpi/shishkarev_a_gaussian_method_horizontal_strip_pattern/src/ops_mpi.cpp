@@ -184,9 +184,7 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(bo
           }
       }
   } else {
-      boost::mpi::status stat;
-      std::memset(&stat, 0, sizeof(stat));
-      world.recv(0, 0, local_matrix.data(), delta * cols, stat);
+      world.recv(0, 0, local_matrix.data(), delta * cols);
   }
 }
 
