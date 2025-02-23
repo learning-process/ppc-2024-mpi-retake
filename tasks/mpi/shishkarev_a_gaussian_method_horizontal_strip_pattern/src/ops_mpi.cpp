@@ -159,16 +159,16 @@ std::vector<int> shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Comp
   return row_num;
 }
 
-void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int cols, std::vector<double>& matrix) {
+void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int delta, int cols, std::vector<double>& matrix) {
   if (world.rank() == 0) {
-      std::vector<double> SendMatrix((delta * cols));
+      std::vector<double> send_matrix((delta * cols));
       for (int proc = 1; proc < world.size(); ++proc) {
           for (int i = 0; i < row_num[proc]; ++i) {
               for (int j = 0; j < cols; ++j) {
-                SendMatrix[(i * cols) + j] = matrix[((proc + (world.size() * i)) * cols) + j];
+                send_matrix[(i * cols) + j] = matrix[((proc + (world.size() * i)) * cols) + j];
               }
           }
-          world.send(proc, 0, SendMatrix.data(), row_num[proc] * cols);
+          world.send(proc, 0, send_matrix.data(), row_num[proc] * cols);
       }
   }
 }
@@ -186,8 +186,8 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(bo
   }
 }
 
-void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ForwardElimination(boost::mpi::communicator& world, Matrix matrix, std::vector<double>& local_matrix, std::vector<double>& row) {
-  std::vector<double> pivot(cols);
+void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ForwardElimination(boost::mpi::communicator& world, Matrix matrix, Vector& vector) {
+  std::vector<double> pivot{matrix.cols};
   int r = 0;
   for (int i = 0; i < matrix.rows - 1; ++i) {
       if (i == row[r]) {
@@ -233,7 +233,7 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BackSubstitution
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::RunImpl() {
   BroadcastMatrixSize(world_, rows_, cols_);
   std::vector<int> row_num = ComputeRowDistribution(world_, rows_);
-  DistributeMatrix(world_, row_num, cols_, matrix_);
+  DistributeMatrix(world_, row_num[world_.rank()], row_num, cols_, matrix_);
   //std::vector<double> local_matrix;
   ReceiveMatrix(world_, row_num[world_.rank()], cols_, local_matrix_, matrix_);
   
@@ -247,16 +247,18 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   matrix.rows = rows_;
   matrix.delta = row_num[world_.rank()];
 
-  ForwardElimination(world_, matrix, local_matrix_, row);
-    
-  local_res_.resize(cols_ - 1, 0);
-
   Vector vector;
   vector.local_matrix = local_matrix_;
   vector.local_res = local_res_;
   vector.res = res_;
   vector.row = row;
-  BackSubstitution(world_, rows_, matrix, vector);
+
+  ForwardElimination(world_, matrix, &vector);
+    
+  local_res_.resize(cols_ - 1, 0);
+  vector.local_res = local_res_;
+
+  BackSubstitution(world_, rows_, matrix, &vector);
   return true;
 }
 

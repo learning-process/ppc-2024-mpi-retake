@@ -21,7 +21,7 @@ struct Vector {
   std::vector<double> local_res;
   std::vector<double> res;
   std::vector<double> row;
-}
+};
 
 int MatrixRank(Matrix matrix, std::vector<double> a);
 
@@ -35,11 +35,11 @@ void BroadcastMatrixSize(boost::mpi::communicator& world, int& rows, int& cols);
 
 std::vector<int> ComputeRowDistribution(boost::mpi::communicator& world, int rows);
 
-void DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int cols, std::vector<double>& matrix);
+void DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int delta, int cols, std::vector<double>& matrix);
 
 void ReceiveMatrix(boost::mpi::communicator& world, int delta, int cols, std::vector<double>& local_matrix, std::vector<double>& matrix);
 
-void ForwardElimination(boost::mpi::communicator& world, Matrix matrix, std::vector<double>& local_matrix, std::vector<double>& row);
+void ForwardElimination(boost::mpi::communicator& world, Matrix matrix, Vector& vector);
 
 void BackSubstitution(boost::mpi::communicator& world, Matrix matrix, Vector& vector);
 
