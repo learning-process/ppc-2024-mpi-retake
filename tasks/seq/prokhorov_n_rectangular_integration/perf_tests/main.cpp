@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
-#include <cstdint>
-#include <memory>
+#include <algorithm>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <cmath>
+#include <functional>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
