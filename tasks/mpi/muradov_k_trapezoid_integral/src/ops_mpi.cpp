@@ -1,16 +1,17 @@
+#include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
+
+#include <mpi.h>
+
 #include <algorithm>
 #include <cmath>
 #include <memory>
-#include <mpi.h>
 #include <utility>
 
 #include "core/task/include/task.hpp"
-#include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
 namespace muradov_k_trap_integral_mpi {
 
-TrapezoidalIntegral::TrapezoidalIntegral(std::shared_ptr<ppc::core::TaskData> task_data)
-    : Task(std::move(task_data)) {}
+TrapezoidalIntegral::TrapezoidalIntegral(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
 
 bool TrapezoidalIntegral::PreProcessingImpl() {
   int rank = 0;
@@ -67,7 +68,5 @@ bool TrapezoidalIntegral::PostProcessingImpl() {
   return true;
 }
 
-double TrapezoidalIntegral::Func(double x) {
-  return x * x;
-}
+double TrapezoidalIntegral::Func(double x) { return x * x; }
 }  // namespace muradov_k_trap_integral_mpi

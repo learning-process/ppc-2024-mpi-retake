@@ -1,5 +1,6 @@
-#include <cstdint>
 #include <gtest/gtest.h>
+
+#include <cstdint>
 #include <memory>
 #include <vector>
 
@@ -13,8 +14,7 @@ TEST(muradov_k_trap_integral_mpi, Compare_With_Seq_Result) {
   double mpi_result = 0.0;
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(input.data()),
-                           reinterpret_cast<uint8_t*>(&n)};
+  task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(input.data()), reinterpret_cast<uint8_t*>(&n)};
   task_data_mpi->outputs = {reinterpret_cast<uint8_t*>(&mpi_result)};
 
   muradov_k_trap_integral_mpi::TrapezoidalIntegral task_mpi(task_data_mpi);

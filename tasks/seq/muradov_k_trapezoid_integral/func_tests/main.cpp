@@ -1,5 +1,6 @@
-#include <cstdint>
 #include <gtest/gtest.h>
+
+#include <cstdint>
 #include <memory>
 #include <vector>
 
@@ -25,7 +26,7 @@ TEST(muradov_k_trap_integral_seq, Test_x2_0_2) {
   task.Run();
   task.PostProcessing();
 
-  EXPECT_NEAR(result, 8.0/3.0, 1e-3);
+  EXPECT_NEAR(result, 8.0 / 3.0, 1e-3);
 }
 
 TEST(muradov_k_trap_integral_seq, Invalid_Parameters) {
