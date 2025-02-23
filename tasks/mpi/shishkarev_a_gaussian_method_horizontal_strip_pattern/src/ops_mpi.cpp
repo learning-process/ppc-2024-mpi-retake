@@ -187,12 +187,12 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(bo
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ForwardElimination(boost::mpi::communicator& world, Matrix matrix, Vector& vector) {
-  std::vector<double> pivot{matrix.cols};
+  std::vector<double> pivot{static_cast<double>(matrix.cols)};
   int r = 0;
   for (int i = 0; i < matrix.rows - 1; ++i) {
-      if (i == row[r]) {
+      if (i == vector.row[r]) {
           for (int j = 0; j < matrix.cols; ++j) {
-            pivot[j] = local_matrix[(r * matrix.cols) + j];
+            pivot[j] = vector.local_matrix[(r * matrix.cols) + j];
           }
           broadcast(world, pivot.data(), matrix.cols, world.rank());
           r++;
@@ -200,9 +200,9 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ForwardEliminati
           broadcast(world, pivot.data(), matrix.cols, i % world.size());
       }
       for (int k = r; k < matrix.delta; ++k) {
-          double m = local_matrix[(k * matrix.cols) + i] / pivot[i];
+          double m = vector.local_matrix[(k * matrix.cols) + i] / pivot[i];
           for (int j = i; j < matrix.cols; ++j) {
-            local_matrix[(k * matrix.cols) + j] -= pivot[j] * m;
+            vector.local_matrix[(k * matrix.cols) + j] -= pivot[j] * m;
           }
       }
   }
@@ -233,7 +233,7 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BackSubstitution
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::RunImpl() {
   BroadcastMatrixSize(world_, rows_, cols_);
   std::vector<int> row_num = ComputeRowDistribution(world_, rows_);
-  DistributeMatrix(world_, row_num[world_.rank()], row_num, cols_, matrix_);
+  DistributeMatrix(world_, row_num, row_num[world_.rank()], cols_, matrix_);
   //std::vector<double> local_matrix;
   ReceiveMatrix(world_, row_num[world_.rank()], cols_, local_matrix_, matrix_);
   
@@ -253,12 +253,12 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   vector.res = res_;
   vector.row = row;
 
-  ForwardElimination(world_, matrix, &vector);
+  ForwardElimination(world_, matrix, vector);
     
   local_res_.resize(cols_ - 1, 0);
   vector.local_res = local_res_;
 
-  BackSubstitution(world_, rows_, matrix, &vector);
+  BackSubstitution(world_, rows_, matrix, vector);
   return true;
 }
 
