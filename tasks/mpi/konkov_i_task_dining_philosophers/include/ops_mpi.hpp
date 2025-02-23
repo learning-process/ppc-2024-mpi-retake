@@ -12,7 +12,7 @@ class DiningPhilosophers {
   bool PreProcessing();
   bool Run();
   bool PostProcessing();
-  bool CheckDeadlock();
+  int CheckDeadlock();
 
  private:
   int num_philosophers_;
@@ -23,7 +23,7 @@ class DiningPhilosophers {
 
   void InitPhilosophers();
   void PhilosopherActions(int id);
-  bool IsDeadlock();
+  int IsDeadlock();
   void UpdateForkStates();
 };
 

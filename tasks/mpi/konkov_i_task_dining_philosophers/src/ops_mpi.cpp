@@ -37,7 +37,7 @@ bool DiningPhilosophers::Run() {
 
 bool DiningPhilosophers::PostProcessing() { return !IsDeadlock(); }
 
-bool DiningPhilosophers::CheckDeadlock() { return IsDeadlock(); }
+int DiningPhilosophers::CheckDeadlock() { return IsDeadlock(); }
 
 void DiningPhilosophers::InitPhilosophers() {
   std::ranges::fill(fork_states_, 0);
@@ -60,12 +60,10 @@ void DiningPhilosophers::PhilosopherActions(int id) {
   philosopher_states_[id] = 0;  // Thinking
 }
 
-bool DiningPhilosophers::IsDeadlock() {
-  int local_deadlock_int = std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; }) ? 1 : 0;
-  int global_deadlock_int = 0;
-  MPI_Allreduce(&local_deadlock_int, &global_deadlock_int, 1, MPI_INT, MPI_LOR, MPI_COMM_WORLD);
-  return global_deadlock_int != 0;
+int DiningPhilosophers::IsDeadlock() {
+  return std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; }) ? 1 : 0;
 }
+
 
 void DiningPhilosophers::UpdateForkStates() {
   MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, fork_states_.data(), 1, MPI_INT, MPI_COMM_WORLD);
