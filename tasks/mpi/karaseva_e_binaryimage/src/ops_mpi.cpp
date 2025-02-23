@@ -7,7 +7,9 @@
 #include <unordered_map>
 #include <vector>
 
-int GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
+// Function to get the root of a label with path compression
+int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent,
+                                                                      int label) {
   if (label_parent.find(label) == label_parent.end()) {
     label_parent[label] = label;
     return label;
@@ -18,7 +20,9 @@ int GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
   return label_parent[label];
 }
 
-void UnionLabels(std::unordered_map<int, int>& label_parent, int label1, int label2) {
+// Function to union two labels
+void karaseva_e_binaryimage_mpi::TestTaskMPI::UnionLabels(std::unordered_map<int, int>& label_parent,
+                                                                      int label1, int label2) {
   int root1 = GetRootLabel(label_parent, label1);
   int root2 = GetRootLabel(label_parent, label2);
   if (root1 != root2) {
@@ -26,33 +30,49 @@ void UnionLabels(std::unordered_map<int, int>& label_parent, int label1, int lab
   }
 }
 
-void Labeling(std::vector<int>& image, std::vector<int>& labeled_image, int rows, int cols, int min_label,
-              std::unordered_map<int, int>& label_parent, int start_row, int end_row) {
-  int label_counter = min_label;
+// Function to process neighbors of a pixel and add them to a list
+void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int rows, int cols,
+                                                               const std::vector<int>& labeled_image,
+                             std::vector<int>& neighbors) {
   int dx[] = {-1, 0, -1};
   int dy[] = {0, -1, 1};
+
+  for (int i = 0; i < 3; ++i) {
+    int nx = x + dx[i], ny = y + dy[i];
+    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[nx * cols + ny] > 1) {
+      neighbors.push_back(labeled_image[nx * cols + ny]);
+    }
+  }
+}
+
+// Function to assign label to a pixel and perform union of labels
+void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::vector<int>& labeled_image,
+                                                                        std::unordered_map<int, int>& label_parent,
+                               int& label_counter, const std::vector<int>& neighbors) {
+  if (neighbors.empty()) {
+    labeled_image[pos] = label_counter++;
+  } else {
+    int min_neighbor = *std::min_element(neighbors.begin(), neighbors.end());
+    labeled_image[pos] = min_neighbor;
+    for (int n : neighbors) {
+      UnionLabels(label_parent, min_neighbor, n);
+    }
+  }
+}
+
+// Main labeling function
+void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, std::vector<int>& labeled_image,
+                                                       int rows, int cols, int min_label,
+                     std::unordered_map<int, int>& label_parent, int start_row, int end_row) {
+  int label_counter = min_label;
 
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = x * cols + y;
       if (image[pos] == 0 || labeled_image[pos] > 1) {
         std::vector<int> neighbors;
-        for (int i = 0; i < 3; ++i) {
-          int nx = x + dx[i], ny = y + dy[i];
-          if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[nx * cols + ny] > 1) {
-            neighbors.push_back(labeled_image[nx * cols + ny]);
-          }
-        }
-
-        if (neighbors.empty()) {
-          labeled_image[pos] = label_counter++;
-        } else {
-          int min_neighbor = *std::min_element(neighbors.begin(), neighbors.end());
-          labeled_image[pos] = min_neighbor;
-          for (int n : neighbors) {
-            UnionLabels(label_parent, min_neighbor, n);
-          }
-        }
+        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
+        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);
       }
     }
   }
