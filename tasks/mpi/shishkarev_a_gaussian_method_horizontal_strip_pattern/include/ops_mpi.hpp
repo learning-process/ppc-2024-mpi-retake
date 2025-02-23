@@ -53,7 +53,7 @@ class MPIGaussHorizontalSequential : public ppc::core::Task {
 
  private:
   std::vector<double> matrix_, res_;
-  int delta, rows_{}, cols_{};
+  int delta_, rows_{}, cols_{};
 };
 
 class MPIGaussHorizontalParallel : public ppc::core::Task {

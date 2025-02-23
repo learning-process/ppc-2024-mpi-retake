@@ -9,7 +9,7 @@
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {
 
-  struct Matrix {
+struct Matrix {
   int rows;
   int cols;
   int delta;
@@ -17,7 +17,7 @@ namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {
 
 int MatrixRank(Matrix matrix, std::vector<double> a);
 
-int Determinant(Matrix matrix, std::vector<double> a);
+double Determinant(Matrix matrix, std::vector<double> a);
 
 template <class InOutType>
 class MPIGaussHorizontalSequential : public ppc::core::Task {

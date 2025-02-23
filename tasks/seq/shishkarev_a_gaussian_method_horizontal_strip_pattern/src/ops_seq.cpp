@@ -1,15 +1,13 @@
 #include "seq/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_seq.hpp"
 
-#include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/gather.hpp>
+#include "core/task/include/task.hpp"
 #include <cstdlib>
 #include <vector>
 
+
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix matrix, std::vector<double> a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MatrixRank(Matrix matrix, std::vector<double> a) {
   int rank = matrix.cols;
   for (int i = 0; i < matrix.cols; ++i) {
     int j = 0;
@@ -31,7 +29,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix
   }
   return rank;
 }
-double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Matrix matrix, std::vector<double> a) {
+double shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::Determinant(Matrix matrix, std::vector<double> a) {
   double det = 1;
 
   for (int i = 0; i < matrix.cols; ++i) {
@@ -63,7 +61,7 @@ double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Ma
   return det;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::PreProcessingImpl() {
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::PreProcessingImpl() {
   matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
   std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
@@ -74,7 +72,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   return true;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::ValidationImpl() {
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::ValidationImpl() {
   matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
   std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
