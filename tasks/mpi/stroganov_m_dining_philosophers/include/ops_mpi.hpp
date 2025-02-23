@@ -10,7 +10,7 @@
 namespace stroganov_m_dining_philosophers_mpi {
 
 class DiningPhilosophersMPI : public ppc::core::Task {
-public:
+ public:
   explicit DiningPhilosophersMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
@@ -25,7 +25,7 @@ public:
   void ResolveDeadlock();
   bool CheckAllThink();
 
-private:
+ private:
   boost::mpi::communicator world_;
   int status_;
   int l_philosopher_;
