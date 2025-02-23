@@ -65,9 +65,15 @@ TEST(prokhorov_n_rectangular_integration_mpi, test_integration_one_over_x) {
   test_mpi_task_parallel->SetFunction([](double x) { return 1.0 / x; });
 
   ASSERT_EQ(test_mpi_task_parallel->ValidationImpl(), true);
-  test_mpi_task_parallel->PreProcessingImpl();
-  test_mpi_task_parallel->RunImpl();
-  test_mpi_task_parallel->PostProcessingImpl();
+
+  bool preprocess_success = test_mpi_task_parallel->PreProcessingImpl();
+  ASSERT_TRUE(preprocess_success);
+
+  bool run_success = test_mpi_task_parallel->RunImpl();
+  ASSERT_TRUE(run_success);
+
+  bool postprocess_success = test_mpi_task_parallel->PostProcessingImpl();
+  ASSERT_TRUE(postprocess_success);
 
   if (world.rank() == 0) {
     std::vector<double> reference_result(1, 0.0);
@@ -82,9 +88,15 @@ TEST(prokhorov_n_rectangular_integration_mpi, test_integration_one_over_x) {
     test_mpi_task_sequential->SetFunction([](double x) { return 1.0 / x; });
 
     ASSERT_EQ(test_mpi_task_sequential->ValidationImpl(), true);
-    test_mpi_task_sequential->PreProcessingImpl();
-    test_mpi_task_sequential->RunImpl();
-    test_mpi_task_sequential->PostProcessingImpl();
+
+    bool seq_preprocess_success = test_mpi_task_sequential->PreProcessingImpl();
+    ASSERT_TRUE(seq_preprocess_success);
+
+    bool seq_run_success = test_mpi_task_sequential->RunImpl();
+    ASSERT_TRUE(seq_run_success);
+
+    bool seq_postprocess_success = test_mpi_task_sequential->PostProcessingImpl();
+    ASSERT_TRUE(seq_postprocess_success);
 
     ASSERT_NEAR(reference_result[0], global_result[0], 1e-3);
   }

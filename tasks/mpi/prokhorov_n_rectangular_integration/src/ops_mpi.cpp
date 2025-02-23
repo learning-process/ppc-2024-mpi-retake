@@ -79,22 +79,28 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskSequential::Integrate(co
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PreProcessingImpl() {
+  bool success = true;
   if (world_.rank() == 0) {
     if (task_data->inputs.empty() || task_data->inputs_count[0] != 3) {
-      return false;
+      success = false;
+    } else {
+      auto* inputs = reinterpret_cast<double*>(task_data->inputs[0]);
+      lower_bound_ = inputs[0];
+      upper_bound_ = inputs[1];
+      n_ = static_cast<int>(inputs[2]);
+
+      if (lower_bound_ >= upper_bound_) {
+        success = false;
+      } else {
+        success = n_ > 0;
+      }
     }
+  }
 
-    auto* inputs = reinterpret_cast<double*>(task_data->inputs[0]);
+  boost::mpi::broadcast(world_, success, 0);
 
-    lower_bound_ = inputs[0];
-    upper_bound_ = inputs[1];
-    n_ = static_cast<int>(inputs[2]);
-
-    if (lower_bound_ >= upper_bound_) {
-      return false;
-    }
-
-    return n_ > 0;
+  if (!success) {
+    return false;
   }
 
   boost::mpi::broadcast(world_, lower_bound_, 0);
@@ -156,11 +162,11 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ParallelIntegrate(c
   int local_n = n / size;
   int remainder = n % size;
 
-  int start = (rank * local_n) + std::min(rank, remainder);
+  int start = rank * local_n + std::min(rank, remainder);
   int end = start + local_n + (rank < remainder ? 1 : 0);
 
   for (int i = start; i < end; ++i) {
-    double x = lower_bound + ((i + 0.5) * step);
+    double x = lower_bound + ((i + 0.5) * step;
     local_area += f(x) * step;
   }
 
