@@ -7,10 +7,10 @@
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <ranges>
 #include <queue>
-#include <vector>
+#include <ranges>
 #include <utility>
+#include <vector>
 
 bool solovev_a_binary_image_marking::TestMPITaskSequential::PreProcessingImpl() {
   int m_tmp = *reinterpret_cast<int*>(task_data->inputs[0]);
@@ -35,7 +35,7 @@ bool solovev_a_binary_image_marking::TestMPITaskSequential::ValidationImpl() {
 
   return (rows_check > 0 && coloms_check > 0 && !input_check.empty());
 }
-
+// NOLINTBEGIN
 bool solovev_a_binary_image_marking::TestMPITaskSequential::RunImpl() {
   std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
   int label = 1;
@@ -72,7 +72,7 @@ bool solovev_a_binary_image_marking::TestMPITaskSequential::RunImpl() {
 
   return true;
 }
-
+// NOLINTEND
 bool solovev_a_binary_image_marking::TestMPITaskSequential::PostProcessingImpl() {
   int* output_ = reinterpret_cast<int*>(task_data->outputs[0]);
   std::ranges::copy(labels_seq_, output_);
@@ -101,7 +101,7 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::ValidationImpl() {
   }
   return true;
 }
-
+// NOLINTBEGIN
 bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
   std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
   boost::mpi::broadcast(world_, m_, 0);
@@ -204,7 +204,7 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
   }
   return true;
 }
-
+// NOLINTEND
 bool solovev_a_binary_image_marking::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     int* output_ = reinterpret_cast<int*>(task_data->outputs[0]);

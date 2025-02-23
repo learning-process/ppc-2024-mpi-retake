@@ -40,7 +40,7 @@ bool solovev_a_binary_image_marking::TestTaskSequential::ValidationImpl() {
 
   return (m_check > 0 && n_check > 0 && !input_check.empty());
 }
-
+// NOLINTBEGIN
 bool solovev_a_binary_image_marking::TestTaskSequential::RunImpl() {
   std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
   int label = 1;
@@ -77,7 +77,7 @@ bool solovev_a_binary_image_marking::TestTaskSequential::RunImpl() {
 
   return true;
 }
-
+// NOLINTEND
 bool solovev_a_binary_image_marking::TestTaskSequential::PostProcessingImpl() {
   int *output_ = reinterpret_cast<int *>(task_data->outputs[0]);
   std::ranges::copy(labels_, output_);

@@ -3,8 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <cstddef>
 #include <vector>
-#include <utility>
 
 #include "seq/solovev_a_binary_image_marking/include/ops_sec.hpp"
 
