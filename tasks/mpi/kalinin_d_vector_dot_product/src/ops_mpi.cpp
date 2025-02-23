@@ -97,6 +97,8 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
     }
   }
 
+  boost::mpi::broadcast(world_, input_, 0);
+
   res_ = 0;
   return true;
 }
