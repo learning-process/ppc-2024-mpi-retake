@@ -28,7 +28,8 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(int ro
   }
   return rank;
 }
-double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(int rows, int cols, std::vector<double> a) {
+double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(int rows, int cols,
+                                                                              std::vector<double> a) {
   double det = 1;
 
   for (int i = 0; i < cols; ++i) {
@@ -63,9 +64,9 @@ double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(in
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::PreProcessingImpl() {
   matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
-  cols_ = task_data->inputs_count[1];
-  rows_ = task_data->inputs_count[2];
+  std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+  cols_ = static_cast<int>(task_data->inputs_count[1]);
+  rows_ = static_cast<int>(task_data->inputs_count[2]);
 
   res_ = std::vector<double>(cols_ - 1, 0);
   return true;
@@ -74,9 +75,9 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::ValidationImpl() {
   matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
-  cols_ = task_data->inputs_count[1];
-  rows_ = task_data->inputs_count[2];
+  std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+  cols_ = static_cast<int>(task_data->inputs_count[1]);
+  rows_ = static_cast<int>(task_data->inputs_count[2]);
 
   return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
          MatrixRank(cols_, rows_, matrix_) == rows_;
@@ -103,7 +104,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::PostProcessingImpl() {
   auto *this_matrix = reinterpret_cast<double *>(task_data->outputs[0]);
-  std::copy(res_.begin(), res_.end(), this_matrix);
+  std::ranges::copy(res_.begin(), res_.end(), this_matrix);
   return true;
 }
 
@@ -111,9 +112,9 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   if (world_.rank() == 0) {
     matrix_ = std::vector<double>(task_data->inputs_count[0]);
     auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-    std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
-    cols_ = task_data->inputs_count[1];
-    rows_ = task_data->inputs_count[2];
+    std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+    cols_ = static_cast<int>(task_data->inputs_count[1]);
+    rows_ = static_cast<int>(task_data->inputs_count[2]);
 
     res_ = std::vector<double>(cols_ - 1, 0);
   }
@@ -124,9 +125,9 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   if (world_.rank() == 0) {
     matrix_ = std::vector<double>(task_data->inputs_count[0]);
     auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-    std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
-    cols_ = task_data->inputs_count[1];
-    rows_ = task_data->inputs_count[2];
+    std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+    cols_ = static_cast<int>(task_data->inputs_count[1]);
+    rows_ = static_cast<int>(task_data->inputs_count[2]);
 
     return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
            MatrixRank(cols_, rows_, matrix_) == rows_;
@@ -239,7 +240,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto *this_matrix = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::copy(res_.begin(), res_.end(), this_matrix);
+    std::ranges::copy(res_.begin(), res_.end(), this_matrix);
   }
   return true;
 }
