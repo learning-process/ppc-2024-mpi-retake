@@ -4,61 +4,60 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
+#include <cstddef>
 #include <cstdlib>
 #include <vector>
 
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(std::size_t rows, std::size_t cols,
-                                                                          std::vector<double> a) {
-  int rank = cols;
-  for (int i = 0; i < cols; ++i) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix matrix, std::vector<double> a) {
+  int rank = matrix->cols;
+  for (int i = 0; i < matrix->cols; ++i) {
     int j = 0;
-    for (j = 0; j < rows; ++j) {
-      if (std::abs(a[(j * rows) + i]) > 1e-6) {
+    for (j = 0; j < matrix->rows; ++j) {
+      if (std::abs(a[(j * matrix->rows) + i]) > 1e-6) {
         break;
       }
     }
-    if (j == rows) {
+    if (j == matrix->rows) {
       --rank;
     } else {
-      for (int k = i + 1; k < cols; ++k) {
-        double ml = a[(k * rows) + i] / a[(i * rows) + i];
-        for (j = i; j < rows - 1; ++j) {
-          a[(k * rows) + j] -= a[(i * rows) + j] * ml;
+      for (int k = i + 1; k < matrix->cols; ++k) {
+        double ml = a[(k * matrix->rows) + i] / a[(i * matrix->rows) + i];
+        for (j = i; j < matrix->rows - 1; ++j) {
+          a[(k * matrix->rows) + j] -= a[(i * matrix->rows) + j] * ml;
         }
       }
     }
   }
   return rank;
 }
-double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(std::size_t rows, std::size_t cols,
-                                                                              std::vector<double> a) {
+double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Matrix matrix, std::vector<double> a) {
   double det = 1;
 
-  for (int i = 0; i < cols; ++i) {
+  for (int i = 0; i < matrix->cols; ++i) {
     int idx = i;
-    for (int k = i + 1; k < cols; ++k) {
-      if (std::abs(a[(k * rows) + i]) > std::abs(a[(idx * rows) + i])) {
+    for (int k = i + 1; k < matrix->cols; ++k) {
+      if (std::abs(a[(k * matrix->rows) + i]) > std::abs(a[(idx * matrix->rows) + i])) {
         idx = k;
       }
     }
-    if (std::abs(a[(idx * rows) + i]) < 1e-6) {
+    if (std::abs(a[(idx * matrix->rows) + i]) < 1e-6) {
       return 0;
     }
     if (idx != i) {
-      for (int j = 0; j < rows - 1; ++j) {
-        double tmp = a[(i * rows) + j];
-        a[(i * rows) + j] = a[(idx * rows) + j];
-        a[(idx * rows) + j] = tmp;
+      for (int j = 0; j < matrix->rows - 1; ++j) {
+        double tmp = a[(i * matrix->rows) + j];
+        a[(i * matrix->rows) + j] = a[(idx * matrix->rows) + j];
+        a[(idx * matrix->rows) + j] = tmp;
       }
       det *= -1;
     }
-    det *= a[(i * rows) + i];
-    for (int k = i + 1; k < cols; ++k) {
-      double ml = a[(k * rows) + i] / a[(i * rows) + i];
-      for (int j = i; j < rows - 1; ++j) {
-        a[(k * rows) + j] -= a[(i * rows) + j] * ml;
+    det *= a[(i * matrix->rows) + i];
+    for (int k = i + 1; k < matrix->cols; ++k) {
+      double ml = a[(k * matrix->rows) + i] / a[(i * matrix->rows) + i];
+      for (int j = i; j < matrix->rows - 1; ++j) {
+        a[(k * matrix->rows) + j] -= a[(i * matrix->rows) + j] * ml;
       }
     }
   }

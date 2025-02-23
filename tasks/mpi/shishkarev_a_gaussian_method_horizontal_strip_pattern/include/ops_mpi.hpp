@@ -10,9 +10,14 @@
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
 
-int MatrixRank(std::size_t rows, std::size_t cols, std::vector<double> a);
+struct Matrix{
+  std::int rows;
+  std::int cols;
+}
 
-double Determinant(std::size_t rows, std::size_t cols, std::vector<double> a);
+int MatrixRank(Matrix matrix, std::vector<double> a);
+
+double Determinant(Matrix matrix, std::vector<double> a);
 
 std::vector<double> GetRandomMatrix(int sz);
 
