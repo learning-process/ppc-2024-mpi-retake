@@ -153,7 +153,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
 
 bool opolin_d_cg_method_mpi::CGMethodkMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
-    auto *out = reinterpret_cast<double *>(task_data->outputs[0]);
+    auto* out = reinterpret_cast<double*>(task_data->outputs[0]);
     std::ranges::copy(x_, out);
   }
   return true;

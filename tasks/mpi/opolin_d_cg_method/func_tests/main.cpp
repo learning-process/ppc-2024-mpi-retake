@@ -24,7 +24,7 @@ void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b
     for (size_t j = 0; j < size; j++) M[i * size + j] = dist(gen);
   A.assign(size * size, 0.0);
   for (size_t i = 0; i < size; i++)
-    for (size_t j = 0; j < siz              e; j++)
+    for (size_t j = 0; j < siz e; j++)
       for (size_t k = 0; k < size; k++) A[i * size + j] += M[k * size + i] * M[k * size + j];
   for (size_t i = 0; i < size; i++) A[i * size + i] += size;
   expectedX.resize(size);
@@ -35,7 +35,6 @@ void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b
 }
 }  // namespace
 }  // namespace opolin_d_cg_method_mpi
-
 
 TEST(opolin_d_cg_method_mpi, test_small_system) {
   boost::mpi::communicator world;
