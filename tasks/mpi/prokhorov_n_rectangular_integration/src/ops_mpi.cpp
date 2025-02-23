@@ -97,9 +97,9 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PreProcessingImpl() {
     return n_ > 0;
   }
 
-  boost::mpi::broadcast(world_, lower_bound_, 0);  // явное использование boost::mpi::broadcast
-  boost::mpi::broadcast(world_, upper_bound_, 0);  // явное использование boost::mpi::broadcast
-  boost::mpi::broadcast(world_, n_, 0);            // явное использование boost::mpi::broadcast
+  boost::mpi::broadcast(world_, lower_bound_, 0);
+  boost::mpi::broadcast(world_, upper_bound_, 0);
+  boost::mpi::broadcast(world_, n_, 0);
 
   return true;
 }
