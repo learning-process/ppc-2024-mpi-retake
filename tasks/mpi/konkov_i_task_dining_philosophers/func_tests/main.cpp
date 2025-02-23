@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <mpi.h>
+#include <gtest/gtest.h>
 
 #include "mpi/konkov_i_task_dining_philosophers/include/ops_mpi.hpp"
 
@@ -31,7 +31,8 @@ TEST(konkov_i_DiningPhilosophersTest, DeadlockFreeExecution) {
   ASSERT_TRUE(dp.Run());
   ASSERT_TRUE(dp.PostProcessing());
 
-  int local_deadlock = dp.CheckDeadlock() ? 1 : 0;
+  bool local_deadlock_bool = dp.CheckDeadlock();
+  int local_deadlock = local_deadlock_bool ? 1 : 0;
   int global_deadlock = 0;
   MPI_Allreduce(&local_deadlock, &global_deadlock, 1, MPI_INT, MPI_LOR, MPI_COMM_WORLD);
   ASSERT_FALSE(global_deadlock) << "Deadlock detected!";
