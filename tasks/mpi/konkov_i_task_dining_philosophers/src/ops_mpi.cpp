@@ -64,7 +64,6 @@ int DiningPhilosophers::IsDeadlock() {
   return std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; }) ? 1 : 0;
 }
 
-
 void DiningPhilosophers::UpdateForkStates() {
   MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, fork_states_.data(), 1, MPI_INT, MPI_COMM_WORLD);
 }
