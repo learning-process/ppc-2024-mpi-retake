@@ -60,32 +60,46 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
   int local_input_size = 0;
-  std::vector<int> send_counts{};
-
-  std::vector<int> displacements{};
-  broadcast(world_, target_, 0);
+  std::vector<int> send_counts;
+  std::vector<int> displacements;
   int rank = world_.rank();
 
+  broadcast(world_, target_, 0);
+
   if (rank == 0) {
-    unsigned int input_length = task_data->inputs_count[0];
-    unsigned int world_size = world_.size();
-    unsigned int segment = input_length / world_size;
-    auto excess = input_length % world_size;
-    send_counts = std::vector<int>(world_size, static_cast<signed int>(segment));
-    for (unsigned int i = 0; i < excess; i++) {
-      send_counts[i]++;
+    int input_length = static_cast<int>(task_data->inputs_count[0]);
+    int world_size = world_.size();
+    int segment = input_length / world_size;
+    int excess = input_length % world_size;
+
+    send_counts.resize(world_size);
+    for (int i = 0; i < world_size; ++i) {
+      send_counts[i] = segment + (i < excess ? 1 : 0);
     }
-    displacements = std::vector<int>(world_size, 0);
-    for (unsigned int i = 1; i < world_size; i++) {
-      displacements[i] = displacements[(i - 1)] + send_counts[(i - 1)];
+
+    displacements.resize(world_size);
+    displacements[0] = 0;
+    for (int i = 1; i < world_size; ++i) {
+      displacements[i] = displacements[i - 1] + send_counts[i - 1];
     }
   }
-  boost::mpi::scatter(world_, send_counts, local_input_size, 0);
-  local_input_ = std::vector<signed char>(local_input_size);
-  boost::mpi::scatterv(world_, input_.data(), send_counts, displacements, local_input_.data(), local_input_size, 0);
 
-  local_result_ = static_cast<int>(std::count(local_input_.begin(), local_input_.end(), target_));
-  reduce(world_, local_result_, result_, std::plus(), 0);
+  // Scatter send_counts to get local_input_size
+  boost::mpi::scatter(world_, send_counts, local_input_size, 0);
+
+  // Resize buffer to match the expected input size
+  local_input_.resize(local_input_size);
+
+  // Scatterv with root-specific parameters
+  boost::mpi::scatterv(world_, (rank == 0) ? input_.data() : nullptr, (rank == 0) ? send_counts : std::vector<int>(),
+                       (rank == 0) ? displacements : std::vector<int>(), local_input_.data(), local_input_size, 0);
+
+  // Compute local count
+  int local_result = std::count(local_input_.begin(), local_input_.end(), target_);
+
+  // Reduce results to root
+  boost::mpi::reduce(world_, local_result, result_, std::plus<int>(), 0);
+
   return true;
 }
 
