@@ -57,7 +57,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
-  unsigned int input_size = 0;
+  unsigned int local_input_size = 0;
   std::vector<int> send_counts{};
 
   std::vector<int> displacements{};
@@ -73,14 +73,13 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
     for (unsigned int i = 0; i < excess; i++) {
       send_counts[i]++;
     }
-    input_size = (segment + 1);
     displacements = std::vector<int>(world_size, 0);
     for (unsigned int i = 1; i < world_size; i++) {
       displacements[i] = displacements[(i - 1)] + send_counts[(i - 1)];
     }
   }
-  broadcast(world_, input_size, 0);
-  local_input_ = std::vector<signed char>(input_size);
+  boost::mpi::scatter(world_, send_counts, local_input_size, 0);
+  local_input_ = std::vector<signed char>(local_input_size);
   boost::mpi::scatterv(world_, input_.data(), send_counts, displacements, local_input_.data(), send_counts[rank], 0);
 
   local_result_ = static_cast<unsigned char>(std::count(local_input_.begin(), local_input_.end(), target_));
