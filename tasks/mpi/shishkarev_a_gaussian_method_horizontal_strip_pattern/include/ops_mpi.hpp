@@ -56,7 +56,7 @@ class MPIGaussHorizontalParallel : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
- private:
+ protected:
   std::vector<double> matrix_, local_matrix_, res_, local_res_;
   int delta_, rows_{}, cols_{};
   boost::mpi::communicator world_;
