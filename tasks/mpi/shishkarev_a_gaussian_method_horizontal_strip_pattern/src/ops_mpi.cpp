@@ -258,7 +258,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   local_res_.resize(cols_ - 1, 0);
   vector.local_res = local_res_;
 
-  BackSubstitution(world_, rows_, matrix, vector);
+  BackSubstitution(world_, matrix, vector);
   return true;
 }
 
