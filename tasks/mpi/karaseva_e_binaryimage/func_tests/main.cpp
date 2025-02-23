@@ -11,7 +11,6 @@
 
 namespace karaseva_e_binaryimage_mpi {
 
-// Function name updated to follow the correct naming convention and made static for internal linkage
 static std::vector<int> GetRandomBinImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
