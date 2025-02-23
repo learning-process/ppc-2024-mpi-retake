@@ -1,12 +1,14 @@
 #include "mpi/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
 #include <cstdlib>
 #include <vector>
 
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(int rows, int cols, std::vector<double> a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(std::size_t rows, std::size_t cols, std::vector<double> a) {
   int rank = cols;
   for (int i = 0; i < cols; ++i) {
     int j = 0;
@@ -28,7 +30,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(int ro
   }
   return rank;
 }
-double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(int rows, int cols,
+double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(std::size_t rows, std::size_t cols,
                                                                               std::vector<double> a) {
   double det = 1;
 
@@ -152,10 +154,6 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   if (world_.rank() == 0) {
     std::vector<double> send_matrix(delta * cols_);
     for (int proc = 1; proc < world_.size(); ++proc) {
-      if (row_num[proc] * cols_ > send_matrix.size()) {
-        std::cerr << "Ошибка: Размерность send_matrix не совпадает!" << std::endl;
-        continue;
-      }
       for (int i = 0; i < row_num[proc]; ++i) {
         for (int j = 0; j < cols_; ++j) {
           send_matrix[(i * cols_) + j] = matrix_[((proc + (world_.size() * i)) * cols_) + j];
@@ -170,15 +168,17 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   if (world_.rank() == 0) {
     for (int i = 0; i < delta; ++i) {
       for (int j = 0; j < cols_; ++j) {
-        local_matrix_[(i * cols_) + j] = matrix_[i * cols_ * world_.size() + j];
+        local_matrix_[(i * cols_) + j] = matrix_[(i * cols_ * world_.size()) + j];
       }
     }
   } else {
-    if (delta * cols_ > local_matrix_.size()) {
-      std::cerr << "Ошибка: Размерность local_matrix_ не совпадает!" << std::endl;
-    } else {
       world_.recv(0, 0, local_matrix_.data(), delta * cols_);
     }
+  }
+
+  std::vector<double> row(delta);
+  for (int i = 0; i < delta; ++i) {
+    row[i] = world.rank() + world.size() * i;
   }
 
   std::vector<double> pivot(cols_);
