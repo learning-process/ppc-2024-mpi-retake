@@ -23,17 +23,17 @@ std::vector<double> GetRandomMatrix(int sz);
 
 double AxB(int n, int m, std::vector<double> a, std::vector<double> res);
 
-void BroadcastMatrixSize();
+void BroadcastMatrixSize(boost::mpi::communicator& world, int& rows, int& cols);
 
-std::vector<int> ComputeRowDistribution();
+std::vector<int> ComputeRowDistribution(boost::mpi::communicator& world, int rows);
 
-void DistributeMatrix(const std::vector<int>& row_num);
+void DistributeMatrix(boost::mpi::communicator& world, const std::vector<int>& row_num, int cols, std::vector<double>& matrix);
 
-void ReceiveMatrix(int delta);
+void ReceiveMatrix(boost::mpi::communicator& world, int delta, int cols, std::vector<double>& local_matrix, std::vector<double>& matrix);
 
-void ForwardElimination(std::vector<double>& row);
+void ForwardElimination(boost::mpi::communicator& world, int rows, int cols, int delta, std::vector<double>& local_matrix, std::vector<double>& row);
 
-void BackSubstitution(std::vector<double>& row);
+void BackSubstitution(boost::mpi::communicator& world, int rows, int cols, int delta, std::vector<double>& local_matrix, std::vector<double>& local_res, std::vector<double>& res, std::vector<double>& row);
 
 class MPIGaussHorizontalSequential : public ppc::core::Task {
  public:
@@ -56,7 +56,7 @@ class MPIGaussHorizontalParallel : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
- protected:
+ private:
   std::vector<double> matrix_, local_matrix_, res_, local_res_;
   int delta_, rows_{}, cols_{};
   boost::mpi::communicator world_;
