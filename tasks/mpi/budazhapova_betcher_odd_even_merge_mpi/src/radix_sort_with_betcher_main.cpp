@@ -24,7 +24,7 @@ void CountingSort(std::vector<int>& arr, int exp) {
   for (int i = 1; i < 10; i++) {
     count[i] += count[i - 1];
   }
-  for (size_t i = n - 1; i >= 0; i--) {
+  for (int i = n - 1; i >= 0; i--) {
     int index = (arr[i] / exp) % 10;
     output[count[index] - 1] = arr[i];
     count[index]--;
