@@ -311,6 +311,7 @@ TEST(strakhov_a_char_freq_counter_mpi, simple_test_1) {
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
+    task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_string.size());
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_target.size());
@@ -359,6 +360,7 @@ TEST(strakhov_a_char_freq_counter_mpi, simple_test_2) {
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
+    task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_string.size());
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_target.size());
@@ -407,6 +409,7 @@ TEST(strakhov_a_char_freq_counter_mpi, simple_test_3) {
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
+    task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_string.size());
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_target.size());
