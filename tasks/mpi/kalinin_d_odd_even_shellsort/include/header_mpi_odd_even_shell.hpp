@@ -23,5 +23,9 @@ class OddEvenShellMpi : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 void GimmeRandVec(std::vector<int> &vec);
-
+void PrepareInput(int &local_sz);
+void PerformOddEvenPhase(int phase, int id, int sz, bool is_even, std::vector<int> &local_vec, int local_sz);
+void ExchangeData(int id, int neighbour, std::vector<int> &local_vec, std::vector<int> &received_data, int send_tag,
+                  int recv_tag);
+void GatherResults(int id, std::vector<int> &local_vec, int local_sz);
 }  // namespace kalinin_d_odd_even_shell_mpi
