@@ -1,12 +1,13 @@
 #include "seq/karaseva_e_binaryimage/include/ops_seq.hpp"
 
 #include <algorithm>
+#include <ranges>  // Added for std::ranges::min_element
 #include <unordered_map>
 #include <vector>
 
-namespace karaseva_e_binaryimage_seq {
-// FixLabels function made static to enforce internal linkage
-static void FixLabels(std::vector<int>& labeled_image, int rows, int cols) {
+// Function moved to anonymous namespace as per the error message
+namespace {
+void FixLabels(std::vector<int>& labeled_image, int rows, int cols) {
   std::unordered_map<int, int> label_map;
   int next_label = 2;
 
@@ -19,7 +20,7 @@ static void FixLabels(std::vector<int>& labeled_image, int rows, int cols) {
     }
   }
 }
-}  // namespace karaseva_e_binaryimage_seq
+}  // namespace
 
 class LabelUnionFind {
  public:
@@ -97,7 +98,7 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::RunImpl() {
         if (neighbors.empty()) {
           labeled_image_[position] = current_label++;
         } else {
-          int min_label = *std::min_element(neighbors.begin(), neighbors.end());
+          int min_label = *std::ranges::min_element(neighbors);
           labeled_image_[position] = min_label;
 
           for (int label : neighbors) {

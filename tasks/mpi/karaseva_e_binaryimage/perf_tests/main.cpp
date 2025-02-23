@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <vector>
 
@@ -11,8 +12,10 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
+namespace karaseva_e_binaryimage_mpi {
+
 // Function to generate a random binary image of given size
-static std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
+std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (auto &px : img) {
     px = rand() % 2;
@@ -20,13 +23,15 @@ static std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
   return img;
 }
 
+}  // namespace karaseva_e_binaryimage_mpi
+
 // Test for the pipeline run
 TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
   constexpr int kRows = 10000;
   constexpr int kCols = 10000;
 
   // Create binary image data
-  std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
+  std::vector<uint8_t> image = karaseva_e_binaryimage_mpi::GenerateRandomBinImg(kRows, kCols);
   std::vector<uint32_t> output(kRows * kCols, 0);
 
   // Create task_data
@@ -71,7 +76,7 @@ TEST(karaseva_e_binaryimage_mpi, test_task_run) {
   constexpr int kCols = 10000;
 
   // Create binary image data
-  std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
+  std::vector<uint8_t> image = karaseva_e_binaryimage_mpi::GenerateRandomBinImg(kRows, kCols);
   std::vector<uint32_t> output(kRows * kCols, 0);
 
   // Create task_data

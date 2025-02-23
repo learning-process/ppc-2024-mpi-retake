@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi.hpp>
+#include <cstdint>  // Äëÿ uint8_t
+#include <memory>   // Äëÿ std::shared_ptr è std::make_shared
 #include <random>
 #include <vector>
 
@@ -8,7 +10,9 @@
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
 namespace karaseva_e_binaryimage_mpi {
-std::vector<int> get_random_bin_image(int r, int c) {
+
+// Function name updated to follow the correct naming convention and made static for internal linkage
+static std::vector<int> GetRandomBinImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(0, 1);
@@ -18,6 +22,7 @@ std::vector<int> get_random_bin_image(int r, int c) {
   }
   return vec;
 }
+
 }  // namespace karaseva_e_binaryimage_mpi
 
 TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
@@ -32,7 +37,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::get_random_bin_image(rows, cols);
+    image = karaseva_e_binaryimage_mpi::GetRandomBinImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);
@@ -141,7 +146,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::get_random_bin_image(rows, cols);
+    image = karaseva_e_binaryimage_mpi::GetRandomBinImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);

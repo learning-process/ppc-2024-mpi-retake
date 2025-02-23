@@ -4,6 +4,7 @@
 #include <boost/mpi/communicator.hpp>
 #include <utility>
 #include <vector>
+#include <unordered_map>
 
 #include "core/task/include/task.hpp"
 

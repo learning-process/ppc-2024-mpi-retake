@@ -2,6 +2,7 @@
 
 #include <mpi.h>
 
+#include <algorithm>  // Äëÿ std::min_element
 #include <cmath>
 #include <cstddef>
 #include <unordered_map>
@@ -118,8 +119,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int min_label = 2;  // Starting label
   std::unordered_map<int, int> label_parent;
 
-  int num_procs;
-  int rank;
+  int num_procs = 0;
+  int rank = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
