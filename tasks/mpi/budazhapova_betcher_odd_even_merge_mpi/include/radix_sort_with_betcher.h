@@ -24,14 +24,14 @@ class MergeSequential : public ppc::core::Task {
 };
 class MergeParallel : public ppc::core::Task {
  public:
-  boost::mpi::communicator world_;
   explicit MergeParallel(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  std::vector<int> local_res_;
-  std::vector<int> res_;
+  std::vector<int> local_res;
+  std::vector<int> res;
+  boost::mpi::communicator world;
 };
 }  // namespace budazhapova_betcher_odd_even_merge_mpi

@@ -50,19 +50,19 @@ void OddEvenMerge(std::vector<int>& local, std::vector<int>& received_data) {
   received_data.assign(merged.begin() + static_cast<long>(local.size()), merged.end());
 }
 void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& data) {
-  if (send_rank >= 0 && send_rank < world_.size()) {
-    world_.send(send_rank, world_.rank(), data);
+  if (send_rank >= 0 && send_rank < world_size()) {
+    world.send(send_rank, world.rank(), data);
   }
   if (recv_rank >= 0 && recv_rank < world.size()) {
-    world_.recv(recv_rank, recv_rank, data);
+    world.recv(recv_rank, recv_rank, data);
   }
 }
 
 void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data) {
   std::vector<int> received_data;
-  world_.recv(neighbor_rank, neighbor_rank, received_data);
+  world.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(local_data, received_data);
-  world_.send(neighbor_rank, world_.rank(), received_data);
+  world.send(neighbor_rank, world.rank(), received_data);
 }
 
 void OddEvenSortPhase(int phase) {
@@ -71,21 +71,21 @@ void OddEvenSortPhase(int phase) {
 
   if (phase % 2 == 0) {
     if (world.rank() % 2 == 0 && next_rank < world.size()) {
-      SendAndReceive(next_rank, -1, local_res_);
+      SendAndReceive(next_rank, -1, local_res);
     } else if (world.rank() % 2 == 1) {
-      PerformOddEvenMerge(prev_rank, local_res_);
+      PerformOddEvenMerge(prev_rank, local_res);
     }
     if (world.rank() % 2 == 0 && next_rank < world.size()) {
-      SendAndReceive(-1, next_rank, local_res_);
+      SendAndReceive(-1, next_rank, local_res);
     }
   } else {
     if (world.rank() % 2 == 1 && next_rank < world.size()) {
-      SendAndReceive(next_rank, -1, local_res_);
+      SendAndReceive(next_rank, -1, local_res);
     } else if (world.rank() % 2 == 0 && world.rank() > 0) {
-      PerformOddEvenMerge(prev_rank, local_res_);
+      PerformOddEvenMerge(prev_rank, local_res);
     }
     if (world.rank() % 2 == 1 && next_rank < world.size()) {
-      SendAndReceive(-1, next_rank, local_res_);
+      SendAndReceive(-1, next_rank, local_res);
     }
   }
 }
@@ -94,7 +94,7 @@ void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements,
                     std::vector<int>& recv_counts, std::vector<int>& displacements) {
   int world_size = world_.size();
   int world_rank = world_.rank();
-  int res_size = static_cast<int>(res_.size());
+  int res_size = static_cast<int>(res.size());
 
   n_of_send_elements = res_size / world_size;
   n_of_proc_with_extra_elements = res_size % world_size;
@@ -109,16 +109,16 @@ void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements,
   start = world_rank * n_of_send_elements + std::min(world_rank, n_of_proc_with_extra_elements);
   end = start + n_of_send_elements + (world_rank < n_of_proc_with_extra_elements ? 1 : 0);
 
-  local_res_.resize(end - start);
+  local_res.resize(end - start);
   for (int i = start; i < end; i++) {
-    local_res_[i - start] = res_[i];
+    local_res[i - start] = res[i];
   }
 }
 }  // namespace
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PreProcessingImpl() {
-  res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
-                          reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
+  res = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
+                         reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   return true;
 }
 
@@ -127,37 +127,37 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::ValidationImpl() {
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::RunImpl() {
-  budazhapova_betcher_odd_even_merge_mpi::RadixSort(res_);
+  budazhapova_betcher_odd_even_merge_mpi::RadixSort(res);
   return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeSequential::PostProcessingImpl() {
   int* output = reinterpret_cast<int*>(task_data->outputs[0]);
-  for (size_t i = 0; i < res_.size(); i++) {
-    output[i] = res_[i];
+  for (size_t i = 0; i < res.size(); i++) {
+    output[i] = res[i];
   }
   return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PreProcessingImpl() {
-  if (world_.rank() == 0) {
-    res_ = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
-                            reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
+  if (world.rank() == 0) {
+    res = std::vector<int>(reinterpret_cast<int*>(task_data->inputs[0]),
+                           reinterpret_cast<int*>(task_data->inputs[0]) + task_data->inputs_count[0]);
   }
   return true;
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::ValidationImpl() {
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     return task_data->inputs_count[0] > 0;
   }
   return true;
 }
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
-  std::vector<int> recv_counts(world_.size(), 0);
-  std::vector<int> displacements(world_.size(), 0);
+  std::vector<int> recv_counts(world.size(), 0);
+  std::vector<int> displacements(world.size(), 0);
 
-  boost::mpi::broadcast(world_, res_, 0);
+  boost::mpi::broadcast(world, res, 0);
 
   int n_of_send_elements = 0;
   int n_of_proc_with_extra_elements = 0;
@@ -166,21 +166,21 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
 
   DistributeData(n_of_send_elements, n_of_proc_with_extra_elements, start, end, recv_counts, displacements);
 
-  int world_size = world_.size();
+  int world_size = world.size();
 
   for (int phase = 0; phase < world_size; ++phase) {
     OddEvenSortPhase(phase, local_data_);
   }
 
-  boost::mpi::gatherv(world_, local_res_.data(), static_cast<int>(local_res_.size()), res_.data(), recv_counts,
+  boost::mpi::gatherv(world, local_res.data(), static_cast<int>(local_res.size()), res.data(), recv_counts,
                       displacements, 0);
 }
 
 bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::PostProcessingImpl() {
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     int* output = reinterpret_cast<int*>(task_data->outputs[0]);
-    for (size_t i = 0; i < res_.size(); i++) {
-      output[i] = res_[i];
+    for (size_t i = 0; i < res.size(); i++) {
+      output[i] = res[i];
     }
   }
   return true;
