@@ -2,7 +2,7 @@
 
 #include <mpi.h>
 
-#include <algorithm>  // Для std::min_element
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <unordered_map>

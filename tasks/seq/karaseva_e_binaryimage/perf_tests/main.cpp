@@ -67,8 +67,7 @@ TEST(karaseva_e_binaryimage_seq, test_pipeline_run) {
 
   for (std::size_t i = 0; i < expected_out.size(); i++) {
     if (expected_out[i] != out[i]) {
-      std::cout << "Mismatch at index " << i << ": expected " << expected_out[i] << ", got " << out[i]
-                << "\n";
+      std::cout << "Mismatch at index " << i << ": expected " << expected_out[i] << ", got " << out[i] << "\n";
     }
   }
 
