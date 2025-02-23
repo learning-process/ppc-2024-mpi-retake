@@ -108,37 +108,21 @@ void ValidationFalseTest(int height, int width) {
 
 }  // namespace
 
-TEST(solovev_a_binary_image_marking, Test_image_random_5X5) {
-  TestBodyFunction(5, 5);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_5X5) { TestBodyFunction(5, 5); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_11X11) {
-  TestBodyFunction(11, 11);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_11X11) { TestBodyFunction(11, 11); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_16X16) {
-  TestBodyFunction(16, 16);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_16X16) { TestBodyFunction(16, 16); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_32X32) {
-  TestBodyFunction(32, 32);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_32X32) { TestBodyFunction(32, 32); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_23X31) {
-  TestBodyFunction(23, 31);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_23X31) { TestBodyFunction(23, 31); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_31X23) {
-  TestBodyFunction(31, 23);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_31X23) { TestBodyFunction(31, 23); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_50X50) {
-  TestBodyFunction(50, 50);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_50X50) { TestBodyFunction(50, 50); }
 
-TEST(solovev_a_binary_image_marking, Test_image_random_75X75) {
-  TestBodyFunction(75, 75);
-}
+TEST(solovev_a_binary_image_marking, Test_image_random_75X75) { TestBodyFunction(75, 75); }
 
 TEST(solovev_a_binary_image_marking, Whole_image) {
   boost::mpi::communicator world;
@@ -194,14 +178,8 @@ TEST(solovev_a_binary_image_marking, Whole_image) {
   }
 }
 
-TEST(solovev_a_binary_image_marking, Validation_false_1) {
-  ValidationFalseTest(-1, 10);
-}
+TEST(solovev_a_binary_image_marking, Validation_false_1) { ValidationFalseTest(-1, 10); }
 
-TEST(solovev_a_binary_image_marking, Validation_false_2) {
-  ValidationFalseTest(10, -1);
-}
+TEST(solovev_a_binary_image_marking, Validation_false_2) { ValidationFalseTest(10, -1); }
 
-TEST(solovev_a_binary_image_marking, Validation_false_3) {
-  ValidationFalseTest(10, 10);
-}
+TEST(solovev_a_binary_image_marking, Validation_false_3) { ValidationFalseTest(10, 10); }
