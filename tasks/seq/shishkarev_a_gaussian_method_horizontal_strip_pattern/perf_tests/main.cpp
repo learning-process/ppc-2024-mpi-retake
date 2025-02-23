@@ -21,14 +21,13 @@ std::vector<double> GetRandomMatrix(int sz) {
   }
   return matrix;
 }
-}
+} // namespace
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_run) {
   constexpr int kCols = 101;
   constexpr int kRows = 100;
 
-  std::vector<double> matrix =
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(kCols * kRows);
+  std::vector<double> matrix = GetRandomMatrix(kCols * kRows);
   std::vector<double> res(kCols - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -62,8 +61,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_task_run) {
   constexpr int kCols = 101;
   constexpr int kRows = 100;
 
-  std::vector<double> matrix =
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(kCols * kRows);
+  std::vector<double> matrix = GetRandomMatrix(kCols * kRows);
   std::vector<double> res(kCols - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
