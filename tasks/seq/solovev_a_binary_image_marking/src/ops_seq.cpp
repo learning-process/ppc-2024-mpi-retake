@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <queue>
-#include <ranges> // NOLINT
+#include <ranges>  // NOLINT
 #include <utility>
 #include <vector>
 
