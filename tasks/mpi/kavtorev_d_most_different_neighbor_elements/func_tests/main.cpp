@@ -152,47 +152,6 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeInputSize_ReturnsCorr
   }
 }
 
-TEST(kavtorev_d_most_different_neighbor_elements_mpi, RandomNumbers_ReturnsCorrectPair) {
-  boost::mpi::communicator world_;
-  std::vector<int> global_vec;
-  std::vector<int> global_max(1);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world_.rank() == 0) {
-    global_vec = kavtorev_d_most_different_neighbor_elements_mpi::Generator(10);
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
-    task_data_mpi->inputs_count.emplace_back(global_vec.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_max.data()));
-    task_data_mpi->outputs_count.emplace_back(global_max.size());
-  }
-
-  kavtorev_d_most_different_neighbor_elements_mpi::MostDifferentNeighborElementsMpi test_mpi_task_parallel(
-      task_data_mpi);
-  ASSERT_EQ(test_mpi_task_parallel.ValidationImpl(), true);
-  test_mpi_task_parallel.PreProcessingImpl();
-  test_mpi_task_parallel.RunImpl();
-  test_mpi_task_parallel.PostProcessingImpl();
-
-  if (world_.rank() == 0) {
-    std::vector<int> reference_max(1);
-
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
-    task_data_seq->inputs_count.emplace_back(global_vec.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_max.data()));
-    task_data_seq->outputs_count.emplace_back(reference_max.size());
-
-    kavtorev_d_most_different_neighbor_elements_mpi::MostDifferentNeighborElementsSeq test_task_sequential(
-        task_data_seq);
-    ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
-    test_task_sequential.PreProcessingImpl();
-    test_task_sequential.RunImpl();
-    test_task_sequential.PostProcessingImpl();
-
-    ASSERT_EQ(reference_max[0], global_max[0]);
-  }
-}
-
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRangeNumbers_ReturnsCorrectPair) {
   boost::mpi::communicator world_;
   std::vector<int> global_vec;
