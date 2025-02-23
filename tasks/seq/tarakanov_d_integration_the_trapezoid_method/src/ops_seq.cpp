@@ -7,14 +7,14 @@ bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMe
   b = *reinterpret_cast<double*>(task_data->inputs[1]);
   h = *reinterpret_cast<double*>(task_data->inputs[2]);
   res = 0.0;
-  
+
   return true;
 }
 
 bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::ValidationImpl() {
-  bool res = task_data->inputs_count[0] == 3 && task_data->outputs_count[2] > 0 && task_data->outputs_count[0] == 1;
+  bool result = task_data->inputs_count[0] == 3 && task_data->outputs_count[0] > 0 && task_data->outputs_count[0] == 1;
 
-  return res;
+  return result;
 }
 
 bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::RunImpl() {
@@ -25,6 +25,12 @@ bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMe
     double x0 = a + i * h;
     double x1 = a + (i + 1) * h;
     integral += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * h;
+  }
+
+  if (n * h + a < b) {
+    double x0 = a + n * h;
+    double x1 = b;
+    integral += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * (b - n * h);
   }
 
   res = integral;
