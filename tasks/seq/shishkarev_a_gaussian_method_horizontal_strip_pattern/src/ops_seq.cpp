@@ -1,5 +1,6 @@
 #include "seq/shishkarev_a_gaussian_method_horizontal_strip_pattern/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <vector>

@@ -12,7 +12,7 @@
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq {
 
-std::vector<double> GetRandomMatrix(int sz) {
+static std::vector<double> GetRandomMatrix(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_real_distribution<double> dis(-1000, 1000);
@@ -26,18 +26,18 @@ std::vector<double> GetRandomMatrix(int sz) {
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_seq
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_run) {
-  constexpr int cols = 101;
-  constexpr int rows = 100;
+  constexpr int kCols = 101;
+  constexpr int kRows = 100;
 
   std::vector<double> matrix =
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols * rows);
-  std::vector<double> res(cols - 1, 0);
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(kCols * kRows);
+  std::vector<double> res(kCols - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
   task_data_seq->inputs_count.emplace_back(matrix.size());
-  task_data_seq->inputs_count.emplace_back(cols);
-  task_data_seq->inputs_count.emplace_back(rows);
+  task_data_seq->inputs_count.emplace_back(kCols);
+  task_data_seq->inputs_count.emplace_back(kRows);
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
   task_data_seq->outputs_count.emplace_back(res.size());
 
@@ -61,18 +61,18 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_pipeline_ru
 }
 
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_seq, test_task_run) {
-  constexpr int cols = 101;
-  constexpr int rows = 100;
+  constexpr int kCols = 101;
+  constexpr int kRows = 100;
 
   std::vector<double> matrix =
-      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(cols * rows);
-  std::vector<double> res(cols - 1, 0);
+      shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::GetRandomMatrix(kCols * kRows);
+  std::vector<double> res(kCols - 1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
   task_data_seq->inputs_count.emplace_back(matrix.size());
-  task_data_seq->inputs_count.emplace_back(cols);
-  task_data_seq->inputs_count.emplace_back(rows);
+  task_data_seq->inputs_count.emplace_back(kCols);
+  task_data_seq->inputs_count.emplace_back(kRows);
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
   task_data_seq->outputs_count.emplace_back(res.size());
 
