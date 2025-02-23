@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <ranges>
 #include <unordered_map>
 #include <vector>
 
@@ -39,8 +40,8 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int
 
   for (int i = 0; i < 3; ++i) {
     int nx = x + dx[i], ny = y + dy[i];
-    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[nx * cols + ny] > 1) {
-      neighbors.push_back(labeled_image[nx * cols + ny]);
+    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[(nx * cols) + ny] > 1) {
+      neighbors.push_back(labeled_image[(nx * cols) + ny]);
     }
   }
 }
@@ -53,7 +54,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::v
   if (neighbors.empty()) {
     labeled_image[pos] = label_counter++;
   } else {
-    int min_neighbor = *std::min_element(neighbors.begin(), neighbors.end());
+    int min_neighbor = *std::ranges::min_element(neighbors);
     labeled_image[pos] = min_neighbor;
     for (int n : neighbors) {
       UnionLabels(label_parent, min_neighbor, n);
@@ -91,20 +92,19 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
-  unsigned int input_size = task_data->inputs_count[0];
+  auto input_size = task_data->inputs_count[0];
   auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
   // Check that the outputs_count vector is not empty
   if (task_data->outputs_count.empty()) {
-    return false;  // or handle the error
+    return false;
   }
 
-  unsigned int output_size = static_cast<unsigned int>(task_data->outputs_count[0]);  // Type cast if necessary
-  output_ = std::vector<int>(output_size, 0);  // The size of the output array matches the size of the input
+  auto output_size = static_cast<unsigned int>(task_data->outputs_count[0]);
+  output_ = std::vector<int>(output_size, 0);
 
-  rc_size_ =
-      static_cast<int>(std::sqrt(input_size));  // rc_size should be equal to sqrt(input_size), assuming a square image
+  rc_size_ = static_cast<int>(std::sqrt(input_size));
   return true;
 }
 
@@ -138,11 +138,13 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> ghost_cells_right(cols, 0);
 
   if (rank > 0) {  // Send left boundary to the previous rank
-    MPI_Send(labeled_image.data() + start_row * cols, cols, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
+    MPI_Send(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0,
+             MPI_COMM_WORLD);
   }
 
   if (rank < num_procs - 1) {  // Send right boundary to the next rank
-    MPI_Send(labeled_image.data() + (end_row - 1) * cols, cols, MPI_INT, rank + 1, 1, MPI_COMM_WORLD);
+    MPI_Send(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 1,
+             MPI_COMM_WORLD);
   }
 
   if (rank != 0) {
@@ -153,23 +155,26 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
     MPI_Recv(ghost_cells_right.data(), cols, MPI_INT, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
-  // Recalculate labels considering "ghost" cells (boundary pixels)
+  // Recalculate labels considering "ghost" cells
   for (int i = 0; i < cols; ++i) {
-    if (start_row > 0 && labeled_image[start_row * cols + i] > 1) {
-      UnionLabels(label_parent, labeled_image[start_row * cols + i], ghost_cells_left[i]);
+    if (start_row > 0 && labeled_image[(start_row * cols) + i] > 1) {
+      UnionLabels(label_parent, labeled_image[(start_row * cols) + i],
+                  ghost_cells_left[i]);
     }
-    if (end_row < rows && labeled_image[(end_row - 1) * cols + i] > 1) {
-      UnionLabels(label_parent, labeled_image[(end_row - 1) * cols + i], ghost_cells_right[i]);
+    if (end_row < rows &&
+        labeled_image[((end_row - 1) * cols) + i] > 1) {
+      UnionLabels(label_parent, labeled_image[((end_row - 1) * cols) + i],
+                  ghost_cells_right[i]);
     }
   }
 
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   // Gather labels from all processes
-  MPI_Allgather(labeled_image.data() + start_row * cols, rows_per_proc * cols, MPI_INT, labeled_image.data(),
+  MPI_Allgather(labeled_image.data() + (start_row * cols), rows_per_proc * cols, MPI_INT, labeled_image.data(),
                 rows_per_proc * cols, MPI_INT, MPI_COMM_WORLD);
 
-  // Perform final post-processing (if needed) and write the result
+  // Perform final post-processing and write the result
   MPI_Barrier(MPI_COMM_WORLD);
   return true;
 }

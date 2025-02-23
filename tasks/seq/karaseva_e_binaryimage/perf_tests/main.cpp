@@ -20,7 +20,7 @@ TEST(karaseva_e_binaryimage_seq, test_pipeline_run) {
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < columns; y++) {
-      int pos = x * columns + y;
+      int pos = (x * columns) + y;  // Added parentheses to specify order of operations
       if (x < 50) {
         in[pos] = 0;
         expected_out[pos] = 2;
@@ -84,7 +84,7 @@ TEST(karaseva_e_binaryimage_seq, test_task_run) {
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < columns; y++) {
-      int pos = x * columns + y;
+      int pos = (x * columns) + y;  // Added parentheses to specify order of operations
       if (x < 50) {
         in[pos] = 0;
         expected_out[pos] = 2;

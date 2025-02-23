@@ -1,7 +1,7 @@
 #include "seq/karaseva_e_binaryimage/include/ops_seq.hpp"
 
 #include <algorithm>
-#include <ranges>
+#include <cstddef>
 #include <unordered_map>
 #include <vector>
 
@@ -69,7 +69,7 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::ValidationImpl() {
     return false;
   }
 
-  return std::all_of(tmp_ptr, tmp_ptr + static_cast<size_t>(tmp_rows) * tmp_columns,
+  return std::all_of(tmp_ptr, tmp_ptr + static_cast<std::size_t>(tmp_rows) * tmp_columns,
                      [](int pixel) { return pixel == 0 || pixel == 1; });
 }
 
@@ -81,14 +81,14 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::RunImpl() {
 
   for (int x = 0; x < rows_; ++x) {
     for (int y = 0; y < columns_; ++y) {
-      int position = x * columns_ + y;
+      int position = (x * columns_) + y;
       if (image_[position] == 0) {
         std::vector<int> neighbors;
 
         for (int i = 0; i < 3; ++i) {
           int nx = x + dx[i];
           int ny = y + dy[i];
-          int neighbor_pos = nx * columns_ + ny;
+          int neighbor_pos = (nx * columns_) + ny;
 
           if (nx >= 0 && ny >= 0 && nx < rows_ && ny < columns_ && labeled_image_[neighbor_pos] > 1) {
             neighbors.push_back(labeled_image_[neighbor_pos]);
