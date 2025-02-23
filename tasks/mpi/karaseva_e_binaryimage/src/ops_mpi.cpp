@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <ranges>
 #include <unordered_map>
 #include <vector>
 
@@ -39,7 +38,8 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int
   int dy[] = {0, -1, 1};
 
   for (int i = 0; i < 3; ++i) {
-    int nx = x + dx[i], ny = y + dy[i];
+    int nx = x + dx[i];
+    int ny = y + dy[i];
     if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[(nx * cols) + ny] > 1) {
       neighbors.push_back(labeled_image[(nx * cols) + ny]);
     }
@@ -71,7 +71,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
 
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
-      int pos = x * cols + y;
+      int pos = (x * cols) + y;
       if (image[pos] == 0 || labeled_image[pos] > 1) {
         std::vector<int> neighbors;
         ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
@@ -83,7 +83,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
   // Local root search after labeling
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
-      int pos = x * cols + y;
+      int pos = (x * cols) + y;
       if (labeled_image[pos] > 1) {
         labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);
       }
@@ -138,13 +138,11 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> ghost_cells_right(cols, 0);
 
   if (rank > 0) {  // Send left boundary to the previous rank
-    MPI_Send(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0,
-             MPI_COMM_WORLD);
+    MPI_Send(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
   }
 
   if (rank < num_procs - 1) {  // Send right boundary to the next rank
-    MPI_Send(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 1,
-             MPI_COMM_WORLD);
+    MPI_Send(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 1, MPI_COMM_WORLD);
   }
 
   if (rank != 0) {
@@ -158,13 +156,10 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   // Recalculate labels considering "ghost" cells
   for (int i = 0; i < cols; ++i) {
     if (start_row > 0 && labeled_image[(start_row * cols) + i] > 1) {
-      UnionLabels(label_parent, labeled_image[(start_row * cols) + i],
-                  ghost_cells_left[i]);
+      UnionLabels(label_parent, labeled_image[(start_row * cols) + i], ghost_cells_left[i]);
     }
-    if (end_row < rows &&
-        labeled_image[((end_row - 1) * cols) + i] > 1) {
-      UnionLabels(label_parent, labeled_image[((end_row - 1) * cols) + i],
-                  ghost_cells_right[i]);
+    if (end_row < rows && labeled_image[((end_row - 1) * cols) + i] > 1) {
+      UnionLabels(label_parent, labeled_image[((end_row - 1) * cols) + i], ghost_cells_right[i]);
     }
   }
 

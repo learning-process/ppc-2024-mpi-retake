@@ -12,10 +12,10 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-namespace  {
+namespace {
 
 // Function to generate a random binary image of given size
-static std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
+std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (auto &px : img) {
     px = rand() % 2;
@@ -23,7 +23,7 @@ static std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
   return img;
 }
 
-}  // namespace 
+}  // namespace
 
 // Test for the pipeline run
 TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {

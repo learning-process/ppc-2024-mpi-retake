@@ -20,6 +20,35 @@ void FixLabels(std::vector<int>& labeled_image, int rows, int cols) {
     }
   }
 }
+
+bool IsValidNeighbor(int nx, int ny, int rows, int columns, const std::vector<int>& labeled_image) {
+  return nx >= 0 && ny >= 0 && nx < rows && ny < columns && labeled_image[(nx * columns) + ny] > 1;
+}
+
+void ProcessNeighbors(int x, int y, int rows, int columns, const std::vector<int>& labeled_image,
+                      std::vector<int>& neighbors, int dx[], int dy[]) {
+  for (int i = 0; i < 3; ++i) {
+    int nx = x + dx[i];
+    int ny = y + dy[i];
+    if (IsValidNeighbor(nx, ny, rows, columns, labeled_image)) {
+      neighbors.push_back(labeled_image[(nx * columns) + ny]);
+    }
+  }
+}
+
+void AssignLabel(int position, int& current_label, std::vector<int>& labeled_image, const std::vector<int>& neighbors,
+                 LabelUnionFind& label_union) {
+  if (neighbors.empty()) {
+    labeled_image[position] = current_label++;
+  } else {
+    int min_label = *std::ranges::min_element(neighbors);
+    labeled_image[position] = min_label;
+
+    for (int label : neighbors) {
+      label_union.Unite(min_label, label);
+    }
+  }
+}
 }  // namespace
 
 class LabelUnionFind {
@@ -69,7 +98,7 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::ValidationImpl() {
     return false;
   }
 
-  return std::all_of(tmp_ptr, tmp_ptr + static_cast<std::size_t>(tmp_rows) * tmp_columns,
+  return std::all_of(tmp_ptr, tmp_ptr + (static_cast<std::size_t>(tmp_rows) * static_cast<std::size_t>(tmp_columns)),
                      [](int pixel) { return pixel == 0 || pixel == 1; });
 }
 
@@ -84,27 +113,8 @@ bool karaseva_e_binaryimage_seq::TestTaskSequential::RunImpl() {
       int position = (x * columns_) + y;
       if (image_[position] == 0) {
         std::vector<int> neighbors;
-
-        for (int i = 0; i < 3; ++i) {
-          int nx = x + dx[i];
-          int ny = y + dy[i];
-          int neighbor_pos = (nx * columns_) + ny;
-
-          if (nx >= 0 && ny >= 0 && nx < rows_ && ny < columns_ && labeled_image_[neighbor_pos] > 1) {
-            neighbors.push_back(labeled_image_[neighbor_pos]);
-          }
-        }
-
-        if (neighbors.empty()) {
-          labeled_image_[position] = current_label++;
-        } else {
-          int min_label = *std::ranges::min_element(neighbors);
-          labeled_image_[position] = min_label;
-
-          for (int label : neighbors) {
-            label_union.Unite(min_label, label);
-          }
-        }
+        ProcessNeighbors(x, y, rows_, columns_, labeled_image_, neighbors, dx, dy);
+        AssignLabel(position, current_label, labeled_image_, neighbors, label_union);
       }
     }
   }

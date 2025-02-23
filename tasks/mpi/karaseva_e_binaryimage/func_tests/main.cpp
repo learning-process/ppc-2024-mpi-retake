@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
 #include <vector>
 
-#include <boost/mpi/communicator.hpp>
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
