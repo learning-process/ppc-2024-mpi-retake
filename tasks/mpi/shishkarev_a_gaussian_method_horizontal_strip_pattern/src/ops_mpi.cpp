@@ -192,7 +192,7 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(bo
       }
     }
   } else {
-      world.recv(0, 0, local_matrix.data(), delta * cols);
+    world.recv(0, 0, local_matrix.data(), delta * cols);
   }
 }
 
@@ -236,7 +236,7 @@ void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BackSubstitution
             vector.local_matrix[(j * matrix.cols) + i] * vector.local_res[i];
       }
     }
-  if (world.rank() == 0) {
+    if (world.rank() == 0) {
       vector.local_res[0] /= vector.local_matrix[0];
       vector.res = vector.local_res;
     }
