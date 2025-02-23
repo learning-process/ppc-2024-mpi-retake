@@ -2,12 +2,12 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 #include <ranges>
+#include <vector>
+
 #include "core/task/include/task.hpp"
 #include "seq/kalinin_d_odd_even_shellsort/include/header_seq_odd_even_shell.hpp"
-TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_0)
-{
+TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_0) {
   const int n = 0;
   // Create data
   std::vector<int> arr(n);
@@ -23,8 +23,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_0)
   ASSERT_EQ(test_task_sequential.Validation(), false);
 }
 
-TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1000)
-{
+TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1000) {
   const int n = 1000;
   // Create data
   std::vector<int> arr(n);
@@ -47,8 +46,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1000)
   ASSERT_EQ(arr, out);
 }
 
-TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_999)
-{
+TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_999) {
   const int n = 999;
   // Create data
   std::vector<int> arr(n);
@@ -71,8 +69,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_999)
   ASSERT_EQ(arr, out);
 }
 
-TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_9999)
-{
+TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_9999) {
   const int n = 9999;
   // Create data
   std::vector<int> arr(n);
@@ -95,8 +92,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_9999)
   ASSERT_EQ(arr, out);
 }
 
-TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1021)
-{
+TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1021) {
   const int n = 1021;
   // Create data
   std::vector<int> arr(n);
