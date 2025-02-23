@@ -11,7 +11,7 @@
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
 TEST(anikin_m_counting_characters_mpi, test_pipeline_run) {
-  constexpr int kCount = 500000;
+  constexpr int kCount = 10000000;
 
   std::vector<char> in1;
   anikin_m_counting_characters_mpi::CreateRanddataVector(&in1, kCount);
@@ -50,7 +50,7 @@ TEST(anikin_m_counting_characters_mpi, test_pipeline_run) {
 }
 
 TEST(anikin_m_counting_characters_mpi, test_task_run) {
-  constexpr int kCount = 500000;
+  constexpr int kCount = 10000000;
   std::vector<char> in1;
   anikin_m_counting_characters_mpi::CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
