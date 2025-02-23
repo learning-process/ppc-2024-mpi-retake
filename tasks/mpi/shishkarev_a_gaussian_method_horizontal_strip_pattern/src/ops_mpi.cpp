@@ -4,7 +4,9 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
+#include <boost/mpi/status.hpp>
 #include <cstdlib>
+#include <cstring>
 #include <vector>
 
 using namespace std::chrono_literals;

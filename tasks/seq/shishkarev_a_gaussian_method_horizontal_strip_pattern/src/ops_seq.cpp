@@ -86,7 +86,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizont
          MatrixRank(matrix, matrix_) == rows_;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::RunImpl() {
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::RunImpl() {
   for (int i = 0; i < rows_ - 1; ++i) {
     for (int k = i + 1; k < rows_; ++k) {
       double m = matrix_[(k * cols_) + i] / matrix_[(i * cols_) + i];
@@ -105,7 +105,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   return true;
 }
 
-bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::PostProcessingImpl() {
+bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential::PostProcessingImpl() {
   auto *this_matrix = reinterpret_cast<double *>(task_data->outputs[0]);
   std::ranges::copy(res_.begin(), res_.end(), this_matrix);
   return true;
