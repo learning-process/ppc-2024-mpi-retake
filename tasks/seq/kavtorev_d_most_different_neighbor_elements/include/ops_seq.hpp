@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -8,9 +7,9 @@
 
 namespace kavtorev_d_most_different_neighbor_elements_seq {
 
-class most_different_neighbor_elements_seq : public ppc::core::Task {
+class MostDifferentNeighborElementsSeq : public ppc::core::Task {
  public:
-  explicit most_different_neighbor_elements_seq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  explicit MostDifferentNeighborElementsSeq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -18,7 +17,7 @@ class most_different_neighbor_elements_seq : public ppc::core::Task {
 
  private:
   std::vector<std::pair<int, int>> input_;
-  std::pair<int, int> res{};
+  std::pair<int, int> res_;
 };
 
 }  // namespace kavtorev_d_most_different_neighbor_elements_seq

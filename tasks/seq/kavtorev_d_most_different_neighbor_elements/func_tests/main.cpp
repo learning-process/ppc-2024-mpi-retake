@@ -1,28 +1,28 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
+#include <algorithm>
 #include <cstdint>
-#include <fstream>
 #include <memory>
 #include <random>
-#include <string>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/kavtorev_d_most_different_neighbor_elements/include/ops_seq.hpp"
 
 namespace kavtorev_d_most_different_neighbor_elements_seq {
 namespace {
-std::vector<int> generator(int sz) {
+std::vector<int> Generator(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
 
   std::vector<int> ans(sz);
   for (int i = 0; i < sz; ++i) {
-    ans[i] = gen() % 1000;
-    int x = gen() % 2;
-    if (x == 0) ans[i] *= -1;
+    ans[i] = static_cast<int>(gen() % 1000);
+    int x = static_cast<int>(gen() % 2);
+    if (x == 0) {
+      ans[i] *= -1;
+    }
   }
 
   return ans;
@@ -41,8 +41,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, LargePositiveNumbers_Retur
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -61,8 +60,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, MixedPositiveAndNegativeNu
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -81,8 +79,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, AlternatingPositiveAndNega
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -101,8 +98,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, RepeatedNumbers_ReturnsCor
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -121,8 +117,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, LargeRangeNumbers_ReturnsC
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -141,8 +136,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, SmallRangeNumbers_ReturnsC
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -160,13 +154,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, EmptyInput_ReturnsFalse) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), false);
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_seq, InputSizeTwo_ReturnsCorrectPair) {
-  std::vector<int> in = kavtorev_d_most_different_neighbor_elements_seq::generator(2);
+  std::vector<int> in = kavtorev_d_most_different_neighbor_elements_seq::Generator(2);
   std::vector<std::pair<int, int>> out(1);
   std::pair<int, int> ans = {std::min(in[0], in[1]), std::max(in[0], in[1])};
 
@@ -176,8 +169,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, InputSizeTwo_ReturnsCorrec
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -196,8 +188,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, SequentialInput_ReturnsFir
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -216,8 +207,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, MostlyZerosInput_ReturnsZe
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -236,8 +226,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, AllZerosInput_ReturnsZeroZ
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();
@@ -256,8 +245,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, CloseNegativeNumbers_Retur
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq test_task_sequential(
-      task_data_seq);
+  kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
   test_task_sequential.PreProcessingImpl();
   test_task_sequential.RunImpl();

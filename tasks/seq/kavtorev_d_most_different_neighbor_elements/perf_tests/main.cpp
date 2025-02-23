@@ -1,15 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/kavtorev_d_most_different_neighbor_elements/include/ops_seq.hpp"
-#include "seq/kavtorev_d_most_different_neighbor_elements/src/ops_seq.cpp"
 
 TEST(kavtorev_d_most_different_neighbor_elements_seq, test_pipeline_run) {
   std::vector<int> in(10000000, 0);
@@ -24,7 +23,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, test_pipeline_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   auto test_task_sequential =
-      std::make_shared<kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq>(
+      std::make_shared<kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq>(
           task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -58,7 +57,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_seq, test_task_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   auto test_task_sequential =
-      std::make_shared<kavtorev_d_most_different_neighbor_elements_seq::most_different_neighbor_elements_seq>(
+      std::make_shared<kavtorev_d_most_different_neighbor_elements_seq::MostDifferentNeighborElementsSeq>(
           task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

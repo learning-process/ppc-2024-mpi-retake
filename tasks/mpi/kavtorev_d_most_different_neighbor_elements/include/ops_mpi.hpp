@@ -1,13 +1,10 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
+#include <cstddef>
 #include <memory>
-#include <numeric>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -15,9 +12,9 @@
 
 namespace kavtorev_d_most_different_neighbor_elements_mpi {
 
-class most_different_neighbor_elements_seq : public ppc::core::Task {
+class MostDifferentNeighborElementsSeq : public ppc::core::Task {
  public:
-  explicit most_different_neighbor_elements_seq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  explicit MostDifferentNeighborElementsSeq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -25,13 +22,13 @@ class most_different_neighbor_elements_seq : public ppc::core::Task {
 
  private:
   std::vector<std::pair<int, int>> input_;
-  std::pair<int, int> res{};
+  std::pair<int, int> res_;
 };
 
-class most_different_neighbor_elements_mpi : public ppc::core::Task {
+class MostDifferentNeighborElementsMpi : public ppc::core::Task {
  public:
-  explicit most_different_neighbor_elements_mpi(std::shared_ptr<ppc::core::TaskData> taskData_)
-      : Task(std::move(taskData_)) {}
+  explicit MostDifferentNeighborElementsMpi(std::shared_ptr<ppc::core::TaskData> task_data)
+      : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -39,10 +36,10 @@ class most_different_neighbor_elements_mpi : public ppc::core::Task {
 
  private:
   std::vector<int> input_, local_input_;
-  std::pair<int, int> res;
-  size_t size;
-  size_t st;
-  boost::mpi::communicator world;
+  std::pair<int, int> res_;
+  size_t size_;
+  size_t st_;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace kavtorev_d_most_different_neighbor_elements_mpi
