@@ -15,9 +15,9 @@ TEST(anikin_m_counting_characters_mpi, test_pipeline_run) {
   constexpr int kCount = 500;
 
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::create_randdata_vector(&in1, kCount);
+  anikin_m_counting_characters_mpi::CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::create_randdata_vector(&in2, kCount);
+  anikin_m_counting_characters_mpi::CreateRanddataVector(&in2, kCount);
   int res_out = 0;
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -53,9 +53,9 @@ TEST(anikin_m_counting_characters_mpi, test_pipeline_run) {
 TEST(anikin_m_counting_characters_mpi, test_task_run) {
   constexpr int kCount = 500;
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::create_randdata_vector(&in1, kCount);
+  anikin_m_counting_characters_mpi::CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::create_randdata_vector(&in2, kCount);
+  anikin_m_counting_characters_mpi::CreateRanddataVector(&in2, kCount);
   int res_out = 0;
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();

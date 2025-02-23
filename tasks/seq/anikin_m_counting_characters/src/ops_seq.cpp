@@ -4,19 +4,20 @@
 #include <cmath>
 #include <random>
 #include <vector>
+#include <string>
 
-void anikin_m_counting_characters_seq::create_data_vector(std::vector<char> *invec, std::string str) {
+void anikin_m_counting_characters_seq::CreateDataVector(std::vector<char> *invec, std::string str) {
   for (auto a : str) {
     invec->push_back(a);
   }
 }
-void anikin_m_counting_characters_seq::create_randdata_vector(std::vector<char> *invec, int count) {
+void anikin_m_counting_characters_seq::CreateRanddataVector(std::vector<char> *invec, int count) {
   for (int i = 0; i < count; i++) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis('A', 'Z');
-    char randomChar = static_cast<char>(dis(gen));
-    invec->push_back(randomChar);
+    char random_ñhar = static_cast<char>(dis(gen));
+    invec->push_back(random_ñhar);
   }
 }
 
@@ -25,39 +26,39 @@ bool anikin_m_counting_characters_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::PreProcessingImpl() {
-  int input1_size = task_data->inputs_count[0];
-  int input2_size = task_data->inputs_count[1];
+  int input1_size = static_cast<int>(task_data->inputs_count[0]);
+  int input2_size = static_cast<int>(task_data->inputs_count[1]);
 
-  res = input1_size - input2_size;
+  res_ = input1_size - input2_size;
 
-  if (res <= 0) {
+  if (res_ <= 0) {
     auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
-    input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input2_size);
+    input_1_ = std::vector<char>(inlarge_ptr, inlarge_ptr + input2_size);
 
     auto *insmall_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
-    input_2 = std::vector<char>(insmall_ptr, insmall_ptr + input1_size);
+    input_2_ = std::vector<char>(insmall_ptr, insmall_ptr + input1_size);
 
-    res = abs(res);
+    res_ = abs(res_);
   } else {
     auto *inlarge_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
-    input_1 = std::vector<char>(inlarge_ptr, inlarge_ptr + input1_size);
+    input_1_ = std::vector<char>(inlarge_ptr, inlarge_ptr + input1_size);
 
     auto *insmall_ptr = reinterpret_cast<char *>(task_data->inputs[1]);
-    input_2 = std::vector<char>(insmall_ptr, insmall_ptr + input2_size);
+    input_2_ = std::vector<char>(insmall_ptr, insmall_ptr + input2_size);
   }
   return true;
 }
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::RunImpl() {
-  auto b = input_1.begin();
-  for (auto a : input_2) {
-    if ((a) != (*b)) res++;
+  auto b = input_1_.begin();
+  for (auto a : input_2_) {
+    if ((a) != (*b)) res_++;
     b++;
   }
   return true;
 }
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::PostProcessingImpl() {
-  reinterpret_cast<int *>(task_data->outputs[0])[0] = res;
+  reinterpret_cast<int *>(task_data->outputs[0])[0] = res_;
   return true;
 }

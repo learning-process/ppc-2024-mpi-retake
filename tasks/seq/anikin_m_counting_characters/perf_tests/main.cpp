@@ -16,9 +16,9 @@ TEST(anikin_m_counting_characters_seq, test_pipeline_run) {
   constexpr int kCount = 500;
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_seq::create_randdata_vector(&in1, kCount);
+  anikin_m_counting_characters_seq::CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
-  anikin_m_counting_characters_seq::create_randdata_vector(&in2, kCount);
+  anikin_m_counting_characters_seq::CreateRanddataVector(&in2, kCount);
   int res_out = 0;
 
   // Create task_data
@@ -55,9 +55,9 @@ TEST(anikin_m_counting_characters_seq, test_task_run) {
   constexpr int kCount = 500;
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_seq::create_randdata_vector(&in1, kCount);
+  anikin_m_counting_characters_seq::CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
-  anikin_m_counting_characters_seq::create_randdata_vector(&in2, kCount);
+  anikin_m_counting_characters_seq::CreateRanddataVector(&in2, kCount);
   int res_out = 0;
 
   // Create task_data

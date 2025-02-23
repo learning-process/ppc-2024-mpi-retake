@@ -14,9 +14,9 @@
 TEST(anikin_m_counting_characters_seq, one_char_dif) {
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::create_data_vector(&in1, "aboba");
+  anikin_m_counting_characters_mpi::CreateDataVector(&in1, "aboba");
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::create_data_vector(&in2, "ababa");
+  anikin_m_counting_characters_mpi::CreateDataVector(&in2, "ababa");
   int res_out = 0;
 
   // Create task_data
@@ -39,9 +39,9 @@ TEST(anikin_m_counting_characters_seq, one_char_dif) {
 TEST(anikin_m_counting_characters_seq, first_larger) {
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::create_data_vector(&in1, "abobaa");
+  anikin_m_counting_characters_mpi::CreateDataVector(&in1, "abobaa");
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::create_data_vector(&in2, "ababa");
+  anikin_m_counting_characters_mpi::CreateDataVector(&in2, "ababa");
   int res_out = 0;
 
   // Create task_data
@@ -64,9 +64,9 @@ TEST(anikin_m_counting_characters_seq, first_larger) {
 TEST(anikin_m_counting_characters_seq, second_larger) {
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::create_data_vector(&in1, "aboba");
+  anikin_m_counting_characters_mpi::CreateDataVector(&in1, "aboba");
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::create_data_vector(&in2, "ababaa");
+  anikin_m_counting_characters_mpi::CreateDataVector(&in2, "ababaa");
   int res_out = 0;
 
   // Create task_data
