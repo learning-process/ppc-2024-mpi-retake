@@ -1,14 +1,9 @@
 // Copyright 2023 Nesterov Alexander
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <memory>
-#include <numeric>
-#include <string>
-#include <utility>
+#include <cstdint>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -24,10 +19,10 @@ class TestMPITaskParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int32_t> input_data;
-  std::vector<int32_t> output_data;
-  std::vector<int32_t> sequence;
-  boost::mpi::communicator world;
+  std::vector<int32_t> input_data_;
+  std::vector<int32_t> output_data_;
+  std::vector<int32_t> sequence_;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace makhov_m_ring_topology

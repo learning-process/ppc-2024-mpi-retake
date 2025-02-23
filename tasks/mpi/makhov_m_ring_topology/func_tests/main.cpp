@@ -2,19 +2,22 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/makhov_m_ring_topology/include/ops_mpi.hpp"
 
 namespace makhov_m_ring_topology_tests {
-std::vector<int32_t> GetRandVector(size_t size, int minValue, int maxValue) {
+std::vector<int32_t> static GetRandVector(size_t size, int min_value, int max_value) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int32_t> res(size);
   for (size_t i = 0; i < size; i++) {
-    res[i] = static_cast<int32_t>((minValue + gen() % (maxValue - minValue + 1)));
+    res[i] = static_cast<int32_t>((min_value + (gen() % (max_value - min_value + 1))));
   }
   return res;
 }
@@ -33,23 +36,23 @@ TEST(makhov_m_ring_topology, VectorZeroSize) {
   }
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
-    taskDataPar->inputs_count.emplace_back(input_vector.size());
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
-    taskDataPar->outputs_count.emplace_back(size);
-    taskDataPar->outputs_count.emplace_back(world.size() + 1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
+    task_data_par->inputs_count.emplace_back(input_vector.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
+    task_data_par->outputs_count.emplace_back(size);
+    task_data_par->outputs_count.emplace_back(world.size() + 1);
   }
 
   // Create Task
-  makhov_m_ring_topology::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  makhov_m_ring_topology::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_TRUE(test_mpi_task_parallel.ValidationImpl());
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
     ASSERT_EQ(input_vector, output_vector);
@@ -71,23 +74,23 @@ TEST(makhov_m_ring_topology, RandVectorSize1) {
   }
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
-    taskDataPar->inputs_count.emplace_back(input_vector.size());
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
-    taskDataPar->outputs_count.emplace_back(size);
-    taskDataPar->outputs_count.emplace_back(world.size() + 1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
+    task_data_par->inputs_count.emplace_back(input_vector.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
+    task_data_par->outputs_count.emplace_back(size);
+    task_data_par->outputs_count.emplace_back(world.size() + 1);
   }
 
   // Create Task
-  makhov_m_ring_topology::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  makhov_m_ring_topology::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_TRUE(test_mpi_task_parallel.ValidationImpl());
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
     ASSERT_EQ(input_vector, output_vector);
@@ -110,23 +113,23 @@ TEST(makhov_m_ring_topology, RandVectorSize10) {
   }
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
-    taskDataPar->inputs_count.emplace_back(input_vector.size());
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
-    taskDataPar->outputs_count.emplace_back(size);
-    taskDataPar->outputs_count.emplace_back(world.size() + 1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
+    task_data_par->inputs_count.emplace_back(input_vector.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
+    task_data_par->outputs_count.emplace_back(size);
+    task_data_par->outputs_count.emplace_back(world.size() + 1);
   }
 
   // Create Task
-  makhov_m_ring_topology::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  makhov_m_ring_topology::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_TRUE(test_mpi_task_parallel.ValidationImpl());
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
     ASSERT_EQ(input_vector, output_vector);
@@ -149,23 +152,23 @@ TEST(makhov_m_ring_topology, RandVectorSize1000) {
   }
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
-    taskDataPar->inputs_count.emplace_back(input_vector.size());
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
-    taskDataPar->outputs_count.emplace_back(size);
-    taskDataPar->outputs_count.emplace_back(world.size() + 1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vector.data()));
+    task_data_par->inputs_count.emplace_back(input_vector.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_vector.data()));
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(sequence.data()));
+    task_data_par->outputs_count.emplace_back(size);
+    task_data_par->outputs_count.emplace_back(world.size() + 1);
   }
 
   // Create Task
-  makhov_m_ring_topology::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  makhov_m_ring_topology::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_TRUE(test_mpi_task_parallel.ValidationImpl());
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
     ASSERT_EQ(input_vector, output_vector);

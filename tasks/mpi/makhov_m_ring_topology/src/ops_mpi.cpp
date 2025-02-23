@@ -2,26 +2,21 @@
 #include "mpi/makhov_m_ring_topology/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <functional>
-#include <random>
-#include <string>
+#include <vector>
 
 bool makhov_m_ring_topology::TestMPITaskParallel::PreProcessingImpl() {
-  // internal_order_test();
-
   // Init vector in root
-  if (world.rank() == 0) {
-    sequence.clear();
-    input_data = std::vector<int32_t>(task_data->inputs_count[0]);
+  if (world_.rank() == 0) {
+    sequence_.clear();
+    input_data_ = std::vector<int32_t>(task_data->inputs_count[0]);
     auto* data_ptr = reinterpret_cast<int32_t*>(task_data->inputs[0]);
-    std::copy(data_ptr, data_ptr + task_data->inputs_count[0], input_data.begin());
+    std::copy(data_ptr, data_ptr + task_data->inputs_count[0], input_data_.begin());
   }
   return true;
 }
 
 bool makhov_m_ring_topology::TestMPITaskParallel::ValidationImpl() {
-  //internal_order_test();
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     return task_data->inputs_count.size() == 1 && task_data->inputs_count[0] >= 0 &&
            task_data->outputs_count.size() == 2 && task_data->outputs_count[0] == task_data->inputs_count[0];
   }
@@ -29,44 +24,42 @@ bool makhov_m_ring_topology::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool makhov_m_ring_topology::TestMPITaskParallel::RunImpl() {
-  //internal_order_test();
-  if (world.size() < 2) {
-    output_data = input_data;
-    sequence.push_back(0);
+  if (world_.size() < 2) {
+    output_data_ = input_data_;
+    sequence_.push_back(0);
   }
 
   else {
-    if (world.rank() == 0) {
-      sequence.push_back(world.rank());
-      world.send(world.rank() + 1, 0, input_data);
-      world.send(world.rank() + 1, 1, sequence);
+    if (world_.rank() == 0) {
+      sequence_.push_back(world_.rank());
+      world_.send(world_.rank() + 1, 0, input_data_);
+      world_.send(world_.rank() + 1, 1, sequence_);
 
-      int sender = world.size() - 1;
-      world.recv(sender, 0, output_data);
-      world.recv(sender, 1, sequence);
-      sequence.push_back(world.rank());
+      int sender = world_.size() - 1;
+      world_.recv(sender, 0, output_data_);
+      world_.recv(sender, 1, sequence_);
+      sequence_.push_back(world_.rank());
     } else {
-      int sender = world.rank() - 1;
-      world.recv(sender, 0, input_data);
-      world.recv(sender, 1, sequence);
-      sequence.push_back(world.rank());
+      int sender = world_.rank() - 1;
+      world_.recv(sender, 0, input_data_);
+      world_.recv(sender, 1, sequence_);
+      sequence_.push_back(world_.rank());
 
-      int receiver = (world.rank() + 1) % world.size();
-      world.send(receiver, 0, input_data);
-      world.send(receiver, 1, sequence);
+      int receiver = (world_.rank() + 1) % world_.size();
+      world_.send(receiver, 0, input_data_);
+      world_.send(receiver, 1, sequence_);
     }
   }
   return true;
 }
 
 bool makhov_m_ring_topology::TestMPITaskParallel::PostProcessingImpl() {
-  //internal_order_test();
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     auto* output_ptr = reinterpret_cast<int32_t*>(task_data->outputs[0]);
     auto* sequence_ptr = reinterpret_cast<int32_t*>(task_data->outputs[1]);
 
-    std::copy(input_data.begin(), input_data.end(), output_ptr);
-    std::copy(sequence.begin(), sequence.end(), sequence_ptr);
+    std::ranges::copy(input_data_, output_ptr);
+    std::ranges::copy(sequence_, sequence_ptr);
   }
   return true;
 }
