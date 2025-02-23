@@ -20,22 +20,22 @@ void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b
   std::mt19937 gen(rd());
   std::normal_distribution<> dist(-5.0, 5.0);
   std::vector<double> M(size * size);
-  for (int i = 0; i < size; i++)
-    for (int j = 0; j < size; j++) M[i * size + j] = dist(gen);
+  for (size_t i = 0; i < size; i++)
+    for (size_t j = 0; j < size; j++) M[i * size + j] = dist(gen);
 
   A.assign(size * size, 0.0);
-  for (int i = 0; i < size; i++)
-    for (int j = 0; j < size; j++)
-      for (int k = 0; k < size; k++) A[i * size + j] += M[k * size + i] * M[k * size + j];
+  for (size_t i = 0; i < size; i++)
+    for (size_t j = 0; j < size; j++)
+      for (size_t k = 0; k < size; k++) A[i * size + j] += M[k * size + i] * M[k * size + j];
 
-  for (int i = 0; i < size; i++) A[i * size + i] += size;
+  for (size_t i = 0; i < size; i++) A[i * size + i] += size;
 
   expectedX.resize(size);
-  for (int i = 0; i < size; i++) expectedX[i] = dist(gen);
+  for (size_t i = 0; i < size; i++) expectedX[i] = dist(gen);
 
   b.assign(size, 0.0);
-  for (int i = 0; i < size; i++)
-    for (int j = 0; j < size; j++) b[i] += A[i * size + j] * expectedX[j];
+  for (size_t i = 0; i < size; i++)
+    for (size_t j = 0; j < size; j++) b[i] += A[i * size + j] * expectedX[j];
 }
 }  // namespace
 }  // namespace opolin_d_cg_method_seq
