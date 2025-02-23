@@ -8,7 +8,7 @@
 
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::matrix_rank(int n, int m, std::vector<double> a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(int n, int m, std::vector<double> a) {
   int rank = m;
   for (int i = 0; i < m; ++i) {
     int j;
@@ -31,7 +31,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::matrix_rank(int n
   return rank;
 }
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::determinant(int n, int m, std::vector<double> a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(int n, int m, std::vector<double> a) {
   double det = 1;
 
   for (int i = 0; i < m; ++i) {
@@ -64,185 +64,185 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::determinant(int n
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::PreProcessingImpl() {
-  matrix = std::vector<double>(task_data->inputs_count[0]);
+  matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix.begin());
-  cols = task_data->inputs_count[1];
-  rows = task_data->inputs_count[2];
+  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+  cols_ = task_data->inputs_count[1];
+  rows_ = task_data->inputs_count[2];
 
-  res = std::vector<double>(cols - 1, 0);
+  res_ = std::vector<double>(cols_ - 1, 0);
   return true;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::ValidationImpl() {
-  matrix = std::vector<double>(task_data->inputs_count[0]);
+  matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix.begin());
-  cols = task_data->inputs_count[1];
-  rows = task_data->inputs_count[2];
+  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+  cols_ = task_data->inputs_count[1];
+  rows_ = task_data->inputs_count[2];
 
-  return task_data->inputs_count[0] > 1 && rows == cols - 1 && determinant(cols, rows, matrix) != 0 &&
-         matrix_rank(cols, rows, matrix) == rows;
+  return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
+         MatrixRank(cols_, rows_, matrix_) == rows_;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::RunImpl() {
-  for (int i = 0; i < rows - 1; ++i) {
-    for (int k = i + 1; k < rows; ++k) {
-      double m = matrix[k * cols + i] / matrix[i * cols + i];
-      for (int j = i; j < cols; ++j) {
-        matrix[k * cols + j] -= matrix[i * cols + j] * m;
+  for (int i = 0; i < rows_ - 1; ++i) {
+    for (int k = i + 1; k < rows_; ++k) {
+      double m = matrix_[k * cols_ + i] / matrix_[i * cols_ + i];
+      for (int j = i; j < cols_; ++j) {
+        matrix_[k * cols_ + j] -= matrix_[i * cols_ + j] * m;
       }
     }
   }
-  for (int i = rows - 1; i >= 0; --i) {
-    double sum = matrix[i * cols + rows];
-    for (int j = i + 1; j < cols - 1; ++j) {
-      sum -= matrix[i * cols + j] * res[j];
+  for (int i = rows_ - 1; i >= 0; --i) {
+    double sum = matrix_[i * cols_ + rows_];
+    for (int j = i + 1; j < cols_ - 1; ++j) {
+      sum -= matrix_[i * cols_ + j] * res_[j];
     }
-    res[i] = sum / matrix[i * cols + i];
+    res_[i] = sum / matrix_[i * cols_ + i];
   }
   return true;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::PostProcessingImpl() {
   auto *this_matrix = reinterpret_cast<double *>(task_data->outputs[0]);
-  std::copy(res.begin(), res.end(), this_matrix);
+  std::copy(res_.begin(), res_.end(), this_matrix);
   return true;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::PreProcessingImpl() {
-  if (world.rank() == 0) {
-    matrix = std::vector<double>(task_data->inputs_count[0]);
+  if (world_.rank() == 0) {
+    matrix_ = std::vector<double>(task_data->inputs_count[0]);
     auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-    std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix.begin());
-    cols = task_data->inputs_count[1];
-    rows = task_data->inputs_count[2];
+    std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+    cols_ = task_data->inputs_count[1];
+    rows_ = task_data->inputs_count[2];
 
-    res = std::vector<double>(cols - 1, 0);
+    res_ = std::vector<double>(cols_ - 1, 0);
   }
   return true;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::ValidationImpl() {
-  if (world.rank() == 0) {
-    matrix = std::vector<double>(task_data->inputs_count[0]);
+  if (world_.rank() == 0) {
+    matrix_ = std::vector<double>(task_data->inputs_count[0]);
     auto *tmp_ptr = reinterpret_cast<double *>(task_data->inputs[0]);
-    std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix.begin());
-    cols = task_data->inputs_count[1];
-    rows = task_data->inputs_count[2];
+    std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+    cols_ = task_data->inputs_count[1];
+    rows_ = task_data->inputs_count[2];
 
-    return task_data->inputs_count[0] > 1 && rows == cols - 1 && determinant(cols, rows, matrix) != 0 &&
-           matrix_rank(cols, rows, matrix) == rows;
+    return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
+           MatrixRank(cols_, rows_, matrix_) == rows_;
   }
   return true;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::RunImpl() {
-  broadcast(world, cols, 0);
-  broadcast(world, rows, 0);
+  broadcast(world_, cols_, 0);
+  broadcast(world_, rows_, 0);
 
-  std::vector<int> row_num(world.size());
+  std::vector<int> row_num(world_.size());
 
-  int delta = rows / world.size();
-  if (rows % world.size() != 0) {
+  int delta = rows_ / world_.size();
+  if (rows_ % world_.size() != 0) {
     delta++;
   }
-  if (world.rank() >= world.size() - world.size() * delta + rows) {
+  if (world_.rank() >= world_.size() - world_.size() * delta + rows_) {
     delta--;
   }
 
-  boost::mpi::gather(world, delta, row_num.data(), 0);
+  boost::mpi::gather(world_, delta, row_num.data(), 0);
 
-  if (world.rank() == 0) {
-    std::vector<double> send_matrix(delta * cols);
-    for (int proc = 1; proc < world.size(); ++proc) {
+  if (world_.rank() == 0) {
+    std::vector<double> send_matrix(delta * cols_);
+    for (int proc = 1; proc < world_.size(); ++proc) {
       for (int i = 0; i < row_num[proc]; ++i) {
-        for (int j = 0; j < cols; ++j) {
-          send_matrix[i * cols + j] = matrix[(proc + world.size() * i) * cols + j];
+        for (int j = 0; j < cols_; ++j) {
+          send_matrix[i * cols_ + j] = matrix_[(proc + world_.size() * i) * cols_ + j];
         }
       }
-      world.send(proc, 0, send_matrix.data(), row_num[proc] * cols);
+      world_.send(proc, 0, send_matrix.data(), row_num[proc] * cols_);
     }
   }
 
-  local_matrix = std::vector<double>(delta * cols);
+  local_matrix_ = std::vector<double>(delta * cols_);
 
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     for (int i = 0; i < delta; ++i) {
-      for (int j = 0; j < cols; ++j) {
-        local_matrix[i * cols + j] = matrix[i * cols * world.size() + j];
+      for (int j = 0; j < cols_; ++j) {
+        local_matrix_[i * cols_ + j] = matrix_[i * cols_ * world_.size() + j];
       }
     }
   } else {
-    world.recv(0, 0, local_matrix.data(), delta * cols);
+    world_.recv(0, 0, local_matrix_.data(), delta * cols_);
   }
 
   std::vector<double> row(delta);
   for (int i = 0; i < delta; ++i) {
-    row[i] = world.rank() + world.size() * i;
+    row[i] = world_.rank() + world_.size() * i;
   }
 
-  std::vector<double> pivot(cols);
+  std::vector<double> pivot(cols_);
   int r = 0;
-  for (int i = 0; i < rows - 1; ++i) {
+  for (int i = 0; i < rows_ - 1; ++i) {
     if (i == row[r]) {
-      for (int j = 0; j < cols; ++j) {
-        pivot[j] = local_matrix[r * cols + j];
+      for (int j = 0; j < cols_; ++j) {
+        pivot[j] = local_matrix_[r * cols_ + j];
       }
-      broadcast(world, pivot.data(), cols, world.rank());
+      broadcast(world_, pivot.data(), cols_, world_.rank());
       r++;
     } else {
-      broadcast(world, pivot.data(), cols, i % world.size());
+      broadcast(world_, pivot.data(), cols_, i % world_.size());
     }
     for (int k = r; k < delta; ++k) {
-      double m = local_matrix[k * cols + i] / pivot[i];
-      for (int j = i; j < cols; ++j) {
-        local_matrix[k * cols + j] -= pivot[j] * m;
+      double m = local_matrix_[k * cols_ + i] / pivot[i];
+      for (int j = i; j < cols_; ++j) {
+        local_matrix_[k * cols_ + j] -= pivot[j] * m;
       }
     }
   }
 
-  local_res = std::vector<double>(cols - 1, 0);
+  local_res_ = std::vector<double>(cols_ - 1, 0);
   r = 0;
-  for (int i = 0; i < rows; ++i) {
+  for (int i = 0; i < rows_; ++i) {
     if (i == row[r]) {
-      local_res[i] = local_matrix[r * cols + rows];
+      local_res_[i] = local_matrix_[r * cols_ + rows_];
       r++;
     }
   }
 
   r = delta - 1;
-  for (int i = rows - 1; i > 0; --i) {
+  for (int i = rows_ - 1; i > 0; --i) {
     if (r >= 0) {
       if (i == row[r]) {
-        local_res[i] /= local_matrix[r * cols + i];
-        broadcast(world, local_res[i], world.rank());
+        local_res_[i] /= local_matrix_[r * cols_ + i];
+        broadcast(world_, local_res_[i], world_.rank());
         r--;
       } else {
-        broadcast(world, local_res[i], i % world.size());
+        broadcast(world_, local_res_[i], i % world_.size());
       }
     } else {
-      broadcast(world, local_res[i], i % world.size());
+      broadcast(world_, local_res_[i], i % world_.size());
     }
     if (r >= 0) {
       for (int j = 0; j <= r; ++j) {
-        local_res[row[j]] -= local_matrix[j * cols + i] * local_res[i];
+        local_res_[row[j]] -= local_matrix_[j * cols_ + i] * local_res_[i];
       }
     }
   }
 
-  if (world.rank() == 0) {
-    local_res[0] /= local_matrix[0];
-    res = local_res;
+  if (world_.rank() == 0) {
+    local_res_[0] /= local_matrix_[0];
+    res_ = local_res_;
   }
 
   return true;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel::PostProcessingImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     auto *this_matrix = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::copy(res.begin(), res.end(), this_matrix);
+    std::copy(res_.begin(), res_.end(), this_matrix);
   }
   return true;
 }

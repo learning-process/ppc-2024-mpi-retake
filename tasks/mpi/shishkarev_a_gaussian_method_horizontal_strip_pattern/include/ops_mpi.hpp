@@ -1,12 +1,8 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
-#include <numeric>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -14,13 +10,13 @@
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
 
-int matrix_rank(int n, int m, std::vector<double> a);
+int MatrixRank(int n, int m, std::vector<double> a);
 
-int determinant(int n, int m, std::vector<double> a);
+int Determinant(int n, int m, std::vector<double> a);
 
-std::vector<double> getRandomMatrix(int sz);
+std::vector<double> GetRandomMatrix(int sz);
 
-double Ax_b(int n, int m, std::vector<double> a, std::vector<double> res);
+double AxB(int n, int m, std::vector<double> a, std::vector<double> res_);
 
 class MPIGaussHorizontalSequential : public ppc::core::Task {
  public:
@@ -31,8 +27,8 @@ class MPIGaussHorizontalSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> matrix, res;
-  int rows{}, cols{};
+  std::vector<double> matrix_, res_;
+  int rows_{}, cols_{};
 };
 
 class MPIGaussHorizontalParallel : public ppc::core::Task {
@@ -44,9 +40,9 @@ class MPIGaussHorizontalParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> matrix, local_matrix, res, local_res;
-  int rows{}, cols{};
-  boost::mpi::communicator world;
+  std::vector<double> matrix_, local_matrix_, res_, local_res_;
+  int rows_{}, cols_{};
+  boost::mpi::communicator world_;
 };
 
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi

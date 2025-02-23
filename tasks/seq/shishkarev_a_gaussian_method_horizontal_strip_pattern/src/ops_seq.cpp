@@ -4,7 +4,7 @@
 
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::matrix_rank(int n, int m, std::vector<double> a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MatrixRank(int n, int m, std::vector<double> a) {
   const double EPS = 1e-6;
 
   int rank = m;
@@ -29,7 +29,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::matrix_rank(int n
   return rank;
 }
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::determinant(int n, int m, std::vector<double> a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::Determinant(int n, int m, std::vector<double> a) {
   const double EPS = 1e-6;
   double det = 1;
 
@@ -65,45 +65,45 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::determinant(int n
 template <class InOutType>
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<
     InOutType>::PreProcessingImpl() {
-  matrix = std::vector<double>(task_data->inputs_count[0]);
+  matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto* tmp_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix.begin());
-  cols = task_data->inputs_count[1];
-  rows = task_data->inputs_count[2];
+  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+  cols_ = task_data->inputs_count[1];
+  rows_ = task_data->inputs_count[2];
 
-  res = std::vector<double>(cols - 1, 0);
+  res_ = std::vector<double>(cols_ - 1, 0);
   return true;
 }
 
 template <typename InOutType>
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<
     InOutType>::ValidationImpl() {
-  matrix = std::vector<double>(task_data->inputs_count[0]);
+  matrix_ = std::vector<double>(task_data->inputs_count[0]);
   auto* tmp_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix.begin());
-  cols = task_data->inputs_count[1];
-  rows = task_data->inputs_count[2];
+  std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
+  cols_ = task_data->inputs_count[1];
+  rows_ = task_data->inputs_count[2];
 
-  return task_data->inputs_count[0] > 1 && rows == cols - 1 && determinant(cols, rows, matrix) != 0 &&
-         matrix_rank(cols, rows, matrix) == rows;
+  return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
+         MatrixRank(cols_, rows_, matrix_) == rows_;
 }
 
 template <typename InOutType>
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<InOutType>::RunImpl() {
-  for (int i = 0; i < rows - 1; ++i) {
-    for (int k = i + 1; k < rows; ++k) {
-      double m = matrix[k * cols + i] / matrix[i * cols + i];
-      for (int j = i; j < cols; ++j) {
-        matrix[k * cols + j] -= matrix[i * cols + j] * m;
+  for (int i = 0; i < rows_ - 1; ++i) {
+    for (int k = i + 1; k < rows_; ++k) {
+      double m = matrix_[k * cols_ + i] / matrix_[i * cols_ + i];
+      for (int j = i; j < cols_; ++j) {
+        matrix_[k * cols_ + j] -= matrix_[i * cols_ + j] * m;
       }
     }
   }
-  for (int i = rows - 1; i >= 0; --i) {
-    double sum = matrix[i * cols + rows];
-    for (int j = i + 1; j < cols - 1; ++j) {
-      sum -= matrix[i * cols + j] * res[j];
+  for (int i = rows_ - 1; i >= 0; --i) {
+    double sum = matrix_[i * cols_ + rows_];
+    for (int j = i + 1; j < cols_ - 1; ++j) {
+      sum -= matrix_[i * cols_ + j] * res_[j];
     }
-    res[i] = sum / matrix[i * cols + i];
+    res_[i] = sum / matrix_[i * cols_ + i];
   }
   return true;
 }
@@ -112,7 +112,7 @@ template <typename InOutType>
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_seq::MPIGaussHorizontalSequential<
     InOutType>::PostProcessingImpl() {
   auto* this_matrix = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::copy(res.begin(), res.end(), this_matrix);
+  std::copy(res_.begin(), res_.end(), this_matrix);
   return true;
 }
 
