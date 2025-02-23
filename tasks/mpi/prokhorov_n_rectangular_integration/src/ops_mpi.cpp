@@ -7,8 +7,6 @@
 #include <functional>
 #include <vector>
 
-#include "core/task/include/task.hpp"
-
 using namespace std::chrono_literals;
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskSequential::PreProcessingImpl() {

@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/prokhorov_n_rectangular_integration/include/ops_mpi.hpp"
 
 TEST(prokhorov_n_rectangular_integration_mpi, test_integration_x_cubed) {
