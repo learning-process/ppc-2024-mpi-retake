@@ -81,9 +81,12 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
   cols_ = static_cast<int>(task_data->inputs_count[1]);
   rows_ = static_cast<int>(task_data->inputs_count[2]);
+  Matrix matrix;
+  matrix.cols = cols_;
+  matrix.rows = rows_;
 
-  return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
-         MatrixRank(cols_, rows_, matrix_) == rows_;
+  return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(matrix, matrix_) != 0 &&
+         MatrixRank(matrix, matrix_) == rows_;
 }
 
 bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalSequential::RunImpl() {
@@ -131,9 +134,12 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
     std::ranges::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[0], matrix_.begin());
     cols_ = static_cast<int>(task_data->inputs_count[1]);
     rows_ = static_cast<int>(task_data->inputs_count[2]);
+    Matrix matrix;
+    matrix.cols = cols_;
+    matrix.rows = rows_;
 
-    return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(cols_, rows_, matrix_) != 0 &&
-           MatrixRank(cols_, rows_, matrix_) == rows_;
+    return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(matrix, matrix_) != 0 &&
+           MatrixRank(matrix, matrix_) == rows_;
   }
   return true;
 }
