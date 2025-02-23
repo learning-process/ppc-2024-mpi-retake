@@ -1,6 +1,7 @@
 #include "mpi/kavtorev_d_most_different_neighbor_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/operations.hpp>
 #include <climits>
@@ -64,7 +65,7 @@ bool kavtorev_d_most_different_neighbor_elements_mpi::MostDifferentNeighborEleme
       delta_size++;
     }
   }
-  boost::mpi::broadcast(world_, delta_size, 0);
+  broadcast(world_, delta_size, 0);
 
   if (world_.rank() == 0) {
     input_ = std::vector<int>((world_.size() * delta_size) + 2, 0);
@@ -85,10 +86,10 @@ bool kavtorev_d_most_different_neighbor_elements_mpi::MostDifferentNeighborEleme
 
   std::pair<int, int> local_ans = {INT_MIN, -1};
   for (size_t i = 0; (i + st_) < size_ - 1 && i < (local_input_.size() - 1); ++i) {
-    std::pair<int, int> tmp = {std::abs(local_input_[i + 1] - local_input_[i]), static_cast<int>(i + st_)};
+    std::pair<int, int> tmp = {abs(local_input_[i + 1] - local_input_[i]), i + st_};
     local_ans = std::max(local_ans, tmp);
   }
-  boost::mpi::reduce(world_, local_ans, res_, boost::mpi::maximum<std::pair<int, int>>(), 0);
+  reduce(world_, local_ans, res_, boost::mpi::maximum<std::pair<int, int>>(), 0);
   return true;
 }
 

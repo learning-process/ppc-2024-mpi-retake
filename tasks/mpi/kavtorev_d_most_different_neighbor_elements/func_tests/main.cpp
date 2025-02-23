@@ -30,12 +30,12 @@ std::vector<int> Generator(int sz) {
 }  // namespace kavtorev_d_most_different_neighbor_elements_mpi
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, MixedPositiveAndNegativeNumbers_ReturnsCorrectPair) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_vec = {-10, 20, -30, 40, -50};
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
@@ -50,7 +50,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, MixedPositiveAndNegativeNu
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -71,12 +71,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, MixedPositiveAndNegativeNu
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, AlternatingPositiveAndNegativeNumbers_ReturnsCorrectPair) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_vec = {1, -1, 2, -2, 3, -3, 4, -4, 5, -5};
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
@@ -91,7 +91,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, AlternatingPositiveAndNega
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -112,12 +112,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, AlternatingPositiveAndNega
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeInputSize_ReturnsCorrectPair) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_vec = kavtorev_d_most_different_neighbor_elements_mpi::Generator(1000);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
@@ -132,7 +132,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeInputSize_ReturnsCorr
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -153,12 +153,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeInputSize_ReturnsCorr
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRangeNumbers_ReturnsCorrectPair) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_vec = {-1000000, 1000000};
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
@@ -173,7 +173,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRangeNumbers_ReturnsC
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -194,11 +194,11 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRangeNumbers_ReturnsC
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, EmptyInput_ReturnsFalse) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_ans(1, 0);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -214,13 +214,13 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, EmptyInput_ReturnsFalse) {
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, InputSizeTwo_CorrectResult) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_diff(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     const int sz = 2;
     global_vec = std::vector<int>(sz, 0);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
@@ -236,7 +236,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, InputSizeTwo_CorrectResult
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_diff(1, 0);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -257,13 +257,13 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, InputSizeTwo_CorrectResult
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRandomInput_CorrectResult) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     const int sz = 1234;
     global_vec = kavtorev_d_most_different_neighbor_elements_mpi::Generator(sz);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
@@ -279,7 +279,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRandomInput_CorrectRe
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -300,13 +300,13 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, LargeRandomInput_CorrectRe
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, MediumRandomInput_CorrectResult) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     const int sz = 120;
     global_vec = kavtorev_d_most_different_neighbor_elements_mpi::Generator(sz);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
@@ -322,7 +322,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, MediumRandomInput_CorrectR
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -343,12 +343,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, MediumRandomInput_CorrectR
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, AllEqualElements_CorrectResult) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     const int sz = 100;
     global_vec = std::vector<int>(sz, 0);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
@@ -364,7 +364,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, AllEqualElements_CorrectRe
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -385,12 +385,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, AllEqualElements_CorrectRe
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, AlternatingElements_CorrectResult) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_vec = {1, -1, 1, -1, 1, -1, 1, -1, 1, -1};
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
@@ -405,7 +405,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, AlternatingElements_Correc
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -426,12 +426,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, AlternatingElements_Correc
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, ConstantDifferenceSequence_CorrectResult) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     const int sz = 123;
     global_vec.resize(sz);
     for (int i = 0; i < sz; ++i) {
@@ -450,7 +450,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, ConstantDifferenceSequence
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -471,12 +471,12 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, ConstantDifferenceSequence
 }
 
 TEST(kavtorev_d_most_different_neighbor_elements_mpi, MostlyZerosInput_ReturnsCorrectPair) {
-  boost::mpi::communicator world_;
+  boost::mpi::communicator world;
   std::vector<int> global_vec;
   std::vector<int> global_max(1);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     global_vec = {12, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
@@ -491,7 +491,7 @@ TEST(kavtorev_d_most_different_neighbor_elements_mpi, MostlyZerosInput_ReturnsCo
   test_mpi_task_parallel.RunImpl();
   test_mpi_task_parallel.PostProcessingImpl();
 
-  if (world_.rank() == 0) {
+  if (world.rank() == 0) {
     std::vector<int> reference_max(1);
 
     auto task_data_seq = std::make_shared<ppc::core::TaskData>();
