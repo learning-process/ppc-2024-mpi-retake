@@ -10,7 +10,7 @@
 
 namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi {
 
-struct Matrix{
+struct Matrix {
   int rows;
   int cols;
 };
@@ -22,6 +22,16 @@ double Determinant(Matrix matrix, std::vector<double> a);
 std::vector<double> GetRandomMatrix(int sz);
 
 double AxB(int n, int m, std::vector<double> a, std::vector<double> res);
+
+void BroadcastMatrixSize();
+
+std::vector<int> ComputeRowDistribution();
+
+void ReceiveMatrix(int delta);
+
+void ForwardElimination(std::vector<double>& row);
+
+void BackSubstitution(std::vector<double>& row);
 
 class MPIGaussHorizontalSequential : public ppc::core::Task {
  public:
