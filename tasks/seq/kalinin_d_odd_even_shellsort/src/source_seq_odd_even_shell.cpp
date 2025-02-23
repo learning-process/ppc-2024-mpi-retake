@@ -12,7 +12,7 @@ void OddEvenShellSeq::ShellSort(std::vector<int> &vec) {
   for (std::size_t gap = n / 2; gap > 0; gap /= 2) {
     for (std::size_t i = gap; i < n; i++) {
       int temp = vec[i];
-      int j = 0;
+      size_t j = 0;
       for (j = i; j >= gap && vec[j - gap] > temp; j -= gap) {
         vec[j] = vec[j - gap];
       }

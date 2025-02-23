@@ -145,6 +145,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1021) {
 
   task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    std::ranges::sort(arr) ASSERT_EQ(arr, out);
+    std::ranges::sort(arr);
+    ASSERT_EQ(arr, out);
   }
 }

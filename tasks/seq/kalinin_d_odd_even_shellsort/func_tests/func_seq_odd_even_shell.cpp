@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -41,7 +42,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1000) {
   test_task_sequential.Run();
 
   test_task_sequential.PostProcessing();
-  std::sort(arr.begin(), arr.end());
+  std::ranges::sort(arr);
   ASSERT_EQ(arr, out);
 }
 
@@ -64,7 +65,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_999) {
   test_task_sequential.Run();
 
   test_task_sequential.PostProcessing();
-  std::sort(arr.begin(), arr.end());
+  std::ranges::sort(arr);
   ASSERT_EQ(arr, out);
 }
 
@@ -87,7 +88,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_9999) {
   test_task_sequential.Run();
 
   test_task_sequential.PostProcessing();
-  std::sort(arr.begin(), arr.end());
+  std::ranges::sort(arr);
   ASSERT_EQ(arr, out);
 }
 
@@ -110,6 +111,6 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1021) {
   test_task_sequential.Run();
 
   test_task_sequential.PostProcessing();
-  std::sort(arr.begin(), arr.end());
+  std::ranges::sort(arr);
   ASSERT_EQ(arr, out);
 }

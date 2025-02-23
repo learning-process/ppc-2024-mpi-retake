@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/collectives/scatter.hpp>
-#include <limits>
+#include <cstdio>
+#include <cstdlib>
 #include <random>
 #include <utility>
 #include <vector>
@@ -85,13 +85,15 @@ bool OddEvenShellMpi::RunImpl() {
   return true;
 }
 
-void PrepareInput(int &local_sz) {
-  size_t reminder = (world_.size() - (input_.size() % world_.size())) % world_.size();
+void OddEvenShellMpi::PrepareInput(int &local_sz) {
+  size_t reminder = 0;
+  reminder = (world_.size() - (input_.size() % world_.size())) % world_.size();
   input_.resize(input_.size() + reminder, std::numeric_limits<int>::max());
-  size_t local_sz = input_.size() / world_.size();
+  local_sz = input_.size() / world_.size();
 }
 
-void PerformOddEvenPhase(int phase, int id, int sz, bool is_even, std::vector<int> &local_vec, int local_sz) {
+void OddEvenShellMpi::PerformOddEvenPhase(int phase, int id, int sz, bool is_even, std::vector<int> &local_vec,
+                                          int local_sz) {
   int lower_bound = (phase % 2 == 0) ? 0 : 1;
   int higher_bound;
   if (phase % 2 == 0) {
@@ -139,8 +141,7 @@ void PerformOddEvenPhase(int phase, int id, int sz, bool is_even, std::vector<in
     ExchangeData(id, neighbour, local_vec, received_data, 1, 0);
   }
 
-  std::ranges::merge(local_vec, received_data, merged);
-
+  std::ranges::merge(local_vec, received_data, merged.begin());
   if (phase % 2 == 0) {
     local_vec.assign(merged.begin(), merged.begin() + local_sz);
   } else {
@@ -148,18 +149,13 @@ void PerformOddEvenPhase(int phase, int id, int sz, bool is_even, std::vector<in
   }
 }
 
-void ExchangeData(int id, int neighbour, std::vector<int> &local_vec, std::vector<int> &received_data, int send_tag,
-                  int recv_tag) {
-  if (id % 2 == 0) {
-    world_.send(neighbour, send_tag, local_vec);
-    world_.recv(neighbour, recv_tag, received_data);
-  } else {
-    world_.recv(neighbour, send_tag, received_data);
-    world_.send(neighbour, recv_tag, local_vec);
-  }
+void OddEvenShellMpi::ExchangeData(int id, int neighbour, std::vector<int> &local_vec, std::vector<int> &received_data,
+                                   int send_tag, int recv_tag) {
+  world_.send(neighbour, send_tag, local_vec);
+  world_.recv(neighbour, recv_tag, received_data);
 }
 
-void GatherResults(int id, std::vector<int> &local_vec, int local_sz) {
+void OddEvenShellMpi::GatherResults(int id, std::vector<int> &local_vec, int local_sz) {
   if (id != 0) {
     gather(world_, local_vec.data(), local_sz, 0);
   } else {
