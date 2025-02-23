@@ -1,8 +1,5 @@
 #include "mpi/vasenkov_a_word_count/include/ops_mpi.hpp"
-
-#include <cmath>
-#include <cstddef>
-#include <vector>
+#include <functional>
 
 bool vasenkov_a_word_count_mpi::WordCountMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
@@ -21,43 +18,43 @@ bool vasenkov_a_word_count_mpi::WordCountMPI::RunImpl() {
   if (world_.rank() == 0) {
     delta = inputString_.length() / world_.size();
   }
-  broadcast(world_, delta, 0);
+  boost::mpi::broadcast(world_, delta, 0);
 
-  std::string localString;
-  localString.resize(delta);
+  std::string local_string;
+  local_string.resize(delta);
 
   if (world_.rank() == 0) {
     for (int i = 1; i < world_.size(); i++) {
-      world_.send(i, 0, inputString_.data() + (i * delta), delta);
+      world_.send(i, 0, inputString_.data() + (i * delta), (int)delta);
     }
-    localString.assign(inputString_.data(), delta);
+    local_string.assign(inputString_.data(), delta);
   } else {
-    world_.recv(0, 0, localString.data(), delta);
+    world_.recv(0, 0, local_string.data(), (int)delta);
   }
 
-  bool inWord = false;
+  bool in_word = false;
   if (world_.rank() != 0) {
-    char prevChar;
-    world_.recv(world_.rank() - 1, 1, &prevChar, 1);
-    inWord = !std::isspace(prevChar);
+    char prev_char = ' ';
+    world_.recv(world_.rank() - 1, 1, &prev_char, 1);
+    in_word = (std::isspace(prev_char) == 0);
   }
 
   wordLoaclCount_ = 0;
-  for (char c : localString) {
-    if (std::isspace(c)) {
-      inWord = false;
-    } else if (!inWord) {
+  for (char c : local_string) {
+    if (std::isspace(c) != 0) {
+      in_word = false;
+    } else if (!in_word) {
       wordLoaclCount_++;
-      inWord = true;
+      in_word = true;
     }
   }
 
   if (world_.rank() != world_.size() - 1) {
-    char lastChar = localString.back();
-    world_.send(world_.rank() + 1, 1, &lastChar, 1);
+    char last_char = local_string.back();
+    world_.send(world_.rank() + 1, 1, &last_char, 1);
   }
 
-  boost::mpi::reduce(world_, wordLoaclCount_, wordCount_, std::plus<>(), 0);
+  reduce(world_, wordLoaclCount_, wordCount_, std::plus<>(), 0);
 
   return true;
 }
