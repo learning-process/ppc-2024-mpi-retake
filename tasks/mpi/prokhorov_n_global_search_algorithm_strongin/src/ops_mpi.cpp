@@ -170,6 +170,7 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAl
 
   return global_x_min;
 }
+
 double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAlgorithm() {
   double x_min = a;
   double f_min = f(x_min);
