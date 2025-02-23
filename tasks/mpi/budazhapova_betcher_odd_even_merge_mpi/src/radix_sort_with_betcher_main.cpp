@@ -1,6 +1,8 @@
 
 #include <algorithm>
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstddef>
 #include <vector>
@@ -49,7 +51,7 @@ void OddEvenMerge(std::vector<int>& local_data, std::vector<int>& received_data)
   // received_data.assign(merged.begin() + local.size(), merged.end());
   received_data.assign(merged.begin() + static_cast<long>(local_data.size()), merged.end());
 }
-void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data, boost::mpi::communicator world) {
+void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
   if (send_rank >= 0 && send_rank < world.size()) {
     world.send(send_rank, world.rank(), local_data);
   }
@@ -58,14 +60,14 @@ void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data, 
   }
 }
 
-void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, boost::mpi::communicator world) {
+void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
   std::vector<int> received_data;
   world.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(local_data, received_data);
   world.send(neighbor_rank, world_.rank(), received_data);
 }
 
-void OddEvenSortPhase(int phase, std::vector<int>& local_data, boost::mpi::communicator world) {
+void OddEvenSortPhase(int phase, std::vector<int>& local_data, const boost::mpi::communicator& world) {
   int next_rank = world.rank() + 1;
   int prev_rank = world.rank() - 1;
 
@@ -92,15 +94,13 @@ void OddEvenSortPhase(int phase, std::vector<int>& local_data, boost::mpi::commu
 
 void DistributeData(int& n_of_send_elements, int& n_of_proc_with_extra_elements, int& start, int& end,
                     std::vector<int>& recv_counts, std::vector<int>& displacements, std::vector<int>& local_data,
-                    boost::mpi::communicator world, std::vector<int>& res_data) {
+                    const boost::mpi::communicator& world, std::vector<int>& res_data) {
   int world_size = 0;
   int world_rank = 0;
   int res_size = 0;
 
-  if (!world.empty()) {
-    world_size = world.size();
-    world_rank = world.rank();
-  }
+  world_size = world.size();
+  world_rank = world.rank();
 
   if (!res_data.empty()) {
     res_size = static_cast<int>(res_data.size());
