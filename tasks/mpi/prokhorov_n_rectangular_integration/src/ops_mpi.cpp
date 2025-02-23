@@ -166,7 +166,7 @@ double prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ParallelIntegrate(c
   int end = start + local_n + (rank < remainder ? 1 : 0);
 
   for (int i = start; i < end; ++i) {
-    double x = lower_bound + ((i + 0.5) * step;
+    double x = lower_bound + ((i + 0.5) * step);
     local_area += f(x) * step;
   }
 
