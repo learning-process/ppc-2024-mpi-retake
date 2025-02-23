@@ -1,8 +1,8 @@
 #include "mpi/kavtorev_d_most_different_neighbor_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
-#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/operations.hpp>
 #include <climits>
 #include <cmath>
