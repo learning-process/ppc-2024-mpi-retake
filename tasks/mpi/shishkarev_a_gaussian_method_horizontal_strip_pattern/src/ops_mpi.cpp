@@ -10,7 +10,7 @@
 
 using namespace std::chrono_literals;
 
-int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix matrix, const std::vector<double>& a) {
+int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix matrix, std::vector<double> a) {
   int rank = matrix.cols;
   for (int i = 0; i < matrix.cols; ++i) {
     int j = 0;
@@ -225,7 +225,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
     }
     if (r >= 0) {
       for (int j = 0; j <= r; ++j) {
-        local_res_[row[j]] -= local_matrix_[(j * cols_) + i] * local_res_[i];
+        local_res_[static_cast<size_t>(row[j])] -= local_matrix_[(j * cols_) + i] * local_res_[i];
       }
     }
   }
