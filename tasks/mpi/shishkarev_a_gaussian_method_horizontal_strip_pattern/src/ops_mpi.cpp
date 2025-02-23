@@ -142,18 +142,20 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
   std::vector<int> row_num(world_.size());
 
   int delta = rows_ / world_.size();
-  if (rows_ % world_.size() != 0) {
-    delta++;
-  }
-  if (world_.rank() >= world_.size() - world_.size() * delta + rows_) {
-    delta--;
+  int remainder = rows_ % world_.size();
+  if (world_.rank() < remainder) {
+      delta++;
   }
 
-  boost::mpi::gather(world_, delta, row_num.data(), 0);
+  boost::mpi::gather(world_, delta, row_num, 0);
 
   if (world_.rank() == 0) {
     std::vector<double> send_matrix(delta * cols_);
     for (int proc = 1; proc < world_.size(); ++proc) {
+      if (row_num[proc] * cols_ > send_matrix.size()) {
+        std::cerr << "Ошибка: Размерность send_matrix не совпадает!" << std::endl;
+        continue;
+      }
       for (int i = 0; i < row_num[proc]; ++i) {
         for (int j = 0; j < cols_; ++j) {
           send_matrix[(i * cols_) + j] = matrix_[((proc + (world_.size() * i)) * cols_) + j];
@@ -172,12 +174,11 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
       }
     }
   } else {
-    world_.recv(0, 0, local_matrix_.data(), delta * cols_);
-  }
-
-  std::vector<double> row(delta);
-  for (int i = 0; i < delta; ++i) {
-    row[i] = world_.rank() + world_.size() * i;
+    if (delta * cols_ > local_matrix_.size()) {
+      std::cerr << "Ошибка: Размерность local_matrix_ не совпадает!" << std::endl;
+    } else {
+      world_.recv(0, 0, local_matrix_.data(), delta * cols_);
+    }
   }
 
   std::vector<double> pivot(cols_);
