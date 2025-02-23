@@ -1,10 +1,8 @@
 // Anikin Maksim 2025
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/operations.hpp>
-#include <functional>
 #include <cmath>
+#include <functional>
 #include <mpi.h>
 #include <random>
 #include <string>
