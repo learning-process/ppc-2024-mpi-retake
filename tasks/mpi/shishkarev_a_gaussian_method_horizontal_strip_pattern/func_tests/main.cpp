@@ -139,7 +139,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_101x100) {
   if (world.rank() == 0) {
     global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
 
-    while (IsSingular(global_matrix, rows, cols)) {
+    while (shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::IsSingular(global_matrix, rows, cols)) {
       global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
     }
 
@@ -195,7 +195,7 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_201x200) {
   if (world.rank() == 0) {
     global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
 
-    while (IsSingular(global_matrix, rows, cols)) {
+    while (shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::IsSingular(global_matrix, rows, cols)) {
       global_matrix = shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::GetRandomMatrix(cols * rows);
     }
 
