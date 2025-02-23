@@ -46,12 +46,12 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
     double alpha_k = rsquare_prev / opolin_d_cg_method_seq::ScalarProduct(p_k, Ap);
 
     // x_k+1
-    for (int i = 0; i < static_cast<int> n_; i++) {
+    for (int i = 0; i < static_cast<int>(n_); i++) {
       x_[i] += alpha_k * p_k[i];
     }
 
     // r_k+1
-    for (int i = 0; i < static_cast<int> n_; i++) {
+    for (int i = 0; i < static_cast<int>(n_); i++) {
       r_k[i] -= alpha_k * Ap[i];
     }
 
@@ -64,7 +64,7 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
     double beta_k = rsquare_k / rsquare_prev;
     rsquare_prev = rsquare_k;
     // p_k+1
-    for (int i = 0; i < static_cast<int> n_; i++) {
+    for (int i = 0; i < static_cast<int>(n_); i++) {
       p_k[i] = r_k[i] + beta_k * p_k[i];
     }
   }
