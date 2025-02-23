@@ -14,7 +14,7 @@
 TEST(mezhuev_m_lattice_torus_mpi, DataTransferTest) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint8_t> input_data(4);
@@ -54,7 +54,7 @@ TEST(mezhuev_m_lattice_torus_mpi, TestPreProcessing) {
 TEST(mezhuev_m_lattice_torus_mpi, TestLargeGridProcessing) {
   boost::mpi::communicator world;
   if (world.size() < 16) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint8_t> input_data(16);
@@ -78,7 +78,7 @@ TEST(mezhuev_m_lattice_torus_mpi, TestLargeGridProcessing) {
 TEST(mezhuev_m_lattice_torus_mpi, TestIterationOnMaxGridSize) {
   boost::mpi::communicator world;
   if (world.size() < 16) {
-    return;
+    GTEST_SKIP();
   }
 
   int max_size = 256;
@@ -139,7 +139,7 @@ TEST(mezhuev_m_lattice_torus_mpi, TestPreProcessingSuccess) {
 TEST(mezhuev_m_lattice_torus_mpi, RunImpl_SingleProcess) {
   boost::mpi::communicator world;
   if (world.size() != 1) {
-    return;
+    GTEST_SKIP();
   }
 
   std::vector<uint8_t> input_data(10);
@@ -162,8 +162,8 @@ TEST(mezhuev_m_lattice_torus_mpi, RunImpl_SingleProcess) {
 
 TEST(mezhuev_m_lattice_torus_mpi, FullPipeline_SmallGrid) {
   boost::mpi::communicator world;
-  if (world.size() < 2 || world.size() > 4) {
-    return;
+  if (world.size() < 2) {
+    GTEST_SKIP();
   }
 
   std::vector<uint8_t> input_data(8, 55);
