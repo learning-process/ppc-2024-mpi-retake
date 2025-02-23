@@ -58,7 +58,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::ValidationImpl() {
 }
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::RunImpl() {
-  unsigned int local_input_size = 0;
+  int local_input_size = 0;
   std::vector<int> send_counts{};
 
   std::vector<int> displacements{};
