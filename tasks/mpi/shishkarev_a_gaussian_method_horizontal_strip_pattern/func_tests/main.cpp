@@ -22,7 +22,12 @@ std::vector<double> GetRandomMatrix(int sz) {
   return mat;
 }
 
-bool IsSingular(const std::vector<double>& matrix, int rows, int cols) { return Determinant(matrix, rows, cols) == 0; }
+bool IsSingular(const std::vector<double>& matrix, int rows, int cols) {
+  Matrix mat;
+  mat.rows = rows;
+  mat.cols = cols
+  return Determinant(mat, matrix) == 0; 
+}
 
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi
 

@@ -29,6 +29,8 @@ double Determinant(Matrix matrix, std::vector<double> a);
 
 std::vector<double> GetRandomMatrix(int sz);
 
+bool IsSingular(const std::vector<double>& matrix, int rows, int cols);
+
 double AxB(int n, int m, std::vector<double> a, std::vector<double> res);
 
 void BroadcastMatrixSize(boost::mpi::communicator& world, int& rows, int& cols);
