@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cstddef>
-
+#include <vector>
 //  Sequential
 
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::PreProcessingImpl() {
