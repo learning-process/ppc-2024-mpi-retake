@@ -43,19 +43,19 @@ bool MostDifferentNeighborElements::RunImpl() {
   }
 
   int max_difference = 0;
-  bool found = false;
+  bool foundd = false;
 
   for (size_t i = 0; i < input_.size() - 1; ++i) {
     int current_difference = std::abs(input_[i] - input_[i + 1]);
-    if (!found || current_difference > max_difference) {
+    if (!foundd || current_difference > max_difference) {
       max_difference = current_difference;
       result_[0] = input_[i];
       result_[1] = input_[i + 1];
-      found = true;
+      foundd = true;
     }
   }
 
-  if (!found) {
+  if (!foundd) {
     result_[0] = input_[0];
     result_[1] = input_[0];
   }
