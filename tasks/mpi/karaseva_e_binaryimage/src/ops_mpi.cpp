@@ -8,8 +8,7 @@
 #include <vector>
 
 // Function to get the root of a label with path compression
-int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent,
-                                                                      int label) {
+int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
   if (label_parent.find(label) == label_parent.end()) {
     label_parent[label] = label;
     return label;
@@ -21,8 +20,8 @@ int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int
 }
 
 // Function to union two labels
-void karaseva_e_binaryimage_mpi::TestTaskMPI::UnionLabels(std::unordered_map<int, int>& label_parent,
-                                                                      int label1, int label2) {
+void karaseva_e_binaryimage_mpi::TestTaskMPI::UnionLabels(std::unordered_map<int, int>& label_parent, int label1,
+                                                          int label2) {
   int root1 = GetRootLabel(label_parent, label1);
   int root2 = GetRootLabel(label_parent, label2);
   if (root1 != root2) {
@@ -33,7 +32,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::UnionLabels(std::unordered_map<int
 // Function to process neighbors of a pixel and add them to a list
 void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int rows, int cols,
                                                                const std::vector<int>& labeled_image,
-                             std::vector<int>& neighbors) {
+                                                               std::vector<int>& neighbors) {
   int dx[] = {-1, 0, -1};
   int dy[] = {0, -1, 1};
 
@@ -47,8 +46,9 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int
 
 // Function to assign label to a pixel and perform union of labels
 void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::vector<int>& labeled_image,
-                                                                        std::unordered_map<int, int>& label_parent,
-                               int& label_counter, const std::vector<int>& neighbors) {
+                                                                 std::unordered_map<int, int>& label_parent,
+                                                                 int& label_counter,
+                                                                 const std::vector<int>& neighbors) {
   if (neighbors.empty()) {
     labeled_image[pos] = label_counter++;
   } else {
@@ -63,7 +63,8 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::v
 // Main labeling function
 void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, std::vector<int>& labeled_image,
                                                        int rows, int cols, int min_label,
-                     std::unordered_map<int, int>& label_parent, int start_row, int end_row) {
+                                                       std::unordered_map<int, int>& label_parent, int start_row,
+                                                       int end_row) {
   int label_counter = min_label;
 
   for (int x = start_row; x < end_row; ++x) {
