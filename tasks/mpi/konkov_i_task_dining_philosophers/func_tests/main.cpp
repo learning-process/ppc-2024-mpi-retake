@@ -31,11 +31,9 @@ TEST(konkov_i_DiningPhilosophersTest, DeadlockFreeExecution) {
   ASSERT_TRUE(dp.Run());
   ASSERT_TRUE(dp.PostProcessing());
 
-  bool local_deadlock = dp.CheckDeadlock();
-
-  bool global_deadlock = false;
-  MPI_Allreduce(&local_deadlock, &global_deadlock, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
-
+  int local_deadlock = dp.CheckDeadlock() ? 1 : 0;
+  int global_deadlock = 0;
+  MPI_Allreduce(&local_deadlock, &global_deadlock, 1, MPI_INT, MPI_LOR, MPI_COMM_WORLD);
   ASSERT_FALSE(global_deadlock) << "Deadlock detected!";
 }
 
