@@ -30,8 +30,9 @@ class MergeParallel : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  std::vector<int> local_res;
-  std::vector<int> res;
-  boost::mpi::communicator world;
+ private:
+  std::vector<int> local_res_;
+  std::vector<int> res_;
+  boost::mpi::communicator world_;
 };
 }  // namespace budazhapova_betcher_odd_even_merge_mpi
