@@ -12,6 +12,7 @@
 
 bool strakhov_a_char_freq_counter_mpi::CharFreqCounterSeq::PreProcessingImpl() {
   auto *tmp = reinterpret_cast<signed char *>(task_data->inputs[0]);
+  input_ = std::vector<signed char>(task_data->inputs_count[0]);
   for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp[i];
   }
@@ -40,6 +41,7 @@ bool strakhov_a_char_freq_counter_mpi::CharFreqCounterPar::PreProcessingImpl() {
   if (world_.rank() == 0) {
     input_.resize(task_data->inputs_count[0]);
     auto *tmp = reinterpret_cast<signed char *>(task_data->inputs[0]);
+    input_ = std::vector<signed char>(task_data->inputs_count[0]);
     for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
       input_[i] = tmp[i];
     }

@@ -2,10 +2,12 @@
 
 #include <algorithm>
 #include <cstddef>
+
 //  Sequential
 
 bool strakhov_a_char_freq_counter_seq::CharFreqCounterSeq::PreProcessingImpl() {
   char *tmp = reinterpret_cast<char *>(task_data->inputs[0]);
+  input_ = std::vector<signed char>(task_data->inputs_count[0]);
   for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp[i];
   }

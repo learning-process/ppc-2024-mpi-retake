@@ -17,7 +17,6 @@ std::vector<char> FillRandomChars(int size, const std::string &charset) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
-
   std::vector<char> result(size);
   for (char &c : result) {
     c = charset[dist(gen)];
@@ -262,6 +261,7 @@ TEST(strakhov_a_char_freq_counter_mpi, random_string) {
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
+    task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_string.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_string.size());
     task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_target.data()));
     task_data_mpi_par->inputs_count.emplace_back(in_target.size());
