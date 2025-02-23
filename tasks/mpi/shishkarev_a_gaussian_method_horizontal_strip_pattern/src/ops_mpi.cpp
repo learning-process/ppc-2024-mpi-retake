@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
-#include <boost/mpi/collectives/gather.hpp>
 #include <cstdlib>
 #include <vector>
 
@@ -143,81 +142,81 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BroadcastMatrixSize() {
-    broadcast(this->world_, this->cols_, 0);
-    broadcast(this->world_, this->rows_, 0);
+    broadcast(MPIGaussHorizontalSequential::world_, MPIGaussHorizontalSequential::cols_, 0);
+    broadcast(MPIGaussHorizontalSequential::world_, MPIGaussHorizontalSequential::rows_, 0);
 }
 
 std::vector<int> shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ComputeRowDistribution() {
-    std::vector<int> row_num(this->world_.size());
-    int this->delta_ = this->rows_ / this->world_.size();
-    int remainder = this->rows_ % this->world_.size();
-    if (this->world_.rank() < remainder) {
-      this->delta_++;
+    std::vector<int> row_num(MPIGaussHorizontalSequential::world_.size());
+    int MPIGaussHorizontalSequential::delta_ = MPIGaussHorizontalSequential::rows_ / MPIGaussHorizontalSequential::world_.size();
+    int remainder = rows_ % world_.size();
+    if (MPIGaussHorizontalSequential::world_.rank() < remainder) {
+      MPIGaussHorizontalSequential::delta_++;
     }
-    boost::mpi::gather(this->world_, this->delta_, row_num, 0);
+    boost::mpi::gather(MPIGaussHorizontalSequential::world_, MPIGaussHorizontalSequential::delta_, row_num, 0);
     return row_num;
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::DistributeMatrix(const std::vector<int>& row_num) {
-    if (this->world_.rank() == 0) {
-        std::vector<double> SendMatrix{this->delta_ * this->cols_};
-        for (int proc = 1; proc < this->world_.size(); ++proc) {
+    if (MPIGaussHorizontalSequential::world_.rank() == 0) {
+        std::vector<double> SendMatrix{MPIGaussHorizontalSequential::delta_ * MPIGaussHorizontalSequential::cols_};
+        for (int proc = 1; proc < MPIGaussHorizontalSequential::world_.size(); ++proc) {
             for (int i = 0; i < row_num[proc]; ++i)
-                for (int j = 0; j < this->cols_; ++j)
-                    SendMatrix[(i * this->cols_) + j] = matrix_[((proc + (this->world_.size() * i)) * this->cols_) + j];
-            this->world_.send(proc, 0, SendMatrix.data(), row_num[proc] * this->cols_);
+                for (int j = 0; j < MPIGaussHorizontalSequential::cols_; ++j)
+                    SendMatrix[(i * MPIGaussHorizontalSequential::cols_) + j] = matrix_[((proc + (MPIGaussHorizontalSequential::world_.size() * i)) * MPIGaussHorizontalSequential::cols_) + j];
+            MPIGaussHorizontalSequential::world_.send(proc, 0, SendMatrix.data(), row_num[proc] * MPIGaussHorizontalSequential::cols_);
         }
     }
 }
 
-void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(int this->delta_) {
-    local_matrix_.resize(this->delta_ * this->cols_);
-    if (this->world_.rank() == 0) {
-        for (int i = 0; i < this->delta_; ++i)
-            for (int j = 0; j < this->cols_; ++j)
-                local_matrix_[(i * this->cols_) + j] = matrix_[(i * this->cols_ * this->world_.size()) + j];
+void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ReceiveMatrix(int MPIGaussHorizontalSequential::delta_) {
+    local_matrix_.resize(MPIGaussHorizontalSequential::delta_ * MPIGaussHorizontalSequential::cols_);
+    if (MPIGaussHorizontalSequential::world_.rank() == 0) {
+        for (int i = 0; i < MPIGaussHorizontalSequential::delta_; ++i)
+            for (int j = 0; j < MPIGaussHorizontalSequential::cols_; ++j)
+                local_matrix_[(i * MPIGaussHorizontalSequential::cols_) + j] = matrix_[(i * MPIGaussHorizontalSequential::cols_ * MPIGaussHorizontalSequential::world_.size()) + j];
     } else {
-        this->world_.recv(0, 0, local_matrix_.data(), this->delta_ * this->cols_);
+        MPIGaussHorizontalSequential::world_.recv(0, 0, local_matrix_.data(), MPIGaussHorizontalSequential::delta_ * MPIGaussHorizontalSequential::cols_);
     }
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::ForwardElimination(std::vector<double>& row) {
-    std::vector<double> Pivot(this->cols_);
+    std::vector<double> Pivot(MPIGaussHorizontalSequential::cols_);
     int r = 0;
-    for (int i = 0; i < this->rows_ - 1; ++i) {
+    for (int i = 0; i < MPIGaussHorizontalSequential::rows_ - 1; ++i) {
         if (i == row[r]) {
-            for (int j = 0; j < this->cols_; ++j)
-                Pivot[j] = local_matrix_[(r * this->cols_) + j];
-            broadcast(this->world_, Pivot.data(), this->cols_, this->world_.rank());
+            for (int j = 0; j < MPIGaussHorizontalSequential::cols_; ++j)
+                Pivot[j] = local_matrix_[(r * MPIGaussHorizontalSequential::cols_) + j];
+            broadcast(MPIGaussHorizontalSequential::world_, Pivot.data(), MPIGaussHorizontalSequential::cols_, MPIGaussHorizontalSequential::world_.rank());
             r++;
         } else {
-            broadcast(this->world_, Pivot.data(), this->cols_, i % this->world_.size());
+            broadcast(MPIGaussHorizontalSequential::world_, Pivot.data(), MPIGaussHorizontalSequential::cols_, i % MPIGaussHorizontalSequential::world_.size());
         }
-        for (int k = r; k < this->delta_; ++k) {
-            double m = local_matrix_[(k * this->cols_) + i] / Pivot[i];
-            for (int j = i; j < this->cols_; ++j)
-                local_matrix_[(k * this->cols_) + j] -= Pivot[j] * m;
+        for (int k = r; k < MPIGaussHorizontalSequential::delta_; ++k) {
+            double m = local_matrix_[(k * MPIGaussHorizontalSequential::cols_) + i] / Pivot[i];
+            for (int j = i; j < MPIGaussHorizontalSequential::cols_; ++j)
+                local_matrix_[(k * MPIGaussHorizontalSequential::cols_) + j] -= Pivot[j] * m;
         }
     }
 }
 
 void shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::BackSubstitution(std::vector<double>& row) {
-    int r = this->delta_ - 1;
-    for (int i = this->rows_ - 1; i > 0; --i) {
+    int r = delta_ - 1;
+    for (int i = MPIGaussHorizontalSequential::rows_ - 1; i > 0; --i) {
         if (r >= 0 && i == row[r]) {
-            local_res_[i] /= local_matrix_[(r * this->cols_) + i];
-            broadcast(this->world_, local_res_[i], this->world_.rank());
+            local_res_[i] /= local_matrix_[(r * MPIGaussHorizontalSequential::cols_) + i];
+            broadcast(MPIGaussHorizontalSequential::world_, local_res_[i], MPIGaussHorizontalSequential::world_.rank());
             r--;
         } else {
-            broadcast(this->world_, local_res_[i], i % this->world_.size());
+            broadcast(MPIGaussHorizontalSequential::world_, local_res_[i], i % MPIGaussHorizontalSequential::world_.size());
         }
         if (r >= 0) {
             for (int j = 0; j <= r; ++j) {
-              local_res_[static_cast<size_t>(row[j])] -= local_matrix_[(j * this->cols_) + i] * local_res_[i];
+              local_res_[static_cast<size_t>(row[j])] -= local_matrix_[(j * MPIGaussHorizontalSequential::cols_) + i] * local_res_[i];
             }
         }
     }
-    if (this->world_.rank() == 0) {
+    if (MPIGaussHorizontalSequential::world_.rank() == 0) {
         local_res_[0] /= local_matrix_[0];
         res_ = local_res_;
     }
