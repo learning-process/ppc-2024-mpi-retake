@@ -1,15 +1,11 @@
 #include "mpi/chernova_n_topology_ring/include/ops_mpi.hpp"
-
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <algorithm>
-#include <functional>
-#include <random>
-#include <string>
-#include <thread>
 #include <vector>
 
 bool chernova_n_topology_ring_mpi::TestMPITaskParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    vector_size_ = task_data->inputs_count[0];
+    vector_size_ = static_cast<int>(task_data->inputs_count[0]);
     input_ = std::vector<char>(vector_size_);
     output_ = std::vector<char>(vector_size_);
     std::copy(task_data->inputs[0], task_data->inputs[0] + vector_size_, input_.data());

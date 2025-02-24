@@ -1,12 +1,18 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <vector>
+#include <string>
+#include <memory>
+#include <cstdint>
+#include <algorithm>
 
+#include "core/task/include/task.hpp"
 #include "core/perf/include/perf.hpp"
 #include "mpi/chernova_n_topology_ring/include/ops_mpi.hpp"
 
-namespace chernova_n_topology_ring_mpi {
+namespace {
 
 std::vector<char> GenerateDataPerf(int k) {
   const std::string words[] = {"one", "two", "three"};
@@ -21,17 +27,17 @@ std::vector<char> GenerateDataPerf(int k) {
     }
   }
 
-  return std::vector<char>(result.begin(), result.end());
+  return {result.begin(), result.end()};
 }
 
-}  // namespace chernova_n_topology_ring_mpi
+}  // namespace
 
 TEST(chernova_n_topology_ring_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   const int k = 100000;
-  std::vector<char> test_data_parallel = chernova_n_topology_ring_mpi::GenerateDataPerf(k);
+  std::vector<char> test_data_parallel = GenerateDataPerf(k);
   std::vector<char> in = test_data_parallel;
-  const int n = in.size();
+  const int n = static_cast<int>(in.size());
   std::vector<char> out_vec(n);
   std::vector<int> out_process;
 
@@ -64,16 +70,16 @@ TEST(chernova_n_topology_ring_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(true, std::equal(in.begin(), in.end(), out_vec.begin(), out_vec.end()));
+    ASSERT_EQ(true, std::ranges::equal(in, out_vec));
   }
 }
 
 TEST(chernova_n_topology_ring_mpi, test_task_run) {
   boost::mpi::communicator world;
   const int k = 100000;
-  std::vector<char> test_data_parallel = chernova_n_topology_ring_mpi::GenerateDataPerf(k);
+  std::vector<char> test_data_parallel = GenerateDataPerf(k);
   std::vector<char> in = test_data_parallel;
-  const int n = in.size();
+  const int n = static_cast<int>(in.size());
   std::vector<char> out_vec(n);
   std::vector<int> out_process;
 
@@ -106,6 +112,6 @@ TEST(chernova_n_topology_ring_mpi, test_task_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(true, std::equal(in.begin(), in.end(), out_vec.begin(), out_vec.end()));
+    ASSERT_EQ(true, std::ranges::equal(in, out_vec));
   }
 }
