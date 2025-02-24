@@ -45,7 +45,7 @@ bool TrapezoidalIntegral::RunImpl() {
 
   const double h = (b_ - a_) / n_;
   const int local_n = (n_ / size) + ((rank < (n_ % size)) ? 1 : 0);
-  const double local_a = a_ + h * ((rank * (static_cast<double>(n_) / size)) + std::min(rank, n_ % size));
+  const double local_a = a_ + (h * ((rank * (static_cast<double>(n_) / size)) + std::min(rank, n_ % size)));
   const double local_b = local_a + (h * local_n);
 
   double local_sum = 0.5 * (Func(local_a) + Func(local_b));
