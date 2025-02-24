@@ -34,23 +34,21 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
   int current_rank = world_.rank();
-
   if (current_rank == 0) {
     task_data_.path.push_back(0);
     int next = GetNextHop(0, task_data_.target, width_, height_);
-    world_.send(next, 0, task_data_);
-    world_.recv(boost::mpi::any_source, 0, task_data_);
+    world_.send(next, 0, task_data_.target);
+    world_.recv(boost::mpi::any_source, 0, task_data_.path);
   } else {
-    world_.recv(boost::mpi::any_source, 0, task_data_);
-    if (task_data_.path[0] == -1) {
-      return true;
-    }
-    task_data_.path.push_back(world_.rank());
+    int received_target;
+    world_.recv(boost::mpi::any_source, 0, received_target);
+    task_data_.target = received_target;
+    task_data_.path.push_back(current_rank);
     if (current_rank != task_data_.target) {
       int next = GetNextHop(current_rank, task_data_.target, width_, height_);
-      world_.send(next, 0, task_data_);
+      world_.send(next, 0, task_data_.target);
     } else {
-      world_.send(0, 0, task_data_);
+      world_.send(0, 0, task_data_.path);
     }
   }
   return true;
@@ -64,8 +62,6 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
   }
   return true;
 }
-
-namespace komshina_d_grid_torus_mpi {
 
 void komshina_d_grid_torus_mpi::TestTaskMPI::ComputeGridSize() {
   int world_size = world_.size();
@@ -95,5 +91,3 @@ std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(int target,
   }
   return path;
 }
-
-}  // namespace komshina_d_grid_torus_mpi

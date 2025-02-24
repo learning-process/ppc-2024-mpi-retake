@@ -26,13 +26,6 @@ class TestTaskMPI : public ppc::core::Task {
 
     TaskData() = default;
     TaskData(const std::string& str, int tgt) : payload(str.begin(), str.end()), target(tgt) {}
-
-    template <class Archive>
-    void Serialize(Archive& ar, unsigned int version) {
-      ar & target;
-      ar & payload;
-      ar & path;
-    }
   };
 
  private:
