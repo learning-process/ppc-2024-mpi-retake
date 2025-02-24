@@ -5,7 +5,7 @@
 #include <functional>
 #include <iostream>
 
-#include "tasks/seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
+#include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 
 namespace muradov_k_trapezoid_integral_seq {
 
