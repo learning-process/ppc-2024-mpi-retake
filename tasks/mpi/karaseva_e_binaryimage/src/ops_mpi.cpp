@@ -114,23 +114,24 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   MPI_Bcast(&rc_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   input_.resize(rc_size_ * rc_size_);
-  MPI_Bcast(input_.data(), input_.size(), MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(input_.data(), static_cast<int>(input_.size()), MPI_INT, 0, MPI_COMM_WORLD);
 
   return true;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
-  int rank;
+  int rank = 0;
+
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  std::cout << "Rank: " << rank << " inputs.size(): " << task_data->inputs.size() << std::endl;
-  std::cout << "Rank: " << rank << " outputs.size(): " << task_data->outputs.size() << std::endl;
+  std::cout << "Rank: " << rank << " inputs.size(): " << task_data->inputs.size() << '\n';
+  std::cout << "Rank: " << rank << " outputs.size(): " << task_data->outputs.size() << '\n';
 
   if (!task_data->inputs.empty()) {
-    std::cout << "Rank: " << rank << " inputs_count[0]: " << task_data->inputs_count[0] << std::endl;
+    std::cout << "Rank: " << rank << " inputs_count[0]: " << task_data->inputs_count[0] << '\n';
   }
   if (!task_data->outputs.empty()) {
-    std::cout << "Rank: " << rank << " outputs_count[0]: " << task_data->outputs_count[0] << std::endl;
+    std::cout << "Rank: " << rank << " outputs_count[0]: " << task_data->outputs_count[0] << '\n';
   }
 
   return !task_data->inputs.empty() && !task_data->outputs.empty() &&
