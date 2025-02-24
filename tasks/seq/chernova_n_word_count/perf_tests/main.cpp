@@ -28,7 +28,7 @@ std::vector<char> chernova_n_word_count_seq::GenerateWordsPerf(int k) {
 const int k_ = 100000;
 namespace {
   std::vector<char> test_data_seq = chernova_n_word_count_seq::GenerateWordsPerf(k_);
-}
+}  // namespace
 
 TEST(chernova_n_word_count_seq, test_pipeline_run) {
   std::vector<char> in = test_data_seq;

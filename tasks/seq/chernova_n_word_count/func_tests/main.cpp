@@ -29,7 +29,7 @@ std::vector<char> chernova_n_word_count_seq::GenerateWords(int k) {
 const int k_ = 50;
 namespace {
   std::vector<char> test_data_seq = chernova_n_word_count_seq::GenerateWords(k_);
-}
+} //namespace
 
 TEST(chernova_n_word_count_seq, Test_empty_string) {
   std::vector<char> in = {};
