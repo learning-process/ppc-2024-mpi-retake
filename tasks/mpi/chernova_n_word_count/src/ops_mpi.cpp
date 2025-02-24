@@ -1,10 +1,12 @@
 #include "mpi/chernova_n_word_count/include/ops_mpi.hpp"
 
-#include <algorithm>
+#include <boost/mpi/collectives.hpp>
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
 
-std::vector<char> chernova_n_word_count_mpi::clean_string(const std::vector<char>& input) {
+std::vector<char> chernova_n_word_count_mpi::CleanString(const std::vector<char>& input) {
   std::string result;
   std::string str(input.begin(), input.end());
 
@@ -29,7 +31,7 @@ std::vector<char> chernova_n_word_count_mpi::clean_string(const std::vector<char
   }
 
   result.assign(str.begin(), str.end());
-  return std::vector<char>(result.begin(), result.end());
+  return {result.begin(), result.end()};
 }
 
 bool chernova_n_word_count_mpi::TestMPITaskSequential::PreProcessingImpl() {
@@ -39,7 +41,9 @@ bool chernova_n_word_count_mpi::TestMPITaskSequential::PreProcessingImpl() {
   for (unsigned i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = tmp_ptr[i];
   }
-  if (!input_.empty()) input_ = clean_string(input_);
+  if (!input_.empty()) {
+    input_ = CleanString(input_);
+  }
   return true;
 }
 
@@ -73,7 +77,9 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::PreProcessingImpl() {
     for (std::size_t i = 0; i < task_data->inputs_count[0]; i++) {
       input_[i] = tmp_ptr[i];
     }
-    if (!input_.empty()) input_ = clean_string(input_);
+    if (!input_.empty()) {
+      input_ = CleanString(input_);
+    }
     task_data->inputs_count[0] = input_.size();
   }
   return true;
@@ -90,17 +96,19 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
   unsigned long total_size = 0;
   if (world_.rank() == 0) {
     total_size = input_.size();
-    part_size_ = task_data->inputs_count[0] / world_.size();
+    part_size_ = static_cast<int>(task_data->inputs_count[0] / world_.size());
   }
   boost::mpi::broadcast(world_, part_size_, 0);
   boost::mpi::broadcast(world_, total_size, 0);
   if (total_size == 0) {
-    if (world_.rank() == 0) space_count_ = -1;
+    if (world_.rank() == 0) {
+      space_count_ = -1;
+    }
     return true;
   }
 
   unsigned long start_pos = world_.rank() * part_size_;
-  unsigned long actual_part_size = (start_pos + part_size_ <= total_size) ? part_size_ : (total_size - start_pos);
+  size_t actual_part_size = (start_pos + part_size_ <= total_size) ? part_size_ : (total_size - start_pos);
 
   local_input_.resize(actual_part_size);
 
@@ -109,13 +117,13 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
       unsigned long proc_start_pos = proc * part_size_;
       unsigned long proc_part_size = (proc_start_pos + part_size_ <= total_size) ? part_size_ : (total_size - proc_start_pos);
       if (proc_part_size > 0) {
-        world_.send(proc, 0, input_.data() + proc_start_pos, proc_part_size);
+        world_.send(proc, 0, input_.data() + proc_start_pos, static_cast<int>(proc_part_size));
       }
     }
     local_input_.assign(input_.begin(), input_.begin() + actual_part_size);
   } else {
     if (actual_part_size > 0) {
-      world_.recv(0, 0, local_input_.data(), actual_part_size);
+      world_.recv(0, 0, local_input_.data(), static_cast<int>(actual_part_size));
     }
   }
   local_space_count_ = 0;

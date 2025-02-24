@@ -1,11 +1,9 @@
 #include "seq/chernova_n_word_count/include/ops_seq.hpp"
 
-#include <iostream>
 #include <string>
-#include <thread>
 #include <vector>
 
-std::vector<char> clean_string(const std::vector<char>& input) {
+static std::vector<char> CleanString(const std::vector<char>& input) {
   std::string result;
   std::string str(input.begin(), input.end());
 
@@ -30,35 +28,31 @@ std::vector<char> clean_string(const std::vector<char>& input) {
   }
 
   result.assign(str.begin(), str.end());
-  return std::vector<char>(result.begin(), result.end());
+  return {result.begin(), result.end()};
 }
 
 bool chernova_n_word_count_seq::TestTaskSequential::PreProcessingImpl() {
-  // Init value for input
   unsigned int input_size = task_data->inputs_count[0];
   auto* in_ptr = reinterpret_cast<char*>(task_data->inputs[0]);
   input_ = std::vector<char>(in_ptr, in_ptr + input_size);
 
-  // Clean the input string
-  input_ = clean_string(input_);
-  spaceCount = 0;
+  input_ = CleanString(input_);
+  spaceCount_ = 0;
 
   return true;
 }
 
 bool chernova_n_word_count_seq::TestTaskSequential::ValidationImpl() {
-  // Check if input and output counts are valid
   return task_data->inputs_count[0] >= 0 && task_data->outputs_count[0] == 1;
 }
 
 bool chernova_n_word_count_seq::TestTaskSequential::RunImpl() {
-  // Count spaces in the input string
   if (input_.empty()) {
-    spaceCount = -1;
+    spaceCount_ = -1;
   } else {
     for (char c : input_) {
       if (c == ' ') {
-        spaceCount++;
+        spaceCount_++;
       }
     }
   }
@@ -66,7 +60,6 @@ bool chernova_n_word_count_seq::TestTaskSequential::RunImpl() {
 }
 
 bool chernova_n_word_count_seq::TestTaskSequential::PostProcessingImpl() {
-  // Set the output value
-  reinterpret_cast<int*>(task_data->outputs[0])[0] = spaceCount + 1;
+  reinterpret_cast<int*>(task_data->outputs[0])[0] = spaceCount_ + 1;
   return true;
 }

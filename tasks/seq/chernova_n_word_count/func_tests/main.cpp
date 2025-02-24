@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
+#include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <vector>
@@ -9,11 +10,11 @@
 #include "core/task/include/task.hpp"
 #include "seq/chernova_n_word_count/include/ops_seq.hpp"
 
-std::vector<char> generateWords(int k) {
+static std::vector<char> GenerateWords(int k) {
   const std::string words[] = {"one", "two", "three"};
 
   std::string result;
-  int j = words->size();
+  size_t j = words->size();
 
   for (int i = 0; i < k; ++i) {
     result += words[rand() % (j)];
@@ -22,11 +23,11 @@ std::vector<char> generateWords(int k) {
     }
   }
 
-  return std::vector<char>(result.begin(), result.end());
+  return {result.begin(), result.end()};
 }
 
-int k = 50;
-std::vector<char> testDataSeq = generateWords(k);
+static int k_ = 50;
+std::vector<char> test_data_seq = GenerateWords(k_);
 
 TEST(chernova_n_word_count_seq, Test_empty_string) {
   std::vector<char> in = {};
@@ -48,9 +49,9 @@ TEST(chernova_n_word_count_seq, Test_empty_string) {
 
 TEST(chernova_n_word_count_seq, Test_five_words) {
   std::vector<char> in;
-  std::string testString = "This is a test phrase";
-  in.resize(testString.size());
-  std::copy(testString.begin(), testString.end(), in.begin());
+  std::string test_string = "This is a test phrase";
+  in.resize(test_string.size());
+  std::ranges::copy(test_string, in.begin());
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -69,9 +70,9 @@ TEST(chernova_n_word_count_seq, Test_five_words) {
 
 TEST(chernova_n_word_count_seq, Test_five_words_with_space_and_hyphen) {
   std::vector<char> in;
-  std::string testString = "This   is a - test phrase";
-  in.resize(testString.size());
-  std::copy(testString.begin(), testString.end(), in.begin());
+  std::string test_string = "This   is a - test phrase";
+  in.resize(test_string.size());
+  std::ranges::copy(test_string, in.begin());
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -90,9 +91,9 @@ TEST(chernova_n_word_count_seq, Test_five_words_with_space_and_hyphen) {
 
 TEST(chernova_n_word_count_seq, Test_ten_words) {
   std::vector<char> in;
-  std::string testString = "This is a test phrase, I really love this phrase";
-  in.resize(testString.size());
-  std::copy(testString.begin(), testString.end(), in.begin());
+  std::string test_string = "This is a test phrase, I really love this phrase";
+  in.resize(test_string.size());
+  std::ranges::copy(test_string, in.begin());
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -111,9 +112,9 @@ TEST(chernova_n_word_count_seq, Test_ten_words) {
 
 TEST(chernova_n_word_count_seq, Test_five_words_with_a_lot_of_space) {
   std::vector<char> in;
-  std::string testString = "This               is           a             test                phrase";
-  in.resize(testString.size());
-  std::copy(testString.begin(), testString.end(), in.begin());
+  std::string test_string = "This               is           a             test                phrase";
+  in.resize(test_string.size());
+  std::ranges::copy(test_string, in.begin());
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -132,10 +133,10 @@ TEST(chernova_n_word_count_seq, Test_five_words_with_a_lot_of_space) {
 
 TEST(chernova_n_word_count_seq, Test_twenty_words) {
   std::vector<char> in;
-  std::string testString =
+  std::string test_string =
       "This is a test phrase, I really love this phrase. This is a test phrase, I really love this phrase";
-  in.resize(testString.size());
-  std::copy(testString.begin(), testString.end(), in.begin());
+  in.resize(test_string.size());
+  std::ranges::copy(test_string, in.begin());
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -154,9 +155,9 @@ TEST(chernova_n_word_count_seq, Test_twenty_words) {
 
 TEST(chernova_n_word_count_seq, Test_five_words_with_space_in_the_end) {
   std::vector<char> in;
-  std::string testString = "This is a test phrase           ";
-  in.resize(testString.size());
-  std::copy(testString.begin(), testString.end(), in.begin());
+  std::string test_string = "This is a test phrase           ";
+  in.resize(test_string.size());
+  std::ranges::copy(test_string, in.begin());
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -174,7 +175,7 @@ TEST(chernova_n_word_count_seq, Test_five_words_with_space_in_the_end) {
 }
 
 TEST(chernova_n_word_count_seq, Test_random_fifty_words) {
-  std::vector<char> in = testDataSeq;
+  std::vector<char> in = test_data_seq;
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();

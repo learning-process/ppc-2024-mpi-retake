@@ -17,7 +17,7 @@ class TestTaskSequential : public ppc::core::Task {
 
  private:
   std::vector<char> input_;
-  int spaceCount{};
+  int spaceCount_{};
 };
 
 }  // namespace chernova_n_word_count_seq

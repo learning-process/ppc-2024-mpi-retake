@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"
@@ -11,28 +11,28 @@
 #include "core/task/include/task.hpp"
 #include "mpi/chernova_n_word_count/include/ops_mpi.hpp"
 
-std::vector<char> generateWords(int k) {
+static std::vector<char> GenerateWordsPerf(int k) {
   const std::string words[] = {"one", "two", "three"};
-  const int wordArraySize = sizeof(words) / sizeof(words[0]);
+  const int word_array_size = sizeof(words) / sizeof(words[0]);
 
   std::string result;
 
   for (int i = 0; i < k; ++i) {
-    result += words[i % wordArraySize];
+    result += words[i % word_array_size];
     if (i < k - 1) {
       result += ' ';
     }
   }
 
-  return std::vector<char>(result.begin(), result.end());
+  return {result.begin(), result.end()};
 }
 
-const int k = 100000;
-std::vector<char> testDataParallel = generateWords(k);
+const int k_ = 100000;
+static std::vector<char> test_data_parallel = GenerateWordsPerf(k_);
 
 TEST(chernova_n_word_count_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  std::vector<char> in = testDataParallel;
+  std::vector<char> in = test_data_parallel;
   std::vector<int> out(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -61,13 +61,13 @@ TEST(chernova_n_word_count_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(out[0], k);
+    ASSERT_EQ(out[0], k_);
   }
 }
 
 TEST(chernova_n_word_count_mpi, test_task_run) {
   boost::mpi::communicator world;
-  std::vector<char> in = testDataParallel;
+  std::vector<char> in = test_data_parallel;
   std::vector<int> out(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -96,6 +96,6 @@ TEST(chernova_n_word_count_mpi, test_task_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(out[0], k);
+    ASSERT_EQ(out[0], k_);
   }
 }

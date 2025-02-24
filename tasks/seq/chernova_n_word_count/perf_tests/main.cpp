@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -11,23 +10,23 @@
 #include "core/task/include/task.hpp"
 #include "seq/chernova_n_word_count/include/ops_seq.hpp"
 
-std::vector<char> generateWords(int k) {
+static std::vector<char> GenerateWords(int k) {
   const std::string words[] = {"one", "two", "three"};
-  const int wordArraySize = sizeof(words) / sizeof(words[0]);
+  const int word_array_size = sizeof(words) / sizeof(words[0]);
   std::string result;
 
   for (int i = 0; i < k; ++i) {
-    result += words[i % wordArraySize];
+    result += words[i % word_array_size];
     if (i < k - 1) {
       result += ' ';
     }
   }
 
-  return std::vector<char>(result.begin(), result.end());
+  return {result.begin(), result.end()};
 }
 
-int k = 100000;
-std::vector<char> testDataSeq = generateWords(k);
+static int k_ = 100000;
+std::vector<char> testDataSeq = GenerateWords(k_);
 
 TEST(chernova_n_word_count_seq, test_pipeline_run) {
   std::vector<char> in = testDataSeq;
@@ -55,7 +54,7 @@ TEST(chernova_n_word_count_seq, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  ASSERT_EQ(out[0], k);
+  ASSERT_EQ(out[0], k_);
 }
 
 TEST(chernova_n_word_count_seq, test_task_run) {
@@ -84,5 +83,5 @@ TEST(chernova_n_word_count_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  ASSERT_EQ(out[0], k);
+  ASSERT_EQ(out[0], k_);
 }
