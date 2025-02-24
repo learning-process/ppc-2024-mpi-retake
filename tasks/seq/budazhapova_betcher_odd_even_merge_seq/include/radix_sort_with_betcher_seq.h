@@ -18,6 +18,5 @@ class MergeSequential : public ppc::core::Task {
 
  private:
   std::vector<int> res_;
-  int n_el_ = 0;
 };
 }  // namespace budazhapova_betcher_odd_even_merge_seq
