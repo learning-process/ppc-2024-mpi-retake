@@ -2,8 +2,6 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -30,7 +28,7 @@ class TestTaskMPI : public ppc::core::Task {
     TaskData(const std::string& str, int tgt) : payload(str.begin(), str.end()), target(tgt) {}
 
     template <class Archive>
-    void serialize(Archive& ar, unsigned int version) {
+    void Serialize(Archive& ar, unsigned int version) {
       ar & target;
       ar & payload;
       ar & path;
