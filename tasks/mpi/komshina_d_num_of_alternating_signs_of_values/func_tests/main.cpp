@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <random>
 #include <vector>
@@ -10,20 +10,19 @@
 #include "core/task/include/task.hpp"
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
-static std::vector<int> GenerateRandomVector(size_t size, int min_val = -100, int max_val = 100) {
+namespace komshina_d_num_of_alternations_signs_mpi {
+  std::vector<int> GenerateRandomVector(size_t size, int min_val = -100, int max_val = 100) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int> dis(min_val, max_val);
   std::vector<int> vec(size);
   for (auto &v : vec) {
     v = dis(gen);
-    
   }
   return vec;
-  
 }
 
-static int count_sign_alternations(const std::vector<int> &vec) {
+int CountSignAlternations(const std::vector<int> &vec) {
   if (vec.size() < 2) {
     return 0;
   }
@@ -31,12 +30,11 @@ static int count_sign_alternations(const std::vector<int> &vec) {
   for (size_t i = 1; i < vec.size(); ++i) {
     if (vec[i - 1] * vec[i] < 0) {
       ++count;
-     }
-    
+    }
   }
   return count;
-  
 }
+}  // namespace komshina_d_num_of_alternations_signs_mpi
 
 TEST(komshina_d_num_of_alternations_signs_mpi, NormalCase) {
   boost::mpi::communicator world;
@@ -261,7 +259,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, RandomTestSmall) {
   test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
-    ASSERT_EQ(out[0], count_sign_alternations(in));
+    ASSERT_EQ(out[0], CountSignAlternations(in));
   }
 }
 
@@ -286,6 +284,6 @@ TEST(komshina_d_num_of_alternations_signs_mpi, RandomTestLarge) {
   test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
-    ASSERT_EQ(out[0], count_sign_alternations(in));
+    ASSERT_EQ(out[0], CountSignAlternations(in));
   }
 }
