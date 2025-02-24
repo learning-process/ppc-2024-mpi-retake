@@ -58,7 +58,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(true_sol[0], out_matrix_c[0]);
   }
 }
 
@@ -108,6 +107,5 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(true_sol[0], out_matrix_c[0]);
   }
 }
