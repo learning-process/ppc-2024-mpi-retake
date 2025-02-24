@@ -40,7 +40,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     world_.send(next, 0, task_data_.target);
     world_.recv(boost::mpi::any_source, 0, task_data_.path);
   } else {
-    int received_target;
+    int received_target = 0;
     world_.recv(boost::mpi::any_source, 0, received_target);
     task_data_.target = received_target;
     task_data_.path.push_back(current_rank);
