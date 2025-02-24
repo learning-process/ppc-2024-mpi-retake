@@ -4,8 +4,57 @@
 #include <cmath>
 #include <functional>
 #include <limits>
+#include <stdexcept>
 
 #include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
+
+// Mock or actual implementation of the integration functions
+double GetIntegralRectangularMethodParallel(double (*func)(double), double a, double b, int n) {
+  // Placeholder for parallel implementation
+  double result = 0.0;
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  if (n <= 0) {
+    throw std::runtime_error("Number of intervals must be greater than zero.");
+  }
+
+  double h = (b - a) / n;
+  double local_result = 0.0;
+  int local_n = n / size;
+  int local_start = rank * local_n;
+  int local_end = (rank == size - 1) ? n : local_start + local_n;
+
+  for (int i = local_start; i < local_end; ++i) {
+    double x = a + (i + 0.5) * h;
+    local_result += func(x);
+  }
+
+  local_result *= h;
+
+  MPI_Reduce(&local_result, &result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  return result;
+}
+
+double GetIntegralRectangularMethodSequential(double (*func)(double), double a, double b, int n) {
+  // Placeholder for sequential implementation
+  if (n <= 0) {
+    throw std::runtime_error("Number of intervals must be greater than zero.");
+  }
+
+  double h = (b - a) / n;
+  double result = 0.0;
+
+  for (int i = 0; i < n; ++i) {
+    double x = a + (i + 0.5) * h;
+    result += func(x);
+  }
+
+  result *= h;
+  return result;
+}
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
