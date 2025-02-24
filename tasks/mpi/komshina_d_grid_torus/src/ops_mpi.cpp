@@ -100,4 +100,5 @@ std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(int target,
   }
   return path;
 }
+
 }  // namespace komshina_d_grid_torus_mpi
