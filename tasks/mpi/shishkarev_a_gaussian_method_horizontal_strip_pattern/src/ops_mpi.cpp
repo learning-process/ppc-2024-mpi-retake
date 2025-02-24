@@ -48,7 +48,7 @@ double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Ma
       }
     }
     if (std::abs(a[(idx * matrix.rows) + i]) < 1e-6) {
-      return 0;
+      return 0.0;
     }
     if (idx != i) {
       for (int j = 0; j < matrix.cols; ++j) {
@@ -62,7 +62,7 @@ double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Ma
     for (int k = i + 1; k < matrix.cols; ++k) {
       double pivot = a[(i * matrix.rows) + i];
       if (std::abs(pivot) < 1e-6) {
-        return 0;
+        return 0.0;
       }
       double ml = a[(k * matrix.rows) + i] / a[(i * matrix.rows) + i];
       for (int j = i; j < matrix.cols; ++j) {

@@ -22,13 +22,7 @@ std::vector<double> GetRandomMatrix(int sz) {
   return mat;
 }
 
-bool IsSingular(const std::vector<double>& matrix, int rows, int cols) {
-  Matrix mat;
-  mat.rows = rows;
-  mat.cols = cols;
-  mat.delta = 0;
-  return Determinant(mat, matrix) == 0;
-}
+bool IsSingular(const std::vector<double>& matrix, Matrix mat) { return Determinant(mat, matrix) == 0; }
 
 }  // namespace shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi
 
@@ -106,8 +100,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_not_square_
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_zero_determinant) {
   boost::mpi::communicator world;
 
-  const int cols = 4;
-  const int rows = 3;
+  const int cols = 5;
+  const int rows = 4;
 
   std::vector<double> global_matrix;
   std::vector<double> global_res(cols - 1, 0);

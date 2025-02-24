@@ -29,7 +29,7 @@ double Determinant(Matrix matrix, std::vector<double> a);
 
 std::vector<double> GetRandomMatrix(int sz);
 
-bool IsSingular(const std::vector<double>& matrix, int rows, int cols);
+bool IsSingular(const std::vector<double>& matrix, Matrix mat);
 
 double AxB(int n, int m, std::vector<double> a, std::vector<double> res);
 
