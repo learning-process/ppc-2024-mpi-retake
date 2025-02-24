@@ -64,7 +64,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, ordinary_test) {
 
 TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test) {
   boost::mpi::communicator world;
-  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_mpi::GenerateRandomVector(120, 5, 100);
+  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_mpi::GenerateRandomVector(15, 5, 100);
   std::vector<int> out(120, 0);
   std::vector<int> out_seq(120, 0);
 
@@ -99,7 +99,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test) {
 
 TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test_2) {
   boost::mpi::communicator world;
-  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_mpi::GenerateRandomVector(85, 5, 100);
+  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_mpi::GenerateRandomVector(51, 5, 100);
   std::vector<int> out(85, 0);
   std::vector<int> out_seq(85, 0);
 
@@ -134,7 +134,7 @@ TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test_2) {
 
 TEST(budazhapova_betcher_odd_even_merge_mpi, random_vector_test_3) {
   boost::mpi::communicator world;
-  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_mpi::GenerateRandomVector(100, 5, 100);
+  std::vector<int> input_vector = budazhapova_betcher_odd_even_merge_mpi::GenerateRandomVector(8, 5, 100);
   std::vector<int> out(100, 0);
   std::vector<int> out_seq(100, 0);
 

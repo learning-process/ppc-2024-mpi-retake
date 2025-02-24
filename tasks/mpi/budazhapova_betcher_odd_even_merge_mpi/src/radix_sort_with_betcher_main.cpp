@@ -46,27 +46,12 @@ void OddEvenMerge(std::vector<int>& local_data, std::vector<int>& received_data)
   std::vector<int> merged(local_data.size() + received_data.size());
   std::ranges::copy(local_data, merged.begin());
   std::ranges::copy(received_data, merged.begin() + static_cast<long>(local_data.size()));
-  std::cout << "Before sorting: ";
-  for (const auto& num : merged) {
-    std::cout << num << " ";
-  }
-  std::cout << std::endl;
   budazhapova_betcher_odd_even_merge_mpi::RadixSort(merged);
-  std::cout << "After sorting: ";
-  for (const auto& num : merged) {
-    std::cout << num << " ";
-  }
-  std::cout << std::endl;
-  std::cout << std::endl;
   received_data.assign(merged.begin(), merged.begin() + static_cast<long>(received_data.size()));
   local_data.assign(merged.begin() + static_cast<long>(received_data.size()), merged.end());
-  // local_data.assign(merged.begin(), merged.begin() + static_cast<long>(local_data.size()));
-  // received_data.assign(merged.begin() + static_cast<long>(local_data.size()), merged.end());
 }
 
 void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
-  std::cout << "IN PERFOM: ";
-  std::cout << std::endl;
   std::vector<int> received_data;
   world.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(local_data, received_data);
@@ -76,8 +61,6 @@ void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const 
 void OddEvenSortPhase(int phase, std::vector<int>& local_data, const boost::mpi::communicator& world) {
   int next_rank = world.rank() + 1;
   int prev_rank = world.rank() - 1;
-  std::cout << "IN ODDEV: ";
-  std::cout << std::endl;
   if (phase % 2 == 0) {
     if (world.rank() % 2 == 0 && next_rank < world.size()) {
       world.send(next_rank, world.rank(), local_data);
