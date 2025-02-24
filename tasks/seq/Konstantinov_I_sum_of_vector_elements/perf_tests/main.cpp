@@ -10,8 +10,9 @@
 #include "core/task/include/task.hpp"
 #include "seq/Konstantinov_I_sum_of_vector_elements/include/ops_seq.hpp"
 
-std::vector<int> konstantinov_i_sum_of_vector_elements_seq::GenerateRandVector(int size, int lower_bound,
-                                                                               int upper_bound) {
+namespace konstantinov_i_sum_of_vector_elements_seq {
+std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int upper_bound = 50)
+{
   std::vector<int> result(size);
   for (int i = 0; i < size; i++) {
     result[i] = lower_bound + rand() % (upper_bound - lower_bound + 1);
@@ -19,15 +20,15 @@ std::vector<int> konstantinov_i_sum_of_vector_elements_seq::GenerateRandVector(i
   return result;
 }
 
-std::vector<std::vector<int>> konstantinov_i_sum_of_vector_elements_seq::GenerateRandMatrix(int rows, int columns,
-                                                                                            int lower_bound,
-                                                                                            int upper_bound) {
+std::vector<std::vector<int>> GenerateRandMatrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50)
+{
   std::vector<std::vector<int>> result(rows);
   for (int i = 0; i < rows; i++) {
     result[i] = konstantinov_i_sum_of_vector_elements_seq::GenerateRandVector(columns, lower_bound, upper_bound);
   }
   return result;
 }
+}  // namespace konstantinov_i_sum_of_vector_elements_seq
 
 TEST(Konstantinov_I_sum_of_vector_seq, test_pipeline_run) {
   int rows = 10000;
