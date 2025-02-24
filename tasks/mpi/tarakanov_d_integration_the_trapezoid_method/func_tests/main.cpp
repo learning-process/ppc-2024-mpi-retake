@@ -74,7 +74,10 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PostProcessingCheck
   EXPECT_TRUE(task.RunImpl());
   EXPECT_TRUE(task.PostProcessingImpl());
 
-  double output = *reinterpret_cast<double*>(data->outputs[0]);
-  bool flag = output == 0.0;
-  EXPECT_FALSE(flag);
+  boost::mpi::communicator world;
+  if (world.rank() == 0) {
+    double output = *reinterpret_cast<double*>(data->outputs[0]);
+    bool flag = output == 0.0;
+    EXPECT_FALSE(flag);
+  }
 }
