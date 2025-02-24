@@ -5,8 +5,7 @@
 
 namespace muradov_k_trapezoid_integral_mpi {
 
-// Computes the integral using the trapezoidal rule in parallel using MPI.
-double getIntegralTrapezoidalRuleParallel(const std::function<double(double)>& f, double a, double b, int n);
+double GetIntegralTrapezoidalRuleParallel(const std::function<double(double)>& f, double a, double b, int n);
 
 }  // namespace muradov_k_trapezoid_integral_mpi
 
