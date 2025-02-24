@@ -1,7 +1,7 @@
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 
-#include <oneapi/tbb/blocked_range.h>
-#include <oneapi/tbb/parallel_reduce.h>
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_reduce.h>
 
 #include <cmath>
 #include <functional>
@@ -30,8 +30,8 @@ class IntegrationTask : public ppc::core::Task {
       std::function<double(double)> func;
       double sum;
       SumBody(double a, double h, const std::function<double(double)>& f) : a(a), h(h), func(f), sum(0.0) {}
-      SumBody(SumBody& other, oneapi::tbb::split) : a(other.a), h(other.h), func(other.func), sum(0.0) {}
-      void operator()(const oneapi::tbb::blocked_range<int>& r) {
+      SumBody(SumBody& other, tbb::split) : a(other.a), h(other.h), func(other.func), sum(0.0) {}
+      void operator()(const tbb::blocked_range<int>& r) {
         for (int i = r.begin(); i != r.end(); ++i) {
           double x_i = a + (i * h);
           double x_next = a + ((i + 1) * h);
@@ -43,7 +43,7 @@ class IntegrationTask : public ppc::core::Task {
       }
     };
     SumBody body(a_, h, func_);
-    oneapi::tbb::parallel_reduce(oneapi::tbb::blocked_range<int>(0, n_), body);
+    tbb::parallel_reduce(tbb::blocked_range<int>(0, n_), body);
     result_ = body.sum;
     return true;
   }
