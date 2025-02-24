@@ -97,11 +97,11 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   }
 
   // Image size is the number of elements
-  input_size_ = task_data->inputs_count[0];  // Initialize input_size_
+  input_size_ = static_cast<int>(task_data->inputs_count[0]);  // Initialize input_size_
 
   // Image dimensions (assuming they are passed through inputs_count)
-  int rows = task_data->inputs_count[0] / task_data->inputs_count[1];  // Number of rows
-  int cols = task_data->inputs_count[1];                               // Number of columns
+  int rows = static_cast<int>(task_data->inputs_count[0] / task_data->inputs_count[1]);  // Number of rows
+  int cols = static_cast<int>(task_data->inputs_count[1]);                               // Number of columns
 
   auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   if (in_ptr == nullptr) {
@@ -154,7 +154,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
   // Check data validity
   int result = MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   if (result != MPI_SUCCESS) {
-    std::cerr << "MPI_Bcast failed with error code: " << result << std::endl;
+    std::cerr << "MPI_Bcast failed with error code: " << result << '\n';
     return false;
   }
 
@@ -163,7 +163,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int rows = rc_size_;
-  int cols = input_size_ / rows;  // Number of columns (or calculated based on passed data)
+  int cols = input_size_ / rows;
   int min_label = 2;
   std::unordered_map<int, int> label_parent;
 
@@ -182,16 +182,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   // Labeling for assigned rows
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
-
-  std::vector<int> recv_counts(num_procs);
-  std::vector<int> displs(num_procs);
-
-  int total_size_check = 0;
-  for (int i = 0; i < num_procs; ++i) {
-    recv_counts[i] = (i < remainder) ? (rows_per_proc + 1) * cols : rows_per_proc * cols;
-    displs[i] = (i == 0) ? 0 : displs[i - 1] + recv_counts[i - 1];
-    total_size_check += recv_counts[i];
-  }
 
   MPI_Barrier(MPI_COMM_WORLD);
 
