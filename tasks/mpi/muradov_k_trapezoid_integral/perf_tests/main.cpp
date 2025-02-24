@@ -9,7 +9,7 @@
 #endif
 #include <mpi.h>
 
-#include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
+#include "tasks/mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
 namespace muradov_k_trapezoid_integral_mpi {
 
