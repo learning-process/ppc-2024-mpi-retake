@@ -112,7 +112,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   rc_size_ = static_cast<int>(std::sqrt(input_size));
 
-  // Передаём данные всем процессам
   MPI_Bcast(&rc_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   input_.resize(rc_size_ * rc_size_);
   MPI_Bcast(input_.data(), input_.size(), MPI_INT, 0, MPI_COMM_WORLD);
