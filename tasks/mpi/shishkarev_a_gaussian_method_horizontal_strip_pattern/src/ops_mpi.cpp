@@ -26,7 +26,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix
       for (int k = i + 1; k < matrix.cols; ++k) {
         double pivot = a[(i * matrix.rows) + i];
         if (std::abs(pivot) < 1e-6) {
-         return 0;
+          return 0;
         }
         double ml = a[(k * matrix.rows) + i] / a[(i * matrix.rows) + i];
         for (j = i; j < matrix.rows - 1; ++j) {
@@ -146,6 +146,7 @@ bool shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizont
     rows_ = static_cast<int>(task_data->inputs_count[2]);
     matrix.cols = static_cast<int>(task_data->inputs_count[1]);
     matrix.rows = static_cast<int>(task_data->inputs_count[2]);
+
     return task_data->inputs_count[0] > 1 && rows_ == cols_ - 1 && Determinant(matrix, matrix_) != 0 &&
            MatrixRank(matrix, matrix_) == rows_;
   }
