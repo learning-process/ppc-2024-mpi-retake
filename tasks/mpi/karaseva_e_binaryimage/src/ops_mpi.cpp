@@ -92,87 +92,67 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
-  if (task_data->inputs.empty() || task_data->inputs_count.empty()) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  bool is_root = (rank == 0);
+
+  if (is_root && (task_data->inputs.empty() || task_data->inputs_count.empty())) {
     return false;
   }
 
-  // Image size is the number of elements
-  input_size_ = static_cast<int>(task_data->inputs_count[0]);  // Initialize input_size_
+  input_size_ = is_root ? static_cast<int>(task_data->inputs_count[0]) : 0;
+  int rows = is_root ? static_cast<int>(task_data->inputs_count[0] / task_data->inputs_count[1]) : 0;
+  int cols = is_root ? static_cast<int>(task_data->inputs_count[1]) : 0;
 
-  // Image dimensions (assuming they are passed through inputs_count)
-  int rows = static_cast<int>(task_data->inputs_count[0] / task_data->inputs_count[1]);  // Number of rows
-  int cols = static_cast<int>(task_data->inputs_count[1]);                               // Number of columns
-
-  auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
-  if (in_ptr == nullptr) {
-    return false;
-  }
-
-  input_ = std::vector<int>(in_ptr, in_ptr + input_size_);
-
-  if (task_data->outputs_count.empty()) {
-    task_data->outputs_count.push_back(input_size_);
-  }
-
-  rc_size_ = rows;
-
-  // Synchronize all processes before data transmission
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  // Broadcast image dimensions to all processes
   MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  // Broadcast the image data
-  MPI_Bcast(input_.data(), static_cast<int>(input_.size()), MPI_INT, 0, MPI_COMM_WORLD);
+  if (rows == 0 || cols == 0) return false;  // Prevent division by zero
+
+  rc_size_ = rows;
+
+  if (is_root) {
+    auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
+    input_ = std::vector<int>(in_ptr, in_ptr + input_size_);
+  } else {
+    input_.resize(rows * cols);
+  }
+
+  MPI_Bcast(input_.data(), rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
 
   return true;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
-  int rank = 0;
-
+  int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  std::cout << "Rank: " << rank << " inputs.size(): " << task_data->inputs.size() << '\n';
-  std::cout << "Rank: " << rank << " outputs.size(): " << task_data->outputs.size() << '\n';
+  unsigned int input_count = task_data->inputs_count.empty() ? 0 : task_data->inputs_count[0];
+  unsigned int output_count = task_data->outputs_count.empty() ? 0 : task_data->outputs_count[0];
 
-  if (!task_data->inputs.empty()) {
-    std::cout << "Rank: " << rank << " inputs_count[0]: " << task_data->inputs_count[0] << '\n';
-  }
-  if (!task_data->outputs.empty()) {
-    std::cout << "Rank: " << rank << " outputs_count[0]: " << task_data->outputs_count[0] << '\n';
-  }
-
-  unsigned int input_count = task_data->inputs_count[0];
-  unsigned int output_count = task_data->outputs_count[0];
+  MPI_Bcast(&input_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&output_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
   bool valid = !task_data->inputs.empty() && !task_data->outputs.empty() && input_count == output_count;
 
   MPI_Barrier(MPI_COMM_WORLD);
-
-  // Check data validity
-  int result = MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
-  if (result != MPI_SUCCESS) {
-    std::cerr << "MPI_Bcast failed with error code: " << result << '\n';
-    return false;
-  }
+  MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
 
   return valid;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
+  if (rc_size_ == 0) return false;  // Prevent division by zero
+
   int rows = rc_size_;
   int cols = input_size_ / rows;
   int min_label = 2;
   std::unordered_map<int, int> label_parent;
 
-  int num_procs = 0;
-  int rank = 0;
+  int num_procs, rank;
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  // Divide rows evenly between processes
   int rows_per_proc = rows / num_procs;
   int remainder = rows % num_procs;
   int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
@@ -180,13 +160,13 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   std::vector<int> labeled_image(rows * cols, 0);
 
-  // Labeling for assigned rows
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   return true;
 }
+
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
   if (!task_data->outputs.empty() && task_data->outputs[0] != nullptr) {
