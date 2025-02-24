@@ -1,12 +1,12 @@
 #include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
 #include <cmath>
 #include <functional>
 #include <memory>
 
-#include "boost/mpi/collectives.hpp"
-#include "boost/mpi/communicator.hpp"
-#include "boost/mpi/environment.hpp"
 #include "core/task/include/task.hpp"
 namespace muradov_k_trapezoid_integral_mpi {
 

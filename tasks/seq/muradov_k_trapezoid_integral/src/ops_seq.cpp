@@ -1,12 +1,14 @@
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 
+#include <tbb/blocked_range.h>
+#include <tbb/parallel_reduce.h>
+#include <tbb/split.h>
+
 #include <cmath>
 #include <functional>
 #include <memory>
 
 #include "core/task/include/task.hpp"
-#include "tbb/blocked_range.h"
-#include "tbb/parallel_reduce.h"
 
 namespace muradov_k_trapezoid_integral_seq {
 
@@ -37,7 +39,7 @@ class IntegrationTask : public ppc::core::Task {
           sum += (func(x_i) + func(x_next)) * 0.5 * h;
         }
       }
-      void Join(const SumBody& rhs) { sum += rhs.sum; }  // Renamed to 'Join' per naming convention.
+      void join(const SumBody& rhs) { sum += rhs.sum; }
     };
     SumBody body(a_, h, func_);
     tbb::parallel_reduce(tbb::blocked_range<int>(0, n_), body);
