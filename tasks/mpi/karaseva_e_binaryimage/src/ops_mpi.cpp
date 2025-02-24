@@ -10,11 +10,9 @@
 
 // Function to get the root of a label with path compression
 int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
-  if (label_parent.find(label) == label_parent.end()) {
+  if (!label_parent.contains(label)) {
     label_parent[label] = label;
-    return label;
-  }
-  if (label_parent[label] != label) {
+  } else if (label_parent[label] != label) {
     label_parent[label] = GetRootLabel(label_parent, label_parent[label]);  // Path compression
   }
   return label_parent[label];
@@ -40,7 +38,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int
   for (int i = 0; i < 3; ++i) {
     int nx = x + dx[i];
     int ny = y + dy[i];
-    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[(nx * cols) + ny] > 1) {
+    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[(nx * cols) + ny] >= 2) {
       neighbors.push_back(labeled_image[(nx * cols) + ny]);
     }
   }
@@ -72,7 +70,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
-      if (image[pos] == 0 || labeled_image[pos] > 1) {
+      if (image[pos] == 0 || labeled_image[pos] >= 2) {
         std::vector<int> neighbors;
         ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
         AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);
@@ -84,7 +82,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
-      if (labeled_image[pos] > 1) {
+      if (labeled_image[pos] >= 2) {
         labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);
       }
     }
@@ -96,7 +94,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
-  // Check that the outputs_count vector is not empty
   if (task_data->outputs_count.empty()) {
     return false;
   }
@@ -109,7 +106,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
-  // Ensure the input and output sizes match
   return task_data->inputs_count[0] == task_data->outputs_count[0];
 }
 
@@ -125,51 +121,49 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   int rows_per_proc = rows / num_procs;
-  int start_row = rank * rows_per_proc;
-  int end_row = (rank == num_procs - 1) ? rows : (rank + 1) * rows_per_proc;
+  int remainder = rows % num_procs;
+  int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : rank * rows_per_proc + remainder;
+  int end_row = start_row + ((rank < remainder) ? (rows_per_proc + 1) : rows_per_proc);
 
   std::vector<int> labeled_image(rows * cols, 0);
 
-  // Initial labeling for the local area
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
-  // Prepare "ghost" cells for boundary synchronization
   std::vector<int> ghost_cells_left(cols, 0);
   std::vector<int> ghost_cells_right(cols, 0);
 
-  if (rank > 0) {  // Send left boundary to the previous rank
+  if (rank > 0) {
     MPI_Send(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
-  }
-
-  if (rank < num_procs - 1) {  // Send right boundary to the next rank
-    MPI_Send(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 1, MPI_COMM_WORLD);
-  }
-
-  if (rank != 0) {
     MPI_Recv(ghost_cells_left.data(), cols, MPI_INT, rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
-  if (rank != num_procs - 1) {
+  if (rank < num_procs - 1) {
+    MPI_Send(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 1, MPI_COMM_WORLD);
     MPI_Recv(ghost_cells_right.data(), cols, MPI_INT, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
-  // Recalculate labels considering "ghost" cells
   for (int i = 0; i < cols; ++i) {
-    if (start_row > 0 && labeled_image[(start_row * cols) + i] > 1) {
+    if (start_row > 0 && labeled_image[(start_row * cols) + i] >= 2 && ghost_cells_left[i] >= 2) {
       UnionLabels(label_parent, labeled_image[(start_row * cols) + i], ghost_cells_left[i]);
     }
-    if (end_row < rows && labeled_image[((end_row - 1) * cols) + i] > 1) {
+    if (end_row < rows && labeled_image[((end_row - 1) * cols) + i] >= 2 && ghost_cells_right[i] >= 2) {
       UnionLabels(label_parent, labeled_image[((end_row - 1) * cols) + i], ghost_cells_right[i]);
     }
   }
 
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
-  // Gather labels from all processes
-  MPI_Allgather(labeled_image.data() + (start_row * cols), rows_per_proc * cols, MPI_INT, labeled_image.data(),
-                rows_per_proc * cols, MPI_INT, MPI_COMM_WORLD);
+  std::vector<int> recv_counts(num_procs);
+  std::vector<int> displs(num_procs);
 
-  // Perform final post-processing and write the result
+  for (int i = 0; i < num_procs; ++i) {
+    recv_counts[i] = (i < remainder) ? (rows_per_proc + 1) * cols : rows_per_proc * cols;
+    displs[i] = (i == 0) ? 0 : displs[i - 1] + recv_counts[i - 1];
+  }
+
+  MPI_Gatherv(labeled_image.data() + (start_row * cols), recv_counts[rank], MPI_INT, labeled_image.data(),
+              recv_counts.data(), displs.data(), MPI_INT, 0, MPI_COMM_WORLD);
+
   MPI_Barrier(MPI_COMM_WORLD);
   return true;
 }
