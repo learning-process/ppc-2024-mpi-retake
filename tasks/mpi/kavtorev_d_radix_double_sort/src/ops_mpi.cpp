@@ -10,7 +10,6 @@
 #include <cstdint>
 #include <cstring>
 #include <iterator>
-#include <vector>
 
 using namespace kavtorev_d_radix_double_sort;
 
@@ -124,7 +123,7 @@ bool RadixSortParallel::RunImpl() {
   int remainder = n_ % size;
 
   std::vector<int> counts(size);
-  std::vector<int> displs(size);
+  std::vector<int> displs(size, 0);
   if (rank == 0) {
     for (int i = 0; i < size; ++i) {
       counts[i] = local_n + (i < remainder ? 1 : 0);

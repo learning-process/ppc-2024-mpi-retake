@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <memory>
 #include <random>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/kavtorev_d_radix_double_sort/include/ops_mpi.hpp"
