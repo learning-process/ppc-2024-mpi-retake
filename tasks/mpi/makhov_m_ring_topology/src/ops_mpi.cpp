@@ -2,6 +2,7 @@
 #include "mpi/makhov_m_ring_topology/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 
 bool makhov_m_ring_topology::TestMPITaskParallel::PreProcessingImpl() {
@@ -17,8 +18,8 @@ bool makhov_m_ring_topology::TestMPITaskParallel::PreProcessingImpl() {
 
 bool makhov_m_ring_topology::TestMPITaskParallel::ValidationImpl() {
   if (world_.rank() == 0) {
-    return task_data->inputs_count.size() == 1 && task_data->inputs_count[0] >= 0 &&
-           task_data->outputs_count.size() == 2 && task_data->outputs_count[0] == task_data->inputs_count[0];
+    return task_data->inputs_count.size() == 1 && task_data->outputs_count.size() == 2 &&
+           task_data->outputs_count[0] == task_data->inputs_count[0];
   }
   return true;
 }

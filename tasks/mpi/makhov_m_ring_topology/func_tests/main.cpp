@@ -11,7 +11,6 @@
 #include "core/task/include/task.hpp"
 #include "mpi/makhov_m_ring_topology/include/ops_mpi.hpp"
 
-namespace makhov_m_ring_topology_tests {
 std::vector<int32_t> static GetRandVector(size_t size, int min_value, int max_value) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -21,7 +20,6 @@ std::vector<int32_t> static GetRandVector(size_t size, int min_value, int max_va
   }
   return res;
 }
-}  // namespace makhov_m_ring_topology_tests
 
 TEST(makhov_m_ring_topology, VectorZeroSize) {
   boost::mpi::communicator world;
@@ -31,7 +29,7 @@ TEST(makhov_m_ring_topology, VectorZeroSize) {
   std::vector<int32_t> sequence(world.size() + 1);
   std::vector<int32_t> reference_sequence(world.size() + 1);
 
-  for (size_t i = 0; i < static_cast<size_t>(world.size()); i++) {
+  for (int32_t i = 0; i < static_cast<int32_t>(world.size()); i++) {
     reference_sequence[i] = i;
   }
 
@@ -67,9 +65,9 @@ TEST(makhov_m_ring_topology, RandVectorSize1) {
   std::vector<int32_t> output_vector(size);
   std::vector<int32_t> sequence(world.size() + 1);
   std::vector<int32_t> reference_sequence(world.size() + 1);
-  input_vector = makhov_m_ring_topology_tests::GetRandVector(size, 0, 9);
+  input_vector = GetRandVector(size, 0, 9);
 
-  for (size_t i = 0; i < static_cast<size_t>(world.size()); i++) {
+  for (int32_t i = 0; i < static_cast<int32_t>(world.size()); i++) {
     reference_sequence[i] = i;
   }
 
@@ -106,9 +104,9 @@ TEST(makhov_m_ring_topology, RandVectorSize10) {
   std::vector<int32_t> sequence(world.size() + 1);
   std::vector<int32_t> reference_sequence(world.size() + 1);
 
-  input_vector = makhov_m_ring_topology_tests::GetRandVector(size, 0, 9);
+  input_vector = GetRandVector(size, 0, 9);
 
-  for (size_t i = 0; i < static_cast<size_t>(world.size()); i++) {
+  for (int32_t i = 0; i < static_cast<int32_t>(world.size()); i++) {
     reference_sequence[i] = i;
   }
 
@@ -145,9 +143,9 @@ TEST(makhov_m_ring_topology, RandVectorSize1000) {
   std::vector<int32_t> sequence(world.size() + 1);
   std::vector<int32_t> reference_sequence(world.size() + 1);
 
-  input_vector = makhov_m_ring_topology_tests::GetRandVector(size, 0, 9);
+  input_vector = GetRandVector(size, 0, 9);
 
-  for (size_t i = 0; i < static_cast<size_t>(world.size()); i++) {
+  for (int32_t i = 0; i < static_cast<int32_t>(world.size()); i++) {
     reference_sequence[i] = i;
   }
 
