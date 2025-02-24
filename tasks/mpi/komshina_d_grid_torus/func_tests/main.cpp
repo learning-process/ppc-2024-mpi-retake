@@ -1,18 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <cstdint>
-#include <random>
-#include <vector>
-#include <string>
 #include <boost/mpi/communicator.hpp>
+#include <cstdint>
+#include <memory>
+#include <random>
+#include <string>
+#include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
 namespace {
-static std::vector<int> getRandomVector(int sz, int a, int b) {
+std::vector<int> GetRandomVector(int sz, int a, int b) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(sz);
@@ -31,7 +30,7 @@ TEST(komshina_d_grid_torus_mpi, Test_Negative_Validation) {
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    global_vec = getRandomVector(1, 0, 100);
+    global_vec = GetRandomVector(1, 0, 100);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
     task_data_mpi->inputs_count.emplace_back(global_vec.size());
 

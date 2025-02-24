@@ -1,10 +1,10 @@
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
-#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <boost/serialization/vector.hpp>
-#include <memory>
 #include <cmath>
+#include <memory>
 #include <vector>
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -88,7 +88,7 @@ int komshina_d_grid_torus_mpi::TestTaskMPI::GetNextHop(int current, int target, 
 }
 
 std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(int target, int world_size, int width,
-                                                                        int height) {
+                                                                     int height) {
   std::vector<int> path = {0};
   int current = 0;
   while (current != target) {
