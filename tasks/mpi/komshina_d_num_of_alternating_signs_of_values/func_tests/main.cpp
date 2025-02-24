@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
-namespace komshina_d_num_of_alternations_signs_mpi {
+namespace {
  std::vector<int> GenerateRandomVector(size_t size, int min_val = -100, int max_val = 100) {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -34,7 +34,7 @@ int CountSignAlternations(const std::vector<int> &vec) {
   }
   return count;
 }
-}  // namespace komshina_d_num_of_alternations_signs_mpi
+}  // namespace
 
 TEST(komshina_d_num_of_alternations_signs_mpi, NormalCase) {
   boost::mpi::communicator world;
@@ -241,7 +241,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, CrossProcessSignChange) {
 TEST(komshina_d_num_of_alternations_signs_mpi, RandomTestSmall) {
   boost::mpi::communicator world;
 
-  std::vector<int> in = komshina_d_num_of_alternations_signs_mpi::GenerateRandomVector(10);
+  std::vector<int> in = GenerateRandomVector(10);
   std::vector<int32_t> out(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -259,14 +259,14 @@ TEST(komshina_d_num_of_alternations_signs_mpi, RandomTestSmall) {
   test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
-    ASSERT_EQ(out[0], komshina_d_num_of_alternations_signs_mpi::CountSignAlternations(in));
+    ASSERT_EQ(out[0], CountSignAlternations(in));
   }
 }
 
 TEST(komshina_d_num_of_alternations_signs_mpi, RandomTestLarge) {
   boost::mpi::communicator world;
 
-  std::vector<int> in = komshina_d_num_of_alternations_signs_mpi::GenerateRandomVector(1000);
+  std::vector<int> in = GenerateRandomVector(1000);
   std::vector<int32_t> out(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -284,6 +284,6 @@ TEST(komshina_d_num_of_alternations_signs_mpi, RandomTestLarge) {
   test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
-    ASSERT_EQ(out[0], komshina_d_num_of_alternations_signs_mpi::CountSignAlternations(in));
+    ASSERT_EQ(out[0], CountSignAlternations(in));
   }
 }
