@@ -11,10 +11,10 @@
 #include "seq/kalinin_d_odd_even_shellsort/include/header_seq_odd_even_shell.hpp"
 
 TEST(kalinin_d_odd_even_shell_seq, test_pipline_run_seq) {
-  const int n = 2000000;
+  const int N = 2000000;
   // Create data
-  std::vector<int> arr(n);
-  std::vector<int> out(n);
+  std::vector<int> arr(N);
+  std::vector<int> out(N);
   kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
@@ -41,15 +41,15 @@ TEST(kalinin_d_odd_even_shell_seq, test_pipline_run_seq) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_seq);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  std::ranges::sort(arr);
+  std::sort(arr.begin(), arr.end());
   ASSERT_EQ(arr, out);
 }
 
 TEST(kalinin_d_odd_even_shell_seq, test_task_run_seq) {
-  const int n = 2000000;
+  const int N = 2000000;
   // Create data
-  std::vector<int> arr(n);
-  std::vector<int> out(n);
+  std::vector<int> arr(N);
+  std::vector<int> out(N);
   kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
@@ -77,6 +77,6 @@ TEST(kalinin_d_odd_even_shell_seq, test_task_run_seq) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_seq);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  std::ranges::sort(arr);
+  std::sort(arr.begin(), arr.end());
   ASSERT_EQ(arr, out);
 }

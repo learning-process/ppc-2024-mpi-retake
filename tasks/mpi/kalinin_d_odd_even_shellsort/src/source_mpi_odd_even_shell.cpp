@@ -1,21 +1,18 @@
 #include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/collectives/scatter.hpp>
-#include <cstdio>
-#include <cstdlib>
 #include <random>
-#include <utility>
-#include <vector>
 
 #include "mpi/kalinin_d_odd_even_shellsort/include/header_mpi_odd_even_shell.hpp"
 
 namespace kalinin_d_odd_even_shell_mpi {
-void OddEvenShellMpi::ShellSort(std::vector<int> &vec) {
-  int n = vec.empty() ? 0 : static_cast<int>(vec.size());
+void OddEvenShellMpi::ShellSort(std::vector<int>& vec) {
+  int n = vec.size();
   for (int gap = n / 2; gap > 0; gap /= 2) {
     for (int i = gap; i < n; i++) {
       int temp = vec[i];
-      int j = 0;
+      int j;
       for (j = i; j >= gap && vec[j - gap] > temp; j -= gap) {
         vec[j] = vec[j - gap];
       }
@@ -23,18 +20,18 @@ void OddEvenShellMpi::ShellSort(std::vector<int> &vec) {
     }
   }
 }
-void GimmeRandVec(std::vector<int> &vec) {
+void GimmeRandVec(std::vector<int>& vec) {
   std::random_device rd;
   std::default_random_engine reng(rd());
   std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::ranges::generate(vec, [&dist, &reng] { return dist(reng); });
+  std::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
 }
 
 bool OddEvenShellMpi::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    int n = static_cast<int>(task_data->inputs_count[0]);
+    int n = task_data->inputs_count[0];
     input_ = std::vector<int>(n);
-    std::ranges::copy(reinterpret_cast<int *>(task_data->inputs[0]), reinterpret_cast<int *>(task_data->inputs[0]) + n,
+    std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[0]), reinterpret_cast<int*>(task_data->inputs[0]) + n,
                       input_.begin());
   }
   return true;
@@ -50,7 +47,7 @@ bool OddEvenShellMpi::ValidationImpl() {
 bool OddEvenShellMpi::PostProcessingImpl() {
   if (world_.rank() == 0) {
     output_.resize(task_data->inputs_count[0]);
-    std::ranges::copy(output_, reinterpret_cast<int *>(task_data->outputs[0]));
+    std::ranges::copy(output_, reinterpret_cast<int*>(task_data->outputs[0]));
   }
 
   return true;
@@ -61,107 +58,101 @@ bool OddEvenShellMpi::RunImpl() {
   bool is_even = (sz % 2 == 0);
   std::vector<int> local_vec;
   int local_sz = 0;
-
   if (sz == 1) {
     output_ = std::move(input_);
     ShellSort(output_);
     return true;
   }
-
   if (id == 0) {
-    PrepareInput(local_sz);
+    int reminder = (sz - (input_.size() % sz)) % sz;
+    input_.resize(input_.size() + reminder, std::numeric_limits<int>::max());
+    local_sz = input_.size() / sz;
   }
-
   broadcast(world_, local_sz, 0);
+
   local_vec.resize(local_sz);
+
   scatter(world_, input_, local_vec.data(), local_sz, 0);
+
   ShellSort(local_vec);
-
-  for (int i = 0; i != sz; ++i) {
-    PerformOddEvenPhase(i, id, sz, is_even, local_vec, local_sz);
-  }
-
-  GatherResults(id, local_vec, local_sz);
-  return true;
-}
-
-void OddEvenShellMpi::PrepareInput(int &local_sz) {
-  size_t reminder = 0;
-  reminder = (world_.size() - (input_.size() % world_.size())) % world_.size();
-  input_.resize(input_.size() + reminder, std::numeric_limits<int>::max());
-  local_sz = input_.size() / world_.size();
-}
-
-void OddEvenShellMpi::PerformOddEvenPhase(int phase, int id, int sz, bool is_even, std::vector<int> &local_vec,
-                                          int local_sz) {
-  int lower_bound = (phase % 2 == 0) ? 0 : 1;
-  int higher_bound;
-  if (phase % 2 == 0) {
-    if (is_even) {
-      higher_bound = sz;
-    } else {
-      higher_bound = sz - 1;
-    }
-  } else {
-    if (is_even) {
-      higher_bound = sz - 1;
-    } else {
-      higher_bound = sz;
-    }
-  }
-
-  if (id < lower_bound || id >= higher_bound) {
-    return;
-  }
-
   int neighbour;
-  if (phase % 2 == 0) {
-    if (id % 2 == 0) {
-      neighbour = id + 1;
+  for (int i = 0; i != sz; ++i) {
+    int lower_bound = 0;
+    int higher_bound = sz;
+    if (i % 2 == 0) {
+      higher_bound = is_even ? sz : sz - 1;
+
+      if (id < lower_bound || id >= higher_bound) {
+        continue;
+      }
+
+      neighbour = (id % 2 == 0) ? id + 1 : id - 1;
+      if (neighbour < 0 || neighbour >= sz) {
+        continue;
+      }
+
+      std::vector<int> received_data(local_sz);
+      std::vector<int> merged(2 * local_sz);
+
+      if (id % 2 == 0) {
+        world_.send(neighbour, 0, local_vec);
+        world_.recv(neighbour, 1, received_data);
+      } else {
+        world_.recv(neighbour, 0, received_data);
+        world_.send(neighbour, 1, local_vec);
+      }
+
+      std::ranges::merge(local_vec.begin(), local_vec.end(), received_data.begin(), received_data.end(),
+                         merged.begin());
+
+      if (id % 2 == 0) {
+        local_vec.assign(merged.begin(), merged.begin() + local_sz);
+      } else {
+        local_vec.assign(merged.begin() + local_sz, merged.end());
+      }
+
     } else {
-      neighbour = id - 1;
+      lower_bound = 1;
+      higher_bound = is_even ? sz - 1 : sz;
+
+      if (id < lower_bound || id >= higher_bound) {
+        continue;
+      }
+
+      neighbour = (id % 2 != 0) ? id + 1 : id - 1;
+      if (neighbour < 0 || neighbour >= sz) {
+        continue;
+      }
+
+      std::vector<int> received_data(local_sz);
+      std::vector<int> merged(2 * local_sz);
+
+      if (id % 2 != 0) {
+        world_.send(neighbour, 0, local_vec);
+        world_.recv(neighbour, 1, received_data);
+      } else {
+        world_.recv(neighbour, 0, received_data);
+        world_.send(neighbour, 1, local_vec);
+      }
+
+      std::ranges::merge(local_vec.begin(), local_vec.end(), received_data.begin(), received_data.end(),
+                         merged.begin());
+
+      if (id % 2 != 0) {
+        local_vec.assign(merged.begin(), merged.begin() + local_sz);
+      } else {
+        local_vec.assign(merged.begin() + local_sz, merged.end());
+      }
     }
-  } else {
-    if (id % 2 != 0) {
-      neighbour = id + 1;
-    } else {
-      neighbour = id - 1;
-    }
-  }
-  if (neighbour < 0 || neighbour >= sz) {
-    return;
   }
 
-  std::vector<int> received_data(local_sz);
-  std::vector<int> merged(2 * local_sz);
-
-  if (phase % 2 == 0) {
-    ExchangeData(id, neighbour, local_vec, received_data, 0, 1);
-  } else {
-    ExchangeData(id, neighbour, local_vec, received_data, 1, 0);
-  }
-
-  std::ranges::merge(local_vec, received_data, merged.begin());
-  if (phase % 2 == 0) {
-    local_vec.assign(merged.begin(), merged.begin() + local_sz);
-  } else {
-    local_vec.assign(merged.begin() + local_sz, merged.end());
-  }
-}
-
-void OddEvenShellMpi::ExchangeData(int id, int neighbour, std::vector<int> &local_vec, std::vector<int> &received_data,
-                                   int send_tag, int recv_tag) {
-  world_.send(neighbour, send_tag, local_vec);
-  world_.recv(neighbour, recv_tag, received_data);
-}
-
-void OddEvenShellMpi::GatherResults(int id, std::vector<int> &local_vec, int local_sz) {
   if (id != 0) {
     gather(world_, local_vec.data(), local_sz, 0);
   } else {
     output_.resize(input_.size());
     gather(world_, local_vec.data(), local_sz, output_, 0);
   }
+  return true;
 }
 
 }  // namespace kalinin_d_odd_even_shell_mpi

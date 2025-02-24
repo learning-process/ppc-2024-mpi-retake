@@ -4,13 +4,12 @@
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/kalinin_d_odd_even_shellsort/include/header_mpi_odd_even_shell.hpp"
 
 TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_0) {
-  const int n = 0;
+  const int N = 0;
 
   boost::mpi::communicator world;
 
@@ -19,8 +18,8 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_0) {
   std::vector<int> out;
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    arr.resize(n);
-    out.resize(n);
+    arr.resize(N);
+    out.resize(N);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
@@ -34,7 +33,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_0) {
 }
 
 TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1000) {
-  const int n = 10;
+  const int N = 10;
   boost::mpi::communicator world;
   // Create data
   std::vector<int> arr;
@@ -42,8 +41,8 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1000) {
 
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    arr.resize(n);
-    out.resize(n);
+    arr.resize(N);
+    out.resize(N);
     kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
@@ -58,21 +57,21 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1000) {
   task_mpi.RunImpl();
   task_mpi.PostProcessingImpl();
   if (world.rank() == 0) {
-    std::ranges::sort(arr);
+    std::sort(arr.begin(), arr.end());
     ASSERT_EQ(arr, out);
   }
 }
 
 TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_999) {
-  const int n = 999;
+  const int N = 999;
   boost::mpi::communicator world;
   // Create data
   std::vector<int> arr;
   std::vector<int> out;
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    arr.resize(n);
-    out.resize(n);
+    arr.resize(N);
+    out.resize(N);
     kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
@@ -87,21 +86,21 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_999) {
 
   task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    std::ranges::sort(arr);
+    std::sort(arr.begin(), arr.end());
     ASSERT_EQ(arr, out);
   }
 }
 
 TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_9999) {
-  const int n = 9999;
+  const int N = 9999;
   boost::mpi::communicator world;
   // Create data
   std::vector<int> arr;
   std::vector<int> out;
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    arr.resize(n);
-    out.resize(n);
+    arr.resize(N);
+    out.resize(N);
     kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
@@ -116,21 +115,21 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_9999) {
 
   task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    std::ranges::sort(arr);
+    std::sort(arr.begin(), arr.end());
     ASSERT_EQ(arr, out);
   }
 }
 
 TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1021) {
-  const int n = 29;
+  const int N = 29;
   boost::mpi::communicator world;
   // Create data
   std::vector<int> arr;
   std::vector<int> out;
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    arr.resize(n);
-    out.resize(n);
+    arr.resize(N);
+    out.resize(N);
     kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
@@ -145,7 +144,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1021) {
 
   task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    std::ranges::sort(arr);
+    std::sort(arr.begin(), arr.end());
     ASSERT_EQ(arr, out);
   }
 }
