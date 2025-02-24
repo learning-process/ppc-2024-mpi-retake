@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
+std::vector<int32_t> GetRandVector(size_t size, int min_value, int max_value);
 
 namespace makhov_m_ring_topology {
 
