@@ -66,9 +66,9 @@ bool stroganov_m_dining_philosophers_mpi::DiningPhilosophersMPI::DistributionFor
   bool is_even = (world_.rank() % 2 == 0);  // NOLINT Assuming the condition is true
 
   auto request_fork = [&](int neighbor, int& status) {
-    world_.send(neighbor, 0, status_);
+    world_.isend(neighbor, 0, status_);
     if (world_.iprobe(neighbor, 0)) {
-      world_.recv(neighbor, 0, status);
+      world_.irecv(neighbor, 0, status);
       return (status == 0);
     }
     return false;
@@ -77,14 +77,14 @@ bool stroganov_m_dining_philosophers_mpi::DiningPhilosophersMPI::DistributionFor
   if (is_even) {
     if (request_fork(l_philosopher_, l_status) && request_fork(r_philosopher_, r_status)) {
       status_ = 1;
-      world_.send(l_philosopher_, 0, status_);
-      world_.send(r_philosopher_, 0, status_);
+      world_.isend(l_philosopher_, 0, status_);
+      world_.isend(r_philosopher_, 0, status_);
     }
   } else {
     if (request_fork(r_philosopher_, r_status) && request_fork(l_philosopher_, l_status)) {
       status_ = 1;
-      world_.send(l_philosopher_, 0, status_);
-      world_.send(r_philosopher_, 0, status_);
+      world_.isend(l_philosopher_, 0, status_);
+      world_.isend(r_philosopher_, 0, status_);
     }
   }
   return true;
@@ -113,7 +113,6 @@ bool stroganov_m_dining_philosophers_mpi::DiningPhilosophersMPI::CheckAllThink()
 bool stroganov_m_dining_philosophers_mpi::DiningPhilosophersMPI::CheckDeadlock() {
   std::vector<int> all_states(world_.size(), 0);
   boost::mpi::all_gather(world_, status_, all_states);
-  // return std::ranges::all_of(all_states, [](const int& state) { return state == 2; });
   return std::ranges::all_of(all_states, [](int state) { return state == 2; });
 }
 
