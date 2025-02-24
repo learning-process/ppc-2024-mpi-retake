@@ -90,8 +90,16 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
+  if (task_data->inputs.empty() || task_data->inputs_count.empty()) {
+    return false;
+  }
+
   auto input_size = task_data->inputs_count[0];
   auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
+  if (!in_ptr) {
+    return false;
+  }
+
   input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
   if (task_data->outputs_count.empty()) {
@@ -106,7 +114,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
-  return task_data->inputs_count[0] == task_data->outputs_count[0];
+  return !task_data->inputs.empty() && !task_data->outputs.empty() &&
+         task_data->inputs_count[0] == task_data->outputs_count[0];
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
@@ -129,26 +138,16 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
-  std::vector<int> ghost_cells_left(cols, 0);
-  std::vector<int> ghost_cells_right(cols, 0);
+  std::vector<int> ghost_cells(cols, 0);
 
   if (rank > 0) {
-    MPI_Send(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0, MPI_COMM_WORLD);
-    MPI_Recv(ghost_cells_left.data(), cols, MPI_INT, rank - 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Sendrecv(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0, ghost_cells.data(), cols,
+                 MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   if (rank < num_procs - 1) {
-    MPI_Send(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 1, MPI_COMM_WORLD);
-    MPI_Recv(ghost_cells_right.data(), cols, MPI_INT, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  }
-
-  for (int i = 0; i < cols; ++i) {
-    if (start_row > 0 && labeled_image[(start_row * cols) + i] >= 2 && ghost_cells_left[i] >= 2) {
-      UnionLabels(label_parent, labeled_image[(start_row * cols) + i], ghost_cells_left[i]);
-    }
-    if (end_row < rows && labeled_image[((end_row - 1) * cols) + i] >= 2 && ghost_cells_right[i] >= 2) {
-      UnionLabels(label_parent, labeled_image[((end_row - 1) * cols) + i], ghost_cells_right[i]);
-    }
+    MPI_Sendrecv(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 0, ghost_cells.data(), cols,
+                 MPI_INT, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
