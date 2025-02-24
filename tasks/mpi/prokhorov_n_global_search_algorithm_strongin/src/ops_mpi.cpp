@@ -124,9 +124,6 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAl
   double global_x_min = a;
 
   while ((b - a) > epsilon) {
-    double local_min = std::numeric_limits<double>::max();
-    double local_x_min;
-
     double step = (b - a) / world.size();
     double local_a = a + step * world.rank();
     double local_b = a + step * (world.rank() + 1);
@@ -137,6 +134,7 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAl
     double f1 = f(x1);
     double f2 = f(x2);
 
+    double local_min, local_x_min;
     if (f1 < f2) {
       local_min = f1;
       local_x_min = x1;
@@ -166,6 +164,10 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAl
 
     boost::mpi::broadcast(world, a, 0);
     boost::mpi::broadcast(world, b, 0);
+
+    if (a == 0.0 && b == 0.0 && epsilon == 0.0) {
+      throw std::runtime_error("Data was not broadcasted correctly.");
+    }
   }
 
   return global_x_min;
