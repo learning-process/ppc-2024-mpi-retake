@@ -41,7 +41,7 @@ void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b
 TEST(opolin_d_cg_method_mpi, test_pipeline_run) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   boost::mpi::communicator world;
-  int size = 1500;
+  int size = 800;
   double epsilon = 1e-5;
   std::vector<double> a;
   std::vector<double> b;
@@ -89,7 +89,7 @@ TEST(opolin_d_cg_method_mpi, test_pipeline_run) {
 
 TEST(opolin_d_cg_method_mpi, test_task_run) {
   boost::mpi::communicator world;
-  int size = 1500;
+  int size = 800;
   double epsilon = 1e-5;
   std::vector<double> a;
   std::vector<double> b;

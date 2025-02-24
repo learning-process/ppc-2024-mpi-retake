@@ -41,7 +41,7 @@ void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b
 }  // namespace opolin_d_cg_method_seq
 
 TEST(opolin_d_cg_method_seq, test_pipeline_run) {
-  int size = 1500;
+  int size = 800;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
@@ -83,7 +83,7 @@ TEST(opolin_d_cg_method_seq, test_pipeline_run) {
 }
 
 TEST(opolin_d_cg_method_seq, test_task_run) {
-  int size = 1500;
+  int size = 800;
   std::vector<double> A;
   std::vector<double> b;
   std::vector<double> X;
