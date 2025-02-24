@@ -74,7 +74,7 @@ void OddEvenSortPhase(int phase, std::vector<int>& local_data, const boost::mpi:
   if (phase % 2 == 0) {
     if (world.rank() % 2 == 0 && next_rank < world.size()) {
       // SendAndReceive(next_rank, -1, local_data, world);
-      world.send(next_rank, world.rank(), local_data));
+      world.send(next_rank, world.rank(), local_data);
     } else if (world.rank() % 2 == 1) {
       PerformOddEvenMerge(prev_rank, local_data, world);
     }
