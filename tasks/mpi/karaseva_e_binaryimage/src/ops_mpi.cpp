@@ -122,7 +122,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   int rows_per_proc = rows / num_procs;
   int remainder = rows % num_procs;
-  int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : rank * rows_per_proc + remainder;
+  int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
   int end_row = start_row + ((rank < remainder) ? (rows_per_proc + 1) : rows_per_proc);
 
   std::vector<int> labeled_image(rows * cols, 0);
