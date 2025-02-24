@@ -134,8 +134,13 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
     std::cout << "Rank: " << rank << " outputs_count[0]: " << task_data->outputs_count[0] << '\n';
   }
 
-  return !task_data->inputs.empty() && !task_data->outputs.empty() &&
-         task_data->inputs_count[0] == task_data->outputs_count[0];
+  int input_count = task_data->inputs_count[0];
+  int output_count = task_data->outputs_count[0];
+
+  bool valid = !task_data->inputs.empty() && !task_data->outputs.empty() && input_count == output_count;
+
+  MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+  return valid;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
