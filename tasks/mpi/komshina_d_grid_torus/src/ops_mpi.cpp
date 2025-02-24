@@ -3,11 +3,9 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/serialization/vector.hpp>
+#include <memory>
 #include <cmath>
-#include <utility>
 #include <vector>
-#include <ranges>
-
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
@@ -22,7 +20,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
-  if (world_.size() % width != 0) {
+  if (world_.size() % width_ != 0) {
     return false;
   }
   if (world_.rank() == 0) {
@@ -41,7 +39,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
 
   if (current_rank == 0) {
     task_data_.path.push_back(0);
-    int next = GetNextHop(0, task_data_.target, width, height);
+    int next = GetNextHop(0, task_data_.target, width_, height_);
     world_.send(next, 0, task_data_);
     world_.recv(boost::mpi::any_source, 0, task_data_);
   } else {
@@ -51,7 +49,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     }
     task_data_.path.push_back(world_.rank());
     if (current_rank != task_data_.target) {
-      int next = GetNextHop(current_rank, task_data_.target, width, height);
+      int next = GetNextHop(current_rank, task_data_.target, width_, height_);
       world_.send(next, 0, task_data_);
     } else {
       world_.send(0, 0, task_data_);
@@ -73,8 +71,8 @@ namespace komshina_d_grid_torus_mpi {
 
 void komshina_d_grid_torus_mpi::TestTaskMPI::ComputeGridSize() {
   int world_size = world_.size();
-  height = static_cast<int>(std::sqrt(world_size));
-  width = world_size / height;
+  height_ = static_cast<int>(std::sqrt(world_size));
+  width_ = world_size / height_;
 }
 
 int komshina_d_grid_torus_mpi::TestTaskMPI::GetNextHop(int current, int target, int width, int height) {
@@ -85,9 +83,8 @@ int komshina_d_grid_torus_mpi::TestTaskMPI::GetNextHop(int current, int target, 
 
   if (current_x != target_x) {
     return (current_x < target_x) ? current + 1 : current - 1;
-  } else {
-    return (current_y < target_y) ? current + width : current - width;
   }
+  return (current_y < target_y) ? current + width : current - width;
 }
 
 std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(int target, int world_size, int width,

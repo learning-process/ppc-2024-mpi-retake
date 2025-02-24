@@ -29,7 +29,7 @@ class TestTaskMPI : public ppc::core::Task {
     TaskData(const std::string& str, int tgt) : payload(str.begin(), str.end()), target(tgt) {}
 
     template <class Archive>
-    void Serialize(Archive& ar, unsigned int version) {
+    void serialize(Archive& ar, unsigned int version) {
       ar & target;
       ar & payload;
       ar & path;
@@ -42,7 +42,7 @@ class TestTaskMPI : public ppc::core::Task {
   
   void ComputeGridSize();
   static int GetNextHop(int current, int target, int width, int height);
-  int width, height;
+  int width_, height_;
 };
 
 }  // namespace komshina_d_grid_torus_mpi

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <cstdint>
 #include <random>
 #include <vector>
@@ -16,7 +17,7 @@ static std::vector<int> getRandomVector(int sz, int a, int b) {
   std::mt19937 gen(dev());
   std::vector<int> vec(sz);
   for (int i = 0; i < sz; i++) {
-    vec[i] = static_cast<int>(gen() % (b - a + 1) + a);
+    vec[i] = static_cast<int>((gen() % (b - a + 1)) + a);
   }
   return vec;
 }
