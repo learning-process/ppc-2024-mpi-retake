@@ -14,7 +14,7 @@
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
   boost::mpi::communicator world;
-  constexpr size_t kMatrixSize = 500;
+  constexpr size_t kMatrixSize = 5000;
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> distribution(-100, 100);
@@ -62,7 +62,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
   boost::mpi::communicator world;
-  constexpr size_t kMatrixSize = 500;
+  constexpr size_t kMatrixSize = 5000;
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> distribution(-100, 100);
