@@ -24,6 +24,10 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix
       --rank;
     } else {
       for (int k = i + 1; k < matrix.cols; ++k) {
+        double pivot = a[(i * matrix.rows) + i];
+        if (std::abs(pivot) < 1e-6) {
+         return 0;
+        }
         double ml = a[(k * matrix.rows) + i] / a[(i * matrix.rows) + i];
         for (j = i; j < matrix.rows - 1; ++j) {
           a[(k * matrix.rows) + j] -= a[(i * matrix.rows) + j] * ml;
@@ -34,7 +38,7 @@ int shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MatrixRank(Matrix
   return rank;
 }
 double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Matrix matrix, std::vector<double> a) {
-  double det = 1;
+  double det = 1.0;
 
   for (int i = 0; i < matrix.cols; ++i) {
     int idx = i;
@@ -47,17 +51,21 @@ double shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::Determinant(Ma
       return 0;
     }
     if (idx != i) {
-      for (int j = 0; j < matrix.rows - 1; ++j) {
+      for (int j = 0; j < matrix.cols; ++j) {
         double tmp = a[(i * matrix.rows) + j];
         a[(i * matrix.rows) + j] = a[(idx * matrix.rows) + j];
         a[(idx * matrix.rows) + j] = tmp;
       }
-      det *= -1;
+      det *= -1.0;
     }
     det *= a[(i * matrix.rows) + i];
     for (int k = i + 1; k < matrix.cols; ++k) {
+      double pivot = a[(i * matrix.rows) + i];
+      if (std::abs(pivot) < 1e-6) {
+        return 0;
+      }
       double ml = a[(k * matrix.rows) + i] / a[(i * matrix.rows) + i];
-      for (int j = i; j < matrix.rows - 1; ++j) {
+      for (int j = i; j < matrix.cols; ++j) {
         a[(k * matrix.rows) + j] -= a[(i * matrix.rows) + j] * ml;
       }
     }
