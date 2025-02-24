@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <vector>
-#include <string>
-#include <memory>
-#include <cstdint>
 #include <algorithm>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/timer.hpp>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "core/task/include/task.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/chernova_n_topology_ring/include/ops_mpi.hpp"
 
 namespace {

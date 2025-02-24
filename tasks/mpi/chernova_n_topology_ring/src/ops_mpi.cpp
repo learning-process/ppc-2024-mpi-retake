@@ -1,6 +1,7 @@
 #include "mpi/chernova_n_topology_ring/include/ops_mpi.hpp"
-#include <boost/mpi/collectives/broadcast.hpp>
+
 #include <algorithm>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <vector>
 
 bool chernova_n_topology_ring_mpi::TestMPITaskParallel::PreProcessingImpl() {
