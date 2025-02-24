@@ -14,7 +14,7 @@ class OddEvenShellSeq : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  static void ShellSort(std::vector<int>& vec);
+  void ShellSort(std::vector<int>& vec);
 
  private:
   std::vector<int> input_;

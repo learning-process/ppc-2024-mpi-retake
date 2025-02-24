@@ -41,7 +41,7 @@ TEST(kalinin_d_odd_even_shell_seq, test_pipline_run_seq) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_seq);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  std::sort(arr.begin(), arr.end());
+  std::ranges::sort(arr.begin(), arr.end());
   ASSERT_EQ(arr, out);
 }
 
@@ -77,6 +77,6 @@ TEST(kalinin_d_odd_even_shell_seq, test_task_run_seq) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_seq);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  std::sort(arr.begin(), arr.end());
+  std::ranges::sort(arr.begin(), arr.end());
   ASSERT_EQ(arr, out);
 }

@@ -55,107 +55,73 @@ bool OddEvenShellMpi::PostProcessingImpl() {
 
   return true;
 }
+
 bool OddEvenShellMpi::RunImpl() {
   auto id = world_.rank();
   auto sz = world_.size();
-  bool is_even = (sz % 2 == 0);
-  std::vector<int> local_vec;
-  int local_sz = 0;
   if (sz == 1) {
     output_ = std::move(input_);
     ShellSort(output_);
     return true;
   }
+
+  bool is_even = (sz % 2 == 0);
+  int local_sz = 0;
   if (id == 0) {
-    int reminder = static_cast<int>((sz - (input_.size() % sz)) % sz);
+    int reminder = (sz - (input_.size() % sz)) % sz;
     input_.resize(input_.size() + reminder, std::numeric_limits<int>::max());
-    local_sz = static_cast<int>(input_.size() / sz);
+    local_sz = input_.size() / sz;
   }
   broadcast(world_, local_sz, 0);
 
-  local_vec.resize(local_sz);
-
+  std::vector<int> local_vec(local_sz);
   scatter(world_, input_, local_vec.data(), local_sz, 0);
-
   ShellSort(local_vec);
-  int neighbour = 0;
-  for (int i = 0; i != sz; ++i) {
-    int lower_bound = 0;
-    int higher_bound = 0;
-    if (i % 2 == 0) {
-      higher_bound = is_even ? sz : sz - 1;
 
-      if (id < lower_bound || id >= higher_bound) {
-        continue;
-      }
+  for (int i = 0; i < sz; ++i) {
+    int lower_bound = (i % 2 == 0) ? 0 : 1;
+    int higher_bound = (i % 2 == 0) ? (is_even ? sz : sz - 1) : (is_even ? sz - 1 : sz);
 
-      neighbour = (id % 2 == 0) ? id + 1 : id - 1;
-      if (neighbour < 0 || neighbour >= sz) {
-        continue;
-      }
+    if (id < lower_bound || id >= higher_bound) continue;
 
-      std::vector<int> received_data(local_sz);
-      std::vector<int> merged(2 * local_sz);
+    int neighbour = (id % 2 == i % 2) ? id + 1 : id - 1;
+    if (neighbour < 0 || neighbour >= sz) continue;
 
-      if (id % 2 == 0) {
-        world_.send(neighbour, 0, local_vec);
-        world_.recv(neighbour, 1, received_data);
-      } else {
-        world_.recv(neighbour, 0, received_data);
-        world_.send(neighbour, 1, local_vec);
-      }
-
-      std::ranges::merge(local_vec.begin(), local_vec.end(), received_data.begin(), received_data.end(),
-                         merged.begin());
-
-      if (id % 2 == 0) {
-        local_vec.assign(merged.begin(), merged.begin() + local_sz);
-      } else {
-        local_vec.assign(merged.begin() + local_sz, merged.end());
-      }
-
-    } else {
-      lower_bound = 1;
-      higher_bound = is_even ? sz - 1 : sz;
-
-      if (id < lower_bound || id >= higher_bound) {
-        continue;
-      }
-
-      neighbour = (id % 2 != 0) ? id + 1 : id - 1;
-      if (neighbour < 0 || neighbour >= sz) {
-        continue;
-      }
-
-      std::vector<int> received_data(local_sz);
-      std::vector<int> merged(2 * local_sz);
-
-      if (id % 2 != 0) {
-        world_.send(neighbour, 0, local_vec);
-        world_.recv(neighbour, 1, received_data);
-      } else {
-        world_.recv(neighbour, 0, received_data);
-        world_.send(neighbour, 1, local_vec);
-      }
-
-      std::ranges::merge(local_vec.begin(), local_vec.end(), received_data.begin(), received_data.end(),
-                         merged.begin());
-
-      if (id % 2 != 0) {
-        local_vec.assign(merged.begin(), merged.begin() + local_sz);
-      } else {
-        local_vec.assign(merged.begin() + local_sz, merged.end());
-      }
-    }
+    ExchangeAndMerge(local_vec, neighbour);
   }
 
-  if (id != 0) {
-    gather(world_, local_vec.data(), local_sz, 0);
+  GatherResults(local_vec, local_sz, id);
+  return true;
+}
+
+void OddEvenShellMpi::ExchangeAndMerge(std::vector<int>& local_vec, int neighbour) {
+  int local_sz = local_vec.size();
+  std::vector<int> received_data(local_sz), merged(2 * local_sz);
+
+  if (world_.rank() < neighbour) {
+    world_.send(neighbour, 0, local_vec);
+    world_.recv(neighbour, 1, received_data);
   } else {
+    world_.recv(neighbour, 0, received_data);
+    world_.send(neighbour, 1, local_vec);
+  }
+
+  std::ranges::merge(local_vec.begin(), local_vec.end(), received_data.begin(), received_data.end(), merged.begin());
+
+  if (world_.rank() < neighbour) {
+    local_vec.assign(merged.begin(), merged.begin() + local_sz);
+  } else {
+    local_vec.assign(merged.begin() + local_sz, merged.end());
+  }
+}
+
+void OddEvenShellMpi::GatherResults(std::vector<int>& local_vec, int local_sz, int id) {
+  if (id == 0) {
     output_.resize(input_.size());
     gather(world_, local_vec.data(), local_sz, output_, 0);
+  } else {
+    gather(world_, local_vec.data(), local_sz, 0);
   }
-  return true;
 }
 
 }  // namespace kalinin_d_odd_even_shell_mpi

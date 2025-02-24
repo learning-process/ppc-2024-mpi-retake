@@ -13,15 +13,17 @@ class OddEvenShellMpi : public ppc::core::Task {
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
+  void ExchangeAndMerge(std::vector<int>& local_vec, int neighbour);
+  void GatherResults(std::vector<int>& local_vec, int local_sz, int id);
   bool PostProcessingImpl() override;
 
-  static void ShellSort(std::vector<int>& vec);
+  void ShellSort(std::vector<int>& vec);
 
  private:
   std::vector<int> input_;
   std::vector<int> output_;
   boost::mpi::communicator world_;
 };
-static void GimmeRandVec(std::vector<int>& vec);
+void GimmeRandVec(std::vector<int>& vec);
 
 }  // namespace kalinin_d_odd_even_shell_mpi
