@@ -6,8 +6,7 @@
 namespace muradov_k_trapezoid_integral_seq {
 
 // Computes the integral using the trapezoidal rule sequentially.
-double getIntegralTrapezoidalRuleSequential(const std::function<double(double)>& f,
-                                            double a, double b, int n);
+double getIntegralTrapezoidalRuleSequential(const std::function<double(double)>& f, double a, double b, int n);
 
 }  // namespace muradov_k_trapezoid_integral_seq
 
