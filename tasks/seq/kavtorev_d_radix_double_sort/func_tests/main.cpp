@@ -34,7 +34,7 @@ TEST(kavtorev_d_radix_double_sort_seq, SimpleData) {
   test_task_sequential.PostProcessingImpl();
 
   auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
-  std::sort(input_data.begin(), input_data.end());
+  std::ranges::sort(input_data.begin(), input_data.end());
 
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(input_data[i], result_seq[i], 1e-12);
@@ -91,7 +91,7 @@ TEST(kavtorev_d_radix_double_sort_seq, RandomDataSmall) {
 
   auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
 
-  std::sort(input_data.begin(), input_data.end());
+  std::ranges::sort(input_data.begin(), input_data.end());
 
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(input_data[i], result_seq[i], 1e-12);
@@ -128,7 +128,7 @@ TEST(kavtorev_d_radix_double_sort_seq, RandomDataLarge) {
 
   auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
 
-  std::sort(input_data.begin(), input_data.end());
+  std::ranges::sort(input_data.begin(), input_data.end());
 
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(input_data[i], result_seq[i], 1e-12);
@@ -158,7 +158,7 @@ TEST(kavtorev_d_radix_double_sort_seq, AlreadySortedData) {
   test_task_sequential.PostProcessingImpl();
 
   auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
-  std::sort(input_data.begin(), input_data.end());
+  std::ranges::sort(input_data.begin(), input_data.end());
 
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(input_data[i], result_seq[i], 1e-12);
@@ -188,7 +188,7 @@ TEST(kavtorev_d_radix_double_sort_seq, ReverseSortedData) {
   test_task_sequential.PostProcessingImpl();
 
   auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
-  std::sort(input_data.begin(), input_data.end());
+  std::ranges::sort(input_data.begin(), input_data.end());
 
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(input_data[i], result_seq[i], 1e-12);

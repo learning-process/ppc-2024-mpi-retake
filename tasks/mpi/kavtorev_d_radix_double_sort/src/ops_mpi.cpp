@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -9,7 +11,6 @@
 #include <iterator>
 #include <vector>
 
-namespace mpi = boost::mpi;
 using namespace kavtorev_d_radix_double_sort;
 
 bool RadixSortSequential::PreProcessingImpl() {
@@ -38,7 +39,7 @@ bool RadixSortSequential::RunImpl() {
 
 bool RadixSortSequential::PostProcessingImpl() {
   auto* out = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::copy(data_.begin(), data_.end(), out);
+  std::ranges::copy(data_.begin(), data_.end(), out);
   return true;
 }
 
@@ -166,8 +167,8 @@ bool RadixSortParallel::RunImpl() {
 
       std::vector<double> merged;
       merged.reserve(local_data.size() + partner_data.size());
-      std::merge(local_data.begin(), local_data.end(), partner_data.begin(), partner_data.end(),
-                 std::back_inserter(merged));
+      std::ranges::merge(local_data.begin(), local_data.end(), partner_data.begin(), partner_data.end(),
+                         std::back_inserter(merged));
       local_data.swap(merged);
     } else if (!is_merger && (rank % group_step_size == group_size)) {
       int receiver = rank - group_size;

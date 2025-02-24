@@ -60,7 +60,7 @@ TEST(kavtorev_d_radix_double_sort_seq, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   std::vector<double> ref_data = input_data;
-  std::sort(ref_data.begin(), ref_data.end());
+  std::ranges::sort(ref_data.begin(), ref_data.end());
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(ref_data[i], output_data[i], 1e-12);
   }
@@ -113,7 +113,7 @@ TEST(kavtorev_d_radix_double_sort_seq, test_task_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   std::vector<double> ref_data = input_data;
-  std::sort(ref_data.begin(), ref_data.end());
+  std::ranges::sort(ref_data.begin(), ref_data.end());
   for (int i = 0; i < n; ++i) {
     ASSERT_NEAR(ref_data[i], output_data[i], 1e-12);
   }
