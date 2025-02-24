@@ -100,8 +100,8 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_not_square_
 TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_zero_determinant) {
   boost::mpi::communicator world;
 
-  const int cols = 5;
-  const int rows = 4;
+  const int cols = 4;
+  const int rows = 3;
 
   std::vector<double> global_matrix;
   std::vector<double> global_res(cols - 1, 0);
