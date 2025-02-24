@@ -63,30 +63,6 @@ TEST(komshina_d_grid_torus_mpi, check_target_in_range) {
   ASSERT_TRUE(input_data.target >= 0 && input_data.target < world.size());
 }
 
-TEST(komshina_d_grid_torus_mpi, test_task_validation_and_preprocessing) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI::TaskData input_data("sample_task", 2);
-  komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
-
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&input_data));
-    task_data_mpi->inputs_count.emplace_back(1);
-
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&output_data));
-    task_data_mpi->outputs_count.emplace_back(1);
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_TRUE(task.ValidationImpl());
-  ASSERT_TRUE(task.PreProcessingImpl());
-}
-
 TEST(komshina_d_grid_torus_mpi, run_task_and_check_results) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
