@@ -2,6 +2,7 @@
 #include "mpi/opolin_d_cg_method/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives/all_gatherv.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
@@ -103,12 +104,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     if (rank == 0) {
       rsquare_prev = rsquare_k;
     }
-    if (rank == 0) {
-      boost::mpi::gatherv(world_, local_p.data(), static_cast<int>(local_n), full_p.data(), send_counts, displs, 0);
-    } else {
-      boost::mpi::gatherv(world_, local_p.data(), static_cast<int>(local_n), 0);
-    }
-    boost::mpi::broadcast(world_, full_p, 0);
+    boost::mpi::all_gatherv(world_, local_p.data(), static_cast<int>(local_n), full_p.data(), send_counts, displs);
 
     for (size_t i = 0; i < local_n; ++i) {
       local_Ap[i] = 0.0;
