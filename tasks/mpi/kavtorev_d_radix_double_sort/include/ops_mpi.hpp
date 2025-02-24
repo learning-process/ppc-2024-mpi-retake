@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/mpi/communicator.hpp>
+#include <boost/serialization/vector.hpp>  //NOLINT
 #include <cstdint>
 #include <cstring>
 #include <memory>

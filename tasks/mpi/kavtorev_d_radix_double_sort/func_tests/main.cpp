@@ -2,6 +2,7 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
+#include <boost/serialization/vector.hpp>  //NOLINT
 #include <cstdint>
 #include <memory>
 #include <random>
