@@ -1,8 +1,6 @@
 #include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
+#include <boost/mpi.hpp>
 #include <cmath>
 #include <functional>
 #include <memory>
