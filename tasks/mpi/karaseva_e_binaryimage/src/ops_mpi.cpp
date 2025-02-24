@@ -96,7 +96,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   auto input_size = task_data->inputs_count[0];
   auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
-  if (!in_ptr) {
+  if (in_ptr == nullptr) {
     return false;
   }
 
