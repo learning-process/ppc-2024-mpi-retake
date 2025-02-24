@@ -22,7 +22,7 @@ void NetworkTopology::create_ring_topology() {
   left_ = (rank_ - 1 + size_) % size_;
   right_ = (rank_ + 1) % size_;
 
-  MPI_Comm_create_group(global_comm_, world_group, 0, &topology_comm_);
+  MPI_Comm_create(global_comm_, world_group, &topology_comm_);
   MPI_Group_free(&world_group);
 }
 
