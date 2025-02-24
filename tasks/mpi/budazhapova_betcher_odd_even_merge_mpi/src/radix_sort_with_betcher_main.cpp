@@ -58,8 +58,10 @@ void OddEvenMerge(std::vector<int>& local_data, std::vector<int>& received_data)
   }
   std::cout << std::endl;
   std::cout << std::endl;
-  local_data.assign(merged.begin(), merged.begin() + static_cast<long>(local_data.size()));
-  received_data.assign(merged.begin() + static_cast<long>(local_data.size()), merged.end());
+  received_data.assign(merged.begin(), merged.begin() + static_cast<long>(received_data.size()));
+  local_data.assign(merged.begin() + static_cast<long>(received_data.size()), merged.end());
+  // local_data.assign(merged.begin(), merged.begin() + static_cast<long>(local_data.size()));
+  // received_data.assign(merged.begin() + static_cast<long>(local_data.size()), merged.end());
 }
 
 void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
