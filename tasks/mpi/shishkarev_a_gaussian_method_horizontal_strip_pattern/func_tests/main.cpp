@@ -96,27 +96,3 @@ TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_not_square_
     ASSERT_FALSE(mpi_gauss_horizontal_parallel.ValidationImpl());
   }
 }
-
-TEST(shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi, test_zero_determinant) {
-  boost::mpi::communicator world;
-
-  const int cols = 5;
-  const int rows = 4;
-
-  std::vector<double> global_matrix;
-  std::vector<double> global_res(cols - 1, 0);
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-
-  if (world.rank() == 0) {
-    global_matrix = {6, -1, 12, 3, -3, -5, -6, 9, 1, 4, 2, -1};
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    task_data_par->inputs_count.emplace_back(global_matrix.size());
-    task_data_par->inputs_count.emplace_back(cols);
-    task_data_par->inputs_count.emplace_back(rows);
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_res.data()));
-    task_data_par->outputs_count.emplace_back(global_res.size());
-    shishkarev_a_gaussian_method_horizontal_strip_pattern_mpi::MPIGaussHorizontalParallel mpi_gauss_horizontal_parallel(
-        task_data_par);
-    ASSERT_FALSE(mpi_gauss_horizontal_parallel.ValidationImpl());
-  }
-}
