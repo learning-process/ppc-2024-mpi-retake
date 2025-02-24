@@ -63,6 +63,8 @@ void OddEvenMerge(std::vector<int>& local_data, std::vector<int>& received_data)
 }
 
 void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
+  std::cout << "IN PERFOM: ";
+  std::cout << std::endl;
   std::vector<int> received_data;
   world.recv(neighbor_rank, neighbor_rank, received_data);
   OddEvenMerge(local_data, received_data);
@@ -181,9 +183,12 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
                  world_, res_);
 
   int world_size = world_.size();
-
-  for (int phase = 0; phase < world_size; ++phase) {
-    OddEvenSortPhase(phase, local_res_, world_);
+  if (world_size > 0) {
+    for (int phase = 0; phase < world_size; phase++) {
+      OddEvenSortPhase(phase, local_res_, world_);
+    }
+  } else {
+    budazhapova_betcher_odd_even_merge_mpi::RadixSort(local_res_);
   }
 
   boost::mpi::gatherv(world_, local_res_.data(), static_cast<int>(local_res_.size()), res_.data(), recv_counts,
