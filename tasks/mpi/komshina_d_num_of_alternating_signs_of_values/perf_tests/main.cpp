@@ -11,7 +11,7 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
-  const int input_size = 100000000;
+  const int input_size = 180000000;
 
   // Create data
   std::vector<int> in(input_size);
@@ -55,7 +55,7 @@ TEST(komshina_d_num_of_alternations_signs_mpi, test_pipeline_Run) {
 }
 
 TEST(komshina_d_num_of_alternations_signs_mpi, test_task_Run) {
-  const int input_size = 100000000;
+  const int input_size = 180000000;
 
   // Create data
   std::vector<int> in(input_size);
