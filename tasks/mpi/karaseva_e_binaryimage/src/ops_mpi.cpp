@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -103,7 +104,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   input_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
   if (task_data->outputs_count.empty()) {
-    return false;
+    task_data->outputs_count.push_back(input_size);
   }
 
   auto output_size = static_cast<unsigned int>(task_data->outputs_count[0]);
@@ -114,6 +115,14 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
+  std::cout << "inputs.size(): " << task_data->inputs.size() << std::endl;
+  std::cout << "outputs.size(): " << task_data->outputs.size() << std::endl;
+  if (!task_data->inputs.empty()) {
+    std::cout << "inputs_count[0]: " << task_data->inputs_count[0] << std::endl;
+  }
+  if (!task_data->outputs.empty()) {
+    std::cout << "outputs_count[0]: " << task_data->outputs_count[0] << std::endl;
+  }
   return !task_data->inputs.empty() && !task_data->outputs.empty() &&
          task_data->inputs_count[0] == task_data->outputs_count[0];
 }
@@ -138,20 +147,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
-  std::vector<int> ghost_cells(cols, 0);
-
-  if (rank > 0) {
-    MPI_Sendrecv(labeled_image.data() + (start_row * cols), cols, MPI_INT, rank - 1, 0, ghost_cells.data(), cols,
-                 MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  }
-
-  if (rank < num_procs - 1) {
-    MPI_Sendrecv(labeled_image.data() + ((end_row - 1) * cols), cols, MPI_INT, rank + 1, 0, ghost_cells.data(), cols,
-                 MPI_INT, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  }
-
-  Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
-
   std::vector<int> recv_counts(num_procs);
   std::vector<int> displs(num_procs);
 
@@ -168,8 +163,11 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
-  for (size_t i = 0; i < output_.size(); ++i) {
-    reinterpret_cast<int*>(task_data->outputs[0])[i] = output_[i];
+  if (!task_data->outputs.empty() && task_data->outputs[0] != nullptr) {
+    for (size_t i = 0; i < output_.size(); ++i) {
+      reinterpret_cast<int*>(task_data->outputs[0])[i] = output_[i];
+    }
+    return true;
   }
-  return true;
+  return false;
 }
