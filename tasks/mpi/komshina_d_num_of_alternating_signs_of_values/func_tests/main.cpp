@@ -11,7 +11,7 @@
 #include "mpi/komshina_d_num_of_alternating_signs_of_values/include/ops_mpi.hpp"
 
 namespace {
- std::vector<int> GenerateRandomVector(size_t size, int min_val = -100, int max_val = 100) {
+std::vector<int> GenerateRandomVector(size_t size, int min_val = -100, int max_val = 100) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int> dis(min_val, max_val);
