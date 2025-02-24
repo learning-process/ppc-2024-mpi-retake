@@ -1,26 +1,27 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
-#include <memory>
-#include <string>
-#include <vector>
 #include <random>
+#include <vector>
+#include <string>
+#include <memory>
+#include <boost/mpi/communicator.hpp>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
+namespace {
 static std::vector<int> getRandomVector(int sz, int a, int b) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(sz);
   for (int i = 0; i < sz; i++) {
-    vec[i] = gen() % (b - a + 1) + a;
+    vec[i] = static_cast<int>(gen() % (b - a + 1) + a);
   }
   return vec;
 }
+}  // namespace
 
 TEST(komshina_d_grid_torus_mpi, Test_Negative_Validation) {
   boost::mpi::communicator world;
@@ -39,8 +40,8 @@ TEST(komshina_d_grid_torus_mpi, Test_Negative_Validation) {
     task_data_mpi->outputs_count.emplace_back(global_path.size());
   }
 
-  komshina_d_grid_torus_mpi::TestTaskMPI testTask(task_data_mpi);
-  ASSERT_EQ(testTask.ValidationImpl(), false);
+  komshina_d_grid_torus_mpi::TestTaskMPI test_task(task_data_mpi);
+  ASSERT_EQ(test_task.ValidationImpl(), false);
 }
 
 TEST(komshina_d_grid_torus_mpi, check_world_size_is_even) {
@@ -241,7 +242,7 @@ TEST(komshina_d_grid_torus_mpi, dynamic_processor_count_test) {
   }
 
   int target = world.size() / 4 * 3;
-  std::vector<int> expected_path = komshina_d_grid_torus_mpi::TestTaskMPI::compute_path(target, world.size(), 4, 4);
+  std::vector<int> expected_path = komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(target, world.size(), 4, 4);
 
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData input_data("dynamic_data", target);
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;

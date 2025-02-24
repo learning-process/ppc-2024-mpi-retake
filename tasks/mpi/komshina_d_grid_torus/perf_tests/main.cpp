@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <cmath>
 #include <memory>
@@ -15,14 +14,16 @@
 
 TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   const std::string data_input(16381, 'x');
   int dest = world.size() - 1;
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData input_data(data_input, dest);
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
 
-  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::compute_path(
+  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(
       dest, world.size(), 4, 4);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -55,14 +56,16 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
 
 TEST(komshina_d_grid_torus_mpi, test_task_run) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   const std::string data_input(16381, 'x');
   int dest = world.size() - 1;
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData input_data(data_input, dest);
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
 
-  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::compute_path(
+  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(
       dest, world.size(), 4, 4);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();

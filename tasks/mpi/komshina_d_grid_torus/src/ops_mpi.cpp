@@ -3,11 +3,11 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/serialization/serialization.hpp>
 #include <cmath>
+#include <utility>
 #include <vector>
 #include <ranges>
-#include <utility>
+
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
@@ -41,15 +41,17 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
 
   if (current_rank == 0) {
     task_data_.path.push_back(0);
-    int next = get_next_hop(0, task_data_.target, width, height);
+    int next = GetNextHop(0, task_data_.target, width, height);
     world_.send(next, 0, task_data_);
     world_.recv(boost::mpi::any_source, 0, task_data_);
   } else {
     world_.recv(boost::mpi::any_source, 0, task_data_);
-    if (task_data_.path[0] == -1) return true;
+    if (task_data_.path[0] == -1) {
+      return true;
+    }
     task_data_.path.push_back(world_.rank());
     if (current_rank != task_data_.target) {
-      int next = get_next_hop(current_rank, task_data_.target, width, height);
+      int next = GetNextHop(current_rank, task_data_.target, width, height);
       world_.send(next, 0, task_data_);
     } else {
       world_.send(0, 0, task_data_);
@@ -69,13 +71,13 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
 
 namespace komshina_d_grid_torus_mpi {
 
-void komshina_d_grid_torus_mpi::TestTaskMPI::compute_grid_size() {
+void komshina_d_grid_torus_mpi::TestTaskMPI::ComputeGridSize() {
   int world_size = world_.size();
-  height = std::sqrt(world_size);
+  height = static_cast<int>(std::sqrt(world_size));
   width = world_size / height;
 }
 
-int komshina_d_grid_torus_mpi::TestTaskMPI::get_next_hop(int current, int target, int width, int height) {
+int komshina_d_grid_torus_mpi::TestTaskMPI::GetNextHop(int current, int target, int width, int height) {
   int current_x = current % width;
   int current_y = current / width;
   int target_x = target % width;
@@ -88,14 +90,14 @@ int komshina_d_grid_torus_mpi::TestTaskMPI::get_next_hop(int current, int target
   }
 }
 
-std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::compute_path(int target, int world_size, int width,
+std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(int target, int world_size, int width,
                                                                         int height) {
   std::vector<int> path = {0};
   int current = 0;
   while (current != target) {
-    current = get_next_hop(current, target, width, height);
+    current = GetNextHop(current, target, width, height);
     path.push_back(current);
   }
   return path;
 }
-}  // namespace milovankin_m_grid_torus_topology
+}  // namespace komshina_d_grid_torus_mpi

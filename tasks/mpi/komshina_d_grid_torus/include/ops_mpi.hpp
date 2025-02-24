@@ -1,9 +1,9 @@
 #pragma once
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
 #include <utility>
 #include <string>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -21,7 +21,7 @@ class TestTaskMPI : public ppc::core::Task {
     TaskData(const std::string& str, int tgt) : payload(str.begin(), str.end()), target(tgt) {}
 
     template <class Archive>
-    void serialize(Archive& ar, unsigned int version) {
+    void Serialize(Archive& ar, unsigned int version) {
       ar & target;
       ar & payload;
       ar & path;
@@ -33,15 +33,16 @@ class TestTaskMPI : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
-  [[nodiscard]] static std::vector<int> compute_path(int target, int world_size, int width, int height);
-  void compute_grid_size();
-  static int get_next_hop(int current, int dest, int width, int height);
-  int width, height;
+  static std::vector<int> ComputePath(int target, int world_size, int width, int height);
+  
 
  private:
   boost::mpi::communicator world_;
   TaskData task_data_;
-
+  
+  void ComputeGridSize();
+  static int GetNextHop(int current, int target, int width, int height);
+  int width, height;
 };
 
 }  // namespace komshina_d_grid_torus_mpi
