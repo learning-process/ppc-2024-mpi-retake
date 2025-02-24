@@ -183,7 +183,7 @@ bool budazhapova_betcher_odd_even_merge_mpi::MergeParallel::RunImpl() {
                  world_, res_);
 
   int world_size = world_.size();
-  if (world_size > 0) {
+  if (world_size > 1) {
     for (int phase = 0; phase < world_size; phase++) {
       OddEvenSortPhase(phase, local_res_, world_);
     }
