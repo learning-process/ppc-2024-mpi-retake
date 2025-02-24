@@ -34,7 +34,7 @@ class IntegrationTask : public ppc::core::Task {
 
     double local_sum = 0.0;
     for (int i = start; i < end; ++i) {
-      const double x_i = a_ + i * h;
+      const double x_i = a_ + (i * h);
       const double x_next = x_i + h;
       local_sum += (func_(x_i) + func_(x_next)) * 0.5 * h;
     }

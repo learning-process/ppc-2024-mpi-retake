@@ -38,10 +38,12 @@ class IntegrationTask : public ppc::core::Task {
           sum += (func(x_i) + func(x_next)) * 0.5 * h;
         }
       }
-      void Join(SumBody& rhs) { sum += rhs.sum; }
+      void join(SumBody& rhs) {  // NOLINT(readability-identifier-naming)
+        sum += rhs.sum;
+      }
     };
     SumBody body(a_, h, func_);
-    oneapi::tbb::parallel_reduce(oneapi::tbb::blocked_range<int>(0, n_), body, oneapi::tbb::auto_partitioner());
+    oneapi::tbb::parallel_reduce(oneapi::tbb::blocked_range<int>(0, n_), body);
     result_ = body.sum;
     return true;
   }
