@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -96,6 +97,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   bool is_root = (rank == 0);
 
   if (is_root && (task_data->inputs.empty() || task_data->inputs_count.empty())) {
+    std::cerr << "[ERROR] Root process has empty inputs or inputs_count." << std::endl;
     return false;
   }
 
@@ -107,7 +109,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
   if (rows == 0 || cols == 0) {
-    return false;  // Prevent division by zero
+    std::cerr << "[ERROR] Rows or columns size is zero." << std::endl;
+    return false;
   }
 
   rc_size_ = rows;
@@ -119,7 +122,13 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     input_.resize(rows * cols);
   }
 
-  MPI_Bcast(input_.data(), rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
+  std::cout << "[INFO] Process " << rank << ": Broadcasting input data..." << std::endl;
+  int bcast_status = MPI_Bcast(input_.data(), rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
+  if (bcast_status != MPI_SUCCESS) {
+    std::cerr << "[ERROR] MPI_Bcast failed in PreProcessingImpl. Status: " << bcast_status << std::endl;
+    return false;
+  }
+  std::cout << "[INFO] Process " << rank << ": MPI_Bcast completed successfully." << std::endl;
 
   return true;
 }
@@ -128,23 +137,40 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  unsigned int input_count = task_data->inputs_count.empty() ? 0 : task_data->inputs_count[0];
-  unsigned int output_count = task_data->outputs_count.empty() ? 0 : task_data->outputs_count[0];
+  unsigned int input_count = 0;
+  unsigned int output_count = 0;
 
+  if (!task_data->inputs_count.empty()) {
+    input_count = task_data->inputs_count[0];
+  }
+  if (!task_data->outputs_count.empty()) {
+    output_count = task_data->outputs_count[0];
+  }
+
+  // Broadcasting input_count and output_count
   MPI_Bcast(&input_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
   MPI_Bcast(&output_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
-  bool valid = !task_data->inputs.empty() && !task_data->outputs.empty() && input_count == output_count;
+  std::cout << "[INFO] Process " << rank << ": Broadcasting validation data (input_count = " << input_count
+            << ", output_count = " << output_count << ")" << std::endl;
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+  int local_valid = (input_count > 0) && (output_count > 0) && (input_count == output_count);
 
-  return valid;
+  // Broadcasting local_valid status
+  MPI_Bcast(&local_valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  if (rank == 0) {
+    std::cout << "[INFO] Process 0: Validation result broadcasted: " << local_valid << std::endl;
+  } else {
+    std::cout << "[INFO] Process " << rank << ": Received validation result: " << local_valid << std::endl;
+  }
+
+  return local_valid;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   if (rc_size_ == 0) {
-    return false;  // Prevent division by zero
+    std::cerr << "[ERROR] rc_size_ is zero. Exiting." << std::endl;
+    return false;
   }
 
   int rows = rc_size_;
@@ -162,10 +188,16 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
   int end_row = start_row + ((rank < remainder) ? (rows_per_proc + 1) : rows_per_proc);
 
-  std::vector<int> labeled_image(rows * cols, 0);
+  if (end_row <= start_row) {
+    std::cerr << "[ERROR] Invalid row range for process " << rank << ": start_row = " << start_row
+              << ", end_row = " << end_row << std::endl;
+    return false;
+  }
 
+  std::vector<int> labeled_image(rows * cols, 0);
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
+  std::cout << "[INFO] Process " << rank << ": Labeling completed, syncing..." << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
 
   return true;
@@ -173,10 +205,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
   if (!task_data->outputs.empty() && task_data->outputs[0] != nullptr) {
-    for (size_t i = 0; i < output_.size(); ++i) {
-      reinterpret_cast<int*>(task_data->outputs[0])[i] = output_[i];
-    }
+    std::copy(output_.begin(), output_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
     return true;
   }
+  std::cerr << "[ERROR] Output is null or empty!" << std::endl;
   return false;
 }

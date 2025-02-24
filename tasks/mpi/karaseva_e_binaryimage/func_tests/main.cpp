@@ -11,13 +11,13 @@
 
 // Move the function to an anonymous namespace to avoid the static warning
 namespace {
-std::vector<uint8_t> GetRandomBinImage(int r, int c) {
+std::vector<int> GetRandomBinImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(0, 1);
-  std::vector<uint8_t> vec(r * c);
+  std::vector<int> vec(r * c);
   for (int i = 0; i < r * c; i++) {
-    vec[i] = static_cast<uint8_t>(dist(gen));
+    vec[i] = dist(gen);
   }
   return vec;
 }
@@ -28,16 +28,16 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
   const int rows = 25;
   const int cols = 25;
 
-  std::vector<uint8_t> image;
-  std::vector<uint8_t> global_labeled_image(rows * cols, 0);
+  std::vector<int> image;
+  std::vector<int> global_labeled_image(rows * cols, 0);
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     image = GetRandomBinImage(rows, cols);
-    task_data_par->inputs.emplace_back(image.data());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count = {rows, cols};
-    task_data_par->outputs.emplace_back(global_labeled_image.data());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
     task_data_par->outputs_count = {rows, cols};
   }
 
@@ -49,12 +49,12 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
   test_task_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    std::vector<uint8_t> reference_labeled_image(rows * cols, 0);
+    std::vector<int> reference_labeled_image(rows * cols, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(image.data());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_seq->inputs_count = {rows, cols};
-    task_data_seq->outputs.emplace_back(reference_labeled_image.data());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_labeled_image.data()));
     task_data_seq->outputs_count = {rows, cols};
 
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
@@ -84,11 +84,9 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
 
   if (world.rank() == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_par->inputs_count.emplace_back(rows);
-    task_data_par->inputs_count.emplace_back(cols);
+    task_data_par->inputs_count = {rows, cols};
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
-    task_data_par->outputs_count.emplace_back(rows);
-    task_data_par->outputs_count.emplace_back(cols);
+    task_data_par->outputs_count = {rows, cols};
   }
 
   // Parallel execution test
@@ -105,11 +103,9 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
     // Create TaskData for sequential execution
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_seq->inputs_count.emplace_back(rows);
-    task_data_seq->inputs_count.emplace_back(cols);
+    task_data_seq->inputs_count = {rows, cols};
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_labeled_image.data()));
-    task_data_seq->outputs_count.emplace_back(rows);
-    task_data_seq->outputs_count.emplace_back(cols);
+    task_data_seq->outputs_count = {rows, cols};
 
     // Sequential execution test
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
@@ -128,16 +124,16 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
   const int rows = 50;
   const int cols = 50;
 
-  std::vector<uint8_t> image;
-  std::vector<uint8_t> global_labeled_image(rows * cols, 0);  // Ensure zero initialization
+  std::vector<int> image;
+  std::vector<int> global_labeled_image(rows * cols, 0);  // Ensure zero initialization
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     image = GetRandomBinImage(rows, cols);
-    task_data_par->inputs.emplace_back(image.data());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count = {rows, cols};
-    task_data_par->outputs.emplace_back(global_labeled_image.data());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
     task_data_par->outputs_count = {rows, cols};
   }
 
@@ -149,12 +145,12 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
   test_task_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    std::vector<uint8_t> reference_labeled_image(rows * cols, 0);
+    std::vector<int> reference_labeled_image(rows * cols, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(image.data());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_seq->inputs_count = {rows, cols};
-    task_data_seq->outputs.emplace_back(reference_labeled_image.data());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_labeled_image.data()));
     task_data_seq->outputs_count = {rows, cols};
 
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
