@@ -97,6 +97,20 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
     }
   }
 
+  // Broadcast the size of the input vectors to all processes
+  size_t input_size = input_.size();
+  boost::mpi::broadcast(world_, input_size, 0);
+
+  // Resize input_ on all processes to match the size on the root process
+  if (world_.rank() != 0) {
+    input_.resize(input_size);
+  }
+
+  // Broadcast each input vector to all processes
+  for (size_t i = 0; i < input_size; ++i) {
+    boost::mpi::broadcast(world_, input_[i], 0);
+  }
+
   local_input1_.resize(counts_[world_.rank()]);
   local_input2_.resize(counts_[world_.rank()]);
   boost::mpi::scatter(world_, input_[0], local_input1_.data(), counts_[world_.rank()], 0);
@@ -107,18 +121,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
-  if (world_.rank() == 0) {
-    size_t offset_remainder = counts_[0];
-    for (size_t proc = 1; proc < num_processes_; proc++) {
-      size_t current_count = counts_[proc];
-      world_.send(static_cast<int>(proc), 0, input_[0].data() + static_cast<int>(offset_remainder),
-                  static_cast<int>(current_count));
-
-      world_.send(static_cast<int>(proc), 1, input_[1].data() + static_cast<int>(offset_remainder),
-                  static_cast<int>(current_count));
-    }
-  }
-
   local_input1_ = std::vector<int>(counts_[world_.rank()]);
   local_input2_ = std::vector<int>(counts_[world_.rank()]);
 
