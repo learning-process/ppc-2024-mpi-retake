@@ -88,7 +88,6 @@ bool khovansky_d_rectangles_integral_seq::RectanglesSeq::RunImpl() {
   return true;
 }
 
-
 bool khovansky_d_rectangles_integral_seq::RectanglesSeq::PostProcessingImpl() {
   reinterpret_cast<double*>(task_data->outputs[0])[0] = integral_result_;
 
