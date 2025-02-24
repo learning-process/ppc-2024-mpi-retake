@@ -7,11 +7,11 @@
 namespace kalinin_d_odd_even_shell_seq {
 
 void OddEvenShellSeq::ShellSort(std::vector<int>& vec) {
-  int n = vec.size();
+  int n = static_cast<int>(vec.size());
   for (int gap = n / 2; gap > 0; gap /= 2) {
     for (int i = gap; i < n; i++) {
       int temp = vec[i];
-      int j;
+      int j = 0;
       for (j = i; j >= gap && vec[j - gap] > temp; j -= gap) {
         vec[j] = vec[j - gap];
       }
@@ -22,7 +22,7 @@ void OddEvenShellSeq::ShellSort(std::vector<int>& vec) {
 
 bool OddEvenShellSeq::PreProcessingImpl() {
   // Init vectors
-  int n = task_data->inputs_count[0];
+  int n = static_cast<int>(task_data->inputs_count[0]);
   input_ = std::vector<int>(n);
   std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[0]), reinterpret_cast<int*>(task_data->inputs[0]) + n,
                     input_.begin());
@@ -46,6 +46,6 @@ void GimmeRandVec(std::vector<int>& vec) {
   std::random_device rd;
   std::default_random_engine reng(rd());
   std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
+  std::ranges::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
 }
 }  // namespace kalinin_d_odd_even_shell_seq

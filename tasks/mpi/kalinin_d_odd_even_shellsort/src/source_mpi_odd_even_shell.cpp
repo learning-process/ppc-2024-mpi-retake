@@ -2,17 +2,20 @@
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/collectives/scatter.hpp>
+#include <limits>
 #include <random>
+#include <utility>
+#include <vector>
 
 #include "mpi/kalinin_d_odd_even_shellsort/include/header_mpi_odd_even_shell.hpp"
 
 namespace kalinin_d_odd_even_shell_mpi {
 void OddEvenShellMpi::ShellSort(std::vector<int>& vec) {
-  int n = vec.size();
+  int n = static_cast<int>(vec.size());
   for (int gap = n / 2; gap > 0; gap /= 2) {
     for (int i = gap; i < n; i++) {
       int temp = vec[i];
-      int j;
+      int j = 0;
       for (j = i; j >= gap && vec[j - gap] > temp; j -= gap) {
         vec[j] = vec[j - gap];
       }
@@ -24,12 +27,12 @@ void GimmeRandVec(std::vector<int>& vec) {
   std::random_device rd;
   std::default_random_engine reng(rd());
   std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
+  std::ranges::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
 }
 
 bool OddEvenShellMpi::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    int n = task_data->inputs_count[0];
+    int n = static_cast<int>(task_data->inputs_count[0]);
     input_ = std::vector<int>(n);
     std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[0]), reinterpret_cast<int*>(task_data->inputs[0]) + n,
                       input_.begin());
@@ -64,9 +67,9 @@ bool OddEvenShellMpi::RunImpl() {
     return true;
   }
   if (id == 0) {
-    int reminder = (sz - (input_.size() % sz)) % sz;
+    int reminder = static_cast<int>((sz - (input_.size() % sz)) % sz);
     input_.resize(input_.size() + reminder, std::numeric_limits<int>::max());
-    local_sz = input_.size() / sz;
+    local_sz = static_cast<int>(input_.size() / sz);
   }
   broadcast(world_, local_sz, 0);
 
@@ -75,10 +78,10 @@ bool OddEvenShellMpi::RunImpl() {
   scatter(world_, input_, local_vec.data(), local_sz, 0);
 
   ShellSort(local_vec);
-  int neighbour;
+  int neighbour = 0;
   for (int i = 0; i != sz; ++i) {
     int lower_bound = 0;
-    int higher_bound = sz;
+    int higher_bound = 0;
     if (i % 2 == 0) {
       higher_bound = is_even ? sz : sz - 1;
 

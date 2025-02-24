@@ -11,10 +11,10 @@
 #include "seq/kalinin_d_odd_even_shellsort/include/header_seq_odd_even_shell.hpp"
 
 TEST(kalinin_d_odd_even_shell_seq, test_pipline_run_seq) {
-  const int N = 2000000;
+  const int n = 2000000;
   // Create data
-  std::vector<int> arr(N);
-  std::vector<int> out(N);
+  std::vector<int> arr(n);
+  std::vector<int> out(n);
   kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
@@ -46,10 +46,10 @@ TEST(kalinin_d_odd_even_shell_seq, test_pipline_run_seq) {
 }
 
 TEST(kalinin_d_odd_even_shell_seq, test_task_run_seq) {
-  const int N = 2000000;
+  const int n = 2000000;
   // Create data
-  std::vector<int> arr(N);
-  std::vector<int> out(N);
+  std::vector<int> arr(n);
+  std::vector<int> out(n);
   kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
