@@ -1,41 +1,22 @@
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 
-#include <cmath>
-#include <memory>
-#include <utility>
+namespace muradov_k_trapezoid_integral_seq {
 
-#include "core/task/include/task.hpp"
+double getIntegralTrapezoidalRuleSequential(const std::function<double(double)>& f,
+                                            double a, double b, int n) {
+    if (n <= 0) {
+        return 0.0;
+    }
 
-namespace muradov_k_trap_integral_seq {
+    double sum = 0.0;
+    double h = (b - a) / n;
 
-TrapezoidalIntegral::TrapezoidalIntegral(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
-
-bool TrapezoidalIntegral::PreProcessingImpl() {
-  auto* input = reinterpret_cast<double*>(task_data->inputs[0]);
-  a_ = input[0];
-  b_ = input[1];
-  n_ = *reinterpret_cast<int*>(task_data->inputs[1]);
-  return true;
+    for (int i = 0; i < n; i++) {
+        double x_i = a + i * h;
+        double x_next = a + (i + 1) * h;
+        sum += (f(x_i) + f(x_next)) * 0.5 * h;
+    }
+    return sum;
 }
 
-bool TrapezoidalIntegral::ValidationImpl() { return (n_ > 0) && (b_ > a_); }
-
-bool TrapezoidalIntegral::RunImpl() {
-  const double h = (b_ - a_) / n_;
-  double sum = 0.5 * (Func(a_) + Func(b_));
-
-  for (int i = 1; i < n_; ++i) {
-    sum += Func(a_ + (static_cast<double>(i) * h));
-  }
-
-  result_ = sum * h;
-  return true;
-}
-
-bool TrapezoidalIntegral::PostProcessingImpl() {
-  *reinterpret_cast<double*>(task_data->outputs[0]) = result_;
-  return true;
-}
-
-double TrapezoidalIntegral::Func(double x) { return x * x; }
-}  // namespace muradov_k_trap_integral_seq
+}  // namespace muradov_k_trapezoid_integral_seq

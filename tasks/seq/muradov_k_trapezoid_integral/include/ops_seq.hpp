@@ -1,21 +1,14 @@
-#pragma once
-#include <memory>
+#ifndef MURADOV_K_TRAPEZOID_INTEGRAL_OPS_SEQ_HPP
+#define MURADOV_K_TRAPEZOID_INTEGRAL_OPS_SEQ_HPP
 
-#include "core/task/include/task.hpp"
+#include <functional>
 
-namespace muradov_k_trap_integral_seq {
+namespace muradov_k_trapezoid_integral_seq {
 
-class TrapezoidalIntegral : public ppc::core::Task {
- public:
-  explicit TrapezoidalIntegral(std::shared_ptr<ppc::core::TaskData> task_data);
-  bool PreProcessingImpl() override;
-  bool ValidationImpl() override;
-  bool RunImpl() override;
-  bool PostProcessingImpl() override;
+// Computes the integral using the trapezoidal rule sequentially.
+double getIntegralTrapezoidalRuleSequential(const std::function<double(double)>& f,
+                                            double a, double b, int n);
 
- private:
-  double a_{}, b_{}, result_{};
-  int n_{};
-  static double Func(double x);
-};
-}  // namespace muradov_k_trap_integral_seq
+}  // namespace muradov_k_trapezoid_integral_seq
+
+#endif  // MURADOV_K_TRAPEZOID_INTEGRAL_OPS_SEQ_HPP

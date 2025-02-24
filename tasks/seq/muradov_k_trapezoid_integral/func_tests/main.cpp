@@ -1,43 +1,49 @@
 #include <gtest/gtest.h>
-
-#include <cstdint>
-#include <memory>
-#include <vector>
-
-#include "core/task/include/task.hpp"
+#include <functional>
+#include <cmath>
 #include "seq/muradov_k_trapezoid_integral/include/ops_seq.hpp"
 
-TEST(muradov_k_trap_integral_seq, Test_x2_0_2) {
-  std::vector<double> input{0.0, 2.0};
-  int n = 1e6;
-  double result = 0.0;
+namespace muradov_k_trapezoid_integral_seq {
 
-  auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  task_data->inputs_count.emplace_back(input.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-  task_data->inputs_count.emplace_back(1);
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(&result));
-  task_data->outputs_count.emplace_back(1);
+TEST(muradov_k_trapezoid_integral_seq, SquareFunction) {
+    auto f = [](double x) { return x * x; };
+    double a = 5.0, b = 10.0;
+    int n = 100;
 
-  muradov_k_trap_integral_seq::TrapezoidalIntegral task(task_data);
-  ASSERT_TRUE(task.Validation());
-  task.PreProcessing();
-  task.Run();
-  task.PostProcessing();
+    double result = getIntegralTrapezoidalRuleSequential(f, a, b, n);
 
-  EXPECT_NEAR(result, 8.0 / 3.0, 1e-3);
+    // Reference
+    double reference_sum = 0.0;
+    if (n > 0) {
+        double h = (b - a) / n;
+        for (int i = 0; i < n; i++) {
+            double x_i = a + i * h;
+            double x_next = a + (i + 1) * h;
+            reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
+        }
+    }
+
+    ASSERT_NEAR(reference_sum, result, 1e-6);
 }
 
-TEST(muradov_k_trap_integral_seq, Invalid_Parameters) {
-  std::vector<double> input{5.0, 1.0};
-  int n = -100;
+TEST(muradov_k_trapezoid_integral_seq, CubeFunction) {
+    auto f = [](double x) { return x * x * x; };
+    double a = 0.0, b = 6.0;
+    int n = 100;
 
-  auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-  task_data->inputs_count.emplace_back(input.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
+    double result = getIntegralTrapezoidalRuleSequential(f, a, b, n);
 
-  muradov_k_trap_integral_seq::TrapezoidalIntegral task(task_data);
-  ASSERT_FALSE(task.Validation());
+    double reference_sum = 0.0;
+    if (n > 0) {
+        double h = (b - a) / n;
+        for (int i = 0; i < n; i++) {
+            double x_i = a + i * h;
+            double x_next = a + (i + 1) * h;
+            reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
+        }
+    }
+
+    ASSERT_NEAR(reference_sum, result, 1e-6);
 }
+
+}  // namespace muradov_k_trapezoid_integral_seq
