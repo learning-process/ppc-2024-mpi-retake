@@ -50,14 +50,15 @@ void OddEvenMerge(std::vector<int>& local_data, std::vector<int>& received_data)
   local_data.assign(merged.begin(), merged.begin() + static_cast<long>(local_data.size()));
   received_data.assign(merged.begin() + static_cast<long>(local_data.size()), merged.end());
 }
-void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
+/* void SendAndReceive(int send_rank, int recv_rank, std::vector<int>& local_data,
+                         const boost::mpi::communicator& world) {
   if (send_rank >= 0 && send_rank < world.size()) {
     world.send(send_rank, world.rank(), local_data);
   }
   if (recv_rank >= 0 && recv_rank < world.size()) {
     world.recv(recv_rank, recv_rank, local_data);
   }
-}
+}*/
 
 void PerformOddEvenMerge(int neighbor_rank, std::vector<int>& local_data, const boost::mpi::communicator& world) {
   std::vector<int> received_data;
@@ -72,21 +73,23 @@ void OddEvenSortPhase(int phase, std::vector<int>& local_data, const boost::mpi:
 
   if (phase % 2 == 0) {
     if (world.rank() % 2 == 0 && next_rank < world.size()) {
-      SendAndReceive(next_rank, -1, local_data, world);
+      // SendAndReceive(next_rank, -1, local_data, world);
+      world.send(next_rank, world.rank(), local_data))
     } else if (world.rank() % 2 == 1) {
       PerformOddEvenMerge(prev_rank, local_data, world);
     }
     if (world.rank() % 2 == 0 && next_rank < world.size()) {
-      SendAndReceive(-1, next_rank, local_data, world);
+      // SendAndReceive(-1, next_rank, local_data, world);
+      world.recv(next_rank, next_rank, local_data);
     }
   } else {
     if (world.rank() % 2 == 1 && next_rank < world.size()) {
-      SendAndReceive(next_rank, -1, local_data, world);
+      world.send(next_rank, world.rank(), local_data);
     } else if (world.rank() % 2 == 0 && world.rank() > 0) {
       PerformOddEvenMerge(prev_rank, local_data, world);
     }
     if (world.rank() % 2 == 1 && next_rank < world.size()) {
-      SendAndReceive(-1, next_rank, local_data, world);
+      world.recv(next_rank, next_rank, local_data);
     }
   }
 }
