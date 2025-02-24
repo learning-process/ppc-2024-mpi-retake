@@ -17,7 +17,7 @@ class OddEvenShellMpi : public ppc::core::Task {
   void GatherResults(std::vector<int>& local_vec, int local_sz, int id);
   bool PostProcessingImpl() override;
 
-  void ShellSort(std::vector<int>& vec);
+  static void ShellSort(std::vector<int>& vec);
 
  private:
   std::vector<int> input_;

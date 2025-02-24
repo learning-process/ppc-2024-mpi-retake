@@ -68,9 +68,9 @@ bool OddEvenShellMpi::RunImpl() {
   bool is_even = (sz % 2 == 0);
   int local_sz = 0;
   if (id == 0) {
-    int reminder = (sz - (input_.size() % sz)) % sz;
+    int reminder = static_cast<int>((sz - (input_.size() % sz)) % sz);
     input_.resize(input_.size() + reminder, std::numeric_limits<int>::max());
-    local_sz = input_.size() / sz;
+    local_sz = static_cast<int>(input_.size() / sz);
   }
   broadcast(world_, local_sz, 0);
 
@@ -80,12 +80,20 @@ bool OddEvenShellMpi::RunImpl() {
 
   for (int i = 0; i < sz; ++i) {
     int lower_bound = (i % 2 == 0) ? 0 : 1;
-    int higher_bound = (i % 2 == 0) ? (is_even ? sz : sz - 1) : (is_even ? sz - 1 : sz);
-
-    if (id < lower_bound || id >= higher_bound) continue;
+    int higher_bound = 0;
+    if (i % 2 == 0) {
+      higher_bound = is_even ? sz : sz - 1;
+    } else {
+      higher_bound = is_even ? sz - 1 : sz;
+    }
+    if (id < lower_bound || id >= higher_bound) {
+      continue;
+    }
 
     int neighbour = (id % 2 == i % 2) ? id + 1 : id - 1;
-    if (neighbour < 0 || neighbour >= sz) continue;
+    if (neighbour < 0 || neighbour >= sz) {
+      continue;
+    }
 
     ExchangeAndMerge(local_vec, neighbour);
   }
@@ -95,8 +103,9 @@ bool OddEvenShellMpi::RunImpl() {
 }
 
 void OddEvenShellMpi::ExchangeAndMerge(std::vector<int>& local_vec, int neighbour) {
-  int local_sz = local_vec.size();
-  std::vector<int> received_data(local_sz), merged(2 * local_sz);
+  int local_sz = static_cast<int>(local_vec.size());
+  std::vector<int> received_data(local_sz);
+  std::vector<int> merged(2 * local_sz);
 
   if (world_.rank() < neighbour) {
     world_.send(neighbour, 0, local_vec);
