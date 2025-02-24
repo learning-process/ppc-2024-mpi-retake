@@ -18,7 +18,7 @@ TEST(muradov_k_trapezoid_integral_seq, SquareFunction) {
   double reference_sum = 0.0;
   double h = (b - a) / n;
   for (int i = 0; i < n; i++) {
-    double x_i = a + i * h;
+    double x_i = a + (i * h);
     double x_next = x_i + h;
     reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
   }
@@ -36,7 +36,7 @@ TEST(muradov_k_trapezoid_integral_seq, CubeFunction) {
   double reference_sum = 0.0;
   double h = (b - a) / n;
   for (int i = 0; i < n; i++) {
-    double x_i = a + i * h;
+    double x_i = a + (i * h);
     double x_next = x_i + h;
     reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
   }
