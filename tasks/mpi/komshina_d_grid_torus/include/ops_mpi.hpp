@@ -12,14 +12,6 @@ namespace komshina_d_grid_torus_mpi {
 
 class TestTaskMPI : public ppc::core::Task {
  public:
-
-  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
-  bool PreProcessingImpl() override;
-  bool ValidationImpl() override;
-  bool RunImpl() override;
-  bool PostProcessingImpl() override;
-  static std::vector<int> ComputePath(int target, int world_size, int width, int height);
-  
   struct TaskData {
     std::vector<int> path;
     std::vector<char> payload;
@@ -35,6 +27,14 @@ class TestTaskMPI : public ppc::core::Task {
       ar & path;
     }
   };
+
+  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
+  static std::vector<int> ComputePath(int target, int world_size, int width, int height);
+  
 
  private:
   boost::mpi::communicator world_;
