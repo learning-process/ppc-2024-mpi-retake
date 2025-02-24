@@ -5,7 +5,7 @@
 #include <functional>
 #include <limits>
 
-#include "mpi/rsoz_b_rectangular_method_integration/include/ops_mpi.hpp"
+#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
