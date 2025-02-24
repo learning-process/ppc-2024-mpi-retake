@@ -96,33 +96,34 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     return false;
   }
 
-  auto input_size = task_data->inputs_count[0];
+  // Image size is the number of elements
+  input_size_ = task_data->inputs_count[0];  // Initialize input_size_
+
+  // Image dimensions (assuming they are passed through inputs_count)
+  int rows = task_data->inputs_count[0] / task_data->inputs_count[1];  // Number of rows
+  int cols = task_data->inputs_count[1];                               // Number of columns
+
   auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   if (in_ptr == nullptr) {
     return false;
   }
 
-  input_ = std::vector<int>(in_ptr, in_ptr + input_size);
+  input_ = std::vector<int>(in_ptr, in_ptr + input_size_);
 
   if (task_data->outputs_count.empty()) {
-    task_data->outputs_count.push_back(input_size);
+    task_data->outputs_count.push_back(input_size_);
   }
 
-  rc_size_ = static_cast<int>(std::sqrt(input_size));
+  rc_size_ = rows;
 
-  // Synchronize all processes before broadcasting input size
+  // Synchronize all processes before data transmission
   MPI_Barrier(MPI_COMM_WORLD);
 
-  // Broadcast the size of the input image to all processes
-  MPI_Bcast(&rc_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  // Broadcast image dimensions to all processes
+  MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  input_.resize(rc_size_ * rc_size_);
-
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  std::cout << "Rank " << rank << ": Broadcasting input size " << input_.size() << '\n';
-
-  // Broadcast the actual input data to all processes
+  // Broadcast the image data
   MPI_Bcast(input_.data(), static_cast<int>(input_.size()), MPI_INT, 0, MPI_COMM_WORLD);
 
   return true;
@@ -148,22 +149,30 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 
   bool valid = !task_data->inputs.empty() && !task_data->outputs.empty() && input_count == output_count;
 
-  // Broadcast validation result to all processes
-  MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  // Check data validity
+  int result = MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+  if (result != MPI_SUCCESS) {
+    std::cerr << "MPI_Bcast failed with error code: " << result << std::endl;
+    return false;
+  }
+
   return valid;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int rows = rc_size_;
-  int cols = rc_size_;
+  int cols = input_size_ / rows;  // Number of columns (or calculated based on passed data)
   int min_label = 2;
   std::unordered_map<int, int> label_parent;
 
-  int num_procs, rank;
+  int num_procs = 0;
+  int rank = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  // Calculate the range of rows each process will handle
+  // Divide rows evenly between processes
   int rows_per_proc = rows / num_procs;
   int remainder = rows % num_procs;
   int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
@@ -171,7 +180,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   std::vector<int> labeled_image(rows * cols, 0);
 
-  // Perform the labeling process for the assigned rows
+  // Labeling for assigned rows
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   std::vector<int> recv_counts(num_procs);
@@ -183,17 +192,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
     displs[i] = (i == 0) ? 0 : displs[i - 1] + recv_counts[i - 1];
     total_size_check += recv_counts[i];
   }
-
-  if (rank == 0) {
-    std::cout << "Total gathered size check: " << total_size_check << ", expected: " << rows * cols << '\n';
-  }
-
-  // Synchronize all processes before gathering the results
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  // Gather the labeled image from all processes
-  MPI_Gatherv(labeled_image.data() + (start_row * cols), recv_counts[rank], MPI_INT, labeled_image.data(),
-              recv_counts.data(), displs.data(), MPI_INT, 0, MPI_COMM_WORLD);
 
   MPI_Barrier(MPI_COMM_WORLD);
 
