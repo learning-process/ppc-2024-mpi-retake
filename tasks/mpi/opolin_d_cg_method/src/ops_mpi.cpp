@@ -59,6 +59,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
   std::vector<double> local_r(local_n);
   std::vector<double> local_p(local_n);
   std::vector<double> local_Ap(local_n);
+  std::vector<double> full_p(n_);
 
   std::vector<int> send_counts(size);
   std::vector<int> displs(size);
@@ -102,11 +103,17 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     if (rank == 0) {
       rsquare_prev = rsquare_k;
     }
-    boost::mpi::broadcast(world_, rsquare_prev, 0);
+    if (rank == 0) {
+      boost::mpi::gatherv(world_, local_p.data(), static_cast<int>(local_n), full_p.data(), send_counts, displs, 0);
+    } else {
+      boost::mpi::gatherv(world_, local_p.data(), static_cast<int>(local_n), 0);
+    }
+    boost::mpi::broadcast(world_, full_p, 0);
+
     for (size_t i = 0; i < local_n; ++i) {
       local_Ap[i] = 0.0;
       for (size_t j = 0; j < n_; ++j) {
-        local_Ap[i] += local_A[i * n_ + j] * local_p[j];
+        local_Ap[i] += local_A[i * n_ + j] * full_p[j];
       }
     }
 
