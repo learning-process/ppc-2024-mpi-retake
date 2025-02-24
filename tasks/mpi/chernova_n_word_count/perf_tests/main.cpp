@@ -11,7 +11,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/chernova_n_word_count/include/ops_mpi.hpp"
 
-static std::vector<char> GenerateWordsPerf(int k) {
+std::vector<char> chernova_n_word_count_mpi::GenerateWordsPerf(int k) {
   const std::string words[] = {"one", "two", "three"};
   const int word_array_size = sizeof(words) / sizeof(words[0]);
 
@@ -28,7 +28,7 @@ static std::vector<char> GenerateWordsPerf(int k) {
 }
 
 const int k_ = 100000;
-static std::vector<char> test_data_parallel = GenerateWordsPerf(k_);
+static std::vector<char> test_data_parallel = chernova_n_word_count_mpi::GenerateWordsPerf(k_);
 
 TEST(chernova_n_word_count_mpi, test_pipeline_run) {
   boost::mpi::communicator world;

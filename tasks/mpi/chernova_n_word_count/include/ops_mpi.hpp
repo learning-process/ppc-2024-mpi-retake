@@ -10,6 +10,8 @@
 namespace chernova_n_word_count_mpi {
 
 std::vector<char> CleanString(const std::vector<char>& input);
+std::vector<char> GenerateWords(int k);
+std::vector<char> GenerateWordsPerf(int k);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:

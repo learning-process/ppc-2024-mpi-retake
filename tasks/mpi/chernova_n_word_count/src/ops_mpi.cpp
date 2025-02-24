@@ -1,6 +1,8 @@
 #include "mpi/chernova_n_word_count/include/ops_mpi.hpp"
 
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <cstddef>
 #include <functional>
 #include <string>
@@ -120,7 +122,7 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
         world_.send(proc, 0, input_.data() + proc_start_pos, static_cast<int>(proc_part_size));
       }
     }
-    local_input_.assign(input_.begin(), input_.begin() + actual_part_size);
+    local_input_.assign(input_.begin(), input_.begin() + static_cast<std::ptrdiff_t>(actual_part_size));
   } else {
     if (actual_part_size > 0) {
       world_.recv(0, 0, local_input_.data(), static_cast<int>(actual_part_size));

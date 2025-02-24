@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/chernova_n_word_count/include/ops_seq.hpp"
 
-static std::vector<char> GenerateWords(int k) {
+std::vector<char> chernova_n_word_count_seq::GenerateWordsPerf(int k) {
   const std::string words[] = {"one", "two", "three"};
   const int word_array_size = sizeof(words) / sizeof(words[0]);
   std::string result;
@@ -25,11 +25,13 @@ static std::vector<char> GenerateWords(int k) {
   return {result.begin(), result.end()};
 }
 
-static int k_ = 100000;
-std::vector<char> testDataSeq = GenerateWords(k_);
+const int k_ = 100000;
+namespace {
+  std::vector<char> test_data_seq = chernova_n_word_count_seq::GenerateWordsPerf(k_);
+}
 
 TEST(chernova_n_word_count_seq, test_pipeline_run) {
-  std::vector<char> in = testDataSeq;
+  std::vector<char> in = test_data_seq;
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -58,7 +60,7 @@ TEST(chernova_n_word_count_seq, test_pipeline_run) {
 }
 
 TEST(chernova_n_word_count_seq, test_task_run) {
-  std::vector<char> in = testDataSeq;
+  std::vector<char> in = test_data_seq;
   std::vector<int> out(1, 0);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-static std::vector<char> CleanString(const std::vector<char>& input) {
+std::vector<char> chernova_n_word_count_seq::CleanString(const std::vector<char>& input) {
   std::string result;
   std::string str(input.begin(), input.end());
 

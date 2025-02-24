@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/chernova_n_word_count/include/ops_seq.hpp"
 
-static std::vector<char> GenerateWords(int k) {
+std::vector<char> chernova_n_word_count_seq::GenerateWords(int k) {
   const std::string words[] = {"one", "two", "three"};
 
   std::string result;
@@ -26,8 +26,10 @@ static std::vector<char> GenerateWords(int k) {
   return {result.begin(), result.end()};
 }
 
-static int k_ = 50;
-std::vector<char> test_data_seq = GenerateWords(k_);
+const int k_ = 50;
+namespace {
+  std::vector<char> test_data_seq = chernova_n_word_count_seq::GenerateWords(k_);
+}
 
 TEST(chernova_n_word_count_seq, Test_empty_string) {
   std::vector<char> in = {};

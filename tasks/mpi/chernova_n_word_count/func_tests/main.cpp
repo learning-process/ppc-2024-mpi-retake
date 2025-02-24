@@ -8,10 +8,9 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/chernova_n_word_count/include/ops_mpi.hpp"
 
-static std::vector<char> GenerateWords(int k) {
+std::vector<char> chernova_n_word_count_mpi::GenerateWords(int k) {
   const std::string words[] = {"one", "two", "three"};
   const int word_array_size = sizeof(words) / sizeof(words[0]);
   std::string result;
@@ -26,8 +25,8 @@ static std::vector<char> GenerateWords(int k) {
   return {result.begin(), result.end()};
 }
 
-int k_ = 50;
-static std::vector<char> test_data_parallel = GenerateWords(k_);
+const int k_ = 50;
+static std::vector<char> test_data_parallel = chernova_n_word_count_mpi::GenerateWords(k_);
 
 TEST(chernova_n_word_count_mpi, Test_empty_string) {
   boost::mpi::communicator world;
