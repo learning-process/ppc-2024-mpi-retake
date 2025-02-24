@@ -51,12 +51,12 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::v
                                                                  int& label_counter,
                                                                  const std::vector<int>& neighbors) {
   if (neighbors.empty()) {
-    labeled_image[pos] = label_counter++;
+    labeled_image[pos] = label_counter++;  // No neighbors, assign a new label
   } else {
-    int min_neighbor = *std::ranges::min_element(neighbors);
+    int min_neighbor = *std::ranges::min_element(neighbors);  // Find the smallest neighbor label
     labeled_image[pos] = min_neighbor;
     for (int n : neighbors) {
-      UnionLabels(label_parent, min_neighbor, n);
+      UnionLabels(label_parent, min_neighbor, n);  // Union current label with neighbors
     }
   }
 }
@@ -68,13 +68,14 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
                                                        int end_row) {
   int label_counter = min_label;
 
+  // Iterate through the image rows assigned to the current process
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
-      if (image[pos] == 0 || labeled_image[pos] >= 2) {
+      if (image[pos] == 0 || labeled_image[pos] >= 2) {  // Skip background or already labeled pixels
         std::vector<int> neighbors;
-        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
-        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);
+        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);                    // Find neighbors of the pixel
+        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);  // Label the pixel
       }
     }
   }
@@ -84,7 +85,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
       if (labeled_image[pos] >= 2) {
-        labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);
+        labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);  // Apply path compression for final labels
       }
     }
   }
@@ -109,16 +110,19 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   rc_size_ = static_cast<int>(std::sqrt(input_size));
 
+  // Synchronize all processes before broadcasting input size
   MPI_Barrier(MPI_COMM_WORLD);
 
+  // Broadcast the size of the input image to all processes
   MPI_Bcast(&rc_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
   input_.resize(rc_size_ * rc_size_);
 
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  std::cout << "Rank " << rank << ": Broadcasting input size " << input_.size() << std::endl;
+  std::cout << "Rank " << rank << ": Broadcasting input size " << input_.size() << '\n';
 
+  // Broadcast the actual input data to all processes
   MPI_Bcast(input_.data(), static_cast<int>(input_.size()), MPI_INT, 0, MPI_COMM_WORLD);
 
   return true;
@@ -144,6 +148,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 
   bool valid = !task_data->inputs.empty() && !task_data->outputs.empty() && input_count == output_count;
 
+  // Broadcast validation result to all processes
   MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   return valid;
 }
@@ -158,6 +163,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  // Calculate the range of rows each process will handle
   int rows_per_proc = rows / num_procs;
   int remainder = rows % num_procs;
   int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
@@ -165,6 +171,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   std::vector<int> labeled_image(rows * cols, 0);
 
+  // Perform the labeling process for the assigned rows
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   std::vector<int> recv_counts(num_procs);
@@ -178,11 +185,13 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   }
 
   if (rank == 0) {
-    std::cout << "Total gathered size check: " << total_size_check << ", expected: " << rows * cols << std::endl;
+    std::cout << "Total gathered size check: " << total_size_check << ", expected: " << rows * cols << '\n';
   }
 
+  // Synchronize all processes before gathering the results
   MPI_Barrier(MPI_COMM_WORLD);
 
+  // Gather the labeled image from all processes
   MPI_Gatherv(labeled_image.data() + (start_row * cols), recv_counts[rank], MPI_INT, labeled_image.data(),
               recv_counts.data(), displs.data(), MPI_INT, 0, MPI_COMM_WORLD);
 
