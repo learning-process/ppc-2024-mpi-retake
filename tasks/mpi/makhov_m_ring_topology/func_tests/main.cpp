@@ -11,7 +11,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/makhov_m_ring_topology/include/ops_mpi.hpp"
 
-std::vector<int32_t> static GetRandVector(size_t size, int min_value, int max_value) {
+std::vector<int32_t> GetRandVector(size_t size, int min_value, int max_value) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int32_t> res(size);
