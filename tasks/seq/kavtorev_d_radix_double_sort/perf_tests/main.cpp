@@ -2,37 +2,40 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/kavtorev_d_radix_double_sort/include/ops_seq.hpp"
 
 using kavtorev_d_radix_double_sort::RadixSortSequential;
 
 TEST(kavtorev_d_radix_double_sort_seq, test_pipeline_run) {
-  int N = 10000000;
-  std::vector<double> inputData(N);
-  std::vector<double> outputData(N, 0.0);
+  int n = 10000000;
+  std::vector<double> input_data(n);
+  std::vector<double> output_data(n, 0.0);
 
   {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dist(-1e9, 1e9);
-    for (int i = 0; i < N; ++i) {
-      inputData[i] = dist(gen);
+    for (int i = 0; i < n; ++i) {
+      input_data[i] = dist(gen);
     }
   }
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
   task_data_seq->inputs_count.emplace_back(1);
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(inputData.data()));
-  task_data_seq->inputs_count.emplace_back(N);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
+  task_data_seq->inputs_count.emplace_back(n);
 
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(outputData.data()));
-  task_data_seq->outputs_count.emplace_back(N);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
+  task_data_seq->outputs_count.emplace_back(n);
 
   auto test_task_sequential = std::make_shared<kavtorev_d_radix_double_sort::RadixSortSequential>(task_data_seq);
   ASSERT_TRUE(test_task_sequential->ValidationImpl());
@@ -49,43 +52,43 @@ TEST(kavtorev_d_radix_double_sort_seq, test_pipeline_run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
-  perf_analyzer->PipelineRun(perf_attr, perfResults);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
 
-  ppc::core::Perf::PrintPerfStatistic(perfResults);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  std::vector<double> refData = inputData;
-  std::sort(refData.begin(), refData.end());
-  for (int i = 0; i < N; ++i) {
-    ASSERT_NEAR(refData[i], outputData[i], 1e-12);
+  std::vector<double> ref_data = input_data;
+  std::sort(ref_data.begin(), ref_data.end());
+  for (int i = 0; i < n; ++i) {
+    ASSERT_NEAR(ref_data[i], output_data[i], 1e-12);
   }
 }
 
 TEST(kavtorev_d_radix_double_sort_seq, test_task_run) {
-  int N = 1000000;
-  std::vector<double> inputData(N);
-  std::vector<double> outputData(N, 0.0);
+  int n = 1000000;
+  std::vector<double> input_data(n);
+  std::vector<double> output_data(n, 0.0);
 
   {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dist(-1e9, 1e9);
-    for (int i = 0; i < N; ++i) {
-      inputData[i] = dist(gen);
+    for (int i = 0; i < n; ++i) {
+      input_data[i] = dist(gen);
     }
   }
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
   task_data_seq->inputs_count.emplace_back(1);
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(inputData.data()));
-  task_data_seq->inputs_count.emplace_back(N);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
+  task_data_seq->inputs_count.emplace_back(n);
 
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(outputData.data()));
-  task_data_seq->outputs_count.emplace_back(N);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
+  task_data_seq->outputs_count.emplace_back(n);
 
   auto test_task_sequential = std::make_shared<kavtorev_d_radix_double_sort::RadixSortSequential>(task_data_seq);
   ASSERT_TRUE(test_task_sequential->ValidationImpl());
@@ -102,16 +105,16 @@ TEST(kavtorev_d_radix_double_sort_seq, test_task_run) {
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
-  perf_analyzer->PipelineRun(perf_attr, perfResults);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
 
-  ppc::core::Perf::PrintPerfStatistic(perfResults);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  std::vector<double> refData = inputData;
-  std::sort(refData.begin(), refData.end());
-  for (int i = 0; i < N; ++i) {
-    ASSERT_NEAR(refData[i], outputData[i], 1e-12);
+  std::vector<double> ref_data = input_data;
+  std::sort(ref_data.begin(), ref_data.end());
+  for (int i = 0; i < n; ++i) {
+    ASSERT_NEAR(ref_data[i], output_data[i], 1e-12);
   }
 }

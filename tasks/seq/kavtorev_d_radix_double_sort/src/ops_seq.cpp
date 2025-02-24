@@ -1,23 +1,27 @@
 #include "seq/kavtorev_d_radix_double_sort/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cmath>
-#include <queue>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <vector>
 
 using namespace kavtorev_d_radix_double_sort;
 
 bool RadixSortSequential::PreProcessingImpl() {
-  data_.resize(n);
+  data_.resize(n_);
   auto* arr = reinterpret_cast<double*>(task_data->inputs[1]);
-  std::copy(arr, arr + n, data_.begin());
+  std::copy(arr, arr + n_, data_.begin());
 
   return true;
 }
 
 bool RadixSortSequential::ValidationImpl() {
   bool is_valid = true;
-  n = *(reinterpret_cast<int*>(task_data->inputs[0]));
-  if (task_data->inputs_count[0] != 1 || task_data->inputs_count[1] != static_cast<size_t>(n) ||
-      task_data->outputs_count[0] != static_cast<size_t>(n)) {
+  n_ = *(reinterpret_cast<int*>(task_data->inputs[0]));
+  if (task_data->inputs_count[0] != 1 || task_data->inputs_count[1] != static_cast<size_t>(n_) ||
+      task_data->outputs_count[0] != static_cast<size_t>(n_)) {
     is_valid = false;
   }
 
@@ -25,7 +29,7 @@ bool RadixSortSequential::ValidationImpl() {
 }
 
 bool RadixSortSequential::RunImpl() {
-  radix_sort_doubles(data_);
+  RadixSortDoubles(data_);
   return true;
 }
 
@@ -35,12 +39,12 @@ bool RadixSortSequential::PostProcessingImpl() {
   return true;
 }
 
-void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
-  size_t n_ = data_.size();
-  std::vector<uint64_t> keys(n_);
-  for (size_t i = 0; i < n_; ++i) {
-    uint64_t u;
-    std::memcpy(&u, &data_[i], sizeof(double));
+void RadixSortSequential::RadixSortDoubles(std::vector<double>& data) {
+  size_t n = data.size();
+  std::vector<uint64_t> keys(n);
+  for (size_t i = 0; i < n; ++i) {
+    uint64_t u = 0;
+    std::memcpy(&u, &data[i], sizeof(double));
     if ((u & 0x8000000000000000ULL) != 0) {
       u = ~u;
     } else {
@@ -49,31 +53,31 @@ void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
     keys[i] = u;
   }
 
-  radix_sort_uint64(keys);
+  RadixSortUint64(keys);
 
-  for (size_t i = 0; i < n_; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     uint64_t u = keys[i];
     if ((u & 0x8000000000000000ULL) != 0) {
       u &= ~0x8000000000000000ULL;
     } else {
       u = ~u;
     }
-    std::memcpy(&data_[i], &u, sizeof(double));
+    std::memcpy(&data[i], &u, sizeof(double));
   }
 }
 
-void RadixSortSequential::radix_sort_uint64(std::vector<uint64_t>& keys) {
-  const int BITS = 64;
-  const int RADIX = 256;
+void RadixSortSequential::RadixSortUint64(std::vector<uint64_t>& keys) {
+  const int bits = 64;
+  const int radix = 256;
   std::vector<uint64_t> temp(keys.size());
 
-  for (int shift = 0; shift < BITS; shift += 8) {
-    size_t count[RADIX + 1] = {0};
+  for (int shift = 0; shift < bits; shift += 8) {
+    size_t count[radix + 1] = {0};
     for (size_t i = 0; i < keys.size(); ++i) {
       uint8_t byte = (keys[i] >> shift) & 0xFF;
       ++count[byte + 1];
     }
-    for (int i = 0; i < RADIX; ++i) {
+    for (int i = 0; i < radix; ++i) {
       count[i + 1] += count[i];
     }
     for (size_t i = 0; i < keys.size(); ++i) {

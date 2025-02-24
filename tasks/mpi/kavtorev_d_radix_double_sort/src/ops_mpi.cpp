@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <cstring>
 #include <iterator>
-#include <ranges>
 #include <vector>
 
 namespace mpi = boost::mpi;
@@ -39,16 +38,16 @@ bool RadixSortSequential::RunImpl() {
 
 bool RadixSortSequential::PostProcessingImpl() {
   auto* out = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::ranges::copy(data_, out);
+  std::copy(data_.begin(), data_.end(), out);
   return true;
 }
 
 void RadixSortSequential::RadixSortDoubles(std::vector<double>& data) {
-  size_t n = data_.size();
+  size_t n = data.size();
   std::vector<uint64_t> keys(n);
   for (size_t i = 0; i < n; ++i) {
     uint64_t u = 0;
-    std::memcpy(&u, &data_[i], sizeof(double));
+    std::memcpy(&u, &data[i], sizeof(double));
     if ((u & 0x8000000000000000ULL) != 0) {
       u = ~u;
     } else {
@@ -111,8 +110,8 @@ bool RadixSortParallel::ValidationImpl() {
       is_valid = false;
     }
   }
-  mpi::broadcast(world_, is_valid, 0);
-  mpi::broadcast(world_, n_, 0);
+  boost::mpi::broadcast(world_, is_valid, 0);
+  boost::mpi::broadcast(world_, n_, 0);
   return is_valid;
 }
 
@@ -134,12 +133,12 @@ bool RadixSortParallel::RunImpl() {
     }
   }
 
-  mpi::broadcast(world_, counts, 0);
-  mpi::broadcast(world_, displs, 0);
+  boost::mpi::broadcast(world_, counts, 0);
+  boost::mpi::broadcast(world_, displs, 0);
 
   std::vector<double> local_data(counts[rank]);
-  mpi::scatterv(world_, (rank == 0 ? data_.data() : (double*)nullptr), counts, displs, local_data.data(), counts[rank],
-                0);
+  boost::mpi::scatterv(world_, (rank == 0 ? data_.data() : (double*)nullptr), counts, displs, local_data.data(),
+                       counts[rank], 0);
   RadixSortDoubles(local_data);
 
   int steps = 0;
@@ -167,7 +166,8 @@ bool RadixSortParallel::RunImpl() {
 
       std::vector<double> merged;
       merged.reserve(local_data.size() + partner_data.size());
-      std::ranges::merge(local_data, partner_data, std::back_inserter(merged));
+      std::merge(local_data.begin(), local_data.end(), partner_data.begin(), partner_data.end(),
+                 std::back_inserter(merged));
       local_data.swap(merged);
     } else if (!is_merger && (rank % group_step_size == group_size)) {
       int receiver = rank - group_size;
@@ -196,51 +196,51 @@ bool RadixSortParallel::PostProcessingImpl() {
   return true;
 }
 
-void RadixSortParallel::RadixSortDoubles(std::vector<double>& data_) {
-  size_t n = data_.size();
-  std::vector<uint64_t> keys_(n);
+void RadixSortParallel::RadixSortDoubles(std::vector<double>& data) {
+  size_t n = data.size();
+  std::vector<uint64_t> keys(n);
   for (size_t i = 0; i < n; ++i) {
-    uint64_t u;
-    std::memcpy(&u, &data_[i], sizeof(double));
+    uint64_t u = 0;
+    std::memcpy(&u, &data[i], sizeof(double));
     if ((u & 0x8000000000000000ULL) != 0) {
       u = ~u;
     } else {
       u |= 0x8000000000000000ULL;
     }
-    keys_[i] = u;
+    keys[i] = u;
   }
 
-  RadixSortUint64(keys_);
+  RadixSortUint64(keys);
 
   for (size_t i = 0; i < n; ++i) {
-    uint64_t u = keys_[i];
+    uint64_t u = keys[i];
     if ((u & 0x8000000000000000ULL) != 0) {
       u &= ~0x8000000000000000ULL;
     } else {
       u = ~u;
     }
-    std::memcpy(&data_[i], &u, sizeof(double));
+    std::memcpy(&data[i], &u, sizeof(double));
   }
 }
 
-void RadixSortParallel::RadixSortUint64(std::vector<uint64_t>& keys_) {
+void RadixSortParallel::RadixSortUint64(std::vector<uint64_t>& keys) {
   const int bits = 64;
   const int radix = 256;
-  std::vector<uint64_t> temp(keys_.size());
+  std::vector<uint64_t> temp(keys.size());
 
   for (int shift = 0; shift < bits; shift += 8) {
     size_t count[radix + 1] = {0};
-    for (size_t i = 0; i < keys_.size(); ++i) {
-      uint8_t byte = (keys_[i] >> shift) & 0xFF;
+    for (size_t i = 0; i < keys.size(); ++i) {
+      uint8_t byte = (keys[i] >> shift) & 0xFF;
       ++count[byte + 1];
     }
     for (int i = 0; i < radix; ++i) {
       count[i + 1] += count[i];
     }
-    for (size_t i = 0; i < keys_.size(); ++i) {
-      uint8_t byte = (keys_[i] >> shift) & 0xFF;
-      temp[count[byte]++] = keys_[i];
+    for (size_t i = 0; i < keys.size(); ++i) {
+      uint8_t byte = (keys[i] >> shift) & 0xFF;
+      temp[count[byte]++] = keys[i];
     }
-    keys_.swap(temp);
+    keys.swap(temp);
   }
 }

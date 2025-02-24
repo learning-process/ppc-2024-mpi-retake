@@ -1,11 +1,9 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
-#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -22,10 +20,10 @@ class RadixSortSequential : public ppc::core::Task {
 
  private:
   std::vector<double> data_;
-  int n = 0;
+  int n_ = 0;
 
-  static void radix_sort_doubles(std::vector<double>& data_);
-  static void radix_sort_uint64(std::vector<uint64_t>& keys);
+  static void RadixSortDoubles(std::vector<double>& data);
+  static void RadixSortUint64(std::vector<uint64_t>& keys);
 };
 
 }  // namespace kavtorev_d_radix_double_sort
