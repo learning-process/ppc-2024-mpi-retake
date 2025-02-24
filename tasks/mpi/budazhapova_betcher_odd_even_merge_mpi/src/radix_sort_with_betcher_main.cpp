@@ -1,10 +1,12 @@
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmisc-include-cleaner"
+#include <boost/serialization/vector.hpp>
+#pragma GCC diagnostic pop
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cstddef>
 #include <vector>
 
