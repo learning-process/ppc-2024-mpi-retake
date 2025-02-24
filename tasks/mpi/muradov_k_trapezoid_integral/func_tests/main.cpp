@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <functional>  // for std::function
+#include <cmath>
+#include <functional>
 #ifndef OMPI_SKIP_MPICXX
 #define OMPI_SKIP_MPICXX 1
 #endif
 #include <mpi.h>
-
-#include <cmath>
 
 #include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
@@ -25,13 +24,11 @@ TEST(muradov_k_trapezoid_integral_mpi, SquareFunction) {
 
   if (rank == 0) {
     double reference_sum = 0.0;
-    if (n > 0) {
-      double h = (b - a) / static_cast<double>(n);
-      for (int i = 0; i < n; i++) {
-        double x_i = a + (i * h);
-        double x_next = a + ((i + 1) * h);
-        reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
-      }
+    double h = (b - a) / static_cast<double>(n);
+    for (int i = 0; i < n; i++) {
+      double x_i = a + i * h;
+      double x_next = a + ((i + 1) * h);
+      reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
     }
     ASSERT_NEAR(reference_sum, global_sum, 1e-6);
   }
@@ -50,13 +47,11 @@ TEST(muradov_k_trapezoid_integral_mpi, CubeFunction) {
 
   if (rank == 0) {
     double reference_sum = 0.0;
-    if (n > 0) {
-      double h = (b - a) / static_cast<double>(n);
-      for (int i = 0; i < n; i++) {
-        double x_i = a + (i * h);
-        double x_next = a + ((i + 1) * h);
-        reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
-      }
+    double h = (b - a) / static_cast<double>(n);
+    for (int i = 0; i < n; i++) {
+      double x_i = a + i * h;
+      double x_next = a + ((i + 1) * h);
+      reference_sum += (f(x_i) + f(x_next)) * 0.5 * h;
     }
     ASSERT_NEAR(reference_sum, global_sum, 1e-6);
   }

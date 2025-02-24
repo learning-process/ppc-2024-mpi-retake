@@ -13,7 +13,6 @@
 
 namespace muradov_k_trapezoid_integral_mpi {
 
-// Test #1: measure performance of entire "task run".
 TEST(muradov_k_trapezoid_integral_mpi, test_task_run) {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -26,7 +25,6 @@ TEST(muradov_k_trapezoid_integral_mpi, test_task_run) {
   auto start = std::chrono::high_resolution_clock::now();
   double result = GetIntegralTrapezoidalRuleParallel(f, a, b, n);
   auto end = std::chrono::high_resolution_clock::now();
-
   std::chrono::duration<double> elapsed = end - start;
 
   if (rank == 0) {
@@ -35,7 +33,6 @@ TEST(muradov_k_trapezoid_integral_mpi, test_task_run) {
   SUCCEED();
 }
 
-// Test #2: measure performance of "pipeline".
 TEST(muradov_k_trapezoid_integral_mpi, test_pipeline_run) {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -48,7 +45,6 @@ TEST(muradov_k_trapezoid_integral_mpi, test_pipeline_run) {
   auto start = std::chrono::high_resolution_clock::now();
   double result = GetIntegralTrapezoidalRuleParallel(f, a, b, n);
   auto end = std::chrono::high_resolution_clock::now();
-
   std::chrono::duration<double> elapsed = end - start;
 
   if (rank == 0) {
