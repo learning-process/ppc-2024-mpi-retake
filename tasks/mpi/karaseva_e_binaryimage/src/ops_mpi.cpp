@@ -107,13 +107,18 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     task_data->outputs_count.push_back(input_size);
   }
 
-  auto output_size = static_cast<unsigned int>(task_data->outputs_count[0]);
-  output_ = std::vector<int>(output_size, 0);
-
   rc_size_ = static_cast<int>(std::sqrt(input_size));
 
+  MPI_Barrier(MPI_COMM_WORLD);
+
   MPI_Bcast(&rc_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
   input_.resize(rc_size_ * rc_size_);
+
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::cout << "Rank " << rank << ": Broadcasting input size " << input_.size() << std::endl;
+
   MPI_Bcast(input_.data(), static_cast<int>(input_.size()), MPI_INT, 0, MPI_COMM_WORLD);
 
   return true;
@@ -146,11 +151,10 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int rows = rc_size_;
   int cols = rc_size_;
-  int min_label = 2;  // Starting label
+  int min_label = 2;
   std::unordered_map<int, int> label_parent;
 
-  int num_procs = 0;
-  int rank = 0;
+  int num_procs, rank;
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -166,15 +170,24 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> recv_counts(num_procs);
   std::vector<int> displs(num_procs);
 
+  int total_size_check = 0;
   for (int i = 0; i < num_procs; ++i) {
     recv_counts[i] = (i < remainder) ? (rows_per_proc + 1) * cols : rows_per_proc * cols;
     displs[i] = (i == 0) ? 0 : displs[i - 1] + recv_counts[i - 1];
+    total_size_check += recv_counts[i];
   }
+
+  if (rank == 0) {
+    std::cout << "Total gathered size check: " << total_size_check << ", expected: " << rows * cols << std::endl;
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   MPI_Gatherv(labeled_image.data() + (start_row * cols), recv_counts[rank], MPI_INT, labeled_image.data(),
               recv_counts.data(), displs.data(), MPI_INT, 0, MPI_COMM_WORLD);
 
   MPI_Barrier(MPI_COMM_WORLD);
+
   return true;
 }
 
