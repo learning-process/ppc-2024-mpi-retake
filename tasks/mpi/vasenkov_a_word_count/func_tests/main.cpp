@@ -2,16 +2,18 @@
 
 #include <gtest/gtest.h>
 
-
+#include <boost/mpi.hpp>
+#include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/vasenkov_a_word_count/include/ops_mpi.hpp"
 TEST(vasenkov_a_word_count_mpi, test_0_word) {
   boost::mpi::communicator world;
-  std::string input = "";
+  std::string input;
+  input = "";
   std::vector<uint8_t> in(input.begin(), input.end());
   std::vector<int> out(1, 0);
   std::vector<int> expect = {0};

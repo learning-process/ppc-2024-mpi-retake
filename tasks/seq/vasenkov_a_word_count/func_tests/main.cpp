@@ -1,18 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
-#include <cstdint>
-#include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/vasenkov_a_word_count/include/ops_seq.hpp"
 
 TEST(vasenkov_a_word_count_seq, test_0_word) {
-  std::string input = "";
+  std::string input;
+  input = "";
   std::vector<uint8_t> in(input.begin(), input.end());
   std::vector<int> out(1, 0);
   std::vector<int> expect = {0};

@@ -2,8 +2,8 @@
 
 #include <chrono>
 #include <cstddef>
-#include <cstdint>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"

@@ -1,9 +1,13 @@
 #include "mpi/vasenkov_a_word_count/include/ops_mpi.hpp"
+
+#include <boost/mpi.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <cctype>
 #include <functional>
 
 bool vasenkov_a_word_count_mpi::WordCountMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    stringSize_ = task_data->inputs_count[0];
+    stringSize_ = (int)task_data->inputs_count[0];
     inputString_ = std::string(reinterpret_cast<char*>(task_data->inputs[0]), stringSize_);
   }
   wordCount_ = 0;
@@ -18,7 +22,7 @@ bool vasenkov_a_word_count_mpi::WordCountMPI::RunImpl() {
   if (world_.rank() == 0) {
     delta = inputString_.length() / world_.size();
   }
-  boost::mpi::broadcast(world_, delta, 0);
+  broadcast(world_, delta, 0);
 
   std::string local_string;
   local_string.resize(delta);
@@ -41,7 +45,7 @@ bool vasenkov_a_word_count_mpi::WordCountMPI::RunImpl() {
 
   wordLoaclCount_ = 0;
   for (char c : local_string) {
-    if (std::isspace(c) != 0) {
+    if (isspace(c) != 0) {
       in_word = false;
     } else if (!in_word) {
       wordLoaclCount_++;
@@ -54,7 +58,7 @@ bool vasenkov_a_word_count_mpi::WordCountMPI::RunImpl() {
     world_.send(world_.rank() + 1, 1, &last_char, 1);
   }
 
-  reduce(world_, wordLoaclCount_, wordCount_, std::plus<>(), 0);
+  boost::mpi::reduce(world_, wordLoaclCount_, wordCount_, std::plus<>(), 0);
 
   return true;
 }
