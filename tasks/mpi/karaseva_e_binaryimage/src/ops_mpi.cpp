@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -92,7 +91,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   bool is_root = (rank == 0);
 
@@ -107,7 +106,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  if (rows == 0 || cols == 0) return false;  // Prevent division by zero
+  if (rows == 0 || cols == 0) {
+    return false;  // Prevent division by zero
+  }
 
   rc_size_ = rows;
 
@@ -124,7 +125,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   unsigned int input_count = task_data->inputs_count.empty() ? 0 : task_data->inputs_count[0];
@@ -142,14 +143,17 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
-  if (rc_size_ == 0) return false;  // Prevent division by zero
+  if (rc_size_ == 0) {
+    return false;  // Prevent division by zero
+  }
 
   int rows = rc_size_;
   int cols = input_size_ / rows;
   int min_label = 2;
   std::unordered_map<int, int> label_parent;
 
-  int num_procs, rank;
+  int num_procs = 0;
+  int rank = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -166,7 +170,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   return true;
 }
-
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
   if (!task_data->outputs.empty() && task_data->outputs[0] != nullptr) {
