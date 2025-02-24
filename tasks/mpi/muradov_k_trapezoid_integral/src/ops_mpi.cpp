@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 
+#include "boost/mpi/collectives.hpp"
 #include "boost/mpi/communicator.hpp"
 #include "boost/mpi/environment.hpp"
 #include "core/task/include/task.hpp"
@@ -15,7 +16,7 @@ namespace {
 class IntegrationTask : public ppc::core::Task {
  public:
   IntegrationTask(const std::function<double(double)>& f, double a, double b, int n)
-      : ppc::core::Task(std::make_shared<ppc::core::TaskData>()), func_(f), a_(a), b_(b), n_(n), result_(0.0) {}
+      : ppc::core::Task(std::make_shared<ppc::core::TaskData>()), func_(f), a_(a), b_(b), n_(n) {}
 
   bool ValidationImpl() override /* NOLINT(readability-make-member-function-const) */ { return (n_ > 0 && a_ <= b_); }
 
@@ -34,7 +35,7 @@ class IntegrationTask : public ppc::core::Task {
       local_sum += (func_(x_i) + func_(x_next)) * 0.5 * h;
     }
     double global_sum = 0.0;
-    boost::mpi::reduce(world, local_sum, global_sum, std::plus<double>(), 0);
+    boost::mpi::reduce(world, local_sum, global_sum, std::plus<>(), 0);
     boost::mpi::broadcast(world, global_sum, 0);
     result_ = global_sum;
     return true;

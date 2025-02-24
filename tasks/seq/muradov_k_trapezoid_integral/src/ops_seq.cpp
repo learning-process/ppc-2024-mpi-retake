@@ -15,7 +15,7 @@ namespace {
 class IntegrationTask : public ppc::core::Task {
  public:
   IntegrationTask(const std::function<double(double)>& f, double a, double b, int n)
-      : ppc::core::Task(std::make_shared<ppc::core::TaskData>()), func_(f), a_(a), b_(b), n_(n), result_(0.0) {}
+      : ppc::core::Task(std::make_shared<ppc::core::TaskData>()), func_(f), a_(a), b_(b), n_(n) {}
 
   bool ValidationImpl() override /* NOLINT(readability-make-member-function-const) */ { return (n_ > 0 && a_ <= b_); }
 
