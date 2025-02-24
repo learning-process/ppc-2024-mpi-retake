@@ -18,13 +18,23 @@ TEST(muradov_k_network_topology_mpi, FullRingCommunication) {
   int received_data = -1;
   const int target = (rank + 1) % size;
 
-  if (size > 1) {
-    topology.send(target, &test_data, 1, MPI_INT);
-    topology.receive((rank - 1 + size) % size, &received_data, 1, MPI_INT);
+  if (size >= 2) {
+    // Send and receive in separate steps
+    if (rank % 2 == 0) {
+      topology.send(target, &test_data, 1, MPI_INT);
+      topology.receive((rank - 1 + size) % size, &received_data, 1, MPI_INT);
+    } else {
+      topology.receive((rank - 1 + size) % size, &received_data, 1, MPI_INT);
+      topology.send(target, &test_data, 1, MPI_INT);
+    }
 
-    ASSERT_EQ(received_data, ((rank - 1 + size) % size) * 100);
+    if (rank == 0) {
+      ASSERT_EQ(received_data, ((size - 1) * 100));
+    } else {
+      ASSERT_EQ(received_data, ((rank - 1) * 100));
+    }
   } else {
-    ASSERT_TRUE(true);  // Skip test for single process
+    GTEST_SKIP() << "Requires at least 2 processes";
   }
 }
 

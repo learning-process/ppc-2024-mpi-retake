@@ -33,6 +33,13 @@ bool NetworkTopology::send(int dest, const void* data, int count, MPI_Datatype d
   while (current != dest) {
     int next = (dest > current) ? right_ : left_;
     MPI_Send(data, count, datatype, next, 0, topology_comm_);
+
+    // If next is the destination, break the loop
+    if (next == dest) break;
+
+    // Receive forwarded message
+    MPI_Recv(const_cast<void*>(data), count, datatype, (next == right_) ? left_ : right_, 0, topology_comm_,
+             MPI_STATUS_IGNORE);
     current = next;
   }
   return true;
@@ -42,11 +49,10 @@ bool NetworkTopology::receive(int source, void* buffer, int count, MPI_Datatype 
   if (topology_comm_ == MPI_COMM_NULL) return false;
 
   MPI_Status status;
-  int flag;
-  MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, topology_comm_, &flag, &status);
+  MPI_Probe(MPI_ANY_SOURCE, 0, topology_comm_, &status);
 
-  if (flag && (source == MPI_ANY_SOURCE || status.MPI_SOURCE == source)) {
-    MPI_Recv(buffer, count, datatype, status.MPI_SOURCE, status.MPI_TAG, topology_comm_, MPI_STATUS_IGNORE);
+  if (source == MPI_ANY_SOURCE || status.MPI_SOURCE == source) {
+    MPI_Recv(buffer, count, datatype, status.MPI_SOURCE, 0, topology_comm_, MPI_STATUS_IGNORE);
     return true;
   }
   return false;
