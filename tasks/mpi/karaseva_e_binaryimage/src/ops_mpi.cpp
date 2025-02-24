@@ -156,7 +156,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
   bool local_valid = (input_count > 0) && (output_count > 0) && (input_count == output_count);
 
   // Broadcasting local_valid status
-  MPI_Bcast(&local_valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&local_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   if (rank == 0) {
     std::cout << "[INFO] Process 0: Validation result broadcasted: " << local_valid << "\n";
   } else {
