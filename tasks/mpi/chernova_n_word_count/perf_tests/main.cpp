@@ -29,8 +29,8 @@ std::vector<char> chernova_n_word_count_mpi::GenerateWordsPerf(int k) {
 
 const int k_ = 100000;
 namespace {
-  std::vector<char> test_data_parallel = chernova_n_word_count_mpi::GenerateWordsPerf(k_);
-} //namespace
+std::vector<char> test_data_parallel = chernova_n_word_count_mpi::GenerateWordsPerf(k_);
+}  // namespace
 
 TEST(chernova_n_word_count_mpi, test_pipeline_run) {
   boost::mpi::communicator world;

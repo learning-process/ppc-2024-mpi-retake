@@ -117,7 +117,8 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
   if (world_.rank() == 0) {
     for (int proc = 1; proc < world_.size(); proc++) {
       unsigned long proc_start_pos = proc * part_size_;
-      unsigned long proc_part_size = (proc_start_pos + part_size_ <= total_size) ? part_size_ : (total_size - proc_start_pos);
+      unsigned long proc_part_size =
+          (proc_start_pos + part_size_ <= total_size) ? part_size_ : (total_size - proc_start_pos);
       if (proc_part_size > 0) {
         world_.send(proc, 0, input_.data() + proc_start_pos, static_cast<int>(proc_part_size));
       }
