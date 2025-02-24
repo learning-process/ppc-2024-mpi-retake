@@ -33,7 +33,7 @@ bool tarakanov_d_integration_the_trapezoid_method_mpi::IntegrationTheTrapezoidMe
   uint32_t rank = world.rank();
   uint32_t size = world.size();
 
-  uint32_t partsCount = static_cast<int>((b - a) / h);
+  uint32_t partsCount = static_cast<uint32_t>((b - a) / h);
   uint32_t localPartsCount = partsCount / size;
   uint32_t start = localPartsCount * rank;
   uint32_t end = (rank == size - 1) ? partsCount : start + localPartsCount;
@@ -41,7 +41,7 @@ bool tarakanov_d_integration_the_trapezoid_method_mpi::IntegrationTheTrapezoidMe
   double local_res = 0.0;
   for (uint32_t i = start; i < end; ++i) {
     double x0 = a + i * h;
-    double x1 = (rank == size - 1) ? b : a + (i + 1) * h;
+    double x1 = x0 + h > b ? b : x0 + h;
     local_res += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * (x1 - x0);
   }
 

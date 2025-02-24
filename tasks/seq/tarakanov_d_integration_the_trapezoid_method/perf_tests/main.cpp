@@ -1,6 +1,5 @@
 // Copyright 2025 Tarakanov Denis
 #include <gtest/gtest.h>
-#include <boost/math/quadrature/trapezoidal.hpp>
 
 #include <boost/math/quadrature/trapezoidal.hpp>
 #include <iostream>
