@@ -134,8 +134,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
     std::cout << "Rank: " << rank << " outputs_count[0]: " << task_data->outputs_count[0] << '\n';
   }
 
-  int input_count = task_data->inputs_count[0];
-  int output_count = task_data->outputs_count[0];
+  unsigned int input_count = task_data->inputs_count[0];
+  unsigned int output_count = task_data->outputs_count[0];
 
   bool valid = !task_data->inputs.empty() && !task_data->outputs.empty() && input_count == output_count;
 
