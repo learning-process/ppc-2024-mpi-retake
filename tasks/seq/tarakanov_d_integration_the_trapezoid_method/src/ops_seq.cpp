@@ -21,7 +21,7 @@ bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMe
   int n = static_cast<int>((b - a) / h);
   double integral = 0.0;
 
-  for (int i = 0; i < n - 1; ++i) {
+  for (int i = 0; i < n; ++i) {
     double x0 = a + i * h;
     double x1 = a + (i + 1) * h;
     integral += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * h;
