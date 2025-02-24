@@ -39,7 +39,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_pipeline_run) {
   auto sobel_task = std::make_shared<mezhuev_m_sobel_edge_detection_mpi::SobelEdgeDetection>(world, task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 200;
+  perf_attr->num_running = 500;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -94,7 +94,7 @@ TEST(mezhuev_m_sobel_edge_detection_mpi, test_task_run) {
   auto sobel_task = std::make_shared<mezhuev_m_sobel_edge_detection_mpi::SobelEdgeDetection>(world, task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 200;
+  perf_attr->num_running = 500;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
