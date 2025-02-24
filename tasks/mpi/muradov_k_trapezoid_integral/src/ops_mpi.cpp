@@ -1,6 +1,9 @@
 #include "mpi/muradov_k_trapezoid_integral/include/ops_mpi.hpp"
 
-#include <boost/mpi.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
 #include <cmath>
 #include <functional>
 #include <memory>
@@ -24,17 +27,22 @@ class IntegrationTask : public ppc::core::Task {
     double h = (b_ - a_) / static_cast<double>(n_);
     boost::mpi::environment env;
     boost::mpi::communicator world;
-    int size = world.size();
-    int rank = world.rank();
+
+    const int chunk_size = n_ / world.size();
+    const int start = world.rank() * chunk_size;
+    const int end = (world.rank() == world.size() - 1) ? n_ : start + chunk_size;
+
     double local_sum = 0.0;
-    for (int i = rank; i < n_; i += size) {
-      double x_i = a_ + (i * h);
-      double x_next = a_ + ((i + 1) * h);
+    for (int i = start; i < end; ++i) {
+      const double x_i = a_ + i * h;
+      const double x_next = x_i + h;
       local_sum += (func_(x_i) + func_(x_next)) * 0.5 * h;
     }
+
     double global_sum = 0.0;
     boost::mpi::reduce(world, local_sum, global_sum, std::plus<>(), 0);
     boost::mpi::broadcast(world, global_sum, 0);
+
     result_ = global_sum;
     return true;
   }

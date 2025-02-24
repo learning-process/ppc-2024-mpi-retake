@@ -23,7 +23,7 @@ class IntegrationTask : public ppc::core::Task {
   bool PreProcessingImpl() override /* NOLINT(readability-convert-member-functions-to-static) */ { return true; }
 
   bool RunImpl() override {
-    double h = (b_ - a_) / static_cast<double>(n_);
+    const double h = (b_ - a_) / n_;
     struct SumBody {
       double a;
       double h;
@@ -38,10 +38,10 @@ class IntegrationTask : public ppc::core::Task {
           sum += (func(x_i) + func(x_next)) * 0.5 * h;
         }
       }
-      void join(SumBody& rhs) { sum += rhs.sum; }
+      void Join(SumBody& rhs) { sum += rhs.sum; }
     };
     SumBody body(a_, h, func_);
-    oneapi::tbb::parallel_reduce(oneapi::tbb::blocked_range<int>(0, n_), body);
+    oneapi::tbb::parallel_reduce(oneapi::tbb::blocked_range<int>(0, n_), body, oneapi::tbb::auto_partitioner());
     result_ = body.sum;
     return true;
   }
