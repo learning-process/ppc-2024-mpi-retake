@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
 #include "seq/solovev_a_binary_image_marking/include/ops_sec.hpp"
 
 namespace {
