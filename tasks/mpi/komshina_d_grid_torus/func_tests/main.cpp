@@ -4,7 +4,6 @@
 #include <random>
 #include <vector>
 #include <string>
-#include <memory>
 #include <boost/mpi/communicator.hpp>
 
 #include "core/task/include/task.hpp"
