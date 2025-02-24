@@ -1,11 +1,11 @@
 #pragma once
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cstdint>
 #include <cstring>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 

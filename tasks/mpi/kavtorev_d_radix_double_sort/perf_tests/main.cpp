@@ -4,10 +4,10 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/timer.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"

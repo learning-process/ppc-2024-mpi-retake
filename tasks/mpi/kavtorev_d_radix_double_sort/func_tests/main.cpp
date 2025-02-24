@@ -2,10 +2,10 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/kavtorev_d_radix_double_sort/include/ops_mpi.hpp"

@@ -4,12 +4,12 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iterator>
+#include <vector>
 
 using namespace kavtorev_d_radix_double_sort;
 
@@ -128,7 +128,6 @@ bool RadixSortParallel::RunImpl() {
     for (int i = 0; i < size; ++i) {
       counts[i] = local_n + (i < remainder ? 1 : 0);
     }
-    displs[0] = 0;
     for (int i = 1; i < size; ++i) {
       displs[i] = displs[i - 1] + counts[i - 1];
     }
