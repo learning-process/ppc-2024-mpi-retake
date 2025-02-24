@@ -43,7 +43,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
 
   // Parallel execution test
   karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
-  ASSERT_TRUE(test_task_mpi.Validation());
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
@@ -58,7 +58,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
     task_data_seq->outputs_count = {rows, cols};
 
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
-    ASSERT_TRUE(test_task_seq.Validation());
+    ASSERT_TRUE(test_task_seq.ValidationImpl());
     test_task_seq.PreProcessingImpl();
     test_task_seq.RunImpl();
     test_task_seq.PostProcessingImpl();
@@ -93,7 +93,7 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
 
   // Parallel execution test
   karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
-  ASSERT_TRUE(test_task_mpi.Validation());
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
@@ -113,7 +113,7 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
 
     // Sequential execution test
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
-    ASSERT_TRUE(test_task_seq.Validation());
+    ASSERT_TRUE(test_task_seq.ValidationImpl());
     test_task_seq.PreProcessingImpl();
     test_task_seq.RunImpl();
     test_task_seq.PostProcessingImpl();
@@ -143,7 +143,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
 
   // Parallel execution test
   karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
-  ASSERT_TRUE(test_task_mpi.Validation());
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
@@ -158,7 +158,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
     task_data_seq->outputs_count = {rows, cols};
 
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
-    ASSERT_TRUE(test_task_seq.Validation());
+    ASSERT_TRUE(test_task_seq.ValidationImpl());
     test_task_seq.PreProcessingImpl();
     test_task_seq.RunImpl();
     test_task_seq.PostProcessingImpl();
