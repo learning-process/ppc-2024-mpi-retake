@@ -21,7 +21,7 @@ void GenerateRandomData(boost::mpi::communicator& world, std::vector<int>& in) {
     }
   }
 }
-}
+}  // namespace
 
 TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
