@@ -127,16 +127,16 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     input_ = std::vector<int>(in_ptr, in_ptr + input_size);
     std::cout << "[Rank 0] Broadcasting image data of size: " << input_size << '\n';
   } else {
-    input_.resize(input_size);  // Make sure this is the correct size
+    input_.resize(input_size);
   }
 
   int result = MPI_Bcast(input_.data(), input_size, MPI_INT, 0, MPI_COMM_WORLD);
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error broadcasting image data.\n";
     return false;
-  } else {
-    std::cout << "[Rank " << rank << "] Image data broadcasted successfully.\n";
   }
+
+  std::cout << "[Rank " << rank << "] Image data broadcasted successfully.\n";
 
   return true;
 }
@@ -167,7 +167,10 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   unsigned int rows = task_data->inputs_count[0];
   unsigned int cols = task_data->inputs_count[1];
-  unsigned int local_rows = rows / MPI_COMM_WORLD;
+  int num_processes = 0;
+  MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
+
+  unsigned int local_rows = rows / num_processes;
 
   std::unordered_map<int, int> label_parent;
   local_labeled_image_.resize(local_rows * cols, 0);
@@ -176,9 +179,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   // Perform labeling for the local region assigned to the current process
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, rank * local_rows, (rank + 1) * local_rows);
 
-  int result =
-      MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT, task_data->outputs[0],
-                 static_cast<int>(local_rows * cols), MPI_INT, 0, MPI_COMM_WORLD);
+  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT,
+                          task_data->outputs[0], static_cast<int>(local_rows * cols), MPI_INT, 0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
