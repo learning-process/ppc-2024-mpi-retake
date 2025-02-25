@@ -11,7 +11,7 @@
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-#include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
+#include "mpi/deryabin_m_cannons_algorithm_/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
   boost::mpi::communicator world;
