@@ -176,11 +176,14 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
     return false;
   }
 
+  // Debugging output to ensure that inputs and outputs are consistent across all ranks
+  std::cerr << "[Rank " << rank << "] Validation successful\n";
+
   return true;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   unsigned int rows = task_data->inputs_count[0];
@@ -195,7 +198,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> neighbors;
 
   // Perform labeling for the local region assigned to the current process
-  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, rank * local_rows, (rank + 1) * local_rows);
+  int start_row = static_cast<int>(rank) * static_cast<int>(local_rows);
+  int end_row = static_cast<int>(rank + 1) * static_cast<int>(local_rows);
+  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, start_row, end_row);
 
   // Ensure output buffer is allocated for gather
   if (task_data->outputs[0] == nullptr) {
