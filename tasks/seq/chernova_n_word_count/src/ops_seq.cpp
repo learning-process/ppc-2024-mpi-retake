@@ -42,9 +42,7 @@ bool chernova_n_word_count_seq::TestTaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool chernova_n_word_count_seq::TestTaskSequential::ValidationImpl() {
-  return task_data->outputs_count[0] == 1;
-}
+bool chernova_n_word_count_seq::TestTaskSequential::ValidationImpl() { return task_data->outputs_count[0] == 1; }
 
 bool chernova_n_word_count_seq::TestTaskSequential::RunImpl() {
   if (input_.empty()) {
@@ -63,7 +61,7 @@ bool chernova_n_word_count_seq::TestTaskSequential::PostProcessingImpl() {
   if (task_data->outputs[0] == nullptr) {
     return false;
   }
-    if (input_.empty()) {
+  if (input_.empty()) {
     reinterpret_cast<int*>(task_data->outputs[0])[0] = 0;
   } else {
     reinterpret_cast<int*>(task_data->outputs[0])[0] = spaceCount_ + 1;

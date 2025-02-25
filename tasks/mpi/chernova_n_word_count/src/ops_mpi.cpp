@@ -49,9 +49,7 @@ bool chernova_n_word_count_mpi::TestMPITaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool chernova_n_word_count_mpi::TestMPITaskSequential::ValidationImpl() {
-  return task_data->outputs_count[0] == 1;
-}
+bool chernova_n_word_count_mpi::TestMPITaskSequential::ValidationImpl() { return task_data->outputs_count[0] == 1; }
 
 bool chernova_n_word_count_mpi::TestMPITaskSequential::RunImpl() {
   if (input_.empty()) {
