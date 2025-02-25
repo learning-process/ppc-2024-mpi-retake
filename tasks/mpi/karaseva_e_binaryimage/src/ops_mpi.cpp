@@ -184,10 +184,6 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   MPI_Allreduce(MPI_IN_PLACE, labeled_image.data(), rows * cols, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
-  if (output_.size() != static_cast<std::size_t>(rows * cols)) {
-    output_.resize(rows * cols);
-  }
-
   output_ = labeled_image;
 
   return true;
@@ -211,7 +207,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
       return false;
     }
 
-    std::copy(output_.begin(), output_.end(), out_ptr);
+    std::ranges::copy(output_, out_ptr);
   }
 
   return true;
