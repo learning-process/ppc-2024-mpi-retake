@@ -1,14 +1,18 @@
-#ifndef ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_SEQ_HPP
-#define ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_SEQ_HPP
+#ifndef ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_MPI_HPP
+#define ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_MPI_HPP
 
 #include <cstddef>
 #include <functional>
+#include <stdexcept>
 
-namespace ersoz_b_rectangular_method_integration_seq {
+namespace ersoz_b_rectangular_method_integration_mpi {
 
 double GetIntegralRectangularMethodSequential(const std::function<double(double)>& integrable_function, double a,
                                               double b, size_t count);
 
-}  // namespace ersoz_b_rectangular_method_integration_seq
+double GetIntegralRectangularMethodParallel(const std::function<double(double)>& integrable_function, double a,
+                                            double b, size_t count);
 
-#endif  // ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_SEQ_HPP
+}  // namespace ersoz_b_rectangular_method_integration_mpi
+
+#endif  // ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_MPI_HPP
