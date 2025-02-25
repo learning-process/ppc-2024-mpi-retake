@@ -7,7 +7,7 @@
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-#include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
+#include "seq/deryabin_m_cannons_algorithm_/include/ops_seq.hpp"
 
 TEST(deryabin_m_cannons_algorithm_seq, test_pipeline_run_Seq) {
   std::vector<double> input_matrix_a = std::vector<double>(10000, 0);
