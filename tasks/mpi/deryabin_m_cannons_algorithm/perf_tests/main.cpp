@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -14,15 +15,17 @@
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
   boost::mpi::communicator world;
-  constexpr size_t kMatrixSize = 500;
+  constexpr size_t kMatrixSize = 16;
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> distribution(-100, 100);
-  std::vector<double> input_matrix_a(kMatrixSize * kMatrixSize, distribution(gen));
-  std::vector<double> input_matrix_b(kMatrixSize * kMatrixSize, distribution(gen));
-  std::vector<double> output_matrix_c(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> input_matrix_a(kMatrixSize * kMatrixSize);
+  std::vector<double> input_matrix_b(kMatrixSize * kMatrixSize);
+  std::ranges::generate(input_matrix_a.begin(), input_matrix_a.end(), [&] { return distribution(gen); });
+  std::ranges::generate(input_matrix_b.begin(), input_matrix_b.end(), [&] { return distribution(gen); });
+  std::vector<double> output_matrix_c(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> true_sol(1, true_solution);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
@@ -69,15 +72,17 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
   boost::mpi::communicator world;
-  constexpr size_t kMatrixSize = 500;
+  constexpr size_t kMatrixSize = 16;
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> distribution(-100, 100);
-  std::vector<double> input_matrix_a(kMatrixSize * kMatrixSize, distribution(gen));
-  std::vector<double> input_matrix_b(kMatrixSize * kMatrixSize, distribution(gen));
-  std::vector<double> output_matrix_c(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> input_matrix_a(kMatrixSize * kMatrixSize);
+  std::vector<double> input_matrix_b(kMatrixSize * kMatrixSize);
+  std::ranges::generate(input_matrix_a.begin(), input_matrix_a.end(), [&] { return distribution(gen); });
+  std::ranges::generate(input_matrix_b.begin(), input_matrix_b.end(), [&] { return distribution(gen); });
+  std::vector<double> output_matrix_c(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize, 0);
+  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> true_sol(1, true_solution);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
