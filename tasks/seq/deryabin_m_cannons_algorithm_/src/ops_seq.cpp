@@ -1,4 +1,4 @@
-#include "seq/deryabin_m_cannons_algorithm/include/ops_seq.hpp"
+#include "seq/deryabin_m_cannons_algorithm_/include/ops_seq.hpp"
 
 #include <cmath>
 #include <vector>
