@@ -42,7 +42,7 @@ bool NetworkTopology::Send(int dest, const void* data, int count, MPI_Datatype d
     if (next == dest) {
       break;
     }
-    
+
     int opposite = (next == right_) ? left_ : right_;
     MPI_Recv(const_cast<void*>(data), count, datatype, opposite, 0, topology_comm_, MPI_STATUS_IGNORE);
     current = next;
