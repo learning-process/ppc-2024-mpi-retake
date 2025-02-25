@@ -7,9 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
-    // Function to get the root of a label with path compression
-    int
-    karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
+// Function to get the root of a label with path compression
+int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
   if (!label_parent.contains(label)) {
     label_parent[label] = label;  // If label is not in the set, it is its own parent
   } else if (label_parent[label] != label) {
