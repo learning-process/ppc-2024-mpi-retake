@@ -40,8 +40,10 @@ TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_WITH_LOW_RANGE) {
 }
 
 TEST(ersoz_b_rectangular_method_integration_seq, EXCEPTION_ON_ZERO_COUNT) {
+  // NOLINTBEGIN(modernize-type-traits, modernize-type-traits-variable)
   EXPECT_THROW(GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 5, 0, 0),
                std::runtime_error);
+  // NOLINTEND(modernize-type-traits, modernize-type-traits-variable)
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_seq
