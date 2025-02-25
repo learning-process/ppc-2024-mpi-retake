@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/communicator.hpp>
 #include <algorithm>
+#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
