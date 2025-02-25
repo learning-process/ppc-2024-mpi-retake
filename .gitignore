@@ -13,5 +13,4 @@ CMakeSettings.json
 .DS_Store
 .cache
 install
-/tasks/mpi/Konstantinov_I_Gauss_Jordan_method
-/tasks/seq/Konstantinov_I_Gauss_Jordan_method
+
