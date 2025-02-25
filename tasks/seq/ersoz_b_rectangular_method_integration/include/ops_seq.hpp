@@ -1,8 +1,8 @@
 #ifndef ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_SEQ_HPP
 #define ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_SEQ_HPP
 
+#include <cstddef>
 #include <functional>
-#include <stdexcept>
 
 namespace ersoz_b_rectangular_method_integration_seq {
 

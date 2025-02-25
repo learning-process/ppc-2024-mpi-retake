@@ -3,6 +3,7 @@
 #include <cmath>
 #include <functional>
 #include <limits>
+#include <stdexcept>
 
 #include "seq/ersoz_b_rectangular_method_integration/include/ops_seq.hpp"
 
@@ -40,7 +41,7 @@ TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_WITH_LOW_RANGE) {
 
 TEST(ersoz_b_rectangular_method_integration_seq, EXCEPTION_ON_ZERO_COUNT) {
   EXPECT_THROW(GetIntegralRectangularMethodSequential(static_cast<double (*)(double)>(&cos), 5, 0, 0),
-               std::runtime_error);
+               std::runtime_error);  // NOLINT(modernize-type-traits, modernize-type-traits-variable)
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_seq
