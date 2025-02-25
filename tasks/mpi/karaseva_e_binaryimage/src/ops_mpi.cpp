@@ -98,7 +98,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   bool is_root = (rank == 0);
 
   if (is_root && (task_data->inputs.empty() || task_data->inputs_count.empty())) {
-    std::cerr << "[ERROR] Root process has empty inputs or inputs_count.\n";
+    std::cerr << "[Rank " << rank << "] [ERROR] Root process has empty inputs or inputs_count.\n";
     return false;
   }
 
@@ -113,6 +113,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
   std::cout << "[Rank " << rank << "] Received image dimensions: " << rows << "x" << cols << '\n';
+
+  // Debugging: Print rows and cols on each process
+  std::cerr << "[Rank " << rank << "] rows: " << rows << ", cols: " << cols << '\n';
 
   // Ensure valid image dimensions
   if (rows == 0 || cols == 0) {
@@ -133,9 +136,14 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     input_ = std::vector<int>(in_ptr, in_ptr + input_size);
     std::cout << "[Rank 0] Broadcasting image data of size: " << input_size << '\n';
   } else {
+    // Resize input_ to the correct size on non-root processes
     input_.resize(input_size);
   }
 
+  // Ensure all processes have the correct input_size
+  std::cerr << "[Rank " << rank << "] Input size: " << input_size << '\n';
+
+  // Broadcast the image data
   int result = MPI_Bcast(input_.data(), input_size, MPI_INT, 0, MPI_COMM_WORLD);
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error broadcasting image data. MPI_Bcast failed.\n";
@@ -153,6 +161,10 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 
   int input_count = 0;
   int output_count = 0;
+
+  // Debugging: Print the size of inputs_count and outputs_count
+  std::cerr << "[Rank " << rank << "] Size of inputs_count: " << task_data->inputs_count.size() << "\n";
+  std::cerr << "[Rank " << rank << "] Size of outputs_count: " << task_data->outputs_count.size() << "\n";
 
   // Ensure that inputs_count and outputs_count are not empty
   if (!task_data->inputs_count.empty() && !task_data->outputs_count.empty()) {
@@ -193,6 +205,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   int local_rows = rows / num_processes;
 
+  // Debugging: Print rows, cols, local_rows, start_row, and end_row on each process
+  std::cerr << "[Rank " << rank << "] rows: " << rows << ", cols: " << cols << ", local_rows: " << local_rows << '\n';
+
   std::unordered_map<int, int> label_parent;
   local_labeled_image_.resize(local_rows * cols, 0);
   std::vector<int> neighbors;
@@ -200,6 +215,10 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   // Perform labeling for the local region assigned to the current process
   int start_row = rank * local_rows;
   int end_row = (rank + 1) * local_rows;
+
+  // Debugging: Print start_row and end_row on each process
+  std::cerr << "[Rank " << rank << "] start_row: " << start_row << ", end_row: " << end_row << '\n';
+
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, start_row, end_row);
 
   // Ensure output buffer is allocated for gather
@@ -208,8 +227,23 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
     return false;
   }
 
-  int result = MPI_Gather(local_labeled_image_.data(), local_rows * cols, MPI_INT,
-                          reinterpret_cast<int*>(task_data->outputs[0]), local_rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
+  // Use MPI_Gatherv for uneven data distribution
+  std::vector<int> recv_counts(num_processes);
+  std::vector<int> displs(num_processes);
+
+  int local_size = local_rows * cols;
+  MPI_Gather(&local_size, 1, MPI_INT, recv_counts.data(), 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (rank == 0) {
+    displs[0] = 0;
+    for (int i = 1; i < num_processes; ++i) {
+      displs[i] = displs[i - 1] + recv_counts[i - 1];
+    }
+  }
+
+  int result =
+      MPI_Gatherv(local_labeled_image_.data(), local_size, MPI_INT, reinterpret_cast<int*>(task_data->outputs[0]),
+                  recv_counts.data(), displs.data(), MPI_INT, 0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
