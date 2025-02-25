@@ -2,6 +2,7 @@
 #include <mpi.h>
 
 #include <cmath>
+#include <cstddef>  // size_t için
 #include <limits>
 #include <stdexcept>
 
