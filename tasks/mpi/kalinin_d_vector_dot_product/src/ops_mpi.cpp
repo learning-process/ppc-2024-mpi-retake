@@ -1,14 +1,18 @@
 // Copyright 2024 Nesterov Alexander
 #include "mpi/kalinin_d_vector_dot_product/include/ops_mpi.hpp"
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/operations.hpp>
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <vector>
-
 int kalinin_d_vector_dot_product_mpi::vectorDotProduct(const std::vector<int>& v1, const std::vector<int>& v2) {
   long long result = 0;
-  for (size_t i = 0; i < v1.size(); i++) result += v1[i] * v2[i];
-  return result;
+  for (size_t i = 0; i < v1.size(); i++) {
+    result += v1[i] * v2[i];
+  }
+  return static_cast<int>(result);
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskSequential::ValidationImpl() {
@@ -79,7 +83,7 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
       counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
     }
   }
-  boost::mpi::broadcast(world, counts_.data(), num_processes_, 0);
+  boost::mpi::broadcast(world, counts_.data(), static_cast<int>(num_processes_), 0);
 
   if (world.rank() == 0) {
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
@@ -101,8 +105,8 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
     size_t offset_remainder = counts_[0];
     for (unsigned int proc = 1; proc < num_processes_; proc++) {
       size_t current_count = counts_[proc];
-      world.send(proc, 0, input_[0].data() + offset_remainder, current_count);
-      world.send(proc, 1, input_[1].data() + offset_remainder, current_count);
+      world.send(static_cast<int>(proc), 0, input_[0].data() + offset_remainder, static_cast<int>(current_count));
+      world.send(static_cast<int>(proc), 1, input_[1].data() + offset_remainder, static_cast<int>(current_count));
       offset_remainder += current_count;
     }
   }
@@ -111,8 +115,8 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   local_input2_ = std::vector<int>(counts_[world.rank()]);
 
   if (world.rank() > 0) {
-    world.recv(0, 0, local_input1_.data(), counts_[world.rank()]);
-    world.recv(0, 1, local_input2_.data(), counts_[world.rank()]);
+    world.recv(0, 0, local_input1_.data(), static_cast<int>(counts_[world.rank()]));
+    world.recv(0, 1, local_input2_.data(), static_cast<int>(counts_[world.rank()]));
   } else {
     local_input1_ = std::vector<int>(input_[0].begin(), input_[0].begin() + counts_[0]);
     local_input2_ = std::vector<int>(input_[1].begin(), input_[1].begin() + counts_[0]);
@@ -123,7 +127,7 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   for (size_t i = 0; i < local_input1_.size(); i++) {
     local_res += local_input1_[i] * local_input2_[i];
   }
-  boost::mpi::reduce(world, local_res, res, std::plus<>(), 0);
+  boost::mpi::reduce(world, local_res, res_, std::plus<>(), 0);
   return true;
 }
 
