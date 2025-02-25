@@ -16,7 +16,6 @@ NetworkTopology::~NetworkTopology() {
 }
 
 void NetworkTopology::CreateRingTopology() {
-  // Initialize world_group to satisfy clang-tidy.
   MPI_Group world_group = MPI_GROUP_NULL;
   MPI_Comm_group(global_comm_, &world_group);
 
@@ -34,19 +33,16 @@ bool NetworkTopology::Send(int dest, const void* data, int count, MPI_Datatype d
 
   int current = rank_;
   while (current != dest) {
-    // Calculate distances in both directions.
     int dist_right = (dest - current + size_) % size_;
     int dist_left = (current - dest + size_) % size_;
 
     int next = (dist_right <= dist_left) ? right_ : left_;
     MPI_Send(data, count, datatype, next, 0, topology_comm_);
 
-    // If the next hop is the destination, we can stop.
     if (next == dest) {
       break;
     }
-
-    // Receive forwarded message from the opposite side.
+    
     int opposite = (next == right_) ? left_ : right_;
     MPI_Recv(const_cast<void*>(data), count, datatype, opposite, 0, topology_comm_, MPI_STATUS_IGNORE);
     current = next;
