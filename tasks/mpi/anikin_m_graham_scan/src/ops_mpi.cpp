@@ -163,7 +163,7 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
-  MPI_Datatype mpi_pt   // NOLINT
+  MPI_Datatype mpi_pt;  // NOLINT
   MPI_Type_contiguous(2, MPI_INT, &mpi_pt);
   MPI_Type_commit(&mpi_pt);
 
