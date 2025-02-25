@@ -84,7 +84,7 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
       counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
     }
   }
-  boost::mpi::broadcast(world_, counts_.data(), num_processes_, 0);
+  boost::mpi::broadcast(world_, counts_.data(), static_cast<int>(num_processes_), 0);
 
   if (world_.rank() == 0) {
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
@@ -104,11 +104,13 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   if (world_.rank() == 0) {
     size_t offset_remainder = counts_[0];
-    for (unsigned int proc = 1; proc < num_processes_; proc++) {
+    for (size_t proc = 1; proc < num_processes_; proc++) {
       size_t current_count = counts_[proc];
-      world_.send(proc, 0, input_[0].data() + offset_remainder, current_count);
-      world_.send(proc, 1, input_[1].data() + offset_remainder, current_count);
-      offset_remainder += current_count;
+      world_.send(static_cast<int>(proc), 0, input_[0].data() + static_cast<int>(offset_remainder),
+                  static_cast<int>(current_count));
+
+      world_.send(static_cast<int>(proc), 1, input_[1].data() + static_cast<int>(offset_remainder),
+                  static_cast<int>(current_count));
     }
   }
 
@@ -116,11 +118,13 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   local_input2_ = std::vector<int>(counts_[world_.rank()]);
 
   if (world_.rank() > 0) {
-    world_.recv(0, 0, local_input1_.data(), counts_[world_.rank()]);
-    world_.recv(0, 1, local_input2_.data(), counts_[world_.rank()]);
+    world_.recv(0, 0, local_input1_.data(), static_cast<int>(counts_[world_.rank()]));
+    world_.recv(0, 1, local_input2_.data(), static_cast<int>(counts_[world_.rank()]));
   } else {
-    local_input1_ = std::vector<int>(input_[0].begin(), input_[0].begin() + counts_[0]);
-    local_input2_ = std::vector<int>(input_[1].begin(), input_[1].begin() + counts_[0]);
+    local_input1_ = std::vector<int>(input_[0].begin(),
+                                     input_[0].begin() + static_cast<std::vector<int>::difference_type>(counts_[0]));
+    local_input2_ = std::vector<int>(input_[1].begin(),
+                                     input_[1].begin() + static_cast<std::vector<int>::difference_type>(counts_[0]));
   }
 
   int local_res = 0;
