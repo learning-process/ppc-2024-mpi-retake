@@ -3,6 +3,7 @@
 
 #include <mpi.h>
 
+#include <cstdint>
 #include <algorithm>
 #include <cstddef>
 #include <random>

@@ -1,6 +1,7 @@
 // Anikin Maksim 2025
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
+#include <cstdint>
 #include <algorithm>
 #include <random>
 #include <vector>
@@ -106,27 +107,37 @@ void anikin_m_graham_scan_seq::CreateTestData(std::vector<Pt> &alg_in, int test)
 }
 
 void anikin_m_graham_scan_seq::ConvexHull(std::vector<Pt> &a) {
-  if (a.size() == 1 || a.size() == 0) {
+  if (a.size() <= 1) {
     return;
   }
-  sort(a.begin(), a.end(), &Cmp);
-  Pt p1 = a[0], p2 = a.back();
-  std::vector<Pt> up, down;
+  std::ranges::sort(a, &Cmp);
+  Pt p1 = a[0];
+  Pt p2 = a.back();
+  std::vector<Pt> up;
+  std::vector<Pt> down;
   up.push_back(p1);
   down.push_back(p1);
   for (size_t i = 1; i < a.size(); ++i) {
     if (i == a.size() - 1 || Cw(p1, a[i], p2)) {
-      while (up.size() >= 2 && !Cw(up[up.size() - 2], up[up.size() - 1], a[i])) up.pop_back();
+      while (up.size() >= 2 && !Cw(up[up.size() - 2], up[up.size() - 1], a[i])) {
+        up.pop_back();
+      }
       up.push_back(a[i]);
     }
     if (i == a.size() - 1 || Ccw(p1, a[i], p2)) {
-      while (down.size() >= 2 && !Ccw(down[down.size() - 2], down[down.size() - 1], a[i])) down.pop_back();
+      while (down.size() >= 2 && !Ccw(down[down.size() - 2], down[down.size() - 1], a[i])) {
+        down.pop_back();
+      }
       down.push_back(a[i]);
     }
   }
   a.clear();
-  for (size_t i = 0; i < up.size(); ++i) a.push_back(up[i]);
-  for (size_t i = down.size() - 2; i > 0; --i) a.push_back(down[i]);
+  for (size_t i = 0; i < up.size(); ++i) {
+    a.push_back(up[i]);
+  }
+  for (size_t i = down.size() - 2; i > 0; --i) {
+    a.push_back(down[i]);
+  }
 }
 
 void anikin_m_graham_scan_seq::CreateRandomData(std::vector<Pt> &alg_in, int count) {

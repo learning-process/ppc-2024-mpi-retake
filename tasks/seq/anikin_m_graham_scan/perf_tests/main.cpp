@@ -1,6 +1,8 @@
 // Anikin Maksim 2025
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <memory>
 #include <chrono>
 #include <vector>
 
