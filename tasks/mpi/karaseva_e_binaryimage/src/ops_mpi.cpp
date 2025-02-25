@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>  // Добавлено для size_t
 #include <iostream>
 #include <unordered_map>
 #include <vector>
@@ -183,7 +184,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   MPI_Allreduce(MPI_IN_PLACE, labeled_image.data(), rows * cols, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
-  if (output_.size() != static_cast<size_t>(rows * cols)) {
+  if (output_.size() != static_cast<std::size_t>(rows * cols)) {
     output_.resize(rows * cols);
   }
 
@@ -193,13 +194,25 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (output_.empty() || task_data->outputs.empty() || task_data->outputs[0] == nullptr ||
-      task_data->outputs_count.empty() || task_data->outputs_count[0] != output_.size()) {
-    std::cerr << "[ERROR] Output is null or empty! Expected size: " << task_data->outputs_count[0]
-              << ", Actual size: " << output_.size() << "\n";
-    return false;
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  if (rank == 0) {
+    if (task_data->outputs.empty() || task_data->outputs_count.empty()) {
+      std::cerr << "[ERROR] Output buffer is not allocated!\n";
+      return false;
+    }
+
+    int output_size = static_cast<int>(task_data->outputs_count[0]);
+    auto* out_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
+
+    if (output_.empty() || output_size == 0) {
+      std::cerr << "[ERROR] Output is null or empty!\n";
+      return false;
+    }
+
+    std::copy(output_.begin(), output_.end(), out_ptr);
   }
 
-  std::ranges::copy(output_.begin(), output_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
   return true;
 }
