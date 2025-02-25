@@ -11,7 +11,7 @@
 
 TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
   // Create data
-  int expectation = 5000000;
+  int expectation = 50000000;
   std::vector<char> in_string(expectation, 'a');
   std::vector<int> out(1, 0);
   std::vector<char> in_target(1, 'a');
@@ -52,7 +52,7 @@ TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
 
 TEST(strakhov_a_char_freq_counter_seq, test_task_run) {
   // Create data
-  int expectation = 5000000;
+  int expectation = 50000000;
   std::vector<char> in_string(expectation, 'a');
   std::vector<int> out(1, 0);
   std::vector<char> in_target(1, 'a');
