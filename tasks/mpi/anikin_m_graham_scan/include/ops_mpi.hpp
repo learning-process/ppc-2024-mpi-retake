@@ -15,19 +15,19 @@ struct Pt {
   bool operator==(const Pt& other) const { return x == other.x && y == other.y; }
 };
 
-bool cmp(const Pt& a, const Pt& b);
+bool Cmp(const Pt& a, const Pt& b);
 
-bool cw(const Pt& a, const Pt& b, const Pt& c);
+bool Cw(const Pt& a, const Pt& b, const Pt& c);
 
-bool ccw(const Pt& a, const Pt& b, const Pt& c);
+bool Ccw(const Pt& a, const Pt& b, const Pt& c);
 
-void convex_hull(std::vector<Pt>& points);
+void ConvexHull(std::vector<Pt>& points);
 
-bool test_data(std::vector<Pt> alg_out_, int case_);
+bool TestData(std::vector<Pt> alg_out, int test);
 
-void create_test_data(std::vector<Pt>& alg_in_, int case_);
+void CreateTestData(std::vector<Pt>& alg_in, int test);
 
-void create_random_data(std::vector<Pt>& alg_in_, int count);
+void CreateRandomData(std::vector<Pt>& alg_in, int count);
 
 class TestTaskMPI : public ppc::core::Task {
  public:

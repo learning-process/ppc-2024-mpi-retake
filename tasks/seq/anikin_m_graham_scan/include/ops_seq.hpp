@@ -10,19 +10,19 @@ struct Pt {
   double x, y;
 };
 
-bool cmp(Pt a, Pt b);
+bool Cmp(Pt a, Pt b);
 
-bool cw(Pt a, Pt b, Pt c);
+bool Cw(Pt a, Pt b, Pt c);
 
-bool ccw(Pt a, Pt b, Pt c);
+bool Ccw(Pt a, Pt b, Pt c);
 
-void convex_hull(std::vector<Pt>& a);
+void ConvexHull(std::vector<Pt>& a);
 
-bool test_data(std::vector<Pt> alg_out_, int case_);
+bool TestData(std::vector<Pt> alg_out_, int case_);
 
-void create_test_data(std::vector<Pt>& alg_in_, int case_);
+void CreateTestData(std::vector<Pt>& alg_in_, int case_);
 
-void create_random_data(std::vector<Pt>& alg_in_, int count);
+void CreateRandomData(std::vector<Pt>& alg_in_, int count);
 
 class TestTaskSequential : public ppc::core::Task {
  public:

@@ -3,42 +3,54 @@
 
 #include <mpi.h>
 
+#include <algorithm>
+#include <cstddef>
 #include <random>
 #include <vector>
 
-bool anikin_m_graham_scan_mpi::cmp(const Pt& a, const Pt& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
+bool anikin_m_graham_scan_mpi::Cmp(const Pt& a, const Pt& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
 
-bool anikin_m_graham_scan_mpi::cw(const Pt& a, const Pt& b, const Pt& c) {
+bool anikin_m_graham_scan_mpi::Cw(const Pt& a, const Pt& b, const Pt& c) {
   return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0;
 }
 
-bool anikin_m_graham_scan_mpi::ccw(const Pt& a, const Pt& b, const Pt& c) {
+bool anikin_m_graham_scan_mpi::Ccw(const Pt& a, const Pt& b, const Pt& c) {
   return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) > 0;
 }
 
-void anikin_m_graham_scan_mpi::convex_hull(std::vector<Pt>& points) {
-  if (points.size() <= 1) return;
-  std::sort(points.begin(), points.end(), &cmp);
-  Pt p1 = points[0], p2 = points.back();
-  std::vector<Pt> up, down;
+void anikin_m_graham_scan_mpi::ConvexHull(std::vector<Pt>& points) {
+  if (points.size() <= 1) {
+    return;
+  }
+  std::sort(points.begin(), points.end(), &Cmp);
+  Pt p1 = points[0];
+  Pt p2 = points.back();
+  std::vector<Pt> up;
+  std::vector<Pt> down;
   up.push_back(p1);
   down.push_back(p1);
   for (size_t i = 1; i < points.size(); ++i) {
-    if (i == points.size() - 1 || cw(p1, points[i], p2)) {
-      while (up.size() >= 2 && !cw(up[up.size() - 2], up.back(), points[i])) up.pop_back();
+    if (i == points.size() - 1 || Cw(p1, points[i], p2)) {
+      while (up.size() >= 2 && !Cw(up[up.size() - 2], up.back(), points[i])) {
+        up.pop_back();
+      }
       up.push_back(points[i]);
     }
-    if (i == points.size() - 1 || ccw(p1, points[i], p2)) {
-      while (down.size() >= 2 && !ccw(down[down.size() - 2], down.back(), points[i])) down.pop_back();
+    if (i == points.size() - 1 || Ccw(p1, points[i], p2)) {
+      while (down.size() >= 2 && !Ccw(down[down.size() - 2], down.back(), points[i])) {
+        down.pop_back();
+      }
       down.push_back(points[i]);
     }
   }
   points.clear();
   points.insert(points.end(), up.begin(), up.end());
-  for (int i = down.size() - 2; i > 0; --i) points.push_back(down[i]);
+  for (size_t i = down.size() - 2; i > 0; --i) {
+    points.push_back(down[i]);
+  }
 }
 
-bool anikin_m_graham_scan_mpi::test_data(std::vector<Pt> alg_out_, int case_) {
+bool anikin_m_graham_scan_mpi::TestData(std::vector<Pt> alg_out, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -48,46 +60,46 @@ bool anikin_m_graham_scan_mpi::test_data(std::vector<Pt> alg_out_, int case_) {
   // case 2
   //  all_points  = [(0, 0), (1, 3), (2, 1), (3, 2), (4, 0), (2, 4)]
   //  hull_points = [(0, 0), (4, 0), (2, 4), (1, 3)]
-  bool out_ = true;
-  switch (case_) {
+  bool out = true;
+  switch (test) {
     case 1:
     case 0:
-      out_ &= (alg_out_.size() == 4);
+      out &= (alg_out.size() == 4);
 
-      out_ &= (alg_out_[0].x == 0);
-      out_ &= (alg_out_[0].y == 0);
+      out &= (alg_out[0].x == 0);
+      out &= (alg_out[0].y == 0);
 
-      out_ &= (alg_out_[1].x == 0);
-      out_ &= (alg_out_[1].y == 4);
+      out &= (alg_out[1].x == 0);
+      out &= (alg_out[1].y == 4);
 
-      out_ &= (alg_out_[2].x == 4);
-      out_ &= (alg_out_[2].y == 4);
+      out &= (alg_out[2].x == 4);
+      out &= (alg_out[2].y == 4);
 
-      out_ &= (alg_out_[3].x == 4);
-      out_ &= (alg_out_[3].y == 0);
+      out &= (alg_out[3].x == 4);
+      out &= (alg_out[3].y == 0);
       break;
     case 2:
-      out_ &= (alg_out_.size() == 4);
+      out &= (alg_out.size() == 4);
 
-      out_ &= (alg_out_[0].x == 0);
-      out_ &= (alg_out_[0].y == 0);
+      out &= (alg_out[0].x == 0);
+      out &= (alg_out[0].y == 0);
 
-      out_ &= (alg_out_[1].x == 1);
-      out_ &= (alg_out_[1].y == 3);
+      out &= (alg_out[1].x == 1);
+      out &= (alg_out[1].y == 3);
 
-      out_ &= (alg_out_[2].x == 2);
-      out_ &= (alg_out_[2].y == 4);
+      out &= (alg_out[2].x == 2);
+      out &= (alg_out[2].y == 4);
 
-      out_ &= (alg_out_[3].x == 4);
-      out_ &= (alg_out_[3].y == 0);
+      out &= (alg_out[3].x == 4);
+      out &= (alg_out[3].y == 0);
       break;
     default:
       break;
   }
-  return out_;
+  return out;
 }
 
-void anikin_m_graham_scan_mpi::create_test_data(std::vector<Pt>& alg_in_, int case_) {
+void anikin_m_graham_scan_mpi::CreateTestData(std::vector<Pt>& alg_in, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -97,39 +109,39 @@ void anikin_m_graham_scan_mpi::create_test_data(std::vector<Pt>& alg_in_, int ca
   // case 2
   //  all_points  = [(0, 0), (1, 3), (2, 1), (3, 2), (4, 0), (2, 4)]
   //  hull_points = [(0, 0), (4, 0), (2, 4), (1, 3)]
-  alg_in_.clear();
-  switch (case_) {
+  alg_in.clear();
+  switch (test) {
     case 0:
-      alg_in_.push_back({0, 0});
-      alg_in_.push_back({4, 0});
-      alg_in_.push_back({4, 4});
-      alg_in_.push_back({0, 4});
-      alg_in_.push_back({2, 2});
+      alg_in.push_back({0, 0});
+      alg_in.push_back({4, 0});
+      alg_in.push_back({4, 4});
+      alg_in.push_back({0, 4});
+      alg_in.push_back({2, 2});
       break;
     case 1:
-      alg_in_.push_back({0, 0});
-      alg_in_.push_back({1, 1});
-      alg_in_.push_back({2, 2});
-      alg_in_.push_back({3, 3});
-      alg_in_.push_back({4, 0});
-      alg_in_.push_back({4, 4});
-      alg_in_.push_back({0, 4});
+      alg_in.push_back({0, 0});
+      alg_in.push_back({1, 1});
+      alg_in.push_back({2, 2});
+      alg_in.push_back({3, 3});
+      alg_in.push_back({4, 0});
+      alg_in.push_back({4, 4});
+      alg_in.push_back({0, 4});
       break;
     case 2:
-      alg_in_.push_back({0, 0});
-      alg_in_.push_back({1, 3});
-      alg_in_.push_back({2, 1});
-      alg_in_.push_back({3, 2});
-      alg_in_.push_back({4, 0});
-      alg_in_.push_back({2, 4});
+      alg_in.push_back({0, 0});
+      alg_in.push_back({1, 3});
+      alg_in.push_back({2, 1});
+      alg_in.push_back({3, 2});
+      alg_in.push_back({4, 0});
+      alg_in.push_back({2, 4});
       break;
     default:
       break;
   }
 }
 
-void anikin_m_graham_scan_mpi::create_random_data(std::vector<Pt>& alg_in_, int count) {
-  alg_in_.clear();
+void anikin_m_graham_scan_mpi::CreateRandomData(std::vector<Pt>& alg_in, int count) {
+  alg_in.clear();
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0.0, 100.0);
@@ -137,7 +149,7 @@ void anikin_m_graham_scan_mpi::create_random_data(std::vector<Pt>& alg_in_, int 
   for (int i = 0; i < count; i++) {
     rand_.x = (int)dis(gen);
     rand_.y = (int)dis(gen);
-    alg_in_.push_back(rand_);
+    alg_in.push_back(rand_);
   }
 }
 
@@ -151,9 +163,9 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
-  MPI_Datatype MPI_PT;
-  MPI_Type_contiguous(2, MPI_INT, &MPI_PT);
-  MPI_Type_commit(&MPI_PT);
+  MPI_Datatype mpi_pt   // NOLINT
+  MPI_Type_contiguous(2, MPI_INT, &mpi_pt);
+  MPI_Type_commit(&mpi_pt);
 
   std::vector<Pt> local_points;
   int n = 0;
@@ -174,57 +186,57 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
     offset += counts[i];
   }
 
-  MPI_Scatterv(world_.rank() == 0 ? data_.data() : nullptr, counts, displs, MPI_PT, local_points.data(), local_count,
-               MPI_PT, 0, world_);
+  MPI_Scatterv(world_.rank() == 0 ? data_.data() : nullptr, counts, displs, mpi_pt, local_points.data(), local_count,
+               mpi_pt, 0, world_);
 
   Pt local_p1 = {0, 0}, local_p2 = {0, 0};
   if (!local_points.empty()) {
-    local_p1 = *std::min_element(local_points.begin(), local_points.end(), cmp);
-    local_p2 = *std::max_element(local_points.begin(), local_points.end(), cmp);
+    local_p1 = *std::min_element(local_points.begin(), local_points.end(), Cmp);
+    local_p2 = *std::max_element(local_points.begin(), local_points.end(), Cmp);
   }
 
   std::vector<Pt> all_p1(world_.size()), all_p2(world_.size());
-  MPI_Gather(&local_p1, 1, MPI_PT, all_p1.data(), 1, MPI_PT, 0, world_);
-  MPI_Gather(&local_p2, 1, MPI_PT, all_p2.data(), 1, MPI_PT, 0, world_);
+  MPI_Gather(&local_p1, 1, mpi_pt, all_p1.data(), 1, mpi_pt, 0, world_);
+  MPI_Gather(&local_p2, 1, mpi_pt, all_p2.data(), 1, mpi_pt, 0, world_);
 
   Pt global_p1, global_p2;
   if (world_.rank() == 0) {
-    global_p1 = *std::min_element(all_p1.begin(), all_p1.end(), cmp);
-    global_p2 = *std::max_element(all_p2.begin(), all_p2.end(), cmp);
+    global_p1 = *std::min_element(all_p1.begin(), all_p1.end(), Cmp);
+    global_p2 = *std::max_element(all_p2.begin(), all_p2.end(), Cmp);
   }
 
-  MPI_Bcast(&global_p1, 1, MPI_PT, 0, world_);
-  MPI_Bcast(&global_p2, 1, MPI_PT, 0, world_);
+  MPI_Bcast(&global_p1, 1, mpi_pt, 0, world_);
+  MPI_Bcast(&global_p2, 1, mpi_pt, 0, world_);
 
   local_points.push_back(global_p1);
   local_points.push_back(global_p2);
-  std::sort(local_points.begin(), local_points.end(), cmp);
+  std::sort(local_points.begin(), local_points.end(), Cmp);
   auto last = std::unique(local_points.begin(), local_points.end());
   local_points.erase(last, local_points.end());
 
-  convex_hull(local_points);
+  ConvexHull(local_points);
 
   if (world_.rank() != 0) {
     int size = local_points.size();
     MPI_Send(&size, 1, MPI_INT, 0, 0, world_);
-    MPI_Send(local_points.data(), size, MPI_PT, 0, 0, world_);
+    MPI_Send(local_points.data(), size, mpi_pt, 0, 0, world_);
   } else {
     std::vector<Pt> final_hull = local_points;
     for (int i = 1; i < world_.size(); ++i) {
       int recv_size;
       MPI_Recv(&recv_size, 1, MPI_INT, i, 0, world_, MPI_STATUS_IGNORE);
       std::vector<Pt> temp(recv_size);
-      MPI_Recv(temp.data(), recv_size, MPI_PT, i, 0, world_, MPI_STATUS_IGNORE);
+      MPI_Recv(temp.data(), recv_size, mpi_pt, i, 0, world_, MPI_STATUS_IGNORE);
       final_hull.insert(final_hull.end(), temp.begin(), temp.end());
     }
-    convex_hull(final_hull);
+    ConvexHull(final_hull);
     data_.clear();
     data_.insert(data_.begin(), final_hull.begin(), final_hull.end());
   }
 
   delete[] counts;
   delete[] displs;
-  MPI_Type_free(&MPI_PT);
+  MPI_Type_free(&mpi_pt);
 
   return true;
 }

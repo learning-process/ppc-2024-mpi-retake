@@ -1,18 +1,22 @@
 // Anikin Maksim 2025
 #include <gtest/gtest.h>
 
+#include <mpi.h>
+#include <stdint.h>
+#include <memory>
+#include <vector>
+
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/anikin_m_graham_scan/include/ops_mpi.hpp"
 
 TEST(anikin_m_graham_scan, case_0) {
   // Create data
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
-  anikin_m_graham_scan_mpi::create_test_data(in, 0);
+  anikin_m_graham_scan_mpi::CreateTestData(in, 0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -30,7 +34,7 @@ TEST(anikin_m_graham_scan, case_0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
-    EXPECT_EQ(true, anikin_m_graham_scan_mpi::test_data(out, 0));
+    EXPECT_EQ(true, anikin_m_graham_scan_mpi::TestData(out, 0));
   } else {
     EXPECT_EQ(true, true);
   }
@@ -38,12 +42,12 @@ TEST(anikin_m_graham_scan, case_0) {
 
 TEST(anikin_m_graham_scan, case_1) {
   // Create data
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
-  anikin_m_graham_scan_mpi::create_test_data(in, 1);
+  anikin_m_graham_scan_mpi::CreateTestData(in, 1);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -61,7 +65,7 @@ TEST(anikin_m_graham_scan, case_1) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
-    EXPECT_EQ(true, anikin_m_graham_scan_mpi::test_data(out, 1));
+    EXPECT_EQ(true, anikin_m_graham_scan_mpi::TestData(out, 1));
   } else {
     EXPECT_EQ(true, true);
   }
@@ -69,12 +73,12 @@ TEST(anikin_m_graham_scan, case_1) {
 
 TEST(anikin_m_graham_scan, case_2) {
   // Create data
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
-  anikin_m_graham_scan_mpi::create_test_data(in, 2);
+  anikin_m_graham_scan_mpi::CreateTestData(in, 2);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -92,7 +96,7 @@ TEST(anikin_m_graham_scan, case_2) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
-    EXPECT_EQ(true, anikin_m_graham_scan_mpi::test_data(out, 2));
+    EXPECT_EQ(true, anikin_m_graham_scan_mpi::TestData(out, 2));
   } else {
     EXPECT_EQ(true, true);
   }

@@ -10,7 +10,7 @@ TEST(anikin_m_graham_scan, case_0) {
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
 
-  anikin_m_graham_scan_seq::create_test_data(in, 0);
+  anikin_m_graham_scan_seq::CreateTestData(in, 0);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -27,7 +27,7 @@ TEST(anikin_m_graham_scan, case_0) {
   auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::Pt *>(task_data_seq->outputs[0]);
   out = std::vector<anikin_m_graham_scan_seq::Pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
 
-  EXPECT_EQ(true, anikin_m_graham_scan_seq::test_data(out, 0));
+  EXPECT_EQ(true, anikin_m_graham_scan_seq::TestData(out, 0));
 }
 
 TEST(anikin_m_graham_scan, case_1) {
@@ -35,7 +35,7 @@ TEST(anikin_m_graham_scan, case_1) {
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
 
-  anikin_m_graham_scan_seq::create_test_data(in, 1);
+  anikin_m_graham_scan_seq::CreateTestData(in, 1);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -52,7 +52,7 @@ TEST(anikin_m_graham_scan, case_1) {
   auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::Pt *>(task_data_seq->outputs[0]);
   out = std::vector<anikin_m_graham_scan_seq::Pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
 
-  EXPECT_EQ(true, anikin_m_graham_scan_seq::test_data(out, 1));
+  EXPECT_EQ(true, anikin_m_graham_scan_seq::TestData(out, 1));
 }
 
 TEST(anikin_m_graham_scan, case_2) {
@@ -60,7 +60,7 @@ TEST(anikin_m_graham_scan, case_2) {
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
 
-  anikin_m_graham_scan_seq::create_test_data(in, 2);
+  anikin_m_graham_scan_seq::CreateTestData(in, 2);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -77,5 +77,5 @@ TEST(anikin_m_graham_scan, case_2) {
   auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::Pt *>(task_data_seq->outputs[0]);
   out = std::vector<anikin_m_graham_scan_seq::Pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
 
-  EXPECT_EQ(true, anikin_m_graham_scan_seq::test_data(out, 2));
+  EXPECT_EQ(true, anikin_m_graham_scan_seq::TestData(out, 2));
 }

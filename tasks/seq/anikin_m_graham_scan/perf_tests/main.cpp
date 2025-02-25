@@ -14,7 +14,7 @@ TEST(anikin_m_graham_scan, test_pipeline_run) {
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
 
-  anikin_m_graham_scan_seq::create_random_data(in, kCount);
+  anikin_m_graham_scan_seq::CreateRandomData(in, kCount);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -50,7 +50,7 @@ TEST(anikin_m_graham_scan, test_task_run) {
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
 
-  anikin_m_graham_scan_seq::create_random_data(in, kCount);
+  anikin_m_graham_scan_seq::CreateRandomData(in, kCount);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
