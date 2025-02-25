@@ -141,7 +141,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     input_.resize(input_size);
   }
 
-  int result = MPI_Bcast(input_.data(), input_size, MPI_INT, 0, MPI_COMM_WORLD);
+  int result = MPI_Bcast(input_.data(), static_cast<int>(input_size), MPI_INT, 0, MPI_COMM_WORLD);
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error broadcasting image data. MPI_Bcast failed.\n";
     return false;
