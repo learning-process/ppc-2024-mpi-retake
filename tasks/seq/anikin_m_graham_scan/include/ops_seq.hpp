@@ -1,0 +1,39 @@
+// Anikin Maksim 2025
+
+#include <vector>
+
+#include "core/task/include/task.hpp"
+
+namespace anikin_m_graham_scan_seq {
+
+struct Pt {
+  double x, y;
+};
+
+bool Cmp(Pt a, Pt b);
+
+bool Cw(Pt a, Pt b, Pt c);
+
+bool Ccw(Pt a, Pt b, Pt c);
+
+void ConvexHull(std::vector<Pt>& a);
+
+bool TestData(std::vector<Pt> alg_out, int test);
+
+void CreateTestData(std::vector<Pt>& alg_in, int test);
+
+void CreateRandomData(std::vector<Pt>& alg_in, int count);
+
+class TestTaskSequential : public ppc::core::Task {
+ public:
+  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}  // NOLINT
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
+
+ private:
+  std::vector<Pt> data_;
+};
+
+}  // namespace anikin_m_graham_scan_seq
