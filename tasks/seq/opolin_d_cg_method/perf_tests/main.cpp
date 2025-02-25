@@ -55,7 +55,7 @@ TEST(opolin_d_cg_method_seq, test_pipeline_run) {
   std::vector<double> a;
   std::vector<double> b;
   std::vector<double> x;
-  opolin_d_cg_method_seq::genDataCGMethod(size, a, b, x);
+  opolin_d_cg_method_seq::GenDataCgMethod(size, a, b, x);
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;
   // Create TaskData
@@ -97,7 +97,7 @@ TEST(opolin_d_cg_method_seq, test_task_run) {
   std::vector<double> a;
   std::vector<double> b;
   std::vector<double> x;
-  opolin_d_cg_method_seq::genDataCGMethod(size, a, b, x);
+  opolin_d_cg_method_seq::GenDataCgMethod(size, a, b, x);
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;
   // Create TaskData

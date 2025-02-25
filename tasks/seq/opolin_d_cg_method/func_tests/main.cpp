@@ -173,7 +173,7 @@ TEST(opolin_d_cg_method_seq, test_negative_values) {
   int size = 3;
   double epsilon = 1e-9;
   std::vector<double> expected, a, b;
-  A = {244.913, -64.084, 59.893, -64.084, 84.215, -23.392, 59.893, -23.392, 31.227};
+  a = {244.913, -64.084, 59.893, -64.084, 84.215, -23.392, 59.893, -23.392, 31.227};
   b = {47.955, -146.484, 35.406};
   expected = {-0.437926, -1.924931, 0.531806};
   std::vector<double> out(size, 0.0);
