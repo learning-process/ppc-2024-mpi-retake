@@ -13,7 +13,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/mezhuev_m_most_different_neighbor_elements_mpi/include/mpi.hpp"
 
-void generateRandomData(boost::mpi::communicator& world, std::vector<int>& in) {
+void GenerateRandomData(boost::mpi::communicator& world, std::vector<int>& in) {
   if (world.rank() == 0) {
     for (size_t i = 0; i < in.size(); i++) {
       in[i] = rand() % 1000000;
@@ -35,7 +35,7 @@ TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
     FAIL();
   }
 
-  generateRandomData(world, in);
+  GenerateRandomData(world, in);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
@@ -81,7 +81,7 @@ TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_task_run) {
   std::vector<int> out1(2, 0);
   std::vector<int> out2(2, 0);
 
-  generateRandomData(world, in);
+  GenerateRandomData(world, in);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
