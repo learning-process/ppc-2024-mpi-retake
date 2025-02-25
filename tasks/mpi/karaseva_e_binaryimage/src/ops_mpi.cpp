@@ -195,8 +195,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   unsigned int cols = task_data->inputs_count[1];
   int num_processes = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
-
-  int local_rows = rows / num_processes;
+  
+  unsigned int local_rows = rows / num_processes;
 
   std::unordered_map<int, int> label_parent;
   local_labeled_image_.resize(local_rows * cols, 0);
@@ -205,7 +205,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   // Perform labeling for the local region assigned to the current process
   int start_row = rank * local_rows;
   int end_row = (rank + 1) * local_rows;
-  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, start_row, end_row);
+  Labeling(input_, local_labeled_image_, static_cast<int>(rows), static_cast<int>(cols), 2, label_parent,
+           static_cast<int>(start_row), static_cast<int>(end_row));
 
   // Ensure output buffer is allocated for gather
   if (task_data->outputs[0] == nullptr) {
@@ -213,8 +214,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
     return false;
   }
 
-  int result = MPI_Gather(local_labeled_image_.data(), local_rows * cols, MPI_INT,
-                          reinterpret_cast<int*>(task_data->outputs[0]), local_rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
+  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT,
+                          reinterpret_cast<int*>(task_data->outputs[0]), static_cast<int>(local_rows * cols), MPI_INT,
+                          0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
