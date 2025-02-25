@@ -1,7 +1,7 @@
 // Anikin Maksim 2025
 #include <gtest/gtest.h>
-#include <mpi.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -11,8 +11,6 @@
 
 TEST(anikin_m_graham_scan, case_0) {
   // Create data
-  int rank = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
@@ -30,7 +28,8 @@ TEST(anikin_m_graham_scan, case_0) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  if (rank == 0) {
+  boost::mpi::communicator world_;
+  if (world_.rank() == 0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
@@ -42,8 +41,6 @@ TEST(anikin_m_graham_scan, case_0) {
 
 TEST(anikin_m_graham_scan, case_1) {
   // Create data
-  int rank = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
@@ -61,7 +58,8 @@ TEST(anikin_m_graham_scan, case_1) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  if (rank == 0) {
+  boost::mpi::communicator world_;
+  if (world_.rank() == 0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
@@ -73,8 +71,6 @@ TEST(anikin_m_graham_scan, case_1) {
 
 TEST(anikin_m_graham_scan, case_2) {
   // Create data
-  int rank = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
@@ -92,7 +88,8 @@ TEST(anikin_m_graham_scan, case_2) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  if (rank == 0) {
+  boost::mpi::communicator world_;
+  if (world_.rank() == 0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
