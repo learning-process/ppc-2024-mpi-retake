@@ -1,5 +1,4 @@
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
-
 #include <mpi.h>
 
 #include <algorithm>
@@ -8,8 +7,9 @@
 #include <unordered_map>
 #include <vector>
 
-// Function to get the root of a label with path compression
-int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
+    // Function to get the root of a label with path compression
+    int
+    karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
   if (!label_parent.contains(label)) {
     label_parent[label] = label;  // If label is not in the set, it is its own parent
   } else if (label_parent[label] != label) {
@@ -180,7 +180,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
-  int rank = 0;
+  int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   unsigned int rows = task_data->inputs_count[0];
@@ -195,8 +195,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> neighbors;
 
   // Perform labeling for the local region assigned to the current process
-  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, static_cast<int>(rank) * local_rows,
-           static_cast<int>((rank + 1) * local_rows));
+  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, rank * local_rows, (rank + 1) * local_rows);
 
   // Ensure output buffer is allocated for gather
   if (task_data->outputs[0] == nullptr) {
@@ -205,7 +204,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   }
 
   int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT,
-                          task_data->outputs[0], static_cast<int>(local_rows * cols), MPI_INT, 0, MPI_COMM_WORLD);
+                          reinterpret_cast<int*>(task_data->outputs[0]), static_cast<int>(local_rows * cols), MPI_INT,
+                          0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
