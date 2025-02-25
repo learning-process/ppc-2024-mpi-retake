@@ -195,7 +195,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> neighbors;
 
   // Perform labeling for the local region assigned to the current process
-  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, rank * local_rows, (rank + 1) * local_rows);
+  Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, static_cast<int>(rank) * local_rows,
+           static_cast<int>((rank + 1) * local_rows));
 
   // Ensure output buffer is allocated for gather
   if (task_data->outputs[0] == nullptr) {
@@ -203,8 +204,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
     return false;
   }
 
-  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_UNSIGNED,
-                          task_data->outputs[0], static_cast<int>(local_rows * cols), MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT,
+                          task_data->outputs[0], static_cast<int>(local_rows * cols), MPI_INT, 0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
