@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>  // Добавлено для size_t
+#include <cstddef>
 #include <iostream>
 #include <unordered_map>
 #include <vector>
