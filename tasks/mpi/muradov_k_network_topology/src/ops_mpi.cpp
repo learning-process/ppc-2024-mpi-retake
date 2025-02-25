@@ -1,6 +1,6 @@
 #include "mpi/muradov_k_network_topology/include/ops_mpi.hpp"
 
-#include <stdexcept>
+#include <mpi.h>
 
 namespace muradov_k_network_topology_mpi {
 
@@ -15,8 +15,9 @@ NetworkTopology::~NetworkTopology() {
   }
 }
 
-void NetworkTopology::create_ring_topology() {
-  MPI_Group world_group;
+void NetworkTopology::CreateRingTopology() {
+  // Initialize world_group to satisfy clang-tidy.
+  MPI_Group world_group = MPI_GROUP_NULL;
   MPI_Comm_group(global_comm_, &world_group);
 
   left_ = (rank_ - 1 + size_) % size_;
@@ -26,8 +27,10 @@ void NetworkTopology::create_ring_topology() {
   MPI_Group_free(&world_group);
 }
 
-bool NetworkTopology::send(int dest, const void* data, int count, MPI_Datatype datatype) {
-  if (topology_comm_ == MPI_COMM_NULL) return false;
+bool NetworkTopology::Send(int dest, const void* data, int count, MPI_Datatype datatype) {
+  if (topology_comm_ == MPI_COMM_NULL) {
+    return false;
+  }
 
   int current = rank_;
   while (current != dest) {
@@ -39,19 +42,22 @@ bool NetworkTopology::send(int dest, const void* data, int count, MPI_Datatype d
     MPI_Send(data, count, datatype, next, 0, topology_comm_);
 
     // If the next hop is the destination, we can stop.
-    if (next == dest) break;
+    if (next == dest) {
+      break;
+    }
 
-    // Receive the forwarded message from the opposite side.
+    // Receive forwarded message from the opposite side.
     int opposite = (next == right_) ? left_ : right_;
     MPI_Recv(const_cast<void*>(data), count, datatype, opposite, 0, topology_comm_, MPI_STATUS_IGNORE);
-
     current = next;
   }
   return true;
 }
 
-bool NetworkTopology::receive(int source, void* buffer, int count, MPI_Datatype datatype) {
-  if (topology_comm_ == MPI_COMM_NULL) return false;
+bool NetworkTopology::Receive(int source, void* buffer, int count, MPI_Datatype datatype) {
+  if (topology_comm_ == MPI_COMM_NULL) {
+    return false;
+  }
 
   MPI_Status status;
   MPI_Probe(MPI_ANY_SOURCE, 0, topology_comm_, &status);
