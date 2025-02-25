@@ -27,12 +27,12 @@ std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
 
 // Test for the pipeline run
 TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
-  constexpr int kRows = 100;
-  constexpr int kCols = 100;
+  constexpr int kRows = 10000;
+  constexpr int kCols = 10000;
 
   // Create binary image data
   std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
-  std::vector<int> output(kRows * kCols, 0);
+  std::vector<uint32_t> output(kRows * kCols, 0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -72,12 +72,12 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
 
 // Test for the task run
 TEST(karaseva_e_binaryimage_mpi, test_task_run) {
-  constexpr int kRows = 100;
-  constexpr int kCols = 100;
+  constexpr int kRows = 10000;
+  constexpr int kCols = 10000;
 
   // Create binary image data
   std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
-  std::vector<int> output(kRows * kCols, 0);
+  std::vector<uint32_t> output(kRows * kCols, 0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();

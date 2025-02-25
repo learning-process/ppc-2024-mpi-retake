@@ -11,7 +11,7 @@
 // Function to get the root of a label with path compression
 int karaseva_e_binaryimage_mpi::TestTaskMPI::GetRootLabel(std::unordered_map<int, int>& label_parent, int label) {
   if (!label_parent.contains(label)) {
-    label_parent[label] = label;  // If label is not in the set, it is its own parent
+    label_parent[label] = label;
   } else if (label_parent[label] != label) {
     label_parent[label] = GetRootLabel(label_parent, label_parent[label]);  // Path compression
   }
@@ -24,7 +24,7 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::UnionLabels(std::unordered_map<int
   int root1 = GetRootLabel(label_parent, label1);
   int root2 = GetRootLabel(label_parent, label2);
   if (root1 != root2) {
-    label_parent[root2] = root1;  // Union: make root1 the parent of root2
+    label_parent[root2] = root1;  // Union
   }
 }
 
@@ -38,9 +38,8 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::ProcessNeighbors(int x, int y, int
   for (int i = 0; i < 3; ++i) {
     int nx = x + dx[i];
     int ny = y + dy[i];
-    // Check if the neighbor is within bounds and has a label >= 2 (indicating it's part of a label)
     if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[(nx * cols) + ny] >= 2) {
-      neighbors.push_back(labeled_image[(nx * cols) + ny]);  // Add the label of the neighbor
+      neighbors.push_back(labeled_image[(nx * cols) + ny]);
     }
   }
 }
@@ -53,9 +52,8 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::v
   if (neighbors.empty()) {
     labeled_image[pos] = label_counter++;  // No neighbors, assign a new label
   } else {
-    int min_neighbor = *std::ranges::min_element(neighbors);  // Find the smallest label from neighbors
+    int min_neighbor = *std::ranges::min_element(neighbors);
     labeled_image[pos] = min_neighbor;
-    // Perform union with all neighbors to ensure they share the same label
     for (int n : neighbors) {
       UnionLabels(label_parent, min_neighbor, n);
     }
@@ -76,22 +74,19 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
-      // Skip pixels that are background or already labeled
       if (image[pos] == 0 || labeled_image[pos] >= 2) {
         std::vector<int> neighbors;
-        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);  // Find neighbors
-        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter,
-                           neighbors);  // Assign label and union with neighbors
+        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
+        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);
       }
     }
   }
 
-  // Second pass: Ensure all pixels with labels are assigned to their root label
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
       if (labeled_image[pos] >= 2) {
-        labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);  // Path compression
+        labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);
       }
     }
   }
@@ -107,48 +102,30 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     return false;
   }
 
-  unsigned int rows = task_data->inputs_count[0];
-  unsigned int cols = task_data->inputs_count[1];
-  if (is_root) {
-    rows = task_data->inputs_count[0];
-    cols = task_data->inputs_count[1];
-  }
+  int input_size = is_root ? static_cast<int>(task_data->inputs_count[0]) : 0;
+  int rows = is_root ? static_cast<int>(task_data->inputs_count[0] / task_data->inputs_count[1]) : 0;
+  int cols = is_root ? static_cast<int>(task_data->inputs_count[1]) : 0;
 
-  // Broadcasting the size and image dimensions to all processes
-  MPI_Bcast(&rows, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cols, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
-  std::cout << "[Rank " << rank << "] Received image dimensions: " << rows << "x" << cols << '\n';
+  MPI_Bcast(&input_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  // Ensure valid image dimensions
   if (rows == 0 || cols == 0) {
-    std::cerr << "[Rank " << rank << "] [ERROR] Invalid image dimensions: " << rows << "x" << cols << '\n';
+    std::cerr << "[ERROR] Rows or columns size is zero.\n";
     return false;
   }
 
-  unsigned int input_size = rows * cols;
+  rc_size_ = rows;
+  input_size_ = input_size;
 
-  // Broadcasting the image data
   if (is_root) {
-    // Check if the input pointer is not null
-    if (task_data->inputs[0] == nullptr) {
-      std::cerr << "[Rank " << rank << "] [ERROR] Input data pointer is null.\n";
-      return false;
-    }
     auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
-    input_ = std::vector<int>(in_ptr, in_ptr + input_size);
-    std::cout << "[Rank 0] Broadcasting image data of size: " << input_size << '\n';
+    input_ = std::vector<int>(in_ptr, in_ptr + input_size_);
   } else {
-    input_.resize(input_size);
+    input_.resize(rows * cols);
   }
 
-  int result = MPI_Bcast(input_.data(), static_cast<int>(input_size), MPI_INT, 0, MPI_COMM_WORLD);
-  if (result != MPI_SUCCESS) {
-    std::cerr << "[Rank " << rank << "] Error broadcasting image data. MPI_Bcast failed.\n";
-    return false;
-  }
-
-  std::cout << "[Rank " << rank << "] Image data broadcasted successfully.\n";
-
+  MPI_Bcast(input_.data(), input_size_, MPI_INT, 0, MPI_COMM_WORLD);
   return true;
 }
 
@@ -159,69 +136,54 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
   unsigned int input_count = 0;
   unsigned int output_count = 0;
 
-  // Ensure that inputs_count and outputs_count are not empty
-  if (!task_data->inputs_count.empty() && !task_data->outputs_count.empty()) {
+  if (!task_data->inputs_count.empty()) {
     input_count = task_data->inputs_count[0];
+  }
+  if (!task_data->outputs_count.empty()) {
     output_count = task_data->outputs_count[0];
   }
 
-  // Debugging output to track input and output dimensions
-  std::cerr << "[Rank " << rank << "] input_count: " << input_count << ", output_count: " << output_count << "\n";
+  MPI_Bcast(&input_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&output_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
-  // Validate input and output dimensions
-  if (input_count == 0 || output_count == 0) {
-    std::cerr << "[Rank " << rank << "] [ERROR] One of the counts is zero: input_count = " << input_count
-              << ", output_count = " << output_count << "\n";
-    return false;
-  }
+  bool local_valid = (input_count > 0) && (output_count > 0) && (input_count == output_count);
 
-  if (input_count != output_count) {
-    std::cerr << "[Rank " << rank << "] [ERROR] Input count does not match output count: input_count = " << input_count
-              << ", output_count = " << output_count << "\n";
-    return false;
-  }
+  MPI_Bcast(&local_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
 
-  // Debugging output to ensure that inputs and outputs are consistent across all ranks
-  std::cerr << "[Rank " << rank << "] Validation successful\n";
-
-  return true;
+  return local_valid;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
+  if (rc_size_ == 0) {
+    std::cerr << "[ERROR] rc_size_ is zero. Exiting.\n";
+    return false;
+  }
+
+  int rows = rc_size_;
+  int cols = input_size_ / rows;
+  int min_label = 2;
+  std::unordered_map<int, int> label_parent;
+
+  int num_procs = 0;
   int rank = 0;
+  MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  unsigned int rows = task_data->inputs_count[0];
-  unsigned int cols = task_data->inputs_count[1];
-  int num_processes = 0;
-  MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
-  
-  unsigned int local_rows = rows / num_processes;
+  int rows_per_proc = rows / num_procs;
+  int remainder = rows % num_procs;
+  int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
+  int end_row = start_row + ((rank < remainder) ? (rows_per_proc + 1) : rows_per_proc);
 
-  std::unordered_map<int, int> label_parent;
-  local_labeled_image_.resize(local_rows * cols, 0);
-  std::vector<int> neighbors;
-
-  // Perform labeling for the local region assigned to the current process
-  int start_row = rank * local_rows;
-  int end_row = (rank + 1) * local_rows;
-  Labeling(input_, local_labeled_image_, static_cast<int>(rows), static_cast<int>(cols), 2, label_parent,
-           static_cast<int>(start_row), static_cast<int>(end_row));
-
-  // Ensure output buffer is allocated for gather
-  if (task_data->outputs[0] == nullptr) {
-    std::cerr << "[Rank " << rank << "] [ERROR] Output buffer is null.\n";
-    return false;
+  if (start_row >= end_row) {
+    return true;
   }
 
-  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT,
-                          reinterpret_cast<int*>(task_data->outputs[0]), static_cast<int>(local_rows * cols), MPI_INT,
-                          0, MPI_COMM_WORLD);
+  std::vector<int> labeled_image(rows * cols, 0);
+  Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
-  if (result != MPI_SUCCESS) {
-    std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
-    return false;
-  }
+  MPI_Allreduce(MPI_IN_PLACE, labeled_image.data(), rows * cols, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+  output_ = labeled_image;
 
   return true;
 }
@@ -231,8 +193,20 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
-    auto* output_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
-    std::ranges::copy(local_labeled_image_.begin(), local_labeled_image_.end(), output_ptr);
+    if (task_data->outputs.empty() || task_data->outputs_count.empty()) {
+      std::cerr << "[ERROR] Output buffer is not allocated!\n";
+      return false;
+    }
+
+    int output_size = static_cast<int>(task_data->outputs_count[0]);
+    auto* out_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
+
+    if (output_.empty() || output_size == 0) {
+      std::cerr << "[ERROR] Output is null or empty!\n";
+      return false;
+    }
+
+    std::ranges::copy(output_, out_ptr);
   }
 
   return true;
