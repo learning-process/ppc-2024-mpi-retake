@@ -7,8 +7,8 @@
 
 TEST(anikin_m_graham_scan, case_0) {
   // Create data
-  std::vector<anikin_m_graham_scan_seq::pt> in;
-  std::vector<anikin_m_graham_scan_seq::pt> out;
+  std::vector<anikin_m_graham_scan_seq::Pt> in;
+  std::vector<anikin_m_graham_scan_seq::Pt> out;
 
   anikin_m_graham_scan_seq::create_test_data(in, 0);
 
@@ -24,16 +24,16 @@ TEST(anikin_m_graham_scan, case_0) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::pt *>(task_data_seq->outputs[0]);
-  out = std::vector<anikin_m_graham_scan_seq::pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
+  auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::Pt *>(task_data_seq->outputs[0]);
+  out = std::vector<anikin_m_graham_scan_seq::Pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
 
   EXPECT_EQ(true, anikin_m_graham_scan_seq::test_data(out, 0));
 }
 
 TEST(anikin_m_graham_scan, case_1) {
   // Create data
-  std::vector<anikin_m_graham_scan_seq::pt> in;
-  std::vector<anikin_m_graham_scan_seq::pt> out;
+  std::vector<anikin_m_graham_scan_seq::Pt> in;
+  std::vector<anikin_m_graham_scan_seq::Pt> out;
 
   anikin_m_graham_scan_seq::create_test_data(in, 1);
 
@@ -49,16 +49,16 @@ TEST(anikin_m_graham_scan, case_1) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::pt *>(task_data_seq->outputs[0]);
-  out = std::vector<anikin_m_graham_scan_seq::pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
+  auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::Pt *>(task_data_seq->outputs[0]);
+  out = std::vector<anikin_m_graham_scan_seq::Pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
 
   EXPECT_EQ(true, anikin_m_graham_scan_seq::test_data(out, 1));
 }
 
 TEST(anikin_m_graham_scan, case_2) {
   // Create data
-  std::vector<anikin_m_graham_scan_seq::pt> in;
-  std::vector<anikin_m_graham_scan_seq::pt> out;
+  std::vector<anikin_m_graham_scan_seq::Pt> in;
+  std::vector<anikin_m_graham_scan_seq::Pt> out;
 
   anikin_m_graham_scan_seq::create_test_data(in, 2);
 
@@ -74,8 +74,8 @@ TEST(anikin_m_graham_scan, case_2) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::pt *>(task_data_seq->outputs[0]);
-  out = std::vector<anikin_m_graham_scan_seq::pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
+  auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_seq::Pt *>(task_data_seq->outputs[0]);
+  out = std::vector<anikin_m_graham_scan_seq::Pt>(out_ptr, out_ptr + task_data_seq->outputs_count[0]);
 
   EXPECT_EQ(true, anikin_m_graham_scan_seq::test_data(out, 2));
 }

@@ -9,25 +9,25 @@
 
 namespace anikin_m_graham_scan_mpi {
 
-struct pt {
+struct Pt {
   int x;
   int y;
-  bool operator==(const pt& other) const { return x == other.x && y == other.y; }
+  bool operator==(const Pt& other) const { return x == other.x && y == other.y; }
 };
 
-bool cmp(const pt& a, const pt& b);
+bool cmp(const Pt& a, const Pt& b);
 
-bool cw(const pt& a, const pt& b, const pt& c);
+bool cw(const Pt& a, const Pt& b, const Pt& c);
 
-bool ccw(const pt& a, const pt& b, const pt& c);
+bool ccw(const Pt& a, const Pt& b, const Pt& c);
 
-void convex_hull(std::vector<pt>& points);
+void convex_hull(std::vector<Pt>& points);
 
-bool test_data(std::vector<pt> alg_out_, int case_);
+bool test_data(std::vector<Pt> alg_out_, int case_);
 
-void create_test_data(std::vector<pt>& alg_in_, int case_);
+void create_test_data(std::vector<Pt>& alg_in_, int case_);
 
-void create_random_data(std::vector<pt>& alg_in_, int count);
+void create_random_data(std::vector<Pt>& alg_in_, int count);
 
 class TestTaskMPI : public ppc::core::Task {
  public:
@@ -38,7 +38,7 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<pt> data_;
+  std::vector<Pt> data_;
   boost::mpi::communicator world_;
 };
 

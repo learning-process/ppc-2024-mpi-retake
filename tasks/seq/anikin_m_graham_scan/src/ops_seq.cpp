@@ -6,17 +6,17 @@
 #include <random>
 #include <vector>
 
-bool anikin_m_graham_scan_seq::cmp(pt a, pt b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
+bool anikin_m_graham_scan_seq::cmp(Pt a, Pt b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
 
-bool anikin_m_graham_scan_seq::cw(pt a, pt b, pt c) {
+bool anikin_m_graham_scan_seq::cw(Pt a, Pt b, Pt c) {
   return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) < 0;
 }
 
-bool anikin_m_graham_scan_seq::ccw(pt a, pt b, pt c) {
+bool anikin_m_graham_scan_seq::ccw(Pt a, Pt b, Pt c) {
   return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) > 0;
 }
 
-bool anikin_m_graham_scan_seq::test_data(std::vector<pt> alg_out_, int case_) {
+bool anikin_m_graham_scan_seq::test_data(std::vector<Pt> alg_out_, int case_) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -65,7 +65,7 @@ bool anikin_m_graham_scan_seq::test_data(std::vector<pt> alg_out_, int case_) {
   return out_;
 }
 
-void anikin_m_graham_scan_seq::create_test_data(std::vector<pt> &alg_in_, int case_) {
+void anikin_m_graham_scan_seq::create_test_data(std::vector<Pt> &alg_in_, int case_) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -106,11 +106,11 @@ void anikin_m_graham_scan_seq::create_test_data(std::vector<pt> &alg_in_, int ca
   }
 }
 
-void anikin_m_graham_scan_seq::convex_hull(std::vector<pt> &a) {
+void anikin_m_graham_scan_seq::convex_hull(std::vector<Pt> &a) {
   if (a.size() == 1 || a.size() == 0) return;
   sort(a.begin(), a.end(), &cmp);
-  pt p1 = a[0], p2 = a.back();
-  std::vector<pt> up, down;
+  Pt p1 = a[0], p2 = a.back();
+  std::vector<Pt> up, down;
   up.push_back(p1);
   down.push_back(p1);
   for (size_t i = 1; i < a.size(); ++i) {
@@ -128,12 +128,12 @@ void anikin_m_graham_scan_seq::convex_hull(std::vector<pt> &a) {
   for (size_t i = down.size() - 2; i > 0; --i) a.push_back(down[i]);
 }
 
-void anikin_m_graham_scan_seq::create_random_data(std::vector<pt> &alg_in_, int count) {
+void anikin_m_graham_scan_seq::create_random_data(std::vector<Pt> &alg_in_, int count) {
   alg_in_.clear();
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0.0, 100.0);
-  pt rand_;
+  Pt rand_;
   for (int i = 0; i < count; i++) {
     rand_.x = dis(gen);
     rand_.y = dis(gen);
@@ -145,8 +145,8 @@ bool anikin_m_graham_scan_seq::TestTaskSequential::ValidationImpl() { return tas
 
 bool anikin_m_graham_scan_seq::TestTaskSequential::PreProcessingImpl() {
   unsigned int input_size = task_data->inputs_count[0];
-  auto *in_ptr = reinterpret_cast<pt *>(task_data->inputs[0]);
-  data_ = std::vector<pt>(in_ptr, in_ptr + input_size);
+  auto *in_ptr = reinterpret_cast<Pt *>(task_data->inputs[0]);
+  data_ = std::vector<Pt>(in_ptr, in_ptr + input_size);
   return true;
 }
 

@@ -15,8 +15,8 @@
 TEST(anikin_m_graham_scan, test_pipeline_run) {
   constexpr int kCount = 1000000;
 
-  std::vector<anikin_m_graham_scan_mpi::pt> in;
-  std::vector<anikin_m_graham_scan_mpi::pt> out;
+  std::vector<anikin_m_graham_scan_mpi::Pt> in;
+  std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
   anikin_m_graham_scan_mpi::create_random_data(in, kCount);
 
@@ -54,8 +54,8 @@ TEST(anikin_m_graham_scan, test_pipeline_run) {
 TEST(anikin_m_graham_scan, test_task_run) {
   constexpr int kCount = 1000000;
 
-  std::vector<anikin_m_graham_scan_mpi::pt> in;
-  std::vector<anikin_m_graham_scan_mpi::pt> out;
+  std::vector<anikin_m_graham_scan_mpi::Pt> in;
+  std::vector<anikin_m_graham_scan_mpi::Pt> out;
 
   anikin_m_graham_scan_mpi::create_random_data(in, kCount);
 

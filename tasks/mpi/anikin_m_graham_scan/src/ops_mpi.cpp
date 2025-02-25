@@ -6,21 +6,21 @@
 #include <random>
 #include <vector>
 
-bool anikin_m_graham_scan_mpi::cmp(const pt& a, const pt& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
+bool anikin_m_graham_scan_mpi::cmp(const Pt& a, const Pt& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
 
-bool anikin_m_graham_scan_mpi::cw(const pt& a, const pt& b, const pt& c) {
+bool anikin_m_graham_scan_mpi::cw(const Pt& a, const Pt& b, const Pt& c) {
   return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0;
 }
 
-bool anikin_m_graham_scan_mpi::ccw(const pt& a, const pt& b, const pt& c) {
+bool anikin_m_graham_scan_mpi::ccw(const Pt& a, const Pt& b, const Pt& c) {
   return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) > 0;
 }
 
-void anikin_m_graham_scan_mpi::convex_hull(std::vector<pt>& points) {
+void anikin_m_graham_scan_mpi::convex_hull(std::vector<Pt>& points) {
   if (points.size() <= 1) return;
   std::sort(points.begin(), points.end(), &cmp);
-  pt p1 = points[0], p2 = points.back();
-  std::vector<pt> up, down;
+  Pt p1 = points[0], p2 = points.back();
+  std::vector<Pt> up, down;
   up.push_back(p1);
   down.push_back(p1);
   for (size_t i = 1; i < points.size(); ++i) {
@@ -38,7 +38,7 @@ void anikin_m_graham_scan_mpi::convex_hull(std::vector<pt>& points) {
   for (int i = down.size() - 2; i > 0; --i) points.push_back(down[i]);
 }
 
-bool anikin_m_graham_scan_mpi::test_data(std::vector<pt> alg_out_, int case_) {
+bool anikin_m_graham_scan_mpi::test_data(std::vector<Pt> alg_out_, int case_) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -87,7 +87,7 @@ bool anikin_m_graham_scan_mpi::test_data(std::vector<pt> alg_out_, int case_) {
   return out_;
 }
 
-void anikin_m_graham_scan_mpi::create_test_data(std::vector<pt>& alg_in_, int case_) {
+void anikin_m_graham_scan_mpi::create_test_data(std::vector<Pt>& alg_in_, int case_) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -128,12 +128,12 @@ void anikin_m_graham_scan_mpi::create_test_data(std::vector<pt>& alg_in_, int ca
   }
 }
 
-void anikin_m_graham_scan_mpi::create_random_data(std::vector<pt>& alg_in_, int count) {
+void anikin_m_graham_scan_mpi::create_random_data(std::vector<Pt>& alg_in_, int count) {
   alg_in_.clear();
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0.0, 100.0);
-  pt rand_;
+  Pt rand_;
   for (int i = 0; i < count; i++) {
     rand_.x = (int)dis(gen);
     rand_.y = (int)dis(gen);
@@ -145,8 +145,8 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::ValidationImpl() { return task_data-
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
   unsigned int input_size = task_data->inputs_count[0];
-  auto* in_ptr = reinterpret_cast<pt*>(task_data->inputs[0]);
-  data_ = std::vector<pt>(in_ptr, in_ptr + input_size);
+  auto* in_ptr = reinterpret_cast<Pt*>(task_data->inputs[0]);
+  data_ = std::vector<Pt>(in_ptr, in_ptr + input_size);
   return true;
 }
 
@@ -155,7 +155,7 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
   MPI_Type_contiguous(2, MPI_INT, &MPI_PT);
   MPI_Type_commit(&MPI_PT);
 
-  std::vector<pt> local_points;
+  std::vector<Pt> local_points;
   int n = 0;
   if (world_.rank() == 0) {
     n = data_.size();
@@ -177,17 +177,17 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
   MPI_Scatterv(world_.rank() == 0 ? data_.data() : nullptr, counts, displs, MPI_PT, local_points.data(), local_count,
                MPI_PT, 0, world_);
 
-  pt local_p1 = {0, 0}, local_p2 = {0, 0};
+  Pt local_p1 = {0, 0}, local_p2 = {0, 0};
   if (!local_points.empty()) {
     local_p1 = *std::min_element(local_points.begin(), local_points.end(), cmp);
     local_p2 = *std::max_element(local_points.begin(), local_points.end(), cmp);
   }
 
-  std::vector<pt> all_p1(world_.size()), all_p2(world_.size());
+  std::vector<Pt> all_p1(world_.size()), all_p2(world_.size());
   MPI_Gather(&local_p1, 1, MPI_PT, all_p1.data(), 1, MPI_PT, 0, world_);
   MPI_Gather(&local_p2, 1, MPI_PT, all_p2.data(), 1, MPI_PT, 0, world_);
 
-  pt global_p1, global_p2;
+  Pt global_p1, global_p2;
   if (world_.rank() == 0) {
     global_p1 = *std::min_element(all_p1.begin(), all_p1.end(), cmp);
     global_p2 = *std::max_element(all_p2.begin(), all_p2.end(), cmp);
@@ -209,11 +209,11 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
     MPI_Send(&size, 1, MPI_INT, 0, 0, world_);
     MPI_Send(local_points.data(), size, MPI_PT, 0, 0, world_);
   } else {
-    std::vector<pt> final_hull = local_points;
+    std::vector<Pt> final_hull = local_points;
     for (int i = 1; i < world_.size(); ++i) {
       int recv_size;
       MPI_Recv(&recv_size, 1, MPI_INT, i, 0, world_, MPI_STATUS_IGNORE);
-      std::vector<pt> temp(recv_size);
+      std::vector<Pt> temp(recv_size);
       MPI_Recv(temp.data(), recv_size, MPI_PT, i, 0, world_, MPI_STATUS_IGNORE);
       final_hull.insert(final_hull.end(), temp.begin(), temp.end());
     }
