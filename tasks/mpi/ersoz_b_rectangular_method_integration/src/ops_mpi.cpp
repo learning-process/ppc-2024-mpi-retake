@@ -1,3 +1,5 @@
+#define OMPI_SKIP_MPICXX
+
 #include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 #include <mpi.h>
