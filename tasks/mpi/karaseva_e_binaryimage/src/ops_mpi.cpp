@@ -179,8 +179,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   // Perform labeling for the local region assigned to the current process
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, rank * local_rows, (rank + 1) * local_rows);
 
-  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT,
-                          task_data->outputs[0], static_cast<int>(local_rows * cols), MPI_INT, 0, MPI_COMM_WORLD);
+  int result = MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_UNSIGNED,
+                          task_data->outputs[0], static_cast<int>(local_rows * cols), MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
