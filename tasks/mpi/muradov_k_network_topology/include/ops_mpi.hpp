@@ -14,7 +14,6 @@ class NetworkTopology {
   explicit NetworkTopology(MPI_Comm global_comm);
   ~NetworkTopology();
 
-  // Renamed to follow PascalCase per clang-tidy recommendations.
   void CreateRingTopology();
   bool Send(int dest, const void* data, int count, MPI_Datatype datatype);
   bool Receive(int source, void* buffer, int count, MPI_Datatype datatype);
