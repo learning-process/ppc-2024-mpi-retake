@@ -13,14 +13,15 @@
 #include "core/task/include/task.hpp"
 #include "mpi/mezhuev_m_most_different_neighbor_elements_mpi/include/mpi.hpp"
 
-static void GenerateRandomData(boost::mpi::communicator& world, std::vector<int>& in) {
+namespace {
+void GenerateRandomData(boost::mpi::communicator& world, std::vector<int>& in) {
   if (world.rank() == 0) {
     for (size_t i = 0; i < in.size(); i++) {
       in[i] = rand() % 1000000;
     }
   }
 }
-
+}
 
 TEST(mezhuev_m_most_different_neighbor_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
