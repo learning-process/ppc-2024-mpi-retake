@@ -50,7 +50,7 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
   job.Run();
   job.PostProcessing();
   if (world.rank() == 0) {
-    for (int i = 0; i < ans.size(); ++i) {
+    for (size_t i = 0; i < ans.size(); ++i) {
       ASSERT_NEAR(ans[i], out[i], 1);
     }
   }
@@ -73,7 +73,7 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, big_matrix) {
     out.resize(matrix_size * matrix_size);
     ans.resize(matrix_size * matrix_size);
 
-    for (int i = 0; i < matrix_size; ++i) {
+    for (size_t i = 0; i < matrix_size; ++i) {
       for (int j = 0; j < matrix_size; ++j) {
         for (int k = 0; k < matrix_size; ++k) {
           ans[i * matrix_size + j] += in1[i * matrix_size + k] * in2[k * matrix_size + j];
