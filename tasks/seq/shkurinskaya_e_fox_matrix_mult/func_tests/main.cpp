@@ -39,7 +39,7 @@ TEST(shkurinskaya_e_fox_mat_mul_seq, small_matrix) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  for (int it = 0; it < ans.size(); ++it) {
+  for (size_t it = 0; it < ans.size(); ++it) {
     ASSERT_NEAR(ans[it], out[it], 1);
   }
 }
@@ -72,7 +72,7 @@ TEST(shkurinskaya_e_fox_mat_mul_seq, not_small_matrix) {
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  for (int it = 0; it < ans.size(); ++it) {
+  for (size_t it = 0; it < ans.size(); ++it) {
     ASSERT_NEAR(ans[it], out[it], 1);
   }
 }
