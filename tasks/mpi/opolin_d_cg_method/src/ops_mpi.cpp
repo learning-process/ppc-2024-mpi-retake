@@ -58,8 +58,10 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
 
   boost::mpi::broadcast(world_, n_, 0);
   boost::mpi::broadcast(world_, epsilon_, 0);
-  size_t local_n = (n_ / size) + (rank < static_cast<int>(n_ % size) ? 1 : 0);
-
+  size_t local_n = n_ / size;
+  if (rank < static_cast<int>(n_ % size)) {
+    ++local_n;
+  }
   std::vector<int> send_counts;
   std::vector<int> displs;
   std::vector<int> send_counts_a;
@@ -73,7 +75,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     size_t offset = 0;
     size_t offset_a = 0;
     for (int i = 0; i < size; ++i) {
-      size_t rows = (n_ / size) + (i < static_cast<int>(n_ % size) ? 1 : 0);
+      size_t rows = n_ / size + (i < static_cast<int>(n_ % size));
       send_counts[i] = static_cast<int>(rows);
       displs[i] = static_cast<int>(offset);
       offset += rows;

@@ -8,7 +8,6 @@
 #include <random>
 #include <vector>
 
-#include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/opolin_d_cg_method/include/ops_seq.hpp"
 

@@ -67,7 +67,6 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
     }
 
     double beta_k = rsquare_k / rsquare_prev;
-    rsquare_prev = rsquare_k;
     // p_k+1
     for (int i = 0; i < static_cast<int>(n_); i++) {
       p_k[i] = r_k[i] + beta_k * p_k[i];
