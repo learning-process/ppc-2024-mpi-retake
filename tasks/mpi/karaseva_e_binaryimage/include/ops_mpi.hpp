@@ -31,6 +31,7 @@ class TestTaskMPI : public ppc::core::Task {
   std::vector<int> input_, output_;
   int rc_size_{};
   int input_size_;
+  std::vector<int> local_labeled_image_;
   boost::mpi::communicator world_;
 };
 
