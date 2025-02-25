@@ -1,11 +1,9 @@
 #ifndef ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_MPI_HPP
 #define ERSOZ_B_RECTANGULAR_METHOD_INTEGRATION_OPS_MPI_HPP
 
-#ifndef OMPI_SKIP_MPICXX
-#define OMPI_SKIP_MPICXX
-#include <cstddef>  // size_t için
+#include <cstddef>
 #include <functional>
-#include <stdexcept>  // std::runtime_error için
+#include <stdexcept>
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
