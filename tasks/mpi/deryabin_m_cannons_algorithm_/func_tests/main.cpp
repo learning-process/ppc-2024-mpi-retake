@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
+#include "mpi/deryabin_m_cannons_algorithm_/include/ops_mpi.hpp"
 
 TEST(deryabin_m_cannons_algorithm_mpi, test_simple_matrix) {
   boost::mpi::communicator world;
