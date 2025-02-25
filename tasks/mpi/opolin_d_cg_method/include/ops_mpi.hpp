@@ -4,7 +4,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstddef>
-#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -12,10 +11,9 @@
 
 namespace opolin_d_cg_method_mpi {
 
-bool isPositiveDefinite(const std::vector<double>& mat, size_t size);
-bool isSimmetric(const std::vector<double>& mat, size_t size);
-double scalarProduct(const std::vector<double>& a_, const std::vector<double>& b_);
-std::vector<double> multiplyVecMat(const std::vector<double>& vec, const std::vector<double>& mat);
+bool IsPositiveDefinite(const std::vector<double>& mat, size_t size);
+bool IsSimmetric(const std::vector<double>& mat, size_t size);
+double ScalarProduct(const std::vector<double>& a, const std::vector<double>& b);
 
 class CGMethodkMPI : public ppc::core::Task {
  public:

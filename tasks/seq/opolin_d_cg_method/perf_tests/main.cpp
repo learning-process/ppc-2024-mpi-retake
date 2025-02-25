@@ -15,42 +15,52 @@
 
 namespace opolin_d_cg_method_seq {
 namespace {
-void genDataCGMethod(size_t size, std::vector<double> &A, std::vector<double> &b, std::vector<double> &expectedX) {
+void GenDataCgMethod(size_t size, std::vector<double> &a, std::vector<double> &b, std::vector<double> &expected) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::normal_distribution<> dist(-5.0, 5.0);
-  std::vector<double> M(size * size);
-  for (size_t i = 0; i < size; i++)
-    for (size_t j = 0; j < size; j++) M[i * size + j] = dist(gen);
-
-  A.assign(size * size, 0.0);
-  for (size_t i = 0; i < size; i++)
-    for (size_t j = 0; j < size; j++)
-      for (size_t k = 0; k < size; k++) A[i * size + j] += M[k * size + i] * M[k * size + j];
-
-  for (size_t i = 0; i < size; i++) A[i * size + i] += size;
-
-  expectedX.resize(size);
-  for (size_t i = 0; i < size; i++) expectedX[i] = dist(gen);
-
+  std::vector<double> m(size * size);
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j < size; j++) {
+      m[(i * size) + j] = dist(gen);
+    }
+  }
+  a.assign(size * size, 0.0);
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j < size; j++) {
+      for (size_t k = 0; k < size; k++) {
+        a[(i * size) + j] += m[(k * size) + i] * m[(k * size) + j];
+      }
+    }
+  }
+  for (size_t i = 0; i < size; i++) {
+    a[(i * size) + i] += size;
+  }
+  expected.resize(size);
+  for (size_t i = 0; i < size; i++) {
+    expected[i] = dist(gen);
+  }
   b.assign(size, 0.0);
-  for (size_t i = 0; i < size; i++)
-    for (size_t j = 0; j < size; j++) b[i] += A[i * size + j] * expectedX[j];
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j < size; j++) {
+      b[i] += a[(i * size) + j] * expected[j];
+    }
+  }
 }
 }  // namespace
 }  // namespace opolin_d_cg_method_seq
 
 TEST(opolin_d_cg_method_seq, test_pipeline_run) {
   int size = 800;
-  std::vector<double> A;
+  std::vector<double> a;
   std::vector<double> b;
-  std::vector<double> X;
-  opolin_d_cg_method_seq::genDataCGMethod(size, A, b, X);
+  std::vector<double> x;
+  opolin_d_cg_method_seq::genDataCGMethod(size, a, b, x);
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));
@@ -84,15 +94,15 @@ TEST(opolin_d_cg_method_seq, test_pipeline_run) {
 
 TEST(opolin_d_cg_method_seq, test_task_run) {
   int size = 800;
-  std::vector<double> A;
+  std::vector<double> a;
   std::vector<double> b;
-  std::vector<double> X;
-  opolin_d_cg_method_seq::genDataCGMethod(size, A, b, X);
+  std::vector<double> x;
+  opolin_d_cg_method_seq::genDataCGMethod(size, a, b, x);
   std::vector<double> out(size, 0);
   double epsilon = 1e-7;
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(A.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
   task_data_seq->inputs_count.emplace_back(out.size());
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&epsilon));

@@ -2,7 +2,6 @@
 #pragma once
 
 #include <cstddef>
-#include <limits>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -11,7 +10,7 @@ namespace opolin_d_cg_method_seq {
 
 bool IsPositiveDefinite(const std::vector<double>& mat, size_t size);
 bool IsSimmetric(const std::vector<double>& mat, size_t size);
-double ScalarProduct(const std::vector<double>& a_, const std::vector<double>& b_);
+double ScalarProduct(const std::vector<double>& a, const std::vector<double>& b);
 std::vector<double> MultiplyVecMat(const std::vector<double>& vec, const std::vector<double>& mat);
 
 class CGMethodSequential : public ppc::core::Task {

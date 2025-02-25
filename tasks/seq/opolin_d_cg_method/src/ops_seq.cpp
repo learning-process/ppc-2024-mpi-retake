@@ -18,21 +18,27 @@ bool opolin_d_cg_method_seq::CGMethodSequential::PreProcessingImpl() {
 }
 
 bool opolin_d_cg_method_seq::CGMethodSequential::ValidationImpl() {
-  if (task_data->inputs_count.empty() || task_data->inputs.size() != 3) return false;
+  if (task_data->inputs_count.empty() || task_data->inputs.size() != 3) {
+    return false;
+  }
 
   if (task_data->outputs_count.empty() || task_data->inputs_count[0] != task_data->outputs_count[0] ||
-      task_data->outputs.empty())
+      task_data->outputs.empty()) {
     return false;
-
+  }
   n_ = task_data->inputs_count[0];
-  if (n_ <= 0) return false;
-
+  if (n_ <= 0) {
+    return false;
+  }
   auto* ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-  A_.assign(ptr, ptr + n_ * n_);
+  A_.assign(ptr, ptr + (n_ * n_));
 
-  if (!opolin_d_cg_method_seq::IsSimmetric(A_, n_)) return false;
-
-  if (!opolin_d_cg_method_seq::IsPositiveDefinite(A_, n_)) return false;
+  if (!opolin_d_cg_method_seq::IsSimmetric(A_, n_)) {
+    return false;
+  }
+  if (!opolin_d_cg_method_seq::IsPositiveDefinite(A_, n_)) {
+    return false;
+  }
   return true;
 }
 
@@ -42,8 +48,8 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
   std::vector<double> p_k = r_k;
   while (true) {
     double rsquare_prev = opolin_d_cg_method_seq::ScalarProduct(r_k, r_k);
-    std::vector<double> Ap = opolin_d_cg_method_seq::MultiplyVecMat(p_k, A_);
-    double alpha_k = rsquare_prev / opolin_d_cg_method_seq::ScalarProduct(p_k, Ap);
+    std::vector<double> ap = opolin_d_cg_method_seq::MultiplyVecMat(p_k, A_);
+    double alpha_k = rsquare_prev / opolin_d_cg_method_seq::ScalarProduct(p_k, ap);
 
     // x_k+1
     for (int i = 0; i < static_cast<int>(n_); i++) {
@@ -52,7 +58,7 @@ bool opolin_d_cg_method_seq::CGMethodSequential::RunImpl() {
 
     // r_k+1
     for (int i = 0; i < static_cast<int>(n_); i++) {
-      r_k[i] -= alpha_k * Ap[i];
+      r_k[i] -= alpha_k * ap[i];
     }
 
     double rsquare_k = opolin_d_cg_method_seq::ScalarProduct(r_k, r_k);
@@ -78,19 +84,25 @@ bool opolin_d_cg_method_seq::CGMethodSequential::PostProcessingImpl() {
 }
 
 bool opolin_d_cg_method_seq::IsPositiveDefinite(const std::vector<double>& mat, size_t size) {
-  std::vector<double> L(size * size, 0);
+  std::vector<double> l(size * size, 0);
 
   for (size_t i = 0; i < size; i++) {
     for (size_t j = 0; j <= i; j++) {
       double sum = 0;
       if (j == i) {
-        for (size_t k = 0; k < j; k++) sum += L[j * size + k] * L[j * size + k];
-        double val = mat[j * size + j] - sum;
-        if (val <= 0) return false;
-        L[j * size + j] = std::sqrt(val);
+        for (size_t k = 0; k < j; k++) {
+          sum += l[(j * size) + k] * l[(j * size) + k];
+        }
+        double val = mat[(j * size) + j] - sum;
+        if (val <= 0) {
+          return false;
+        }
+        l[(j * size) + j] = std::sqrt(val);
       } else {
-        for (size_t k = 0; k < j; k++) sum += L[i * size + k] * L[j * size + k];
-        L[i * size + j] = (mat[i * size + j] - sum) / L[j * size + j];
+        for (size_t k = 0; k < j; k++) {
+          sum += l[(i * size) + k] * l[(j * size) + k];
+        }
+        l[(i * size) + j] = (mat[(i * size) + j] - sum) / l[(j * size) + j];
       }
     }
   }
@@ -102,7 +114,7 @@ bool opolin_d_cg_method_seq::IsSimmetric(const std::vector<double>& mat, size_t 
   for (size_t i = 0; i < size; i++) {
     for (size_t j = 0; j < size; j++) {
       if (j != i) {
-        if (mat[i * size + j] != mat[j * size + i]) {
+        if (mat[(i * size) + j] != mat[(j * size) + i]) {
           simetric = false;
         }
       }
@@ -111,11 +123,11 @@ bool opolin_d_cg_method_seq::IsSimmetric(const std::vector<double>& mat, size_t 
   return simetric;
 }
 
-double opolin_d_cg_method_seq::ScalarProduct(const std::vector<double>& a_, const std::vector<double>& b_) {
-  size_t size = a_.size();
+double opolin_d_cg_method_seq::ScalarProduct(const std::vector<double>& a, const std::vector<double>& b) {
+  size_t size = a.size();
   double result = 0.0;
   for (size_t i = 0; i < size; i++) {
-    result += a_[i] * b_[i];
+    result += a[i] * b[i];
   }
   return result;
 }
@@ -126,7 +138,7 @@ std::vector<double> opolin_d_cg_method_seq::MultiplyVecMat(const std::vector<dou
   std::vector<double> result(size, 0.0);
   for (size_t i = 0; i < size; i++) {
     for (size_t j = 0; j < size; j++) {
-      result[i] += mat[i * size + j] * vec[j];
+      result[i] += mat[(i * size) + j] * vec[j];
     }
   }
   return result;
