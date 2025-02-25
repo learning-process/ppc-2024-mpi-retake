@@ -29,10 +29,8 @@ class TestTaskMPI : public ppc::core::Task {
                                  int& label_counter, const std::vector<int>& neighbors);
 
   std::vector<int> input_, output_;
-  int rc_size_;
-  int input_size_;
   boost::mpi::communicator world_;
-  std::vector<int> local_labeled_image;
+  std::vector<int> local_labeled_image_;
 };
 
 }  // namespace karaseva_e_binaryimage_mpi
