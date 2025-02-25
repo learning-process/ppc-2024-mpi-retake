@@ -2,6 +2,7 @@
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <random>
 #include <vector>
