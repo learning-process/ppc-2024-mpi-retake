@@ -8,7 +8,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
-TEST(anikin_m_graham_scan, case_0) {
+TEST(anikin_m_graham_scan_seq, case_0) {
   // Create data
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
@@ -33,7 +33,7 @@ TEST(anikin_m_graham_scan, case_0) {
   EXPECT_EQ(true, anikin_m_graham_scan_seq::TestData(out, 0));
 }
 
-TEST(anikin_m_graham_scan, case_1) {
+TEST(anikin_m_graham_scan_seq, case_1) {
   // Create data
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
@@ -58,7 +58,7 @@ TEST(anikin_m_graham_scan, case_1) {
   EXPECT_EQ(true, anikin_m_graham_scan_seq::TestData(out, 1));
 }
 
-TEST(anikin_m_graham_scan, case_2) {
+TEST(anikin_m_graham_scan_seq, case_2) {
   // Create data
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;

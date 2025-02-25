@@ -11,7 +11,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/anikin_m_graham_scan/include/ops_mpi.hpp"
 
-TEST(anikin_m_graham_scan, test_pipeline_run) {
+TEST(anikin_m_graham_scan_mpi, test_pipeline_run) {
   constexpr int kCount = 1000000;
 
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
@@ -50,7 +50,7 @@ TEST(anikin_m_graham_scan, test_pipeline_run) {
   ASSERT_EQ(true, true);
 }
 
-TEST(anikin_m_graham_scan, test_task_run) {
+TEST(anikin_m_graham_scan_mpi, test_task_run) {
   constexpr int kCount = 1000000;
 
   std::vector<anikin_m_graham_scan_mpi::Pt> in;

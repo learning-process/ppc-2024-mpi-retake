@@ -9,7 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/anikin_m_graham_scan/include/ops_mpi.hpp"
 
-TEST(anikin_m_graham_scan, case_0) {
+TEST(anikin_m_graham_scan_mpi, case_0) {
   // Create data
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
@@ -39,7 +39,7 @@ TEST(anikin_m_graham_scan, case_0) {
   }
 }
 
-TEST(anikin_m_graham_scan, case_1) {
+TEST(anikin_m_graham_scan_mpi, case_1) {
   // Create data
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
@@ -69,7 +69,7 @@ TEST(anikin_m_graham_scan, case_1) {
   }
 }
 
-TEST(anikin_m_graham_scan, case_2) {
+TEST(anikin_m_graham_scan_mpi, case_2) {
   // Create data
   std::vector<anikin_m_graham_scan_mpi::Pt> in;
   std::vector<anikin_m_graham_scan_mpi::Pt> out;
