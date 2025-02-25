@@ -80,7 +80,7 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 
   if (world_.rank() == 0) {
     // Distribute sizes to each process
-    for (unsigned int i = 0; i < num_processes_; ++i) {
+    for (int i = 0; i < num_processes_; ++i) {
       counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
     }
   }
@@ -104,7 +104,7 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   if (world_.rank() == 0) {
     size_t offset_remainder = counts_[0];
-    for (unsigned int proc = 1; proc < num_processes_; proc++) {
+    for (int proc = 1; proc < num_processes_; proc++) {
       size_t current_count = counts_[proc];
       world_.send(proc, 0, input_[0].data() + offset_remainder, static_cast<int>(current_count));
       world_.send(proc, 1, input_[1].data() + offset_remainder, static_cast<int>(current_count));
@@ -116,8 +116,8 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   local_input2_ = std::vector<int>(counts_[world_.rank()]);
 
   if (world_.rank() > 0) {
-    world_.recv(0, 0, local_input1_.data(), static_cast<int>(counts_[world_.rank()]));
-    world_.recv(0, 1, local_input2_.data(), static_cast<int>(counts_[world_.rank()]));
+    world_.recv(0, 0, local_input1_.data(), counts_[world_.rank()]);
+    world_.recv(0, 1, local_input2_.data(), counts_[world_.rank()]);
   } else {
     local_input1_ = std::vector<int>(input_[0].begin(), input_[0].begin() + counts_[0]);
     local_input2_ = std::vector<int>(input_[1].begin(), input_[1].begin() + counts_[0]);

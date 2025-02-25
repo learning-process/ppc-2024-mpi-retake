@@ -36,8 +36,8 @@ class TestMPITaskParallel : public ppc::core::Task {
  private:
   std::vector<std::vector<int>> input_;
   std::vector<int> local_input1_, local_input2_;
-  std::vector<unsigned int> counts_;
-  size_t num_processes_ = 0;
+  std::vector<int> counts_;
+  int num_processes_ = 0;
   int res_{};
   boost::mpi::communicator world_;
 };
