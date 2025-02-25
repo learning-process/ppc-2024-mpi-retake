@@ -53,45 +53,42 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
   boost::mpi::broadcast(world_, epsilon_, 0);
   size_t local_n = n_ / size + (rank < static_cast<int>(n_ % size) ? 1 : 0);
 
-  std::vector<double> local_A(local_n * n_);
-  std::vector<double> local_b(local_n);
-  std::vector<double> local_x(local_n, 0.0);
-  std::vector<double> local_r(local_n);
-  std::vector<double> local_p(local_n);
-  std::vector<double> local_Ap(local_n);
-  std::vector<double> full_p(n_);
-
-  std::vector<int> send_counts(size);
-  std::vector<int> displs(size);
-  size_t offset = 0;
-  for (int i = 0; i < size; ++i) {
-    size_t rows = n_ / size + (i < static_cast<int>(n_ % size) ? 1 : 0);
-    send_counts[i] = static_cast<int>(rows * n_);
-    displs[i] = static_cast<int>(offset);
-    offset += rows * n_;
-  }
-
+  std::vector<int> send_counts, displs, send_counts_A, displs_A;
   if (rank == 0) {
-    boost::mpi::scatterv(world_, A_.data(), send_counts, displs, local_A.data(), static_cast<int>(local_n * n_), 0);
+    send_counts.resize(size);
+    displs.resize(size);
+    send_counts_A.resize(size);
+    displs_A.resize(size);
+
+    size_t offset = 0, offset_A = 0;
+    for (int i = 0; i < size; ++i) {
+      size_t rows = n_ / size + (i < static_cast<int>(n_ % size) ? 1 : 0);
+      send_counts[i] = static_cast<int>(rows);
+      displs[i] = static_cast<int>(offset);
+      offset += rows;
+      
+      send_counts_A[i] = static_cast<int>(rows * n_);
+      displs_A[i] = static_cast<int>(offset_A);
+      offset_A += rows * n_;
+    }
+  }
+  std::vector<double> local_A(local_n * n_);
+  if (rank == 0) {
+    boost::mpi::scatterv(world_, A_.data(), send_counts_A, displs_A, local_A.data(), static_cast<int>(local_n * n_), 0);
   } else {
     boost::mpi::scatterv(world_, local_A.data(), static_cast<int>(local_n * n_), 0);
   }
-
-  offset = 0;
-  for (int i = 0; i < size; ++i) {
-    size_t rows = n_ / size + (i < static_cast<int>(n_ % size) ? 1 : 0);
-    send_counts[i] = static_cast<int>(rows);
-    displs[i] = static_cast<int>(offset);
-    offset += rows;
-  }
+  std::vector<double> local_b(local_n);
   if (rank == 0) {
     boost::mpi::scatterv(world_, b_.data(), send_counts, displs, local_b.data(), static_cast<int>(local_n), 0);
   } else {
     boost::mpi::scatterv(world_, local_b.data(), static_cast<int>(local_n), 0);
   }
-
-  local_r = local_b;
-  local_p = local_r;
+  std::vector<double> local_x(local_n, 0.0);
+  std::vector<double> local_r = local_b;
+  std::vector<double> local_p = local_r;
+  std::vector<double> local_Ap(local_n);
+  std::vector<double> full_p(n_);
 
   double rsquare_prev = 0.0;
   while (true) {
@@ -124,13 +121,10 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     // alpha_k
     double alpha_k = rsquare_prev / pAp;
 
-    // x_k+1
     for (size_t i = 0; i < local_n; ++i) {
+      // x_k+1
       local_x[i] += alpha_k * local_p[i];
-    }
-
-    // r_k+1
-    for (size_t i = 0; i < local_n; ++i) {
+      // r_k+1
       local_r[i] -= alpha_k * local_Ap[i];
     }
 
@@ -143,7 +137,6 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
       break;
     }
     double beta_k = rsquare_k / rsquare_prev;
-
     for (size_t i = 0; i < local_n; ++i) {
       local_p[i] = local_r[i] + beta_k * local_p[i];
     }
