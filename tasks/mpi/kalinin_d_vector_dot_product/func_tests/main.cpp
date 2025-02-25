@@ -17,7 +17,7 @@ int offset = 0;
 }  // namespace
 
 namespace {
-std::vector<int> createRandomVector(int v_size) {
+std::vector<int> CreateRandomVector(int v_size) {
   std::vector<int> vec(v_size);
   std::mt19937 gen;
   gen.seed((unsigned)time(nullptr) + ++offset);
@@ -34,8 +34,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_125) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     const int count_size_vector = 125;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -74,7 +74,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_125) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
 
@@ -88,8 +88,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_300) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 300;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -128,7 +128,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_300) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
 
@@ -142,8 +142,8 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_not_equal) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 120;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector + 5);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector + 5);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -169,8 +169,8 @@ TEST(kalinin_d_vector_dot_product_mpi, check_vectors_equal_true) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 120;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -190,7 +190,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_vectorDotProduct_right) {
   // Create data
   std::vector<int> v1 = {1, 2, 5};
   std::vector<int> v2 = {4, 7, 8};
-  ASSERT_EQ(58, kalinin_d_vector_dot_product_mpi::vectorDotProduct(v1, v2));
+  ASSERT_EQ(58, kalinin_d_vector_dot_product_mpi::VectorDotProduct(v1, v2));
 }
 
 TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_size_5) {
@@ -218,7 +218,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_size_5) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(v1, v2), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(v1, v2), res[0]);
   }
 }
 
@@ -276,7 +276,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_size_7) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(v1, v2), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(v1, v2), res[0]);
   }
 }
 
@@ -305,7 +305,7 @@ TEST(kalinin_d_vector_dot_product_mpi, check_mpi_Run_right_empty) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(v1, v2), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(v1, v2), res[0]);
   }
 }
 
@@ -317,8 +317,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_50) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 50;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -353,7 +353,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_50) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
 
@@ -365,8 +365,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_75) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 75;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -401,7 +401,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_75) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
 
@@ -413,8 +413,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_150) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 150;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -449,7 +449,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_150) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
 
@@ -461,8 +461,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_200) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 200;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -497,7 +497,7 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_200) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
 
@@ -509,8 +509,8 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_250) {
 
   if (world.rank() == 0) {
     const int count_size_vector = 250;
-    std::vector<int> v1 = createRandomVector(count_size_vector);
-    std::vector<int> v2 = createRandomVector(count_size_vector);
+    std::vector<int> v1 = CreateRandomVector(count_size_vector);
+    std::vector<int> v2 = CreateRandomVector(count_size_vector);
 
     global_vec = {v1, v2};
     for (size_t i = 0; i < global_vec.size(); i++) {
@@ -545,6 +545,6 @@ TEST(kalinin_d_vector_dot_product_mpi, can_scalar_multiply_vec_size_250) {
     test_task_sequential.Run();
     test_task_sequential.PostProcessing();
     ASSERT_EQ(reference_res[0], res[0]);
-    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::vectorDotProduct(global_vec[0], global_vec[1]), res[0]);
+    ASSERT_EQ(kalinin_d_vector_dot_product_mpi::VectorDotProduct(global_vec[0], global_vec[1]), res[0]);
   }
 }
