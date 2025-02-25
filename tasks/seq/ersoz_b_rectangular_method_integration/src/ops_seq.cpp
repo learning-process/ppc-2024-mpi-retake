@@ -1,6 +1,7 @@
 #include "seq/ersoz_b_rectangular_method_integration/include/ops_seq.hpp"
 
 #include <cmath>
+#include <cstddef>
 #include <functional>
 #include <stdexcept>
 
