@@ -1,58 +1,76 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
-#include <omp.h>
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_reduce.h>
 
-#include <chrono>
 #include <cmath>
-#include <functional>
-#include <iostream>
-#include <thread>
-#include <vector>
+#include <limits>
+#include <stdexcept>
 
 #include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
-TEST(ersoz_b_rectangular_method_integration_mpi, test_task_run) {
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_FROM_0_TO_1) {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  std::function<double(double)> f = [](double x) { return std::cos(x); };
-  double a = 0.0;
-  double b = 100.0;
-  size_t count = 10000000;
-
-  auto start = std::chrono::high_resolution_clock::now();
-  double result = GetIntegralRectangularMethodParallel(f, a, b, count);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 0, 1, 10000);
   if (rank == 0) {
-    std::cout << "[MPI Task Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 0, 1, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
   }
-  SUCCEED();
 }
 
-TEST(ersoz_b_rectangular_method_integration_mpi, test_pipeline_run) {
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_FROM_5_TO_0) {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  std::function<double(double)> f = [](double x) { return std::cos(x); };
-  double a = 0.0;
-  double b = 1000.0;
-  size_t count = 10000000;
-
-  auto start = std::chrono::high_resolution_clock::now();
-  double result = GetIntegralRectangularMethodParallel(f, a, b, count);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 5, 0, 10000);
   if (rank == 0) {
-    std::cout << "[MPI Pipeline Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 5, 0, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
   }
-  SUCCEED();
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_FROM_0_TO_100) {
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 0, 100, 10000);
+  if (rank == 0) {
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 0, 100, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
+  }
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_FROM_0_TO_709) {
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 0, 709, 10000);
+  if (rank == 0) {
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 0, 709, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 10000);
+  }
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_WITH_LOW_RANGE) {
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 1, 1.01, 10000);
+  if (rank == 0) {
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 1, 1.01, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
+  }
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, EXCEPTION_ON_ZERO_COUNT) {
+  EXPECT_THROW(GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 5, 0, 0), std::runtime_error);
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_mpi

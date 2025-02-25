@@ -1,18 +1,10 @@
-#include <omp.h>
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_reduce.h>
+#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
+
+#include <mpi.h>
 
 #include <cmath>
 #include <functional>
 #include <stdexcept>
-#include <thread>
-#include <vector>
-#ifndef OMPI_SKIP_MPICXX
-#define OMPI_SKIP_MPICXX 1
-#endif
-#include <mpi.h>
-
-#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
@@ -48,7 +40,6 @@ double GetIntegralRectangularMethodParallel(const std::function<double(double)>&
   size_t start = rank * part;
   size_t end = (rank == process_count - 1) ? count : start + part;
 
-#pragma omp parallel for reduction(+ : local_result)
   for (size_t i = start; i < end; ++i) {
     local_result += integrable_function(a + i * delta);
   }
