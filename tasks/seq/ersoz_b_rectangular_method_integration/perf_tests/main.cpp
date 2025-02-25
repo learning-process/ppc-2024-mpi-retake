@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cmath>
+#include <cstddef>  // Added for size_t
 #include <functional>
 #include <iostream>
 
@@ -10,7 +11,7 @@
 namespace ersoz_b_rectangular_method_integration_seq {
 
 TEST(ersoz_b_rectangular_method_integration_seq, test_task_run) {
-  std::function<double(double)> f = [](double x) { return cos(x); };
+  std::function<double(double)> f = [](double x) { return std::cos(x); };
   double a = 0.0;
   double b = 100.0;
   size_t count = 10000000;
@@ -24,7 +25,7 @@ TEST(ersoz_b_rectangular_method_integration_seq, test_task_run) {
 }
 
 TEST(ersoz_b_rectangular_method_integration_seq, test_pipeline_run) {
-  std::function<double(double)> f = [](double x) { return cos(x); };
+  std::function<double(double)> f = [](double x) { return std::cos(x); };
   double a = 0.0;
   double b = 1000.0;
   size_t count = 10000000;
