@@ -75,7 +75,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     size_t offset = 0;
     size_t offset_a = 0;
     for (int i = 0; i < size; ++i) {
-      size_t rows = n_ / size + (i < static_cast<int>(n_ % size));
+      size_t rows = (n_ / size) + static_cast<size_t>(i < static_cast<int>(n_ % size));
       send_counts[i] = static_cast<int>(rows);
       displs[i] = static_cast<int>(offset);
       offset += rows;
