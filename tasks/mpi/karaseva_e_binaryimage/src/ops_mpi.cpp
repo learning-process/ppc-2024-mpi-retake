@@ -129,6 +129,11 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   // Broadcasting the image data
   if (is_root) {
+    // Check if the input pointer is not null
+    if (task_data->inputs[0] == nullptr) {
+      std::cerr << "[Rank " << rank << "] [ERROR] Input data pointer is null.\n";
+      return false;
+    }
     auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_ = std::vector<int>(in_ptr, in_ptr + input_size);
     std::cout << "[Rank 0] Broadcasting image data of size: " << input_size << '\n';
@@ -138,7 +143,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   int result = MPI_Bcast(input_.data(), input_size, MPI_INT, 0, MPI_COMM_WORLD);
   if (result != MPI_SUCCESS) {
-    std::cerr << "[Rank " << rank << "] Error broadcasting image data.\n";
+    std::cerr << "[Rank " << rank << "] Error broadcasting image data. MPI_Bcast failed.\n";
     return false;
   }
 
