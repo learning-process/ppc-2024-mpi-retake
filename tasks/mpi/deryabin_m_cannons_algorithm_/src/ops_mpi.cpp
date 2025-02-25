@@ -1,4 +1,4 @@
-#include "mpi/deryabin_m_cannons_algorithm/include/ops_mpi.hpp"
+#include "mpi/deryabin_m_cannons_algorithm_/include/ops_mpi.hpp"
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
