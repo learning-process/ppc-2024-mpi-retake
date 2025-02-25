@@ -1,4 +1,5 @@
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
+
 #include <mpi.h>
 
 #include <algorithm>
