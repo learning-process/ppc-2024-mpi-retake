@@ -1,6 +1,10 @@
 #ifndef MURADOV_K_NETWORK_TOPOLOGY_OPS_MPI_HPP
 #define MURADOV_K_NETWORK_TOPOLOGY_OPS_MPI_HPP
 
+#ifndef OMPI_SKIP_MPICXX
+#define OMPI_SKIP_MPICXX
+#endif
+
 #include <mpi.h>
 
 namespace muradov_k_network_topology_mpi {
