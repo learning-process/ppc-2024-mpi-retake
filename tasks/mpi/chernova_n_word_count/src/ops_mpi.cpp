@@ -50,7 +50,7 @@ bool chernova_n_word_count_mpi::TestMPITaskSequential::PreProcessingImpl() {
 }
 
 bool chernova_n_word_count_mpi::TestMPITaskSequential::ValidationImpl() {
-  return task_data->inputs_count[0] >= 0 && task_data->outputs_count[0] == 1;
+  return task_data->outputs_count[0] == 1;
 }
 
 bool chernova_n_word_count_mpi::TestMPITaskSequential::RunImpl() {
@@ -67,7 +67,14 @@ bool chernova_n_word_count_mpi::TestMPITaskSequential::RunImpl() {
 }
 
 bool chernova_n_word_count_mpi::TestMPITaskSequential::PostProcessingImpl() {
-  reinterpret_cast<int*>(task_data->outputs[0])[0] = space_count_ + 1;
+  if (task_data->outputs[0] == nullptr) {
+    return false;
+  }
+  if (input_.empty()) {
+    reinterpret_cast<int*>(task_data->outputs[0])[0] = 0;
+  } else {
+    reinterpret_cast<int*>(task_data->outputs[0])[0] = space_count_ + 1;
+  }
   return true;
 }
 
@@ -89,7 +96,7 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::PreProcessingImpl() {
 
 bool chernova_n_word_count_mpi::TestMPITaskParallel::ValidationImpl() {
   if (world_.rank() == 0) {
-    return task_data->inputs_count[0] >= 0 && task_data->outputs_count[0] == 1;
+    return task_data->outputs_count[0] == 1;
   }
   return true;
 }
@@ -103,9 +110,8 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
   boost::mpi::broadcast(world_, part_size_, 0);
   boost::mpi::broadcast(world_, total_size, 0);
   if (total_size == 0) {
-    if (world_.rank() == 0) {
-      space_count_ = -1;
-    }
+    space_count_ = -1;
+    boost::mpi::broadcast(world_, space_count_, 0);
     return true;
   }
 
@@ -143,10 +149,14 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
 
 bool chernova_n_word_count_mpi::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
-    if (space_count_ == 0) {
-      space_count_ = -1;
+    if (task_data->outputs[0] == nullptr) {
+      return false;
     }
-    reinterpret_cast<int*>(task_data->outputs[0])[0] = space_count_ + 1;
+    if (space_count_ == -1) {
+      reinterpret_cast<int*>(task_data->outputs[0])[0] = 0;
+    } else {
+      reinterpret_cast<int*>(task_data->outputs[0])[0] = space_count_ + 1;
+    }
   }
   return true;
 }
