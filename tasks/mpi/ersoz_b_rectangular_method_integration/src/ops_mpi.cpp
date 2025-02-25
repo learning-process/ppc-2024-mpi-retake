@@ -10,15 +10,14 @@
 #include <stdexcept>
 
 namespace {
-// Helper function to compute the integral sequentially over a given range.
-double integrateSequential(const std::function<double(double)>& f, double a, double b, size_t count) {
+double IntegrateSequential(const std::function<double(double)>& integrable_function, double a, double b, size_t count) {
   if (count == 0) {
     throw std::runtime_error("Zero rectangles count");
   }
   double result = 0.0;
   double delta = (b - a) / static_cast<double>(count);
   for (size_t i = 0; i < count; ++i) {
-    result += f(a + i * delta);
+    result += integrable_function(a + (static_cast<double>(i) * delta));
   }
   return result * delta;
 }
@@ -26,17 +25,19 @@ double integrateSequential(const std::function<double(double)>& f, double a, dou
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
-double GetIntegralRectangularMethodSequential(const std::function<double(double)>& f, double a, double b,
-                                              size_t count) {
-  return integrateSequential(f, a, b, count);
+double GetIntegralRectangularMethodSequential(const std::function<double(double)>& integrable_function, double a,
+                                              double b, size_t count) {
+  return IntegrateSequential(integrable_function, a, b, count);
 }
 
-double GetIntegralRectangularMethodParallel(const std::function<double(double)>& f, double a, double b, size_t count) {
+double GetIntegralRectangularMethodParallel(const std::function<double(double)>& integrable_function, double a,
+                                            double b, size_t count) {
   if (count == 0) {
     throw std::runtime_error("Zero rectangles count");
   }
 
-  int rank = 0, process_count = 0;
+  int rank = 0;
+  int process_count = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &process_count);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -47,7 +48,7 @@ double GetIntegralRectangularMethodParallel(const std::function<double(double)>&
   double local_result = 0.0;
 
   for (size_t i = start; i < end; ++i) {
-    local_result += f(a + i * delta);
+    local_result += integrable_function(a + (static_cast<double>(i) * delta));
   }
   local_result *= delta;
 

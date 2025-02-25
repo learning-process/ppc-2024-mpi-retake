@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <functional>
-#include <stdexcept>
 
 namespace ersoz_b_rectangular_method_integration_mpi {
 
