@@ -1,15 +1,12 @@
 // Anikin Maksim 2025
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <random>
+#include <vector>
 
-
-bool anikin_m_graham_scan_seq::cmp(pt a, pt b) { 
-  return a.x < b.x || a.x == b.x && a.y < b.y; 
-}
+bool anikin_m_graham_scan_seq::cmp(pt a, pt b) { return a.x < b.x || a.x == b.x && a.y < b.y; }
 
 bool anikin_m_graham_scan_seq::cw(pt a, pt b, pt c) {
   return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) < 0;
@@ -37,7 +34,7 @@ bool anikin_m_graham_scan_seq::test_data(std::vector<pt> alg_out_, int case_) {
 
       out_ &= (alg_out_[0].x == 0);
       out_ &= (alg_out_[0].y == 0);
-   
+
       out_ &= (alg_out_[1].x == 0);
       out_ &= (alg_out_[1].y == 4);
 
@@ -109,7 +106,7 @@ void anikin_m_graham_scan_seq::create_test_data(std::vector<pt> &alg_in_, int ca
   }
 }
 
-void anikin_m_graham_scan_seq::convex_hull(std::vector<pt>& a) {
+void anikin_m_graham_scan_seq::convex_hull(std::vector<pt> &a) {
   if (a.size() == 1 || a.size() == 0) return;
   sort(a.begin(), a.end(), &cmp);
   pt p1 = a[0], p2 = a.back();
@@ -131,7 +128,7 @@ void anikin_m_graham_scan_seq::convex_hull(std::vector<pt>& a) {
   for (size_t i = down.size() - 2; i > 0; --i) a.push_back(down[i]);
 }
 
-void anikin_m_graham_scan_seq::create_random_data(std::vector<pt>& alg_in_, int count) {
+void anikin_m_graham_scan_seq::create_random_data(std::vector<pt> &alg_in_, int count) {
   alg_in_.clear();
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -144,9 +141,7 @@ void anikin_m_graham_scan_seq::create_random_data(std::vector<pt>& alg_in_, int 
   }
 }
 
-bool anikin_m_graham_scan_seq::TestTaskSequential::ValidationImpl() {
-  return task_data->inputs[0] != nullptr; 
-}
+bool anikin_m_graham_scan_seq::TestTaskSequential::ValidationImpl() { return task_data->inputs[0] != nullptr; }
 
 bool anikin_m_graham_scan_seq::TestTaskSequential::PreProcessingImpl() {
   unsigned int input_size = task_data->inputs_count[0];
@@ -155,7 +150,7 @@ bool anikin_m_graham_scan_seq::TestTaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool anikin_m_graham_scan_seq::TestTaskSequential::RunImpl() { 
+bool anikin_m_graham_scan_seq::TestTaskSequential::RunImpl() {
   convex_hull(data_);
   return true;
 }

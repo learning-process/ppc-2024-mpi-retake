@@ -1,13 +1,12 @@
 // Anikin Maksim 2025
 #include "mpi/anikin_m_graham_scan/include/ops_mpi.hpp"
 
-#include <vector>
-#include <random>
 #include <mpi.h>
 
-bool anikin_m_graham_scan_mpi::cmp(const pt& a, const pt& b) { 
-  return a.x < b.x || (a.x == b.x && a.y < b.y); 
-}
+#include <random>
+#include <vector>
+
+bool anikin_m_graham_scan_mpi::cmp(const pt& a, const pt& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
 
 bool anikin_m_graham_scan_mpi::cw(const pt& a, const pt& b, const pt& c) {
   return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) < 0;
@@ -136,15 +135,13 @@ void anikin_m_graham_scan_mpi::create_random_data(std::vector<pt>& alg_in_, int 
   std::uniform_real_distribution<> dis(0.0, 100.0);
   pt rand_;
   for (int i = 0; i < count; i++) {
-    rand_.x = (int) dis(gen);
-    rand_.y = (int) dis(gen);
+    rand_.x = (int)dis(gen);
+    rand_.y = (int)dis(gen);
     alg_in_.push_back(rand_);
   }
 }
 
-bool anikin_m_graham_scan_mpi::TestTaskMPI::ValidationImpl() {
-  return task_data->inputs[0] != nullptr;
-}
+bool anikin_m_graham_scan_mpi::TestTaskMPI::ValidationImpl() { return task_data->inputs[0] != nullptr; }
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
   unsigned int input_size = task_data->inputs_count[0];
@@ -177,8 +174,8 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
     offset += counts[i];
   }
 
-  MPI_Scatterv(world_.rank() == 0 ? data_.data() : nullptr, counts, displs, MPI_PT, local_points.data(),
-               local_count, MPI_PT, 0, world_);
+  MPI_Scatterv(world_.rank() == 0 ? data_.data() : nullptr, counts, displs, MPI_PT, local_points.data(), local_count,
+               MPI_PT, 0, world_);
 
   pt local_p1 = {0, 0}, local_p2 = {0, 0};
   if (!local_points.empty()) {

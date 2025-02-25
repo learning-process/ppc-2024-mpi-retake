@@ -36,4 +36,4 @@ class TestTaskSequential : public ppc::core::Task {
   std::vector<pt> data_;
 };
 
-} // namespace anikin_m_graham_scan_seq
+}  // namespace anikin_m_graham_scan_seq

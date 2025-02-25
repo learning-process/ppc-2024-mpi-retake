@@ -8,8 +8,8 @@
 #include "core/task/include/task.hpp"
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
-TEST(anikin_m_graham_scan, test_pipeline_run) { 
-  constexpr int kCount = 1000000; 
+TEST(anikin_m_graham_scan, test_pipeline_run) {
+  constexpr int kCount = 1000000;
 
   std::vector<anikin_m_graham_scan_seq::pt> in;
   std::vector<anikin_m_graham_scan_seq::pt> out;
