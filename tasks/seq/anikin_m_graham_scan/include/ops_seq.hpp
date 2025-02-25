@@ -26,7 +26,7 @@ void CreateRandomData(std::vector<Pt>& alg_in, int count);
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {} // NOLINT
+  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}  // NOLINT
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

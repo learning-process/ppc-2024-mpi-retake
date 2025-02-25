@@ -3,9 +3,9 @@
 
 #include <mpi.h>
 
-#include <cstdint>
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <random>
 #include <vector>
 

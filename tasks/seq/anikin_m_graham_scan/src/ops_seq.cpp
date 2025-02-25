@@ -1,8 +1,8 @@
 // Anikin Maksim 2025
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 #include <random>
 #include <vector>
 
