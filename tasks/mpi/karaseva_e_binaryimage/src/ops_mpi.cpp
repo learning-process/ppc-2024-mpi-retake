@@ -107,16 +107,16 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     return false;
   }
 
-  size_t rows = 0;
-  size_t cols = 0;
+  int rows = task_data->inputs_count[0];
+  int cols = task_data->inputs_count[1];
   if (is_root) {
     rows = task_data->inputs_count[0];
     cols = task_data->inputs_count[1];
   }
 
   // Broadcasting the size and image dimensions to all processes
-  MPI_Bcast(&rows, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cols, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
   std::cout << "[Rank " << rank << "] Received image dimensions: " << rows << "x" << cols << '\n';
 
   // Ensure valid image dimensions
@@ -125,7 +125,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     return false;
   }
 
-  size_t input_size = rows * cols;
+  int input_size = rows * cols;
 
   // Broadcasting the image data
   if (is_root) {
@@ -156,8 +156,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  size_t input_count = 0;
-  size_t output_count = 0;
+  int input_count = 0;
+  int output_count = 0;
 
   // Ensure that inputs_count and outputs_count are not empty
   if (!task_data->inputs_count.empty() && !task_data->outputs_count.empty()) {
@@ -191,20 +191,20 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  size_t rows = task_data->inputs_count[0];
-  size_t cols = task_data->inputs_count[1];
+  int rows = task_data->inputs_count[0];
+  int cols = task_data->inputs_count[1];
   int num_processes = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 
-  size_t local_rows = rows / num_processes;
+  int local_rows = rows / num_processes;
 
   std::unordered_map<int, int> label_parent;
   local_labeled_image_.resize(local_rows * cols, 0);
   std::vector<int> neighbors;
 
   // Perform labeling for the local region assigned to the current process
-  size_t start_row = rank * local_rows;
-  size_t end_row = (rank + 1) * local_rows;
+  int start_row = rank * local_rows;
+  int end_row = (rank + 1) * local_rows;
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, start_row, end_row);
 
   // Ensure output buffer is allocated for gather
