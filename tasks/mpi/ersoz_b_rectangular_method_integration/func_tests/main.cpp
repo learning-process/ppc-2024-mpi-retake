@@ -72,7 +72,8 @@ TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_WITH_LOW_RANGE) {
 }
 
 TEST(ersoz_b_rectangular_method_integration_mpi, EXCEPTION_ON_ZERO_COUNT) {
-  EXPECT_THROW(GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 5, 0, 0), std::runtime_error);
+  EXPECT_THROW(GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 5, 0, 0),
+               std::runtime_error);  // NOLINT(modernize-type-traits, modernize-type-traits-variable)
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_mpi
