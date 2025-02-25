@@ -44,9 +44,9 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
   // Parallel execution test
   karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
   ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_TRUE(test_task_mpi.PreProcessingImpl());
+  ASSERT_TRUE(test_task_mpi.RunImpl());
+  ASSERT_TRUE(test_task_mpi.PostProcessingImpl());
 
   if (world.rank() == 0) {
     std::vector<int> reference_labeled_image(rows * cols, 0);
@@ -59,9 +59,9 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
 
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
     ASSERT_TRUE(test_task_seq.ValidationImpl());
-    test_task_seq.PreProcessingImpl();
-    test_task_seq.RunImpl();
-    test_task_seq.PostProcessingImpl();
+    ASSERT_TRUE(test_task_seq.PreProcessingImpl());
+    ASSERT_TRUE(test_task_seq.RunImpl());
+    ASSERT_TRUE(test_task_seq.PostProcessingImpl());
 
     ASSERT_EQ(reference_labeled_image, global_labeled_image);
   }
@@ -69,6 +69,8 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
 
 TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
   boost::mpi::communicator world;
+  int rank = world.rank();
+
   const int rows = 10;
   const int cols = 10;
 
@@ -79,10 +81,9 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
                             0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
   std::vector<int> global_labeled_image(rows * cols);
 
-  // Create TaskData for parallel execution
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
+  if (rank == 0) {
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_par->inputs_count = {rows, cols};
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
@@ -96,11 +97,9 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  if (world.rank() == 0) {
-    // Result for sequential processing
+  if (rank == 0) {
     std::vector<int> reference_labeled_image(rows * cols);
 
-    // Create TaskData for sequential execution
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
     task_data_seq->inputs_count = {rows, cols};
@@ -114,7 +113,6 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
     test_task_seq.RunImpl();
     test_task_seq.PostProcessingImpl();
 
-    // Check that the results of parallel and sequential execution match
     ASSERT_EQ(reference_labeled_image, global_labeled_image);
   }
 }
@@ -125,7 +123,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
   const int cols = 50;
 
   std::vector<int> image;
-  std::vector<int> global_labeled_image(rows * cols, 0);  // Ensure zero initialization
+  std::vector<int> global_labeled_image(rows * cols, 0);
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
@@ -140,9 +138,9 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
   // Parallel execution test
   karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
   ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_TRUE(test_task_mpi.PreProcessingImpl());
+  ASSERT_TRUE(test_task_mpi.RunImpl());
+  ASSERT_TRUE(test_task_mpi.PostProcessingImpl());
 
   if (world.rank() == 0) {
     std::vector<int> reference_labeled_image(rows * cols, 0);
@@ -155,9 +153,9 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
 
     karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
     ASSERT_TRUE(test_task_seq.ValidationImpl());
-    test_task_seq.PreProcessingImpl();
-    test_task_seq.RunImpl();
-    test_task_seq.PostProcessingImpl();
+    ASSERT_TRUE(test_task_seq.PreProcessingImpl());
+    ASSERT_TRUE(test_task_seq.RunImpl());
+    ASSERT_TRUE(test_task_seq.PostProcessingImpl());
 
     ASSERT_EQ(reference_labeled_image, global_labeled_image);
   }
