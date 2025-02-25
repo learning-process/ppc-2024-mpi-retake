@@ -116,8 +116,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   // Ensure valid image dimensions
   if (rows == 0 || cols == 0) {
-    std::cerr << "[Rank " << rank << "] [ERROR] Invalid image dimensions: " << rows << "x" << cols << '\n';
-    return false;
+    std::cerr << "[Rank " << rank << "] [ERROR] Invalid image dimensions: " << rows << "x" << cols
+              << '\n';
+        return false;
   }
 
   int input_size = rows * cols;
