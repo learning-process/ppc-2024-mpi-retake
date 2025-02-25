@@ -28,8 +28,8 @@ TEST(anikin_m_graham_scan, case_0) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  boost::mpi::communicator world_;
-  if (world_.rank() == 0) {
+  boost::mpi::communicator world;
+  if (world.rank() == 0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
@@ -58,8 +58,8 @@ TEST(anikin_m_graham_scan, case_1) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  boost::mpi::communicator world_;
-  if (world_.rank() == 0) {
+  boost::mpi::communicator world;
+  if (world.rank() == 0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
@@ -88,8 +88,8 @@ TEST(anikin_m_graham_scan, case_2) {
   test_task_mpi.Run();
   test_task_mpi.PostProcessing();
 
-  boost::mpi::communicator world_;
-  if (world_.rank() == 0) {
+  boost::mpi::communicator world;
+  if (world.rank() == 0) {
     auto *out_ptr = reinterpret_cast<anikin_m_graham_scan_mpi::Pt *>(task_data_mpi->outputs[0]);
     out = std::vector<anikin_m_graham_scan_mpi::Pt>(out_ptr, out_ptr + task_data_mpi->outputs_count[0]);
 
