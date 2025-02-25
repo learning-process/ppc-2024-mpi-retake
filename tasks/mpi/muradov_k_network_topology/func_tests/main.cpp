@@ -2,16 +2,15 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <vector>
-
 #include "mpi/muradov_k_network_topology/include/ops_mpi.hpp"
 
 namespace muradov_k_network_topology_mpi {
 
 // Test 1: Full ring communication between neighboring processes.
-TEST(muradov_k_network_topology_mpi, FullRingCommunication) {
+TEST(muradov_k_network_topology_mpi, FullRingCommunication) {  // NOLINT(readability-function-cognitive-complexity)
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size = 0, rank = 0;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
@@ -65,9 +64,10 @@ TEST(muradov_k_network_topology_mpi, ReceiveWithoutTopology) {
 }
 
 // Test 4: Multiple rounds of ring communication should return the original value.
-TEST(muradov_k_network_topology_mpi, MultipleRoundCommunication) {
+TEST(muradov_k_network_topology_mpi, MultipleRoundCommunication) {  // NOLINT(readability-function-cognitive-complexity)
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size = 0, rank = 0;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
@@ -101,7 +101,8 @@ TEST(muradov_k_network_topology_mpi, MultipleRoundCommunication) {
 // Test 5: Verify that using MPI_ANY_SOURCE in Receive works correctly.
 TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size = 0, rank = 0;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
