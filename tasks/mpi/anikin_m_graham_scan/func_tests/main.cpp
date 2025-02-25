@@ -1,7 +1,7 @@
 // Anikin Maksim 2025
 #include <gtest/gtest.h>
 #include <mpi.h>
-#include <stdint.h>
+#include <cstdint>
 
 #include <memory>
 #include <vector>

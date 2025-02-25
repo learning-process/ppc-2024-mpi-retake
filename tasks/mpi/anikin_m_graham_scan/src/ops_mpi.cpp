@@ -22,7 +22,7 @@ void anikin_m_graham_scan_mpi::ConvexHull(std::vector<Pt>& points) {
   if (points.size() <= 1) {
     return;
   }
-  std::sort(points.begin(), points.end(), &Cmp);
+  std::ranges::sort(points, &Cmp);
   Pt p1 = points[0];
   Pt p2 = points.back();
   std::vector<Pt> up;
@@ -145,11 +145,11 @@ void anikin_m_graham_scan_mpi::CreateRandomData(std::vector<Pt>& alg_in, int cou
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(0.0, 100.0);
-  Pt rand_;
+  Pt rand;
   for (int i = 0; i < count; i++) {
-    rand_.x = (int)dis(gen);
-    rand_.y = (int)dis(gen);
-    alg_in.push_back(rand_);
+    rand.x = (int)dis(gen);
+    rand.y = (int)dis(gen);
+    alg_in.push_back(rand);
   }
 }
 
@@ -170,15 +170,15 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
   std::vector<Pt> local_points;
   int n = 0;
   if (world_.rank() == 0) {
-    n = data_.size();
+    n = (int)data_.size();
   }
   MPI_Bcast(&n, 1, MPI_INT, 0, world_);
-  int local_count = n / world_.size() + ((world_.rank() < n % world_.size()) ? 1 : 0);
+  int local_count = (n / world_.size()) + ((world_.rank() < n % world_.size()) ? 1 : 0);
   local_points.resize(local_count);
 
-  int world_size_ = world_.size();
-  int* counts = new int[world_size_];
-  int* displs = new int[world_size_];
+  int world_size = world_.size();
+  int* counts = new int[world_size];
+  int* displs = new int[world_size];
   int offset = 0;
   for (int i = 0; i < world_.size(); i++) {
     counts[i] = n / world_.size() + (i < n % world_.size() ? 1 : 0);
@@ -189,20 +189,23 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
   MPI_Scatterv(world_.rank() == 0 ? data_.data() : nullptr, counts, displs, mpi_pt, local_points.data(), local_count,
                mpi_pt, 0, world_);
 
-  Pt local_p1 = {0, 0}, local_p2 = {0, 0};
+  Pt local_p1 = {.x = 0, .y = 0};
+  Pt local_p2 = {.x = 0, .y = 0};
   if (!local_points.empty()) {
-    local_p1 = *std::min_element(local_points.begin(), local_points.end(), Cmp);
-    local_p2 = *std::max_element(local_points.begin(), local_points.end(), Cmp);
+    local_p1 = *std::ranges::min_element(local_points, Cmp);
+    local_p2 = *std::ranges::max_element(local_points, Cmp);
   }
 
-  std::vector<Pt> all_p1(world_.size()), all_p2(world_.size());
+  std::vector<Pt> all_p1(world_.size());
+  std::vector<Pt> all_p2(world_.size());
   MPI_Gather(&local_p1, 1, mpi_pt, all_p1.data(), 1, mpi_pt, 0, world_);
   MPI_Gather(&local_p2, 1, mpi_pt, all_p2.data(), 1, mpi_pt, 0, world_);
 
-  Pt global_p1, global_p2;
+  Pt global_p1;
+  Pt global_p2;
   if (world_.rank() == 0) {
-    global_p1 = *std::min_element(all_p1.begin(), all_p1.end(), Cmp);
-    global_p2 = *std::max_element(all_p2.begin(), all_p2.end(), Cmp);
+    global_p1 = *std::ranges::min_element(all_p1, Cmp);
+    global_p2 = *std::ranges::max_element(all_p2, Cmp);
   }
 
   MPI_Bcast(&global_p1, 1, mpi_pt, 0, world_);
@@ -210,20 +213,20 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
 
   local_points.push_back(global_p1);
   local_points.push_back(global_p2);
-  std::sort(local_points.begin(), local_points.end(), Cmp);
-  auto last = std::unique(local_points.begin(), local_points.end());
-  local_points.erase(last, local_points.end());
+  std::ranges::sort(local_points, Cmp);
+  auto last = std::ranges::unique(local_points);
+  local_points.erase(last.begin(), local_points.end());
 
   ConvexHull(local_points);
 
   if (world_.rank() != 0) {
-    int size = local_points.size();
+    int size = (int)local_points.size();
     MPI_Send(&size, 1, MPI_INT, 0, 0, world_);
     MPI_Send(local_points.data(), size, mpi_pt, 0, 0, world_);
   } else {
     std::vector<Pt> final_hull = local_points;
     for (int i = 1; i < world_.size(); ++i) {
-      int recv_size;
+      int recv_size = 0;
       MPI_Recv(&recv_size, 1, MPI_INT, i, 0, world_, MPI_STATUS_IGNORE);
       std::vector<Pt> temp(recv_size);
       MPI_Recv(temp.data(), recv_size, mpi_pt, i, 0, world_, MPI_STATUS_IGNORE);

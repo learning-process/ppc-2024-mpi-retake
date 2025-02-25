@@ -1,8 +1,11 @@
 // Anikin Maksim 2025
 #include <gtest/gtest.h>
+#include <cstdint>
 
+#include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
 TEST(anikin_m_graham_scan, case_0) {

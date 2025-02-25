@@ -18,11 +18,11 @@ bool Ccw(Pt a, Pt b, Pt c);
 
 void ConvexHull(std::vector<Pt>& a);
 
-bool TestData(std::vector<Pt> alg_out_, int case_);
+bool TestData(std::vector<Pt> alg_out, int test);
 
-void CreateTestData(std::vector<Pt>& alg_in_, int case_);
+void CreateTestData(std::vector<Pt>& alg_in, int test);
 
-void CreateRandomData(std::vector<Pt>& alg_in_, int count);
+void CreateRandomData(std::vector<Pt>& alg_in, int count);
 
 class TestTaskSequential : public ppc::core::Task {
  public:
