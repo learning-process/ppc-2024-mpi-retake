@@ -31,15 +31,20 @@ bool NetworkTopology::send(int dest, const void* data, int count, MPI_Datatype d
 
   int current = rank_;
   while (current != dest) {
-    int next = (dest > current) ? right_ : left_;
+    // Calculate distances in both directions.
+    int dist_right = (dest - current + size_) % size_;
+    int dist_left = (current - dest + size_) % size_;
+
+    int next = (dist_right <= dist_left) ? right_ : left_;
     MPI_Send(data, count, datatype, next, 0, topology_comm_);
 
-    // If next is the destination, break the loop
+    // If the next hop is the destination, we can stop.
     if (next == dest) break;
 
-    // Receive forwarded message
-    MPI_Recv(const_cast<void*>(data), count, datatype, (next == right_) ? left_ : right_, 0, topology_comm_,
-             MPI_STATUS_IGNORE);
+    // Receive the forwarded message from the opposite side.
+    int opposite = (next == right_) ? left_ : right_;
+    MPI_Recv(const_cast<void*>(data), count, datatype, opposite, 0, topology_comm_, MPI_STATUS_IGNORE);
+
     current = next;
   }
   return true;
