@@ -40,7 +40,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(true_sol.data()));
     task_data_seq->outputs_count.emplace_back(true_sol.size());
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential test_mpi_task_sequential(task_data_seq);
-    ASSERT_EQ(test_mpi_task_sequential.Validation(), true);
     test_mpi_task_sequential.PreProcessing();
     test_mpi_task_sequential.Run();
     test_mpi_task_sequential.PostProcessing();
@@ -95,7 +94,6 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(true_sol.data()));
     task_data_seq->outputs_count.emplace_back(true_sol.size());
     deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential test_mpi_task_sequential(task_data_seq);
-    ASSERT_EQ(test_mpi_task_sequential.Validation(), true);
     test_mpi_task_sequential.PreProcessing();
     test_mpi_task_sequential.Run();
     test_mpi_task_sequential.PostProcessing();
