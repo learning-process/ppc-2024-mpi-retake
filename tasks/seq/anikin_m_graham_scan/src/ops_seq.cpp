@@ -6,7 +6,7 @@
 #include <random>
 #include <vector>
 
-bool anikin_m_graham_scan_seq::cmp(pt a, pt b) { return a.x < b.x || a.x == b.x && a.y < b.y; }
+bool anikin_m_graham_scan_seq::cmp(pt a, pt b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
 
 bool anikin_m_graham_scan_seq::cw(pt a, pt b, pt c) {
   return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y) < 0;
