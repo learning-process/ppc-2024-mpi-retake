@@ -10,7 +10,8 @@
 #include "mpi/Konstantinov_I_sum_of_vector_elements/include/ops_mpi.hpp"
 
 namespace konstantinov_i_sum_of_vector_elements_mpi {
-static std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int upper_bound = 50) {
+namespace {
+std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int upper_bound = 50) {
   std::vector<int> result(size);
   for (int i = 0; i < size; i++) {
     result[i] = lower_bound + rand() % (upper_bound - lower_bound + 1);
@@ -18,14 +19,14 @@ static std::vector<int> GenerateRandVector(int size, int lower_bound = 0, int up
   return result;
 }
 
-static std::vector<std::vector<int>> GenerateRandMatrix(int rows, int columns, int lower_bound = 0,
-                                                        int upper_bound = 50) {
+std::vector<std::vector<int>> GenerateRandMatrix(int rows, int columns, int lower_bound = 0, int upper_bound = 50) {
   std::vector<std::vector<int>> result(rows);
   for (int i = 0; i < rows; i++) {
     result[i] = konstantinov_i_sum_of_vector_elements_mpi::GenerateRandVector(columns, lower_bound, upper_bound);
   }
   return result;
 }
+}  // namespace
 }  // namespace konstantinov_i_sum_of_vector_elements_mpi
 
 TEST(Konstantinov_I_sum_of_vector_elements_parallel, EmptyInput) {
