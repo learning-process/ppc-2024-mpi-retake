@@ -156,41 +156,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
-  int rank = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  int input_count = 0;
-  int output_count = 0;
-
-  // Debugging: Print the size of inputs_count and outputs_count
-  std::cerr << "[Rank " << rank << "] Size of inputs_count: " << task_data->inputs_count.size() << "\n";
-  std::cerr << "[Rank " << rank << "] Size of outputs_count: " << task_data->outputs_count.size() << "\n";
-
-  // Ensure that inputs_count and outputs_count are not empty
-  if (!task_data->inputs_count.empty() && !task_data->outputs_count.empty()) {
-    input_count = static_cast<int>(task_data->inputs_count[0]);
-    output_count = static_cast<int>(task_data->outputs_count[0]);
+  if (world_.rank() == 0) {
+    return task_data->inputs_count[0] != 0 && task_data->outputs_count[0] != 0;
   }
-
-  // Debugging output to track input and output dimensions
-  std::cerr << "[Rank " << rank << "] input_count: " << input_count << ", output_count: " << output_count << "\n";
-
-  // Validate input and output dimensions
-  if (input_count == 0 || output_count == 0) {
-    std::cerr << "[Rank " << rank << "] [ERROR] One of the counts is zero: input_count = " << input_count
-              << ", output_count = " << output_count << "\n";
-    return false;
-  }
-
-  if (input_count != output_count) {
-    std::cerr << "[Rank " << rank << "] [ERROR] Input count does not match output count: input_count = " << input_count
-              << ", output_count = " << output_count << "\n";
-    return false;
-  }
-
-  // Debugging output to ensure that inputs and outputs are consistent across all ranks
-  std::cerr << "[Rank " << rank << "] Validation successful\n";
-
   return true;
 }
 
