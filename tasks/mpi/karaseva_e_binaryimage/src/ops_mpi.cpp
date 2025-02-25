@@ -67,24 +67,25 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
                                                        int end_row) {
   int label_counter = min_label;
 
-  // Iterate through the image rows assigned to the current process
+  // If process has no rows assigned, return immediately
+  if (start_row >= end_row) return;
+
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
       if (image[pos] == 0 || labeled_image[pos] >= 2) {  // Skip background or already labeled pixels
         std::vector<int> neighbors;
-        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);                    // Find neighbors of the pixel
-        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);  // Label the pixel
+        ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
+        AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);
       }
     }
   }
 
-  // Local root search after labeling
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
       if (labeled_image[pos] >= 2) {
-        labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);  // Apply path compression for final labels
+        labeled_image[pos] = GetRootLabel(label_parent, labeled_image[pos]);
       }
     }
   }
@@ -172,22 +173,21 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
   int end_row = start_row + ((rank < remainder) ? (rows_per_proc + 1) : rows_per_proc);
 
-  if (end_row <= start_row) {
-    std::cerr << "[ERROR] Invalid row range for process " << rank << ": start_row = " << start_row
-              << ", end_row = " << end_row << "\n";
-    return false;
-  }
+  if (start_row >= end_row) return true;  // Skip processing if no rows assigned
 
   std::vector<int> labeled_image(rows * cols, 0);
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   MPI_Allreduce(MPI_IN_PLACE, labeled_image.data(), rows * cols, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
+  output_ = labeled_image;
+
   return true;
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (!task_data->outputs.empty() && task_data->outputs[0] != nullptr) {
+  if (!output_.empty() && !task_data->outputs.empty() && task_data->outputs[0] != nullptr &&
+      !task_data->outputs_count.empty() && task_data->outputs_count[0] == output_.size()) {
     std::ranges::copy(output_.begin(), output_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
     return true;
   }
