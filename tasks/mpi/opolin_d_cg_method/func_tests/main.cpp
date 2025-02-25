@@ -35,7 +35,7 @@ void GenDataCgMethod(size_t size, std::vector<double> &a, std::vector<double> &b
     }
   }
   for (size_t i = 0; i < size; i++) {
-    a[(i * size) + i] += size;
+    a[(i * size) + i] += static_cast<double>(size);
   }
   expected.resize(size);
   for (size_t i = 0; i < size; i++) {

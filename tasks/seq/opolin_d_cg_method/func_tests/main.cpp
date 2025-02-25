@@ -1,7 +1,6 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
-#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
@@ -34,7 +33,7 @@ void GenDataCgMethod(size_t size, std::vector<double> &a, std::vector<double> &b
     }
   }
   for (size_t i = 0; i < size; i++) {
-    a[(i * size) + i] += size;
+    a[(i * size) + i] += static_cast<double>(size);
   }
   expected.resize(size);
   for (size_t i = 0; i < size; i++) {
@@ -53,7 +52,9 @@ void GenDataCgMethod(size_t size, std::vector<double> &a, std::vector<double> &b
 TEST(opolin_d_cg_method_seq, test_small_system) {
   int size = 3;
   double epsilon = 1e-9;
-  std::vector<double> expected, a, b;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
   opolin_d_cg_method_seq::GenDataCgMethod(size, a, b, expected);
 
   std::vector<double> out(size, 0.0);
@@ -79,7 +80,9 @@ TEST(opolin_d_cg_method_seq, test_small_system) {
 TEST(opolin_d_cg_method_seq, test_big_system) {
   int size = 100;
   double epsilon = 1e-9;
-  std::vector<double> expected, a, b;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
   opolin_d_cg_method_seq::GenDataCgMethod(size, a, b, expected);
 
   std::vector<double> out(size, 0.0);
@@ -105,7 +108,9 @@ TEST(opolin_d_cg_method_seq, test_big_system) {
 TEST(opolin_d_cg_method_seq, test_correct_input) {
   int size = 3;
   double epsilon = 1e-9;
-  std::vector<double> expected, a, b;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
   a = {29.0, 29.0, 39.0, 29.0, 53.0, 17.0, 39.0, 17.0, 90.0};
   b = {204.0, 186.0, 343.0};
   expected = {1.0, 2.0, 3.0};
@@ -132,7 +137,8 @@ TEST(opolin_d_cg_method_seq, test_correct_input) {
 TEST(opolin_d_cg_method_seq, test_no_simertric) {
   int size = 3;
   double epsilon = 1e-9;
-  std::vector<double> a, b;
+  std::vector<double> a;
+  std::vector<double> b;
   a = {29.0, 0.0, 39.0, 29.0, 53.0, 17.0, 39.0, 1.0, 90.0};
   b = {0.0, 0.0, 0.0};
   std::vector<double> out(size, 0.0);
@@ -152,7 +158,8 @@ TEST(opolin_d_cg_method_seq, test_no_simertric) {
 TEST(opolin_d_cg_method_seq, test_no_positive_define) {
   int size = 3;
   double epsilon = 1e-9;
-  std::vector<double> a, b;
+  std::vector<double> a;
+  std::vector<double> b;
   a = {0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0};
   b = {0.0, 0.0, 0.0};
   std::vector<double> out(size, 0.0);
@@ -172,7 +179,9 @@ TEST(opolin_d_cg_method_seq, test_no_positive_define) {
 TEST(opolin_d_cg_method_seq, test_negative_values) {
   int size = 3;
   double epsilon = 1e-9;
-  std::vector<double> expected, a, b;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
   a = {244.913, -64.084, 59.893, -64.084, 84.215, -23.392, 59.893, -23.392, 31.227};
   b = {47.955, -146.484, 35.406};
   expected = {-0.437926, -1.924931, 0.531806};
@@ -199,7 +208,9 @@ TEST(opolin_d_cg_method_seq, test_negative_values) {
 TEST(opolin_d_cg_method_seq, test_simple_element) {
   int size = 1;
   double epsilon = 1e-9;
-  std::vector<double> expected, a, b;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
   opolin_d_cg_method_seq::GenDataCgMethod(size, a, b, expected);
 
   std::vector<double> out(size, 0.0);
@@ -225,7 +236,9 @@ TEST(opolin_d_cg_method_seq, test_simple_element) {
 TEST(opolin_d_cg_method_seq, test_simple_matrix) {
   int size = 3;
   double epsilon = 1e-9;
-  std::vector<double> expected, a, b;
+  std::vector<double> expected;
+  std::vector<double> a;
+  std::vector<double> b;
   a = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
   b = {1.0, 2.0, 3.0};
   expected = {1.0, 2.0, 3.0};

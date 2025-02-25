@@ -9,6 +9,7 @@
 #include <boost/serialization/vector.hpp>  // NOLINT(misc-include-cleaner)
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <vector>
 
 bool opolin_d_cg_method_mpi::CGMethodkMPI::PreProcessingImpl() {
@@ -104,7 +105,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
   while (true) {
     double local_rsquare = opolin_d_cg_method_mpi::ScalarProduct(local_r, local_r);
     double rsquare_k = 0.0;
-    boost::mpi::reduce(world_, local_rsquare, rsquare_k, std::plus<double>(), 0);
+    boost::mpi::reduce(world_, local_rsquare, rsquare_k, std::plus<>(), 0);
     boost::mpi::broadcast(world_, rsquare_k, 0);
 
     rsquare_prev = rsquare_k;
@@ -125,7 +126,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
     // p^T * A * p
     double local_p_ap = opolin_d_cg_method_mpi::ScalarProduct(local_p, local_ap);
     double p_ap = 0.0;
-    boost::mpi::reduce(world_, local_p_ap, p_ap, std::plus<double>(), 0);
+    boost::mpi::reduce(world_, local_p_ap, p_ap, std::plus<>(), 0);
     boost::mpi::broadcast(world_, p_ap, 0);
 
     // alpha_k
@@ -140,7 +141,7 @@ bool opolin_d_cg_method_mpi::CGMethodkMPI::RunImpl() {
 
     local_rsquare = opolin_d_cg_method_mpi::ScalarProduct(local_r, local_r);
     rsquare_k = 0.0;
-    boost::mpi::reduce(world_, local_rsquare, rsquare_k, std::plus<double>(), 0);
+    boost::mpi::reduce(world_, local_rsquare, rsquare_k, std::plus<>(), 0);
     boost::mpi::broadcast(world_, rsquare_k, 0);
 
     if (sqrt(rsquare_k) < epsilon_) {
