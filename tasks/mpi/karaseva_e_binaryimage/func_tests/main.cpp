@@ -39,12 +39,6 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
     task_data_par->inputs_count = {rows, cols};
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
     task_data_par->outputs_count = {rows, cols};
-  } else {
-    // Initialize empty vectors for other processes
-    task_data_par->inputs.emplace_back(nullptr);
-    task_data_par->inputs_count = {0, 0};
-    task_data_par->outputs.emplace_back(nullptr);
-    task_data_par->outputs_count = {0, 0};
   }
 
   // Parallel execution test
@@ -94,12 +88,6 @@ TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
     task_data_par->inputs_count = {rows, cols};
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
     task_data_par->outputs_count = {rows, cols};
-  } else {
-    // Initialize empty vectors for other processes
-    task_data_par->inputs.emplace_back(nullptr);
-    task_data_par->inputs_count = {0, 0};
-    task_data_par->outputs.emplace_back(nullptr);
-    task_data_par->outputs_count = {0, 0};
   }
 
   // Parallel execution test
@@ -148,12 +136,6 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
     task_data_par->inputs_count = {rows, cols};
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
     task_data_par->outputs_count = {rows, cols};
-  } else {
-    // Initialize empty vectors for other processes
-    task_data_par->inputs.emplace_back(nullptr);
-    task_data_par->inputs_count = {0, 0};
-    task_data_par->outputs.emplace_back(nullptr);
-    task_data_par->outputs_count = {0, 0};
   }
 
   // Parallel execution test

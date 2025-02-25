@@ -112,10 +112,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   // Broadcasting the size and image dimensions to all processes
   MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  std::cout << "[Rank " << rank << "] Received image dimensions: " << rows << "x" << cols << '\n';
-
-  // Debugging: Print rows and cols on each process
-  std::cerr << "[Rank " << rank << "] rows: " << rows << ", cols: " << cols << '\n';
+  std::cerr << "[Rank " << rank << "] After Bcast: rows = " << rows << ", cols = " << cols << '\n';
 
   // Ensure valid image dimensions
   if (rows == 0 || cols == 0) {
@@ -127,30 +124,23 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
 
   // Broadcasting the image data
   if (is_root) {
-    // Check if the input pointer is not null
     if (task_data->inputs[0] == nullptr) {
       std::cerr << "[Rank " << rank << "] [ERROR] Input data pointer is null.\n";
       return false;
     }
     auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_ = std::vector<int>(in_ptr, in_ptr + input_size);
-    std::cout << "[Rank 0] Broadcasting image data of size: " << input_size << '\n';
   } else {
-    // Resize input_ to the correct size on non-root processes
     input_.resize(input_size);
   }
 
-  // Ensure all processes have the correct input_size
-  std::cerr << "[Rank " << rank << "] Input size: " << input_size << '\n';
-
-  // Broadcast the image data
   int result = MPI_Bcast(input_.data(), input_size, MPI_INT, 0, MPI_COMM_WORLD);
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error broadcasting image data. MPI_Bcast failed.\n";
     return false;
   }
 
-  std::cout << "[Rank " << rank << "] Image data broadcasted successfully.\n";
+  std::cerr << "[Rank " << rank << "] Image data broadcasted successfully.\n";
 
   return true;
 }
@@ -172,30 +162,27 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 
   int local_rows = rows / num_processes;
+  if (local_rows == 0) {
+    std::cerr << "[Rank " << rank << "] [ERROR] local_rows is zero. Check rows and num_processes.\n";
+    return false;
+  }
 
-  // Debugging: Print rows, cols, local_rows, start_row, and end_row on each process
-  std::cerr << "[Rank " << rank << "] rows: " << rows << ", cols: " << cols << ", local_rows: " << local_rows << '\n';
-
-  std::unordered_map<int, int> label_parent;
-  local_labeled_image_.resize(local_rows * cols, 0);
-  std::vector<int> neighbors;
-
-  // Perform labeling for the local region assigned to the current process
   int start_row = rank * local_rows;
   int end_row = (rank + 1) * local_rows;
 
-  // Debugging: Print start_row and end_row on each process
-  std::cerr << "[Rank " << rank << "] start_row: " << start_row << ", end_row: " << end_row << '\n';
+  std::cerr << "[Rank " << rank << "] rows: " << rows << ", cols: " << cols << ", local_rows: " << local_rows
+            << ", start_row: " << start_row << ", end_row: " << end_row << '\n';
+
+  std::unordered_map<int, int> label_parent;
+  local_labeled_image_.resize(local_rows * cols, 0);
 
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, start_row, end_row);
 
-  // Ensure output buffer is allocated for gather
   if (task_data->outputs[0] == nullptr) {
     std::cerr << "[Rank " << rank << "] [ERROR] Output buffer is null.\n";
     return false;
   }
 
-  // Use MPI_Gatherv for uneven data distribution
   std::vector<int> recv_counts(num_processes);
   std::vector<int> displs(num_processes);
 
