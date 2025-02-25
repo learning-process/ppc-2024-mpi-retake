@@ -67,13 +67,14 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::Labeling(std::vector<int>& image, 
                                                        int end_row) {
   int label_counter = min_label;
 
-  // If process has no rows assigned, return immediately
-  if (start_row >= end_row) return;
+  if (start_row >= end_row) {
+    return;
+  }
 
   for (int x = start_row; x < end_row; ++x) {
     for (int y = 0; y < cols; ++y) {
       int pos = (x * cols) + y;
-      if (image[pos] == 0 || labeled_image[pos] >= 2) {  // Skip background or already labeled pixels
+      if (image[pos] == 0 || labeled_image[pos] >= 2) {
         std::vector<int> neighbors;
         ProcessNeighbors(x, y, rows, cols, labeled_image, neighbors);
         AssignLabelToPixel(pos, labeled_image, label_parent, label_counter, neighbors);
@@ -173,12 +174,18 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   int start_row = (rank < remainder) ? rank * (rows_per_proc + 1) : (rank * rows_per_proc) + remainder;
   int end_row = start_row + ((rank < remainder) ? (rows_per_proc + 1) : rows_per_proc);
 
-  if (start_row >= end_row) return true;  // Skip processing if no rows assigned
+  if (start_row >= end_row) {
+    return true;
+  }
 
   std::vector<int> labeled_image(rows * cols, 0);
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
   MPI_Allreduce(MPI_IN_PLACE, labeled_image.data(), rows * cols, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+  if (output_.size() != static_cast<size_t>(rows * cols)) {
+    output_.resize(rows * cols);
+  }
 
   output_ = labeled_image;
 
@@ -186,11 +193,13 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (!output_.empty() && !task_data->outputs.empty() && task_data->outputs[0] != nullptr &&
-      !task_data->outputs_count.empty() && task_data->outputs_count[0] == output_.size()) {
-    std::ranges::copy(output_.begin(), output_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
-    return true;
+  if (output_.empty() || task_data->outputs.empty() || task_data->outputs[0] == nullptr ||
+      task_data->outputs_count.empty() || task_data->outputs_count[0] != output_.size()) {
+    std::cerr << "[ERROR] Output is null or empty! Expected size: " << task_data->outputs_count[0]
+              << ", Actual size: " << output_.size() << "\n";
+    return false;
   }
-  std::cerr << "[ERROR] Output is null or empty!\n";
-  return false;
+
+  std::ranges::copy(output_.begin(), output_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
+  return true;
 }
