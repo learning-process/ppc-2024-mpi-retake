@@ -52,10 +52,10 @@ void karaseva_e_binaryimage_mpi::TestTaskMPI::AssignLabelToPixel(int pos, std::v
   if (neighbors.empty()) {
     labeled_image[pos] = label_counter++;  // No neighbors, assign a new label
   } else {
-    int min_neighbor = *std::ranges::min_element(neighbors);  // Find the smallest neighbor label
+    int min_neighbor = *std::ranges::min_element(neighbors);
     labeled_image[pos] = min_neighbor;
     for (int n : neighbors) {
-      UnionLabels(label_parent, min_neighbor, n);  // Union current label with neighbors
+      UnionLabels(label_parent, min_neighbor, n);
     }
   }
 }
@@ -100,10 +100,11 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     return false;
   }
 
-  input_size_ = is_root ? static_cast<int>(task_data->inputs_count[0]) : 0;
+  int input_size = is_root ? static_cast<int>(task_data->inputs_count[0]) : 0;
   int rows = is_root ? static_cast<int>(task_data->inputs_count[0] / task_data->inputs_count[1]) : 0;
   int cols = is_root ? static_cast<int>(task_data->inputs_count[1]) : 0;
 
+  MPI_Bcast(&input_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&rows, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cols, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -113,6 +114,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   }
 
   rc_size_ = rows;
+  input_size_ = input_size;
 
   if (is_root) {
     auto* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
@@ -121,14 +123,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     input_.resize(rows * cols);
   }
 
-  std::cout << "[INFO] Process " << rank << ": Broadcasting input data...\n";
-  int bcast_status = MPI_Bcast(input_.data(), rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
-  if (bcast_status != MPI_SUCCESS) {
-    std::cerr << "[ERROR] MPI_Bcast failed in PreProcessingImpl. Status: " << bcast_status << "\n";
-    return false;
-  }
-  std::cout << "[INFO] Process " << rank << ": MPI_Bcast completed successfully.\n";
-
+  MPI_Bcast(input_.data(), input_size_, MPI_INT, 0, MPI_COMM_WORLD);
   return true;
 }
 
@@ -146,22 +141,12 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::ValidationImpl() {
     output_count = task_data->outputs_count[0];
   }
 
-  // Broadcasting input_count and output_count
   MPI_Bcast(&input_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
   MPI_Bcast(&output_count, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
-  std::cout << "[INFO] Process " << rank << ": Broadcasting validation data (input_count = " << input_count
-            << ", output_count = " << output_count << ")\n";
-
   bool local_valid = (input_count > 0) && (output_count > 0) && (input_count == output_count);
 
-  // Broadcasting local_valid status
   MPI_Bcast(&local_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
-  if (rank == 0) {
-    std::cout << "[INFO] Process 0: Validation result broadcasted: " << local_valid << "\n";
-  } else {
-    std::cout << "[INFO] Process " << rank << ": Received validation result: " << local_valid << "\n";
-  }
 
   return local_valid;
 }
@@ -196,8 +181,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   std::vector<int> labeled_image(rows * cols, 0);
   Labeling(input_, labeled_image, rows, cols, min_label, label_parent, start_row, end_row);
 
-  std::cout << "[INFO] Process " << rank << ": Labeling completed, syncing...\n";
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Allreduce(MPI_IN_PLACE, labeled_image.data(), rows * cols, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
   return true;
 }
