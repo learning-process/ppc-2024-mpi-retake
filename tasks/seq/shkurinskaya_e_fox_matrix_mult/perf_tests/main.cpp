@@ -50,7 +50,7 @@ TEST(shkurinskaya_e_fox_mat_mul_seq, test_pipline_run_seq) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_seq);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-   for (int it = 0; it < ans.size(); ++it) {
+  for (int it = 0; it < ans.size(); ++it) {
     ASSERT_NEAR(ans[it], out[it], 1);
   }
 }
