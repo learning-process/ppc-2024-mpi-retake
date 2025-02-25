@@ -107,7 +107,8 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
     return false;
   }
 
-  unsigned int rows = 0, cols = 0;
+  unsigned int rows = 0;
+  unsigned int cols = 0;
   if (is_root) {
     rows = task_data->inputs_count[0];
     cols = task_data->inputs_count[1];
@@ -118,7 +119,7 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::PreProcessingImpl() {
   MPI_Bcast(&cols, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
   std::cout << "[Rank " << rank << "] Received image dimensions: " << rows << "x" << cols << '\n';
 
-  int input_size = rows * cols;
+  int input_size = static_cast<int>(rows * cols);
 
   // Broadcasting the image data
   if (is_root) {
@@ -175,8 +176,9 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   // Perform labeling for the local region assigned to the current process
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, rank * local_rows, (rank + 1) * local_rows);
 
-  int result = MPI_Gather(local_labeled_image_.data(), local_rows * cols, MPI_INT, task_data->outputs[0],
-                          local_rows * cols, MPI_INT, 0, MPI_COMM_WORLD);
+  int result =
+      MPI_Gather(local_labeled_image_.data(), static_cast<int>(local_rows * cols), MPI_INT, task_data->outputs[0],
+                 static_cast<int>(local_rows * cols), MPI_INT, 0, MPI_COMM_WORLD);
 
   if (result != MPI_SUCCESS) {
     std::cerr << "[Rank " << rank << "] Error gathering labeled image data.\n";
