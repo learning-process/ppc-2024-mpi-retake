@@ -64,8 +64,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() {
-  
-
   size_t total_elements = 0;
   size_t delta = 0;
   size_t remainder = 0;
@@ -104,7 +102,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
-
   if (world_.rank() == 0) {
     size_t offset_remainder = counts_[0];
     for (unsigned int proc = 1; proc < num_processes_; proc++) {
