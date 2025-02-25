@@ -56,7 +56,7 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, test_pipeline_run) {
   // Create Perf analyzer
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    for (int it = 0; it < ans.size(); ++it) {
+    for (size_t it = 0; it < ans.size(); ++it) {
       ASSERT_NEAR(ans[it], out[it], 1);
     }
   }
@@ -108,7 +108,7 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, test_task_run) {
   // Create Perf analyzer
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    for (int it = 0; it < ans.size(); ++it) {
+    for (size_t it = 0; it < ans.size(); ++it) {
       ASSERT_NEAR(ans[it], out[it], 1);
     }
   }
