@@ -18,8 +18,7 @@ int karaseva_e_binaryimage_mpi::FindRootLabel(std::map<int, std::set<int>>& labe
 // Combines two connected labels in the label connection map.
 void karaseva_e_binaryimage_mpi::CombineLabels(std::map<int, std::set<int>>& label_connection_map, int label1,
                                                int label2) {
-  if (label1 == label2)
-      return;
+  if (label1 == label2) return;
 
   auto it1 = label_connection_map.find(label1);
   auto it2 = label_connection_map.find(label2);
@@ -37,14 +36,14 @@ void karaseva_e_binaryimage_mpi::CombineLabels(std::map<int, std::set<int>>& lab
 
 // Connects a new label with an existing label in the map.
 void karaseva_e_binaryimage_mpi::ConnectWithexisting_label(std::map<int, std::set<int>>& label_connection_map,
-                                                          int existing_label, int newLabel) {
+                                                           int existing_label, int newLabel) {
   label_connection_map[existing_label].insert(newLabel);
   label_connection_map[newLabel] = label_connection_map[existing_label];
 }
 
 // Creates a new connection between two labels in the label connection map.
-void karaseva_e_binaryimage_mpi::Createnew_labelConnection(std::map<int, std::set<int>>& label_connection_map, int label1,
-                                                          int label2) {
+void karaseva_e_binaryimage_mpi::Createnew_labelConnection(std::map<int, std::set<int>>& label_connection_map,
+                                                           int label1, int label2) {
   label_connection_map[label1].insert(label2);
   label_connection_map[label1].insert(label1);
   label_connection_map[label2].insert(label1);

@@ -11,8 +11,6 @@
 
 namespace karaseva_e_binaryimage_mpi {
 
-// Forward declarations of functions
-
 // Label management functions
 int FindRootLabel(std::map<int, std::set<int>>& label_connection_map, int label);
 void CombineLabels(std::map<int, std::set<int>>& label_connection_map, int label1, int label2);
@@ -21,8 +19,8 @@ void CorrectLabels(std::vector<int>& labeled_image, int rows, int cols);
 int AssignLabel(int current_label, std::map<int, int>& label_reassignment, int& next_available_label);
 
 // Labeling functions
-void ApplyLabeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows, int cols, int starting_label,
-                   std::map<int, std::set<int>>& label_connection_map);
+void ApplyLabeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows, int cols,
+                   int starting_label, std::map<int, std::set<int>>& label_connection_map);
 void HandlePixelLabeling(std::vector<int>& input_image, std::vector<int>& labeled_image,
                          std::map<int, std::set<int>>& label_connection_map, int x, int y, int rows, int cols,
                          int& label_counter, int dx[], int dy[]);
