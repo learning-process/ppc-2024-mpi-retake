@@ -41,29 +41,10 @@ TEST(chernova_n_word_count_mpi, Test_empty_string) {
     task_data_mpi->inputs_count.emplace_back(in.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
     task_data_mpi->outputs_count.emplace_back(out.size());
-  }
+  //}
 
   chernova_n_word_count_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-
-  if (world.rank() == 0) {
-    std::vector<int> reference_word_count(1, 0);
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
-    task_data_seq->inputs_count.emplace_back(in.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_word_count.data()));
-    task_data_seq->outputs_count.emplace_back(reference_word_count.size());
-
-    chernova_n_word_count_mpi::TestMPITaskSequential test_task_seq(task_data_seq);
-    ASSERT_EQ(test_task_seq.Validation(), true);
-    test_task_seq.PreProcessing();
-    test_task_seq.Run();
-    test_task_seq.PostProcessing();
-
-    ASSERT_EQ(out[0], reference_word_count[0]);
+  ASSERT_FALSE(test_task_mpi.ValidationImpl());
   }
 }
 

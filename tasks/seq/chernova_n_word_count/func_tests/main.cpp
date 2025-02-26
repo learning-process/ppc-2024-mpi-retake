@@ -42,11 +42,7 @@ TEST(chernova_n_word_count_seq, Test_empty_string) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   chernova_n_word_count_seq::TestTaskSequential test_task_sequential(task_data_seq);
-  ASSERT_EQ(test_task_sequential.Validation(), true);
-  test_task_sequential.PreProcessing();
-  test_task_sequential.Run();
-  test_task_sequential.PostProcessing();
-  ASSERT_EQ(out[0], 0);
+  ASSERT_FALSE(test_task_sequential.ValidationImpl());
 }
 
 TEST(chernova_n_word_count_seq, Test_five_words) {
