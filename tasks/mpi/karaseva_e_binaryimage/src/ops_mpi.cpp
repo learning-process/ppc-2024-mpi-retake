@@ -71,16 +71,15 @@ void karaseva_e_binaryimage_mpi::UnionLabels(std::map<int, std::set<int>>& label
     label_parent_map[new_label] = label_parent_map[neighbour_label];
   } else {
     std::set<int> tempSet = label_parent_map[new_label];
-    label_parent_map[new_label].insert(label_parent_map[neighbour_label].begin(), label_parent_map[neighbour_label].end());
+    label_parent_map[new_label].insert(label_parent_map[neighbour_label].begin(),
+                                       label_parent_map[neighbour_label].end());
     label_parent_map[neighbour_label].insert(label_parent_map[new_label].begin(), label_parent_map[new_label].end());
   }
 }
 
 // Sequential labeling algorithm (used in each MPI process)
-void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image,
-                                                 int rows,
-                                                 int cols, int min_label,
-                     std::map<int, std::set<int>>& label_parent_map) {
+void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows,
+                                          int cols, int min_label, std::map<int, std::set<int>>& label_parent_map) {
   int currentLabel = min_label;
   // Directions for neighboring pixels
   int dx[] = {-1, 0, -1};
@@ -229,7 +228,7 @@ void LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& labelSet) {
 
 // Custom serialization for std::map
 void karaseva_e_binaryimage_mpi::SaveLabelMapToStream(std::ostringstream& oss,
-                                                   const std::map<int, std::set<int>>& label_map) {
+                                                      const std::map<int, std::set<int>>& label_map) {
   oss << label_map.size() << " ";
   for (const auto& entry : label_map) {
     oss << entry.first << " ";
@@ -272,8 +271,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
   std::vector<int> localLabeledImage(partitionSizes[world.rank()], 1);
   int min_label = 100000 * world.rank() + 2;
   std::map<int, std::set<int>> localParentMap;
-  Labeling(local_image_, localLabeledImage, partitionSizes[world.rank()] / columns, columns, min_label,
-                  localParentMap);
+  Labeling(local_image_, localLabeledImage, partitionSizes[world.rank()] / columns, columns, min_label, localParentMap);
 
   boost::mpi::gatherv(world, localLabeledImage, labeled_image.data(), partitionSizes, 0);
 

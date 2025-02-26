@@ -20,7 +20,7 @@ void PropagateLabelEquivalences(std::map<int, std::set<int>>& label_parent_map);
 void UpdateLabels(std::vector<int>& labeled_image, int rows, int cols);
 void UnionLabels(std::map<int, std::set<int>>& label_parent_map, int new_label, int neighbour_label);
 void Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows, int cols, int min_label,
-                     std::map<int, std::set<int>>& label_parent_map);
+              std::map<int, std::set<int>>& label_parent_map);
 void SaveLabelMapToStream(std::ostringstream& oss, const std::map<int, std::set<int>>& label_map);
 void LoadLabelMapFromStream(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
 
