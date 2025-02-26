@@ -18,9 +18,6 @@ TEST(muradov_k_trapezoid_integral_mpi, test_task_run) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   std::function<double(double)> f = [](double x) { return x * sin(x); };
-  double a = 0.0;
-  double b = 10.0;
-  int n = 10000000;
 
   auto start = std::chrono::high_resolution_clock::now();
   auto end = std::chrono::high_resolution_clock::now();
@@ -33,9 +30,6 @@ TEST(muradov_k_trapezoid_integral_mpi, test_pipeline_run) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   std::function<double(double)> f = [](double x) { return exp(x); };
-  double a = -6.0;
-  double b = 6.0;
-  int n = 10000000;
 
   auto start = std::chrono::high_resolution_clock::now();
   auto end = std::chrono::high_resolution_clock::now();
