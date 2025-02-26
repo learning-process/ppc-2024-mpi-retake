@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <iostream>
 
-
 #include "seq/ersoz_b_horizontal_a_vertical_b/include/ops_seq.hpp"
 
 TEST(ersoz_b_horizontal_a_vertical_b_seq, test_pipeline_run) {
