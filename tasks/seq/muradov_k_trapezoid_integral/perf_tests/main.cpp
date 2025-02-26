@@ -20,7 +20,6 @@ TEST(muradov_k_trapezoid_integral_seq, test_task_run) {
   auto end = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double> elapsed = end - start;
-  std::cout << "[SEQ Task Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
   SUCCEED();
 }
 
@@ -35,7 +34,6 @@ TEST(muradov_k_trapezoid_integral_seq, test_pipeline_run) {
   auto end = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double> elapsed = end - start;
-  std::cout << "[SEQ Pipeline Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
   SUCCEED();
 }
 

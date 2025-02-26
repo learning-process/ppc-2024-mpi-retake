@@ -15,9 +15,9 @@ class IntegrationTask : public ppc::core::Task {
   IntegrationTask(const std::function<double(double)>& f, double a, double b, int n)
       : ppc::core::Task(std::make_shared<ppc::core::TaskData>()), func_(f), a_(a), b_(b), n_(n) {}
 
-  bool ValidationImpl() override /* NOLINT(readability-make-member-function-const) */ { return (n_ > 0 && a_ <= b_); }
+  bool ValidationImpl() override { return (n_ > 0 && a_ <= b_); }
 
-  bool PreProcessingImpl() override /* NOLINT(readability-convert-member-functions-to-static) */ { return true; }
+  bool PreProcessingImpl() override { return true; }
 
   bool RunImpl() override {
     const double h = (b_ - a_) / static_cast<double>(n_);
@@ -33,7 +33,7 @@ class IntegrationTask : public ppc::core::Task {
     return true;
   }
 
-  bool PostProcessingImpl() override /* NOLINT(readability-convert-member-functions-to-static) */ { return true; }
+  bool PostProcessingImpl() override { return true; }
 
   [[nodiscard]] double GetResult() const { return result_; }
 
