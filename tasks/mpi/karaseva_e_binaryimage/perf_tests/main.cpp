@@ -15,7 +15,7 @@
 namespace {
 
 // Function to generate a random binary image of given size
-std::vector<uint8_t> createRandomBinaryImg(size_t rows, size_t cols) {
+std::vector<uint8_t> CreateRandomBinaryImg(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (auto &px : img) {
     px = rand() % 2;
@@ -31,7 +31,7 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
   constexpr int kCols = 100;
 
   // Create binary image data
-  std::vector<uint8_t> image = createRandomBinaryImg(kRows, kCols);
+  std::vector<uint8_t> image = CreateRandomBinaryImg(kRows, kCols);
   std::vector<int> output(kRows * kCols, 0);
 
   // Create task_data
@@ -76,7 +76,7 @@ TEST(karaseva_e_binaryimage_mpi, test_task_run) {
   constexpr int kCols = 100;
 
   // Create binary image data
-  std::vector<uint8_t> image = createRandomBinaryImg(kRows, kCols);
+  std::vector<uint8_t> image = CreateRandomBinaryImg(kRows, kCols);
   std::vector<int> output(kRows * kCols, 0);
 
   // Create task_data
