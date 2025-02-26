@@ -48,7 +48,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
   int rank = world_.rank();
-  auto determine_next = [this, &rank]() {
+  auto determine_next = [this]() {
     int dest_x = task_data_.target % size_x_;
     int dest_y = task_data_.target / size_x_;
 
