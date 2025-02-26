@@ -8,7 +8,7 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
-// NOLINTBEGIN
+
 std::vector<int> karaseva_e_binaryimage_mpi::CreateRandomBinaryImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -225,4 +225,3 @@ TEST(karaseva_e_binaryimage_mpi, predefined_test_50x50) {
     ASSERT_EQ(reference_labeled_image, global_labeled_image);
   }
 }
-// NOLINTEND
