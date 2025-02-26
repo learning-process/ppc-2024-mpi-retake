@@ -13,18 +13,17 @@
 
 namespace muradov_k_odd_even_batcher_sort {
 
-std::vector<int> random_vector(int size) {
-  std::mt19937 rng(static_cast<unsigned int>(time(0)));
+std::vector<int> RandomVector(int size) {
+  std::mt19937 rng(static_cast<unsigned int>(time(nullptr)));
   std::vector<int> v(size);
   for (int i = 0; i < size; ++i) {
-    v[i] = rng() % 1000;
+    v[i] = static_cast<int>(rng()) % 1000;
   }
   return v;
 }
 
 namespace {
-// Partition function for quicksort.
-int partition(std::vector<int>& v, int l, int r) {
+int Partition(std::vector<int>& v, int l, int r) {
   int pivot = v[r];
   int i = l - 1;
   for (int j = l; j < r; ++j) {
@@ -37,165 +36,167 @@ int partition(std::vector<int>& v, int l, int r) {
   return i + 1;
 }
 
-void q_sort_impl(std::vector<int>& v, int l, int r) {
+void QSortImpl(std::vector<int>& v, int l, int r) {
   if (l < r) {
-    int p = partition(v, l, r);
-    q_sort_impl(v, l, p - 1);
-    q_sort_impl(v, p + 1, r);
+    int p = Partition(v, l, r);
+    QSortImpl(v, l, p - 1);
+    QSortImpl(v, p + 1, r);
   }
 }
 }  // anonymous namespace
 
-void q_sort(std::vector<int>& v, int l, int r) { q_sort_impl(v, l, r); }
+void QSort(std::vector<int>& v, int l, int r) { QSortImpl(v, l, r); }
 
-// --- Helpers to build the odd–even merge schedule ---
 namespace {
-void odd_even_merge(const std::vector<int>& l, const std::vector<int>& r, std::vector<std::pair<int, int>>& schedule) {
+void OddEvenMerge(const std::vector<int>& l, const std::vector<int>& r, std::vector<std::pair<int, int>>& schedule) {
   int size = static_cast<int>(l.size() + r.size());
-  if (size <= 1) return;
-  if (size == 2) {
-    schedule.push_back({l[0], r[0]});
+  if (size <= 1) {
     return;
   }
-  std::vector<int> l_even, l_odd, r_even, r_odd, res;
+  if (size == 2) {
+    schedule.emplace_back(l[0], r[0]);
+    return;
+  }
+  std::vector<int> l_even;
+  std::vector<int> l_odd;
+  std::vector<int> r_even;
+  std::vector<int> r_odd;
+  std::vector<int> res;
   for (size_t i = 0; i < l.size(); ++i) {
-    if (i % 2 == 0)
+    if (i % 2 == 0) {
       l_even.push_back(l[i]);
-    else
+    } else {
       l_odd.push_back(l[i]);
+    }
   }
   for (size_t i = 0; i < r.size(); ++i) {
-    if (i % 2 == 0)
+    if (i % 2 == 0) {
       r_even.push_back(r[i]);
-    else
+    } else {
       r_odd.push_back(r[i]);
+    }
   }
-  odd_even_merge(l_odd, r_odd, schedule);
-  odd_even_merge(l_even, r_even, schedule);
+  OddEvenMerge(l_odd, r_odd, schedule);
+  OddEvenMerge(l_even, r_even, schedule);
   res.insert(res.end(), l.begin(), l.end());
   res.insert(res.end(), r.begin(), r.end());
   for (int i = 1; i < size - 1; i += 2) {
-    schedule.push_back({res[i], res[i + 1]});
+    schedule.emplace_back(res[i], res[i + 1]);
   }
 }
 
-void allocation(const std::vector<int>& v, std::vector<std::pair<int, int>>& schedule) {
+void Allocation(const std::vector<int>& v, std::vector<std::pair<int, int>>& schedule) {
   int size = static_cast<int>(v.size());
-  if (size <= 1) return;
+  if (size <= 1) {
+    return;
+  }
   std::vector<int> l(v.begin(), v.begin() + size / 2);
   std::vector<int> r(v.begin() + size / 2, v.end());
-  allocation(l, schedule);
-  allocation(r, schedule);
-  odd_even_merge(l, r, schedule);
+  Allocation(l, schedule);
+  Allocation(r, schedule);
+  OddEvenMerge(l, r, schedule);
 }
 
-std::vector<std::pair<int, int>> build_allocation(int procNum) {
-  std::vector<int> v(procNum);
-  for (int i = 0; i < procNum; ++i) {
+std::vector<std::pair<int, int>> BuildAllocation(int proc_num) {
+  std::vector<int> v(proc_num);
+  for (int i = 0; i < proc_num; ++i) {
     v[i] = i;
   }
   std::vector<std::pair<int, int>> schedule;
-  allocation(v, schedule);
+  Allocation(v, schedule);
   return schedule;
 }
 }  // anonymous namespace
 
-// --- Parallel odd–even batcher sort ---
-void odd_even_batcher_sort(std::vector<int>& v) {
-  int procRank = 0, procCount = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &procRank);
-  MPI_Comm_size(MPI_COMM_WORLD, &procCount);
+void OddEvenBatcherSort(std::vector<int>& v) {
+  int proc_rank = 0;
+  int proc_count = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &proc_count);
 
-  // If only one process or the vector is too small, perform sequential sort.
-  if (procCount <= 1 || static_cast<int>(v.size()) <= procCount) {
-    if (procRank == 0 && !v.empty()) {
-      q_sort(v, 0, static_cast<int>(v.size()) - 1);
+  if (proc_count <= 1 || static_cast<int>(v.size()) <= proc_count) {
+    if (proc_rank == 0 && !v.empty()) {
+      QSort(v, 0, static_cast<int>(v.size()) - 1);
     }
     return;
   }
 
-  // Build the communication schedule.
-  std::vector<std::pair<int, int>> schedule = build_allocation(procCount);
+  std::vector<std::pair<int, int>> schedule = BuildAllocation(proc_count);
 
-  int paddingCount = 0;
-  if (procRank == 0) {
-    // Pad the vector so its size is divisible by procCount.
-    while (v.size() % procCount != 0) {
-      v.push_back(1337);  // dummy value
-      ++paddingCount;
+  int padding_count = 0;
+  if (proc_rank == 0) {
+    while (v.size() % proc_count != 0) {
+      v.push_back(1337);
+      ++padding_count;
     }
   }
 
   int enlarged_size = 0;
-  if (procRank == 0) {
+  if (proc_rank == 0) {
     enlarged_size = static_cast<int>(v.size());
   }
   MPI_Bcast(&enlarged_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  int partSize = enlarged_size / procCount;
-  std::vector<int> localPart(partSize);
-  MPI_Scatter(v.data(), partSize, MPI_INT, localPart.data(), partSize, MPI_INT, 0, MPI_COMM_WORLD);
+  int part_size = enlarged_size / proc_count;
+  std::vector<int> local_part(part_size);
+  MPI_Scatter(v.data(), part_size, MPI_INT, local_part.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
 
-  // Local sort.
-  if (!localPart.empty()) {
-    q_sort(localPart, 0, static_cast<int>(localPart.size()) - 1);
+  if (!local_part.empty()) {
+    QSort(local_part, 0, static_cast<int>(local_part.size()) - 1);
   }
 
-  // Temporary buffers for merging.
-  std::vector<int> tmp(partSize);
-  std::vector<int> neighborPart(partSize);
+  std::vector<int> tmp(part_size);
+  std::vector<int> neighbor_part(part_size);
 
-  // Merge according to the schedule.
   for (size_t i = 0; i < schedule.size(); ++i) {
-    int procFirst = schedule[i].first;
-    int procSecond = schedule[i].second;
+    int proc_first = schedule[i].first;
+    int proc_second = schedule[i].second;
     MPI_Status status;
-    if (procRank == procSecond) {
-      MPI_Recv(neighborPart.data(), partSize, MPI_INT, procFirst, 0, MPI_COMM_WORLD, &status);
-      MPI_Send(localPart.data(), partSize, MPI_INT, procFirst, 0, MPI_COMM_WORLD);
-      // Merge in descending order.
-      int idx1 = partSize - 1, idx2 = partSize - 1;
-      for (int j = partSize - 1; j >= 0; --j) {
+    if (proc_rank == proc_second) {
+      MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD, &status);
+      MPI_Send(local_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD);
+      int idx1 = part_size - 1;
+      int idx2 = part_size - 1;
+      for (int j = part_size - 1; j >= 0; --j) {
         if (idx1 >= 0 && idx2 >= 0) {
-          if (localPart[idx1] > neighborPart[idx2]) {
-            tmp[j] = localPart[idx1--];
+          if (local_part[idx1] > neighbor_part[idx2]) {
+            tmp[j] = local_part[idx1--];
           } else {
-            tmp[j] = neighborPart[idx2--];
+            tmp[j] = neighbor_part[idx2--];
           }
         } else if (idx1 >= 0) {
-          tmp[j] = localPart[idx1--];
+          tmp[j] = local_part[idx1--];
         } else {
-          tmp[j] = neighborPart[idx2--];
+          tmp[j] = neighbor_part[idx2--];
         }
       }
-      localPart = tmp;
-    } else if (procRank == procFirst) {
-      MPI_Send(localPart.data(), partSize, MPI_INT, procSecond, 0, MPI_COMM_WORLD);
-      MPI_Recv(neighborPart.data(), partSize, MPI_INT, procSecond, 0, MPI_COMM_WORLD, &status);
-      // Merge in ascending order.
-      int idx1 = 0, idx2 = 0;
-      for (int j = 0; j < partSize; ++j) {
-        if (idx1 < partSize && idx2 < partSize) {
-          if (localPart[idx1] < neighborPart[idx2]) {
-            tmp[j] = localPart[idx1++];
+      local_part = tmp;
+    } else if (proc_rank == proc_first) {
+      MPI_Send(local_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD);
+      MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD, &status);
+      int idx1 = 0;
+      int idx2 = 0;
+      for (int j = 0; j < part_size; ++j) {
+        if (idx1 < part_size && idx2 < part_size) {
+          if (local_part[idx1] < neighbor_part[idx2]) {
+            tmp[j] = local_part[idx1++];
           } else {
-            tmp[j] = neighborPart[idx2++];
+            tmp[j] = neighbor_part[idx2++];
           }
-        } else if (idx1 < partSize) {
-          tmp[j] = localPart[idx1++];
+        } else if (idx1 < part_size) {
+          tmp[j] = local_part[idx1++];
         } else {
-          tmp[j] = neighborPart[idx2++];
+          tmp[j] = neighbor_part[idx2++];
         }
       }
-      localPart = tmp;
+      local_part = tmp;
     }
-    // Processes not in the current pair simply continue.
   }
 
-  MPI_Gather(localPart.data(), partSize, MPI_INT, v.data(), partSize, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Gather(local_part.data(), part_size, MPI_INT, v.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
 
-  if (procRank == 0 && paddingCount > 0) {
-    v.resize(enlarged_size - paddingCount);
+  if (proc_rank == 0 && padding_count > 0) {
+    v.resize(enlarged_size - padding_count);
   }
 }
 

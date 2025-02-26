@@ -19,7 +19,7 @@ TEST(muradov_k_odd_even_batcher_sort_mpi, test_pipeline_run) {
   const int n = 256 * 1024;
   std::vector<int> original;
   if (procRank == 0) {
-    original = mk::random_vector(n);
+    original = mk::RandomVector(n);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   double start = MPI_Wtime();
@@ -28,13 +28,13 @@ TEST(muradov_k_odd_even_batcher_sort_mpi, test_pipeline_run) {
     if (procRank == 0) {
       v = original;  // copy original unsorted vector
     }
-    mk::odd_even_batcher_sort(v);
+    mk::OddEvenBatcherSort(v);
   }
   double end = MPI_Wtime();
   if (procRank == 0) {
     double total_time = end - start;
     double avg_time = total_time / kIterations;
-    std::cout << "test_pipeline_run: Average parallel sort time: " << avg_time << " seconds." << std::endl;
+    std::cout << "test_pipeline_run: Average parallel sort time: " << avg_time << " seconds.\n";
   }
   SUCCEED();
 }
@@ -46,15 +46,15 @@ TEST(muradov_k_odd_even_batcher_sort_mpi, test_task_run) {
   const int n = 1024;
   std::vector<int> v;
   if (procRank == 0) {
-    v = mk::random_vector(n);
+    v = mk::RandomVector(n);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   double start = MPI_Wtime();
-  mk::odd_even_batcher_sort(v);
+  mk::OddEvenBatcherSort(v);
   double end = MPI_Wtime();
   if (procRank == 0) {
     double elapsed = end - start;
-    std::cout << "test_task_run: Parallel sort round-trip time: " << elapsed << " seconds." << std::endl;
+    std::cout << "test_task_run: Parallel sort round-trip time: " << elapsed << " seconds.\n";
   }
   SUCCEED();
 }
