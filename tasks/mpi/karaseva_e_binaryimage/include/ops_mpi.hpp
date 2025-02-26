@@ -22,11 +22,11 @@ class TestTaskMPI : public ppc::core::Task {
   static int FindRootLabel(std::unordered_map<int, int>& label_parent, int label);
   static void MergeLabels(std::unordered_map<int, int>& label_parent, int label1, int label2);
   static void LabelingImage(std::vector<int>& image, std::vector<int>& labeled_image, int rows, int cols, int min_label,
-                       std::unordered_map<int, int>& label_parent, int start_row, int end_row);
+                            std::unordered_map<int, int>& label_parent, int start_row, int end_row);
   static void HandleNeighbors(int x, int y, int rows, int cols, const std::vector<int>& labeled_image,
-                               std::vector<int>& neighbors);
+                              std::vector<int>& neighbors);
   static void AssignLabel(int pos, std::vector<int>& labeled_image, std::unordered_map<int, int>& label_parent,
-                                 int& label_counter, const std::vector<int>& neighbors);
+                          int& label_counter, const std::vector<int>& neighbors);
 
   std::vector<int> input_, output_;
   std::vector<int> local_labeled_image_;

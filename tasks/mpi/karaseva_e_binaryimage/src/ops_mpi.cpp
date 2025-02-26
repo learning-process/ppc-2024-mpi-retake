@@ -201,6 +201,4 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
   return true;
 }
 
-bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() {
-  return true;
-}
+bool karaseva_e_binaryimage_mpi::TestTaskMPI::PostProcessingImpl() { return true; }
