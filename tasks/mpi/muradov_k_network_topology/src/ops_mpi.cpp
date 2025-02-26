@@ -1,3 +1,7 @@
+#ifndef OMPI_SKIP_MPICXX
+#define OMPI_SKIP_MPICXX 1
+#endif
+
 #include "mpi/muradov_k_network_topology/include/ops_mpi.hpp"
 
 #include <mpi.h>
