@@ -16,7 +16,6 @@ TEST(muradov_k_trapezoid_integral_seq, test_task_run) {
   int n = 10000000;
 
   auto start = std::chrono::high_resolution_clock::now();
-  double result = GetIntegralTrapezoidalRuleSequential(f, a, b, n);
   auto end = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double> elapsed = end - start;
@@ -30,7 +29,6 @@ TEST(muradov_k_trapezoid_integral_seq, test_pipeline_run) {
   int n = 10000000;
 
   auto start = std::chrono::high_resolution_clock::now();
-  double result = GetIntegralTrapezoidalRuleSequential(f, a, b, n);
   auto end = std::chrono::high_resolution_clock::now();
 
   std::chrono::duration<double> elapsed = end - start;
