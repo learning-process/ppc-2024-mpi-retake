@@ -1,7 +1,6 @@
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
 #include <boost/mpi/operations.hpp>
-
 #include <iostream>
 #include <map>
 #include <set>
@@ -20,7 +19,9 @@ int karaseva_e_binaryimage_mpi::FindRootLabel(std::map<int, std::set<int>>& labe
 // Combines two connected labels in the label connection map.
 void karaseva_e_binaryimage_mpi::CombineLabels(std::map<int, std::set<int>>& label_connection_map, int label1,
                                                int label2) {
-  if (label1 == label2) return;
+  if (label1 == label2) {
+    return;
+  }
 
   auto it1 = label_connection_map.find(label1);
   auto it2 = label_connection_map.find(label2);
@@ -38,14 +39,14 @@ void karaseva_e_binaryimage_mpi::CombineLabels(std::map<int, std::set<int>>& lab
 
 // Connects a new label with an existing label in the map.
 void karaseva_e_binaryimage_mpi::ConnectWithexistingLabel(std::map<int, std::set<int>>& label_connection_map,
-                                                           int existing_label, int newLabel) {
-  label_connection_map[existing_label].insert(newLabel);
-  label_connection_map[newLabel] = label_connection_map[existing_label];
+                                                          int existing_label, int new_label) {
+  label_connection_map[existing_label].insert(new_label);
+  label_connection_map[new_label] = label_connection_map[existing_label];
 }
 
 // Creates a new connection between two labels in the label connection map.
 void karaseva_e_binaryimage_mpi::CreatenewLabelConnection(std::map<int, std::set<int>>& label_connection_map,
-                                                           int label1, int label2) {
+                                                          int label1, int label2) {
   label_connection_map[label1].insert(label2);
   label_connection_map[label1].insert(label1);
   label_connection_map[label2].insert(label1);
@@ -55,15 +56,15 @@ void karaseva_e_binaryimage_mpi::CreatenewLabelConnection(std::map<int, std::set
 // Merges two label connections into a single set of connections.
 void karaseva_e_binaryimage_mpi::MergeLabelConnections(std::map<int, std::set<int>>& label_connection_map, int label1,
                                                        int label2) {
-  std::set<int> mergedLabels = label_connection_map[label1];
+  std::set<int> merged_labels = label_connection_map[label1];
   label_connection_map[label1].insert(label_connection_map[label2].begin(), label_connection_map[label2].end());
-  label_connection_map[label2].insert(mergedLabels.begin(), mergedLabels.end());
+  label_connection_map[label2].insert(merged_labels.begin(), merged_labels.end());
 }
 
 // Fixes label connections after the first pass by ensuring all connected labels point to the same root.
 void karaseva_e_binaryimage_mpi::FixLabelConnections(std::map<int, std::set<int>>& label_connection_map) {
   for (auto& entry : label_connection_map) {
-    for (auto& label : entry.second) {
+    for (const auto& label : entry.second) {
       label_connection_map[label].insert(entry.second.begin(), entry.second.end());
     }
   }
@@ -76,10 +77,10 @@ void karaseva_e_binaryimage_mpi::CorrectLabels(std::vector<int>& labeled_image, 
 
   for (int x = 0; x < rows; ++x) {
     for (int y = 0; y < cols; ++y) {
-      int index = x * cols + y;
+      int index = (x * cols) + y;
       if (labeled_image[index] > 1) {
-        int finalLabel = AssignLabel(labeled_image[index], label_reassignment, next_available_label);
-        labeled_image[index] = finalLabel;
+        int final_label = AssignLabel(labeled_image[index], label_reassignment, next_available_label);
+        labeled_image[index] = final_label;
       }
     }
   }
@@ -90,9 +91,9 @@ int karaseva_e_binaryimage_mpi::AssignLabel(int current_label, std::map<int, int
                                             int& next_available_label) {
   auto label_mapping = label_reassignment.find(current_label);
   if (label_mapping == label_reassignment.end()) {
-    int newLabel = next_available_label++;
-    label_reassignment[current_label] = newLabel;
-    return newLabel;
+    int new_label = next_available_label++;
+    label_reassignment[current_label] = new_label;
+    return new_label;
   }
   return label_mapping->second;
 }
@@ -107,7 +108,7 @@ void karaseva_e_binaryimage_mpi::ApplyLabeling(std::vector<int>& input_image, st
 
   for (int x = 0; x < rows; ++x) {
     for (int y = 0; y < cols; ++y) {
-      int pos = x * cols + y;
+      int pos = (x * cols) + y;
       if (input_image[pos] == 0 || labeled_image[pos] > 1) {
         HandlePixelLabeling(input_image, labeled_image, label_connection_map, x, y, rows, cols, label_counter, dx, dy);
       }
@@ -119,10 +120,10 @@ void karaseva_e_binaryimage_mpi::ApplyLabeling(std::vector<int>& input_image, st
   // Final pass to assign root labels to each pixel.
   for (int x = 0; x < rows; ++x) {
     for (int y = 0; y < cols; ++y) {
-      int pos = x * cols + y;
+      int pos = (x * cols) + y;
       if (labeled_image[pos] > 1) {
-        int rootLabel = FindRootLabel(label_connection_map, labeled_image[pos]);
-        labeled_image[pos] = rootLabel;
+        int root_label = FindRootLabel(label_connection_map, labeled_image[pos]);
+        labeled_image[pos] = root_label;
       }
     }
   }
@@ -131,7 +132,8 @@ void karaseva_e_binaryimage_mpi::ApplyLabeling(std::vector<int>& input_image, st
 // Handles the pixel labeling for each pixel in the image, considering its neighbors.
 void karaseva_e_binaryimage_mpi::HandlePixelLabeling(std::vector<int>& input_image, std::vector<int>& labeled_image,
                                                      std::map<int, std::set<int>>& label_connection_map, int x, int y,
-                                                     int rows, int cols, int& label_counter, int dx[], int dy[]) {
+                                                     int rows, int cols, int& label_counter, const int dx[],
+                                                     const int dy[]) {
   int pos = x * cols + y;
   std::vector<int> neighboringLabels;
 
@@ -139,7 +141,7 @@ void karaseva_e_binaryimage_mpi::HandlePixelLabeling(std::vector<int>& input_ima
   for (int i = 0; i < 3; ++i) {
     int nx = x + dx[i];
     int ny = y + dy[i];
-    int tmpPos = nx * cols + ny;
+    int tmpPos = (nx * cols) + ny;
     if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[tmpPos] > 1) {
       neighboringLabels.push_back(labeled_image[tmpPos]);
     }
@@ -269,8 +271,8 @@ void karaseva_e_binaryimage_mpi::LoadLabelSet(std::istringstream& iss, std::set<
 }
 
 // Custom serialization for std::map (map of labels and their connected labels)
-void karaseva_e_binaryimage_mpi::Serializelabel_map(std::ostringstream& oss,
-                                                   const std::map<int, std::set<int>>& label_map) {
+void karaseva_e_binaryimage_mpi::SerializelabelMap(std::ostringstream& oss,
+                                                    const std::map<int, std::set<int>>& label_map) {
   oss << label_map.size() << " ";
   for (const auto& entry : label_map) {
     oss << entry.first << " ";  // Save label
@@ -279,7 +281,8 @@ void karaseva_e_binaryimage_mpi::Serializelabel_map(std::ostringstream& oss,
 }
 
 // Custom deserialization for std::map (map of labels and their connected labels)
-void karaseva_e_binaryimage_mpi::Deserializelabel_map(std::istringstream& iss, std::map<int, std::set<int>>& label_map) {
+void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss,
+                                                      std::map<int, std::set<int>>& label_map) {
   size_t size;
   iss >> size;
   label_map.clear();
@@ -319,7 +322,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
   boost::mpi::gatherv(world_, locallabeled_image, labeled_image_.data(), partitionSizes, 0);
 
   std::ostringstream oss;
-  Serializelabel_map(oss, localParentMap);
+  SerializelabelMap(oss, localParentMap);
   std::string serializedData = oss.str();
 
   std::vector<int> dataSizes(world_.size());
@@ -346,7 +349,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
       std::string mapData = std::string(buffer.begin() + displacement, buffer.begin() + displacement + dataSizes[i]);
       std::istringstream inputStream(mapData);
       std::map<int, std::set<int>> receivedMap;
-      Deserializelabel_map(inputStream, receivedMap);
+      DeserializelabelMap(inputStream, receivedMap);
       displacement += dataSizes[i];
       globalMap.insert(receivedMap.begin(), receivedMap.end());
     }

@@ -5,8 +5,8 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <utility>
 #include <vector>
-#include <utility> 
 
 #include "core/task/include/task.hpp"
 
@@ -27,7 +27,7 @@ void ApplyLabeling(std::vector<int>& input_image, std::vector<int>& labeled_imag
                    int starting_label, std::map<int, std::set<int>>& label_connection_map);
 void HandlePixelLabeling(std::vector<int>& input_image, std::vector<int>& labeled_image,
                          std::map<int, std::set<int>>& label_connection_map, int x, int y, int rows, int cols,
-                         int& label_counter, int dx[], int dy[]);
+                         int& label_counter, const int dx[], const int dy[]);
 
 // Label connection functions
 void CreatenewLabelConnection(std::map<int, std::set<int>>& label_connection_map, int label1, int label2);
@@ -37,8 +37,8 @@ void MergeLabelConnections(std::map<int, std::set<int>>& label_connection_map, i
 // Serialization functions
 void SavelabelSet(std::ostringstream& oss, const std::set<int>& label_set);
 void LoadLabelSet(std::istringstream& iss, std::set<int>& label_set);
-void Serializelabel_map(std::ostringstream& oss, const std::map<int, std::set<int>>& label_map);
-void Deserializelabel_map(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
+void SerializelabelMap(std::ostringstream& oss, const std::map<int, std::set<int>>& label_map);
+void DeserializelabelMap(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
 
 // TestMPITaskSequential class declaration
 class TestMPITaskSequential : public ppc::core::Task {
