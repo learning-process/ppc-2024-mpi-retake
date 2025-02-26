@@ -6,10 +6,14 @@
 #include <set>
 #include <sstream>
 #include <vector>
+#include <utility> 
 
 #include "core/task/include/task.hpp"
 
 namespace karaseva_e_binaryimage_mpi {
+
+// Function declaration
+std::vector<int> CreateRandomBinaryImage(int r, int c);
 
 // Label management functions
 int FindRootLabel(std::map<int, std::set<int>>& label_connection_map, int label);
@@ -26,15 +30,15 @@ void HandlePixelLabeling(std::vector<int>& input_image, std::vector<int>& labele
                          int& label_counter, int dx[], int dy[]);
 
 // Label connection functions
-void Createnew_labelConnection(std::map<int, std::set<int>>& label_connection_map, int label1, int label2);
-void ConnectWithexisting_label(std::map<int, std::set<int>>& label_connection_map, int existing_label, int new_label);
+void CreatenewLabelConnection(std::map<int, std::set<int>>& label_connection_map, int label1, int label2);
+void ConnectWithexistingLabel(std::map<int, std::set<int>>& label_connection_map, int existing_label, int new_label);
 void MergeLabelConnections(std::map<int, std::set<int>>& label_connection_map, int label1, int label2);
 
 // Serialization functions
-void Savelabel_set(std::ostringstream& oss, const std::set<int>& label_set);
+void SavelabelSet(std::ostringstream& oss, const std::set<int>& label_set);
 void LoadLabelSet(std::istringstream& iss, std::set<int>& label_set);
-void SerializeLabelMap(std::ostringstream& oss, const std::map<int, std::set<int>>& labelMap);
-void DeserializeLabelMap(std::istringstream& iss, std::map<int, std::set<int>>& labelMap);
+void Serializelabel_map(std::ostringstream& oss, const std::map<int, std::set<int>>& label_map);
+void Deserializelabel_map(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
 
 // TestMPITaskSequential class declaration
 class TestMPITaskSequential : public ppc::core::Task {
