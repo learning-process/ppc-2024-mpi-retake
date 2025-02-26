@@ -7,7 +7,7 @@
 #include <random>
 #include <vector>
 
-std::vector<int> getRandomMatrix(std::size_t row_count, std::size_t column_count) {
+std::vector<int> GetRandomMatrix(std::size_t row_count, std::size_t column_count) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::vector<int> matrix(row_count * column_count);
@@ -19,64 +19,65 @@ std::vector<int> getRandomMatrix(std::size_t row_count, std::size_t column_count
   return matrix;
 }
 
-std::vector<int> getSequentialOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
-                                         std::size_t A_rows, std::size_t A_cols, std::size_t B_cols) {
-  std::vector<int> result(A_rows * B_cols, 0);
-  for (std::size_t i = 0; i < A_rows; ++i) {
-    for (std::size_t j = 0; j < B_cols; ++j) {
+std::vector<int> GetSequentialOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
+                                         std::size_t a_rows, std::size_t a_cols, std::size_t b_cols) {
+  std::vector<int> result(a_rows * b_cols, 0);
+  for (std::size_t i = 0; i < a_rows; ++i) {
+    for (std::size_t j = 0; j < b_cols; ++j) {
       int sum = 0;
-      for (std::size_t k = 0; k < A_cols; ++k) {
-        sum += matrix1[i * A_cols + k] * matrix2[k * B_cols + j];
+      for (std::size_t k = 0; k < a_cols; ++k) {
+        sum += matrix1[i * a_cols + k] * matrix2[k * b_cols + j];
       }
-      result[i * B_cols + j] = sum;
+      result[i * b_cols + j] = sum;
     }
   }
   return result;
 }
 
-std::vector<int> getParallelOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
-                                       std::size_t A_rows, std::size_t A_cols) {
-  std::size_t B_cols = A_rows;
-  int size, rank;
+std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
+                                       std::size_t a_rows, std::size_t a_cols) {
+  std::size_t b_cols = a_rows;
+  int size;
+  int rank;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (size == 1) {
-    return getSequentialOperations(matrix1, matrix2, A_rows, A_cols, B_cols);
+    return GetSequentialOperations(matrix1, matrix2, a_rows, a_cols, b_cols);
   }
-  std::size_t rows_per_proc = A_rows / size;
-  std::size_t remainder = A_rows % size;
+  std::size_t rows_per_proc = a_rows / size;
+  std::size_t remainder = a_rows % size;
   std::size_t local_rows = rows_per_proc + (static_cast<std::size_t>(rank) < remainder ? 1 : 0);
   std::vector<int> sendcounts(size);
   std::vector<int> displs(size);
   for (int i = 0; i < size; i++) {
     std::size_t rows_i = rows_per_proc + (static_cast<std::size_t>(i) < remainder ? 1 : 0);
-    sendcounts[i] = static_cast<int>(rows_i * A_cols);
+    sendcounts[i] = static_cast<int>(rows_i * a_cols);
     if (i == 0) {
       displs[i] = 0;
     } else {
       displs[i] = displs[i - 1] + sendcounts[i - 1];
     }
   }
-  std::vector<int> local_matrix1(local_rows * A_cols);
+  std::vector<int> local_matrix1(local_rows * a_cols);
   MPI_Scatterv(matrix1.data(), sendcounts.data(), displs.data(), MPI_INT, local_matrix1.data(), sendcounts[rank],
                MPI_INT, 0, MPI_COMM_WORLD);
   std::vector<int> local_matrix2(matrix2);
-  MPI_Bcast(local_matrix2.data(), static_cast<int>(A_cols * B_cols), MPI_INT, 0, MPI_COMM_WORLD);
-  std::vector<int> local_result(local_rows * B_cols, 0);
+  MPI_Bcast(local_matrix2.data(), static_cast<int>(a_cols * b_cols), MPI_INT, 0, MPI_COMM_WORLD);
+  std::vector<int> local_result(local_rows * b_cols, 0);
   for (std::size_t i = 0; i < local_rows; i++) {
-    for (std::size_t j = 0; j < B_cols; j++) {
+    for (std::size_t j = 0; j < b_cols; j++) {
       int sum = 0;
-      for (std::size_t k = 0; k < A_cols; k++) {
-        sum += local_matrix1[i * A_cols + k] * local_matrix2[k * B_cols + j];
+      for (std::size_t k = 0; k < a_cols; k++) {
+        sum += local_matrix1[i * a_cols + k] * local_matrix2[k * b_cols + j];
       }
-      local_result[i * B_cols + j] = sum;
+      local_result[i * b_cols + j] = sum;
     }
   }
   std::vector<int> recvcounts(size);
   std::vector<int> rdispls(size);
   for (int i = 0; i < size; i++) {
     std::size_t rows_i = rows_per_proc + (static_cast<std::size_t>(i) < remainder ? 1 : 0);
-    recvcounts[i] = static_cast<int>(rows_i * B_cols);
+    recvcounts[i] = static_cast<int>(rows_i * b_cols);
     if (i == 0) {
       rdispls[i] = 0;
     } else {
@@ -85,7 +86,7 @@ std::vector<int> getParallelOperations(const std::vector<int>& matrix1, const st
   }
   std::vector<int> global_result;
   if (rank == 0) {
-    global_result.resize(A_rows * B_cols);
+    global_result.resize(a_rows * b_cols);
   }
   MPI_Gatherv(local_result.data(), static_cast<int>(local_result.size()), MPI_INT, global_result.data(),
               recvcounts.data(), rdispls.data(), MPI_INT, 0, MPI_COMM_WORLD);
