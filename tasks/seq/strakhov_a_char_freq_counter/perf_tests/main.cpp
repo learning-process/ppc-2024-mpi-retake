@@ -10,29 +10,28 @@
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
 namespace strakhov_a_char_freq_counter_seq {
-  namespace {
-  std::vector<char> FillRandomChars(int size, const std::string &charset) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
-  
-    std::vector<char> result(size);
-    for (char &c : result) {
-      c = charset[dist(gen)];
-    }
-    return result;
+namespace {
+std::vector<char> FillRandomChars(int size, const std::string &charset) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
+
+  std::vector<char> result(size);
+  for (char &c : result) {
+    c = charset[dist(gen)];
   }
-  }  // namespace
-  }  // namespace strakhov_a_char_freq_counter_seq
+  return result;
+}
+}  // namespace
+}  // namespace strakhov_a_char_freq_counter_seq
 
 TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
   // Create data
   std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
-    1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       500000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*", );
   std::vector<int> out(1, 0);
-
 
   // Create task_data
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -64,13 +63,12 @@ TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
 }
 
 TEST(strakhov_a_char_freq_counter_seq, test_task_run) {
   // Create data
   std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
-    1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       500000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*", );
   std::vector<int> out(1, 0);
@@ -105,5 +103,4 @@ TEST(strakhov_a_char_freq_counter_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
 }

@@ -2,8 +2,8 @@
 
 #include <chrono>
 #include <cstdint>
-#include <random>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"
@@ -12,19 +12,19 @@
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
 namespace strakhov_a_char_freq_counter_mpi {
-  namespace {
-  std::vector<char> FillRandomChars(int size, const std::string &charset) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
-    std::vector<char> result(size);
-    for (char &c : result) {
-      c = charset[dist(gen)];
-    }
-    return result;
+namespace {
+std::vector<char> FillRandomChars(int size, const std::string &charset) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
+  std::vector<char> result(size);
+  for (char &c : result) {
+    c = charset[dist(gen)];
   }
-  }  // namespace
-  }  // namespace strakhov_a_char_freq_counter_mpi
+  return result;
+}
+}  // namespace
+}  // namespace strakhov_a_char_freq_counter_mpi
 
 TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
@@ -72,7 +72,6 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
-
 }
 
 TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
@@ -121,5 +120,4 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
-
 }

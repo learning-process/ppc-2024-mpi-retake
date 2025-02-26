@@ -222,12 +222,12 @@ TEST(strakhov_a_char_freq_counter_seq, simple_test_3) {
 
 TEST(strakhov_a_char_freq_counter_seq, random_string) {
   std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
-    1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       1000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*", );
   std::vector<int> out_par(1, 0);
   std::vector<int> out_seq(1, 0);
-  int expectance_r = std::count(in_string.begin(), in_string.end(), in_target[0]); 
+  int expectance_r = std::count(in_string.begin(), in_string.end(), in_target[0]);
   // Sequential
 
   // Create task_data
@@ -248,4 +248,3 @@ TEST(strakhov_a_char_freq_counter_seq, random_string) {
 
   ASSERT_EQ(out_seq[0], expectance_r);
 }
-
