@@ -3,16 +3,14 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <memory>
-#include <numeric>
-#include <string>
+#include <cstddef>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace kalinin_d_vector_dot_product_mpi {
-int vectorDotProduct(const std::vector<int>& v1, const std::vector<int>& v2);
+int VectorDotProduct(const std::vector<int>& v1, const std::vector<int>& v2);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
@@ -24,7 +22,7 @@ class TestMPITaskSequential : public ppc::core::Task {
 
  private:
   std::vector<std::vector<int>> input_;
-  int res{};
+  int res_{};
 };
 
 class TestMPITaskParallel : public ppc::core::Task {
@@ -36,12 +34,12 @@ class TestMPITaskParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<std::vector<int>> input_{};
-  std::vector<int> local_input1_{}, local_input2_{};
-  std::vector<unsigned int> counts_{};
-  size_t num_processes_ = 0;
-  int res{};
-  boost::mpi::communicator world;
+  std::vector<std::vector<int>> input_;
+  std::vector<int> local_input1_, local_input2_;
+  std::vector<unsigned int> counts_;
+  int num_processes_ = 0;
+  int res_{};
+  boost::mpi::communicator world_;
 };
 
 }  // namespace kalinin_d_vector_dot_product_mpi
