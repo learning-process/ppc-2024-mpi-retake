@@ -1,4 +1,4 @@
-#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
+#include "mpi/ersoz_b_horizontal_a_vertical_b/include/ops_mpi.hpp"
 
 #include <mpi.h>
 
