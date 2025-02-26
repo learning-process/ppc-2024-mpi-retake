@@ -4,9 +4,9 @@
 #include <boost/mpi/communicator.hpp>
 #include <map>
 #include <set>
+#include <sstream>
 #include <utility>
 #include <vector>
-#include <sstream>
 
 #include "core/task/include/task.hpp"
 
