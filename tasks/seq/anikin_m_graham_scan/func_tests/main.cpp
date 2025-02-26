@@ -3,14 +3,13 @@
 
 #include <cstdint>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
 namespace {
-static bool TestData(std::vector<anikin_m_graham_scan_seq::Pt> alg_out, int test) {
+bool TestData(std::vector<anikin_m_graham_scan_seq::Pt> alg_out, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -63,7 +62,7 @@ static bool TestData(std::vector<anikin_m_graham_scan_seq::Pt> alg_out, int test
   return out;
 }
 
-static void CreateTestData(std::vector<anikin_m_graham_scan_seq::Pt> &alg_in, int test) {
+void CreateTestData(std::vector<anikin_m_graham_scan_seq::Pt> &alg_in, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
