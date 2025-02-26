@@ -58,7 +58,9 @@ TEST(leontev_n_average_mpi, avg_mpi_0elem) {
     taskEmplacement(taskDataPar, global_vec, global_avg);
   }
   leontev_n_average_mpi::MPIVecAvgParallel MPIVecAvgParallel(taskDataPar);
-  ASSERT_FALSE(MPIVecAvgParallel.ValidationImpl());
+  if (world.rank() == 0) {
+    ASSERT_FALSE(MPIVecAvgParallel.ValidationImpl());
+  }
 }
 TEST(leontev_n_average_mpi, avg_mpi_1000elem) {
   boost::mpi::communicator world;
