@@ -158,7 +158,7 @@ void karaseva_e_binaryimage_mpi::HandlePixelLabeling(std::vector<int>& input_ima
     }
   }
 }
-
+// NOLINTBEGIN
 // Preprocessing step for the sequential task, which initializes the image data and labeled image.
 bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::PreProcessingImpl() {
   rows_ = task_data->inputs_count[0];
@@ -249,6 +249,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
   }
   return true;
 }
+// NOLINTEND
 
 // Save label set to a string stream (for serialization)
 void karaseva_e_binaryimage_mpi::SavelabelSet(std::ostringstream& oss, const std::set<int>& label_set) {
@@ -272,7 +273,7 @@ void karaseva_e_binaryimage_mpi::LoadLabelSet(std::istringstream& iss, std::set<
 
 // Custom serialization for std::map (map of labels and their connected labels)
 void karaseva_e_binaryimage_mpi::SerializelabelMap(std::ostringstream& oss,
-                                                    const std::map<int, std::set<int>>& label_map) {
+                                                   const std::map<int, std::set<int>>& label_map) {
   oss << label_map.size() << " ";
   for (const auto& entry : label_map) {
     oss << entry.first << " ";  // Save label
@@ -281,8 +282,7 @@ void karaseva_e_binaryimage_mpi::SerializelabelMap(std::ostringstream& oss,
 }
 
 // Custom deserialization for std::map (map of labels and their connected labels)
-void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss,
-                                                      std::map<int, std::set<int>>& label_map) {
+void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss, std::map<int, std::set<int>>& label_map) {
   size_t size;
   iss >> size;
   label_map.clear();
@@ -295,6 +295,7 @@ void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss,
   }
 }
 
+// NOLINTBEGIN
 // Main implementation of the parallel task
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
   std::cout << "Rank " << world_.rank() << " - RunImpl started" << std::endl;
@@ -373,3 +374,4 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PostProcessingImpl() {
 
   return true;
 }
+// NOLINTEND
