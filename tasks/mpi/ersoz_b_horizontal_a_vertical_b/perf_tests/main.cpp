@@ -3,7 +3,6 @@
 #include <mpi.h>
 
 #include <cstddef>
-#include <iostream>
 #include <vector>
 
 #include "mpi/ersoz_b_horizontal_a_vertical_b/include/ops_mpi.hpp"
