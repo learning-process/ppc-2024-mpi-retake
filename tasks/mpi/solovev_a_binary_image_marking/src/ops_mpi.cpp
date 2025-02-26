@@ -118,7 +118,7 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::ValidationImpl() {
   return true;
 }
 
-const bool solovev_a_binary_image_marking::TestMPITaskParallel::IsValidMPI(int nr, int local_pixel_count, int nc) {
+bool solovev_a_binary_image_marking::TestMPITaskParallel::IsValidMPI(int nr, int local_pixel_count, int nc) const {
   return (nr >= 0 && nr < (local_pixel_count / n_) && nc >= 0 && nc < n_);
 }
 
@@ -157,8 +157,8 @@ void solovev_a_binary_image_marking::TestMPITaskParallel::MPIBfs(int* p_local_im
     }
   }
 }
-
-static void MakeNorm(int total, std::vector<int> parent, int* p_global) {
+namespace {
+void MakeNorm(int total, std::vector<int> parent, int* p_global) {
   auto find_rep = [&parent](int x) -> int {
     while (x != parent[x]) {
       x = parent[x] = parent[parent[x]];
@@ -166,10 +166,11 @@ static void MakeNorm(int total, std::vector<int> parent, int* p_global) {
     return x;
   };
 
-  for (int i = 0; i < total; ++i)
+  for (int i = 0; i < total; ++i) {
     if (p_global[i] != 0) {
       p_global[i] = find_rep(p_global[i]);
     }
+  }
   std::unordered_map<int, int> norm;
   int next_label = 1;
   for (int i = 0; i < total; ++i) {
@@ -182,8 +183,10 @@ static void MakeNorm(int total, std::vector<int> parent, int* p_global) {
     }
   }
 }
+}  // namespace
 
-std::vector<int> solovev_a_binary_image_marking::TestMPITaskParallel::MakeMPIResult(std::vector<int> global_labels) {
+std::vector<int> solovev_a_binary_image_marking::TestMPITaskParallel::MakeMPIResult(
+    std::vector<int> global_labels) const {
   int total = m_ * n_;
   int* p_global = global_labels.data();
   std::vector<int> parent(total + 1);
