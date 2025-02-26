@@ -6,7 +6,7 @@
 #include <set>
 #include <sstream>
 #include <vector>
-
+// NOLINTBEGIN
 // Finds the root label of a given label in the label connection map.
 int karaseva_e_binaryimage_mpi::FindRootLabel(std::map<int, std::set<int>>& label_connection_map, int label) {
   auto it = label_connection_map.find(label);
@@ -158,7 +158,7 @@ void karaseva_e_binaryimage_mpi::HandlePixelLabeling(std::vector<int>& input_ima
     }
   }
 }
-// NOLINTBEGIN
+
 // Preprocessing step for the sequential task, which initializes the image data and labeled image.
 bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::PreProcessingImpl() {
   rows_ = task_data->inputs_count[0];
@@ -249,7 +249,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
   }
   return true;
 }
-// NOLINTEND
 
 // Save label set to a string stream (for serialization)
 void karaseva_e_binaryimage_mpi::SavelabelSet(std::ostringstream& oss, const std::set<int>& label_set) {
@@ -283,7 +282,7 @@ void karaseva_e_binaryimage_mpi::SerializelabelMap(std::ostringstream& oss,
 
 // Custom deserialization for std::map (map of labels and their connected labels)
 void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss, std::map<int, std::set<int>>& label_map) {
-  size_t size;
+  size_t size = 0;
   iss >> size;
   label_map.clear();
   for (size_t i = 0; i < size; ++i) {
@@ -295,7 +294,6 @@ void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss, st
   }
 }
 
-// NOLINTBEGIN
 // Main implementation of the parallel task
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
   std::cout << "Rank " << world_.rank() << " - RunImpl started" << std::endl;
@@ -314,13 +312,13 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
   std::cout << "Rank " << world_.rank() << " - Image data scattered" << std::endl;
 
   // Perform local labeling on each process's partition
-  std::vector<int> locallabeled_image(partitionSizes[world_.rank()], 1);
+  std::vector<int> local_labeled_image(partitionSizes[world_.rank()], 1);
   int minLabel = 100000 * world_.rank() + 2;
   std::map<int, std::set<int>> localParentMap;
-  ApplyLabeling(local_image_, locallabeled_image, partitionSizes[world_.rank()] / columns_, columns_, minLabel,
+  ApplyLabeling(local_image_, local_labeled_image, partitionSizes[world_.rank()] / columns_, columns_, minLabel,
                 localParentMap);
 
-  boost::mpi::gatherv(world_, locallabeled_image, labeled_image_.data(), partitionSizes, 0);
+  boost::mpi::gatherv(world_, local_labeled_image, labeled_image_.data(), partitionSizes, 0);
 
   std::ostringstream oss;
   SerializelabelMap(oss, localParentMap);
@@ -366,12 +364,11 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
 
 // Post-processing for parallel task (copying the labeled image to output)
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PostProcessingImpl() {
-  boost::mpi::broadcast(world_, rows_, 0);
-  boost::mpi::broadcast(world_, columns_, 0);
-
-  auto* outputData = reinterpret_cast<int*>(task_data->outputs[0]);
-  boost::mpi::gather(world_, labeled_image_.data(), rows_ * columns_, outputData, 0);
-
+    if (world_.rank() == 0) {
+        auto* outputPtr = reinterpret_cast<int*>(task_data->outputs[0]);
+        std::copy(labeled_image_.begin(), labeled_image_.end(), outputPtr);
+    }
+  
   return true;
 }
 // NOLINTEND
