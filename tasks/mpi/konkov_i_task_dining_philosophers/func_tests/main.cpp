@@ -23,7 +23,7 @@ TEST(DiningPhilosophersTest, DeadlockFreeExecution) {
   philosophers.Run();
   philosophers.PostProcessing();
 
-  EXPECT_TRUE(true);  // ≈сли код доходит сюда, значит deadlock не произошел.
+  EXPECT_TRUE(true);
 
   MPI_Finalize();
 }
