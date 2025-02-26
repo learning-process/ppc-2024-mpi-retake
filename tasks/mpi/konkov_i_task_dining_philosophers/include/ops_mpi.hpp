@@ -5,12 +5,9 @@
 
 #include <vector>
 
-namespace dining_philosophers {
-
 class DiningPhilosophersMPI {
  public:
-  DiningPhilosophersMPI(int num_philosophers);
-  ~DiningPhilosophersMPI();
+  explicit DiningPhilosophersMPI(int numPhilosophers);
 
   void Validation();
   void PreProcessing();
@@ -18,17 +15,16 @@ class DiningPhilosophersMPI {
   void PostProcessing();
 
  private:
-  int num_philosophers;
-  int rank, size;
+  int numPhilosophers;
+  int rank;
+  int size;
+  int localStart, localEnd;
   MPI_Comm comm;
-  std::vector<int> states;
 
-  void Think(int philosopher_id);
-  void Eat(int philosopher_id);
-  void TakeForks(int philosopher_id);
-  void PutForks(int philosopher_id);
+  void PickUpForks(int id);
+  void PutDownForks(int id);
+  void Think(int id);
+  void Eat(int id);
 };
-
-}  // namespace dining_philosophers
 
 #endif  // KONKOV_I_TASK_DINING_PHILOSOPHERS_OPS_MPI_HPP
