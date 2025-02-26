@@ -23,12 +23,6 @@ bool Ccw(const Pt& a, const Pt& b, const Pt& c);
 
 void ConvexHull(std::vector<Pt>& points);
 
-bool TestData(std::vector<Pt> alg_out, int test);
-
-void CreateTestData(std::vector<Pt>& alg_in, int test);
-
-void CreateRandomData(std::vector<Pt>& alg_in, int count);
-
 class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}

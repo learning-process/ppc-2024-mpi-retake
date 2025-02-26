@@ -18,15 +18,9 @@ bool Ccw(Pt a, Pt b, Pt c);
 
 void ConvexHull(std::vector<Pt>& a);
 
-bool TestData(std::vector<Pt> alg_out, int test);
-
-void CreateTestData(std::vector<Pt>& alg_in, int test);
-
-void CreateRandomData(std::vector<Pt>& alg_in, int count);
-
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}  // NOLINT
+  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

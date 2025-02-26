@@ -51,109 +51,6 @@ void anikin_m_graham_scan_mpi::ConvexHull(std::vector<Pt>& points) {
   }
 }
 
-bool anikin_m_graham_scan_mpi::TestData(std::vector<Pt> alg_out, int test) {
-  // case 0
-  //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
-  //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
-  // case 1
-  //  all_points  = [(0, 0), (1, 1), (2, 2), (3, 3), (4, 0), (4, 4), (0, 4)]
-  //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
-  // case 2
-  //  all_points  = [(0, 0), (1, 3), (2, 1), (3, 2), (4, 0), (2, 4)]
-  //  hull_points = [(0, 0), (4, 0), (2, 4), (1, 3)]
-  bool out = true;
-  switch (test) {
-    case 1:
-    case 0:
-      out &= (alg_out.size() == 4);
-
-      out &= (alg_out[0].x == 0);
-      out &= (alg_out[0].y == 0);
-
-      out &= (alg_out[1].x == 0);
-      out &= (alg_out[1].y == 4);
-
-      out &= (alg_out[2].x == 4);
-      out &= (alg_out[2].y == 4);
-
-      out &= (alg_out[3].x == 4);
-      out &= (alg_out[3].y == 0);
-      break;
-    case 2:
-      out &= (alg_out.size() == 4);
-
-      out &= (alg_out[0].x == 0);
-      out &= (alg_out[0].y == 0);
-
-      out &= (alg_out[1].x == 1);
-      out &= (alg_out[1].y == 3);
-
-      out &= (alg_out[2].x == 2);
-      out &= (alg_out[2].y == 4);
-
-      out &= (alg_out[3].x == 4);
-      out &= (alg_out[3].y == 0);
-      break;
-    default:
-      break;
-  }
-  return out;
-}
-
-void anikin_m_graham_scan_mpi::CreateTestData(std::vector<Pt>& alg_in, int test) {
-  // case 0
-  //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
-  //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
-  // case 1
-  //  all_points  = [(0, 0), (1, 1), (2, 2), (3, 3), (4, 0), (4, 4), (0, 4)]
-  //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
-  // case 2
-  //  all_points  = [(0, 0), (1, 3), (2, 1), (3, 2), (4, 0), (2, 4)]
-  //  hull_points = [(0, 0), (4, 0), (2, 4), (1, 3)]
-  alg_in.clear();
-  switch (test) {
-    case 0:
-      alg_in.push_back({0, 0});
-      alg_in.push_back({4, 0});
-      alg_in.push_back({4, 4});
-      alg_in.push_back({0, 4});
-      alg_in.push_back({2, 2});
-      break;
-    case 1:
-      alg_in.push_back({0, 0});
-      alg_in.push_back({1, 1});
-      alg_in.push_back({2, 2});
-      alg_in.push_back({3, 3});
-      alg_in.push_back({4, 0});
-      alg_in.push_back({4, 4});
-      alg_in.push_back({0, 4});
-      break;
-    case 2:
-      alg_in.push_back({0, 0});
-      alg_in.push_back({1, 3});
-      alg_in.push_back({2, 1});
-      alg_in.push_back({3, 2});
-      alg_in.push_back({4, 0});
-      alg_in.push_back({2, 4});
-      break;
-    default:
-      break;
-  }
-}
-
-void anikin_m_graham_scan_mpi::CreateRandomData(std::vector<Pt>& alg_in, int count) {
-  alg_in.clear();
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0.0, 100.0);
-  Pt rand;
-  for (int i = 0; i < count; i++) {
-    rand.x = (int)dis(gen);
-    rand.y = (int)dis(gen);
-    alg_in.push_back(rand);
-  }
-}
-
 bool anikin_m_graham_scan_mpi::TestTaskMPI::ValidationImpl() { return task_data->inputs[0] != nullptr; }
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -164,7 +61,7 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
-  MPI_Datatype mpi_pt;  // NOLINT
+  MPI_Datatype mpi_pt;
   MPI_Type_contiguous(2, MPI_INT, &mpi_pt);
   MPI_Type_commit(&mpi_pt);
 
