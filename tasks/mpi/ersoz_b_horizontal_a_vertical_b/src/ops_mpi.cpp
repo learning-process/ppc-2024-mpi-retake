@@ -3,7 +3,7 @@
 #include <random>
 #include <vector>
 
-#include "ersoz_b_horizontal_a_vertical_b.hpp"
+#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 std::vector<int> getRandomMatrix(std::size_t row_count, std::size_t column_count) {
   std::random_device rd;

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "ersoz_b_horizontal_a_vertical_b.hpp"
+#include "seq/ersoz_b_horizontal_a_vertical_b/include/ops_seq.hpp"
 
 TEST(Generation_Matrix, can_generate_square_matrix) {
   auto mat = getRandomMatrix(10, 10);

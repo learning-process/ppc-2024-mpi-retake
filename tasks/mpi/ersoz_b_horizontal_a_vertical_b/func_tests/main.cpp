@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "ersoz_b_horizontal_a_vertical_b.hpp"
+#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 TEST(Generation_Matrix, can_generate_square_matrix) {
   auto mat = getRandomMatrix(10, 10);
