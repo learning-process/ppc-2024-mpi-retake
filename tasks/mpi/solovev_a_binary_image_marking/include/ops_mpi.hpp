@@ -21,12 +21,9 @@ using Directions = std::vector<Point>;
 
 void Bfs(int i, int j, int label, Matrix& labels_tmp, const Matrix& data_tmp, int m_tmp, int n_tmp,
          const Directions& directions);
-
 void ProcessNeighbor(std::queue<Point>& q, int new_x, int new_y, Matrix& labels_tmp, const Matrix& data_tmp, int label,
                      int n_tmp);
-
 bool ShouldProcess(int i, int j, const Matrix& data_tmp, const Matrix& labels_tmp, int n_tmp);
-
 bool IsValid(int x, int y, int m_tmp, int n_tmp);
 
 class TestMPITaskSequential : public ppc::core::Task {
@@ -50,6 +47,12 @@ class TestMPITaskParallel : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
+  void MPIBfs(int* p_local_image, int local_pixel_count, int* p_local_labels, int curr_label);
+  bool IsValidMPI(int nr, int local_pixel_count, int nc);
+  void BFSCheck(int* p_local_image, int curr_label, int* p_local_labels, int local_pixel_count, Point cp,
+                 std::queue<Point> bfs_queue);
+  std::vector<int> MakeMPIResult(std::vector<int> global_labels);
+  void MergeLabels(int* p_global, std::vector<int> parent);
 
  private:
   std::vector<int> data_;

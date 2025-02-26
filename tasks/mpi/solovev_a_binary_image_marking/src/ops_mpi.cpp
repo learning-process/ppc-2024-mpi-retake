@@ -7,6 +7,7 @@
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <queue>
+#include <unordered_map>
 #include <vector>
 
 bool solovev_a_binary_image_marking::ShouldProcess(int i, int j, const Matrix& data_tmp, const Matrix& labels_tmp,
@@ -115,9 +116,98 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::ValidationImpl() {
   }
   return true;
 }
-// NOLINTBEGIN
-bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
+
+bool solovev_a_binary_image_marking::TestMPITaskParallel::IsValidMPI(int nr, int local_pixel_count, int nc) {
+  return (nr >= 0 && nr < (local_pixel_count / n_) && nc >= 0 && nc < n_);
+}
+
+void solovev_a_binary_image_marking::TestMPITaskParallel::BFSCheck(int* p_local_image, int curr_label,
+                                                                    int* p_local_labels, int local_pixel_count,
+                                                                    Point cp, std::queue<Point> bfs_queue) {
   std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
+  for (const auto& step : directions) {
+    int nr = cp.x + step.x, nc = cp.y + step.y;
+    if (IsValidMPI(nr, local_pixel_count, nc)) {
+      int ni = (nr * n_) + nc;
+      if (p_local_image[ni] == 1 && p_local_labels[ni] == 0) {
+        p_local_labels[ni] = curr_label;
+        bfs_queue.push({nr, nc});
+      }
+    }
+  }
+}
+
+void solovev_a_binary_image_marking::TestMPITaskParallel::MPIBfs(int* p_local_image, int local_pixel_count,
+                                                                  int* p_local_labels, int curr_label) {
+  auto to_coordinates = [this](int idx) -> std::pair<int, int> { return {idx / this->n_, idx % this->n_}; };
+  for (int i = 0; i < local_pixel_count; ++i) {
+    if (p_local_image[i] == 1 && p_local_labels[i] == 0) {
+      std::queue<Point> bfs_queue;
+      auto coord = to_coordinates(i);
+      bfs_queue.push({coord.first, coord.second});
+      p_local_labels[i] = curr_label;
+      while (!bfs_queue.empty()) {
+        Point cp = bfs_queue.front();
+        bfs_queue.pop();
+        BFSCheck(p_local_image, curr_label, p_local_labels, local_pixel_count, cp, bfs_queue);
+      }
+      ++curr_label;
+    }
+  }
+}
+
+void MakeNorm(int total, std::vector<int> parent, int* p_global) {
+  auto find_rep = [&parent](int x) -> int {
+    while (x != parent[x]) x = parent[x] = parent[parent[x]];
+    return x;
+  };
+
+  for (int i = 0; i < total; ++i)
+    if (p_global[i] != 0) p_global[i] = find_rep(p_global[i]);
+  std::unordered_map<int, int> norm;
+  int nextLabel = 1;
+  for (int i = 0; i < total; ++i) {
+    if (p_global[i] != 0) {
+      int rep = p_global[i];
+      if (norm.find(rep) == norm.end()) norm[rep] = nextLabel++;
+      p_global[i] = norm[rep];
+    }
+  }
+}
+
+std::vector<int> solovev_a_binary_image_marking::TestMPITaskParallel::MakeMPIResult(std::vector<int> global_labels) {
+  int total = m_ * n_;
+  int* p_global = global_labels.data();
+  std::vector<int> parent(total + 1);
+  for (int i = 1; i <= total; ++i) parent[i] = i;
+  auto find_rep = [&parent](int x) -> int {
+    while (x != parent[x]) x = parent[x] = parent[parent[x]];
+    return x;
+  };
+  auto union_rep = [&find_rep, &parent](int a, int b) {
+    int ra = find_rep(a), rb = find_rep(b);
+    if (ra != rb) {
+      int newRep = (ra < rb) ? ra : rb;
+      int obsolete = (ra < rb) ? rb : ra;
+      parent[obsolete] = newRep;
+    }
+  };
+  for (int row = 0; row < m_; ++row) {
+    for (int col = 0; col < n_; ++col) {
+      int idx = (row * n_) + col;
+      if (p_global[idx] == 0) continue;
+      int label = p_global[idx];
+      if (col > 0 && p_global[(row * n_ + col) - 1] != 0) union_rep(label, p_global[(row * n_) + col - 1]);
+      if (row > 0 && p_global[((row - 1) * n_) + col] != 0) union_rep(label, p_global[((row - 1) * n_) + col]);
+    }
+  }
+
+  MakeNorm(total, parent, p_global);
+
+  return global_labels;
+}
+
+bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
   boost::mpi::broadcast(world_, m_, 0);
   boost::mpi::broadcast(world_, n_, 0);
 
@@ -143,33 +233,10 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
   std::vector<int> local_labels(local_pixel_count, 0);
   int base_label = displacements[proc_rank] + 1;
   int curr_label = base_label;
-  auto to_coordinates = [this](int idx) -> std::pair<int, int> { return {idx / this->n_, idx % this->n_}; };
   int* p_local_image = local_image.data();
   int* p_local_labels = local_labels.data();
 
-  for (int i = 0; i < local_pixel_count; ++i) {
-    if (p_local_image[i] == 1 && p_local_labels[i] == 0) {
-      std::queue<Point> bfs_queue;
-      auto coord = to_coordinates(i);
-      bfs_queue.push({coord.first, coord.second});
-      p_local_labels[i] = curr_label;
-      while (!bfs_queue.empty()) {
-        Point cp = bfs_queue.front();
-        bfs_queue.pop();
-        for (const auto& step : directions) {
-          int nr = cp.x + step.x, nc = cp.y + step.y;
-          if (nr >= 0 && nr < (local_pixel_count / n_) && nc >= 0 && nc < n_) {
-            int ni = (nr * n_) + nc;
-            if (p_local_image[ni] == 1 && p_local_labels[ni] == 0) {
-              p_local_labels[ni] = curr_label;
-              bfs_queue.push({nr, nc});
-            }
-          }
-        }
-      }
-      curr_label++;
-    }
-  }
+  MPIBfs(p_local_image, local_pixel_count, p_local_labels, curr_label);
 
   std::vector<int> global_labels;
 
@@ -178,47 +245,11 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
   boost::mpi::gatherv(world_, local_labels, global_labels.data(), counts, displacements, 0);
 
   if (proc_rank == 0) {
-    int total = m_ * n_;
-    int* p_global = global_labels.data();
-    std::vector<int> parent(total + 1);
-    for (int i = 1; i <= total; ++i) parent[i] = i;
-    auto find_rep = [&parent](int x) -> int {
-      while (x != parent[x]) x = parent[x] = parent[parent[x]];
-      return x;
-    };
-    auto union_rep = [&find_rep, &parent](int a, int b) {
-      int ra = find_rep(a), rb = find_rep(b);
-      if (ra != rb) {
-        int newRep = (ra < rb) ? ra : rb;
-        int obsolete = (ra < rb) ? rb : ra;
-        parent[obsolete] = newRep;
-      }
-    };
-    for (int row = 0; row < m_; ++row) {
-      for (int col = 0; col < n_; ++col) {
-        int idx = (row * n_) + col;
-        if (p_global[idx] == 0) continue;
-        int label = p_global[idx];
-        if (col > 0 && p_global[(row * n_ + col) - 1] != 0) union_rep(label, p_global[(row * n_) + col - 1]);
-        if (row > 0 && p_global[((row - 1) * n_) + col] != 0) union_rep(label, p_global[((row - 1) * n_) + col]);
-      }
-    }
-    for (int i = 0; i < total; ++i)
-      if (p_global[i] != 0) p_global[i] = find_rep(p_global[i]);
-    std::unordered_map<int, int> norm;
-    int nextLabel = 1;
-    for (int i = 0; i < total; ++i) {
-      if (p_global[i] != 0) {
-        int rep = p_global[i];
-        if (norm.find(rep) == norm.end()) norm[rep] = nextLabel++;
-        p_global[i] = norm[rep];
-      }
-    }
-    labels_ = std::move(global_labels);
+    labels_ = MakeMPIResult(global_labels);
   }
   return true;
 }
-// NOLINTEND
+
 bool solovev_a_binary_image_marking::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     int* output = reinterpret_cast<int*>(task_data->outputs[0]);

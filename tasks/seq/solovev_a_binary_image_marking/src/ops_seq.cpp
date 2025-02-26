@@ -1,9 +1,47 @@
 #include <algorithm>
 #include <queue>
-#include <ranges>  // NOLINT
 #include <vector>
 
 #include "seq/solovev_a_binary_image_marking/include/ops_sec.hpp"
+
+bool solovev_a_binary_image_marking::ShouldProcess(int i, int j, const Matrix &data_tmp, const Matrix &labels_tmp,
+                                                   int n_tmp) {
+  return data_tmp[(i * n_tmp) + j] == 1 && labels_tmp[(i * n_tmp) + j] == 0;
+}
+
+bool solovev_a_binary_image_marking::IsValid(int x, int y, int m_tmp, int n_tmp) {
+  return x >= 0 && x < m_tmp && y >= 0 && y < n_tmp;
+}
+
+void solovev_a_binary_image_marking::ProcessNeighbor(std::queue<Point> &q, int new_x, int new_y, Matrix &labels_tmp,
+                                                     const Matrix &data_tmp, int label, int n_tmp) {
+  int new_idx = (new_x * n_tmp) + new_y;
+  if (data_tmp[new_idx] == 1 && labels_tmp[new_idx] == 0) {
+    labels_tmp[new_idx] = label;
+    q.push({new_x, new_y});
+  }
+}
+
+void solovev_a_binary_image_marking::Bfs(int i, int j, int label, Matrix &labels_tmp, const Matrix &data_tmp, int m_tmp,
+                                         int n_tmp, const Directions &directions) {
+  std::queue<Point> q;
+  q.push({i, j});
+  labels_tmp[(i * n_tmp) + j] = label;
+
+  while (!q.empty()) {
+    Point current = q.front();
+    q.pop();
+
+    for (const Point &dir : directions) {
+      int new_x = current.x + dir.x;
+      int new_y = current.y + dir.y;
+
+      if (IsValid(new_x, new_y, m_tmp, n_tmp)) {
+        ProcessNeighbor(q, new_x, new_y, labels_tmp, data_tmp, label, n_tmp);
+      }
+    }
+  }
+}
 
 bool solovev_a_binary_image_marking::TestTaskSequential::PreProcessingImpl() {
   int m_tmp = *reinterpret_cast<int *>(task_data->inputs[0]);
@@ -40,36 +78,15 @@ bool solovev_a_binary_image_marking::TestTaskSequential::ValidationImpl() {
 
   return (m_check > 0 && n_check > 0 && !input_check.empty());
 }
-// NOLINTBEGIN
-bool solovev_a_binary_image_marking::TestTaskSequential::RunImpl() {
-  std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
-  int label = 1;
 
-  std::queue<Point> q;
+bool solovev_a_binary_image_marking::TestTaskSequential::RunImpl() {
+  Directions directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
+  int label = 1;
 
   for (int i = 0; i < m_; ++i) {
     for (int j = 0; j < n_; ++j) {
-      if (data_[(i * n_) + j] == 1 && labels_[(i * n_) + j] == 0) {
-        q.push({i, j});
-        labels_[(i * n_) + j] = label;
-
-        while (!q.empty()) {
-          Point current = q.front();
-          q.pop();
-
-          for (const Point &dir : directions) {
-            int new_x = current.x + dir.x;
-            int new_y = current.y + dir.y;
-
-            if (new_x >= 0 && new_x < m_ && new_y >= 0 && new_y < n_) {
-              int new_idx = (new_x * n_) + new_y;
-              if (data_[new_idx] == 1 && labels_[new_idx] == 0) {
-                labels_[new_idx] = label;
-                q.push({new_x, new_y});
-              }
-            }
-          }
-        }
+      if (ShouldProcess(i, j, data_, labels_, n_)) {
+        Bfs(i, j, label, labels_, data_, m_, n_, directions);
         ++label;
       }
     }
@@ -77,7 +94,7 @@ bool solovev_a_binary_image_marking::TestTaskSequential::RunImpl() {
 
   return true;
 }
-// NOLINTEND
+
 bool solovev_a_binary_image_marking::TestTaskSequential::PostProcessingImpl() {
   int *output = reinterpret_cast<int *>(task_data->outputs[0]);
   std::ranges::copy(labels_, output);
