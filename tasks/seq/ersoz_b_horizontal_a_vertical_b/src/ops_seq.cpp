@@ -1,8 +1,8 @@
+#include "seq/ersoz_b_horizontal_a_vertical_b/include/ops_seq.hpp"
+
 #include <random>
 #include <thread>
 #include <vector>
-
-#include "seq/ersoz_b_horizontal_a_vertical_b/include/ops_seq.hpp"
 
 std::vector<int> getRandomMatrix(std::size_t row_count, std::size_t column_count) {
   std::random_device rd;

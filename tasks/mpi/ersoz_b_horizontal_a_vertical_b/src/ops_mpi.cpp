@@ -1,9 +1,9 @@
+#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
+
 #include <mpi.h>
 
 #include <random>
 #include <vector>
-
-#include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
 std::vector<int> getRandomMatrix(std::size_t row_count, std::size_t column_count) {
   std::random_device rd;
