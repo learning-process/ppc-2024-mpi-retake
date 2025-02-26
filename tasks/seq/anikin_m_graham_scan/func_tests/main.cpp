@@ -24,34 +24,38 @@ static bool TestData(std::vector<anikin_m_graham_scan_seq::Pt> alg_out, int test
   switch (test) {
     case 1:
     case 0:
-      out &= (alg_out.size() == 4);
+      if (alg_out.size() == 4) {
+        out &= (alg_out[0].x == 0);
+        out &= (alg_out[0].y == 0);
 
-      out &= (alg_out[0].x == 0);
-      out &= (alg_out[0].y == 0);
+        out &= (alg_out[1].x == 0);
+        out &= (alg_out[1].y == 4);
 
-      out &= (alg_out[1].x == 0);
-      out &= (alg_out[1].y == 4);
+        out &= (alg_out[2].x == 4);
+        out &= (alg_out[2].y == 4);
 
-      out &= (alg_out[2].x == 4);
-      out &= (alg_out[2].y == 4);
-
-      out &= (alg_out[3].x == 4);
-      out &= (alg_out[3].y == 0);
+        out &= (alg_out[3].x == 4);
+        out &= (alg_out[3].y == 0);
+      } else {
+        out = false;
+      }
       break;
     case 2:
-      out &= (alg_out.size() == 4);
+      if (alg_out.size() == 4) {
+        out &= (alg_out[0].x == 0);
+        out &= (alg_out[0].y == 0);
 
-      out &= (alg_out[0].x == 0);
-      out &= (alg_out[0].y == 0);
+        out &= (alg_out[1].x == 1);
+        out &= (alg_out[1].y == 3);
 
-      out &= (alg_out[1].x == 1);
-      out &= (alg_out[1].y == 3);
+        out &= (alg_out[2].x == 2);
+        out &= (alg_out[2].y == 4);
 
-      out &= (alg_out[2].x == 2);
-      out &= (alg_out[2].y == 4);
-
-      out &= (alg_out[3].x == 4);
-      out &= (alg_out[3].y == 0);
+        out &= (alg_out[3].x == 4);
+        out &= (alg_out[3].y == 0);
+      } else {
+        out = false;
+      }
       break;
     default:
       break;
