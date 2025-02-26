@@ -8,6 +8,7 @@
 #include <boost/mpi/communicator.hpp>
 #include <queue>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 bool solovev_a_binary_image_marking::ShouldProcess(int i, int j, const Matrix& data_tmp, const Matrix& labels_tmp,
@@ -117,16 +118,17 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::ValidationImpl() {
   return true;
 }
 
-bool solovev_a_binary_image_marking::TestMPITaskParallel::IsValidMPI(int nr, int local_pixel_count, int nc) {
+const bool solovev_a_binary_image_marking::TestMPITaskParallel::IsValidMPI(int nr, int local_pixel_count, int nc) {
   return (nr >= 0 && nr < (local_pixel_count / n_) && nc >= 0 && nc < n_);
 }
 
-void solovev_a_binary_image_marking::TestMPITaskParallel::BFSCheck(int* p_local_image, int curr_label,
-                                                                    int* p_local_labels, int local_pixel_count,
-                                                                    Point cp, std::queue<Point> bfs_queue) {
+void solovev_a_binary_image_marking::TestMPITaskParallel::BFSCheck(const int* p_local_image, int curr_label,
+                                                                   int* p_local_labels, int local_pixel_count, Point cp,
+                                                                   std::queue<Point> bfs_queue) {
   std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
   for (const auto& step : directions) {
-    int nr = cp.x + step.x, nc = cp.y + step.y;
+    int nr = cp.x + step.x;
+    int nc = cp.y + step.y;
     if (IsValidMPI(nr, local_pixel_count, nc)) {
       int ni = (nr * n_) + nc;
       if (p_local_image[ni] == 1 && p_local_labels[ni] == 0) {
@@ -138,7 +140,7 @@ void solovev_a_binary_image_marking::TestMPITaskParallel::BFSCheck(int* p_local_
 }
 
 void solovev_a_binary_image_marking::TestMPITaskParallel::MPIBfs(int* p_local_image, int local_pixel_count,
-                                                                  int* p_local_labels, int curr_label) {
+                                                                 int* p_local_labels, int curr_label) {
   auto to_coordinates = [this](int idx) -> std::pair<int, int> { return {idx / this->n_, idx % this->n_}; };
   for (int i = 0; i < local_pixel_count; ++i) {
     if (p_local_image[i] == 1 && p_local_labels[i] == 0) {
@@ -156,20 +158,26 @@ void solovev_a_binary_image_marking::TestMPITaskParallel::MPIBfs(int* p_local_im
   }
 }
 
-void MakeNorm(int total, std::vector<int> parent, int* p_global) {
+static void MakeNorm(int total, std::vector<int> parent, int* p_global) {
   auto find_rep = [&parent](int x) -> int {
-    while (x != parent[x]) x = parent[x] = parent[parent[x]];
+    while (x != parent[x]) {
+      x = parent[x] = parent[parent[x]];
+    }
     return x;
   };
 
   for (int i = 0; i < total; ++i)
-    if (p_global[i] != 0) p_global[i] = find_rep(p_global[i]);
+    if (p_global[i] != 0) {
+      p_global[i] = find_rep(p_global[i]);
+    }
   std::unordered_map<int, int> norm;
-  int nextLabel = 1;
+  int next_label = 1;
   for (int i = 0; i < total; ++i) {
     if (p_global[i] != 0) {
       int rep = p_global[i];
-      if (norm.find(rep) == norm.end()) norm[rep] = nextLabel++;
+      if (norm.find(rep) == norm.end()) {
+        norm[rep] = next_label++;
+      }
       p_global[i] = norm[rep];
     }
   }
@@ -179,26 +187,38 @@ std::vector<int> solovev_a_binary_image_marking::TestMPITaskParallel::MakeMPIRes
   int total = m_ * n_;
   int* p_global = global_labels.data();
   std::vector<int> parent(total + 1);
-  for (int i = 1; i <= total; ++i) parent[i] = i;
+  for (int i = 1; i <= total; ++i) {
+    parent[i] = i;
+  }
   auto find_rep = [&parent](int x) -> int {
-    while (x != parent[x]) x = parent[x] = parent[parent[x]];
+    while (x != parent[x]) {
+      x = parent[x] = parent[parent[x]];
+    }
     return x;
   };
   auto union_rep = [&find_rep, &parent](int a, int b) {
-    int ra = find_rep(a), rb = find_rep(b);
+    int ra = find_rep(a);
+    int rb = find_rep(b);
     if (ra != rb) {
-      int newRep = (ra < rb) ? ra : rb;
+      int new_rep = (ra < rb) ? ra : rb;
       int obsolete = (ra < rb) ? rb : ra;
-      parent[obsolete] = newRep;
+      parent[obsolete] = new_rep;
     }
   };
   for (int row = 0; row < m_; ++row) {
     for (int col = 0; col < n_; ++col) {
       int idx = (row * n_) + col;
-      if (p_global[idx] == 0) continue;
+      if (p_global[idx] == 0) {
+        continue;
+      }
       int label = p_global[idx];
-      if (col > 0 && p_global[(row * n_ + col) - 1] != 0) union_rep(label, p_global[(row * n_) + col - 1]);
-      if (row > 0 && p_global[((row - 1) * n_) + col] != 0) union_rep(label, p_global[((row - 1) * n_) + col]);
+      if (col > 0 && p_global[(row * n_ + col) - 1] != 0) {
+        union_rep(label, p_global[(row * n_) + col - 1]);
+      }
+
+      if (row > 0 && p_global[((row - 1) * n_) + col] != 0) {
+        union_rep(label, p_global[((row - 1) * n_) + col]);
+      }
     }
   }
 
@@ -224,7 +244,9 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
     counts[proc] = proc_rows * n_;
     displacements[proc] = current_row_offset * n_;
     current_row_offset += proc_rows;
-    if (proc == proc_count - 1) counts[proc] += (n_ * m_ - (m_ / proc_count) * n_ * proc_count);
+    if (proc == proc_count - 1) {
+      counts[proc] += (n_ * m_ - (m_ / proc_count) * n_ * proc_count);
+    }
   }
 
   int local_pixel_count = counts[proc_rank];
@@ -240,7 +262,9 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::RunImpl() {
 
   std::vector<int> global_labels;
 
-  if (proc_rank == 0) global_labels.resize(m_ * n_);
+  if (proc_rank == 0) {
+    global_labels.resize(m_ * n_);
+  }
 
   boost::mpi::gatherv(world_, local_labels, global_labels.data(), counts, displacements, 0);
 

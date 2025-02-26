@@ -48,9 +48,9 @@ class TestMPITaskParallel : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
   void MPIBfs(int* p_local_image, int local_pixel_count, int* p_local_labels, int curr_label);
-  bool IsValidMPI(int nr, int local_pixel_count, int nc);
-  void BFSCheck(int* p_local_image, int curr_label, int* p_local_labels, int local_pixel_count, Point cp,
-                 std::queue<Point> bfs_queue);
+  const bool IsValidMPI(int nr, int local_pixel_count, int nc);
+  void BFSCheck(const int* p_local_image, int curr_label, int* p_local_labels, int local_pixel_count, Point cp,
+                std::queue<Point> bfs_queue);
   std::vector<int> MakeMPIResult(std::vector<int> global_labels);
   void MergeLabels(int* p_global, std::vector<int> parent);
 
