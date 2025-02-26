@@ -20,16 +20,18 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
 
   const std::string data_input(100000, 'a');
   int dest = world.size() - 1;
+
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData input_data(data_input, dest);
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
 
-  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(dest, world.size(), 4, 4);
+  std::vector<int> expected_path = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
+      dest, std::sqrt(world.size()), world.size() / std::sqrt(world.size()));
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&input_data));
-  task_data_mpi->inputs_count.emplace_back(sizeof(komshina_d_grid_torus_mpi::TestTaskMPI::TaskData));
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(&output_data));
-  task_data_mpi->outputs_count.emplace_back(sizeof(komshina_d_grid_torus_mpi::TestTaskMPI::TaskData));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&input_data));
+  task_data_mpi->inputs_count.emplace_back(sizeof(input_data));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&output_data));
+  task_data_mpi->outputs_count.emplace_back(sizeof(output_data));
 
   auto test_task_mpi = std::make_shared<komshina_d_grid_torus_mpi::TestTaskMPI>(task_data_mpi);
 
@@ -49,7 +51,7 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(output_data.payload, input_data.payload);
-    ASSERT_EQ(output_data.path, route_expected);
+    ASSERT_EQ(output_data.path, expected_path);
   }
 }
 
@@ -61,16 +63,18 @@ TEST(komshina_d_grid_torus_mpi, test_task_run) {
 
   const std::string data_input(100000, 'a');
   int dest = world.size() - 1;
+
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData input_data(data_input, dest);
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
 
-  std::vector<int> route_expected = komshina_d_grid_torus_mpi::TestTaskMPI::ComputePath(dest, world.size(), 4, 4);
+  std::vector<int> expected_path = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
+      dest, std::sqrt(world.size()), world.size() / std::sqrt(world.size()));
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&input_data));
-  task_data_mpi->inputs_count.emplace_back(sizeof(komshina_d_grid_torus_mpi::TestTaskMPI::TaskData));
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(&output_data));
-  task_data_mpi->outputs_count.emplace_back(sizeof(komshina_d_grid_torus_mpi::TestTaskMPI::TaskData));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&input_data));
+  task_data_mpi->inputs_count.emplace_back(sizeof(input_data));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&output_data));
+  task_data_mpi->outputs_count.emplace_back(sizeof(output_data));
 
   auto test_task_mpi = std::make_shared<komshina_d_grid_torus_mpi::TestTaskMPI>(task_data_mpi);
 
@@ -90,6 +94,6 @@ TEST(komshina_d_grid_torus_mpi, test_task_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(output_data.payload, input_data.payload);
-    ASSERT_EQ(output_data.path, route_expected);
+    ASSERT_EQ(output_data.path, expected_path);
   }
 }

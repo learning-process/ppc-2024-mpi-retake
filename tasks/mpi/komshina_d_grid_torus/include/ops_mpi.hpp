@@ -17,24 +17,24 @@ class TestTaskMPI : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
-  static std::vector<int> ComputePath(int target, int world_size, int width, int height);
-
+  
   struct TaskData {
     std::vector<int> path;
     std::vector<char> payload;
     int target;
 
     TaskData() = default;
-    TaskData(const std::string& str, int tgt) : payload(str.begin(), str.end()), target(tgt) {}
+    TaskData(const std::string& str, int trg) : payload(str.begin(), str.end()), target(trg) {}
   };
+
+  static std::vector<int> CalculateRoute(int dest, int sizeX, int sizeY);
 
  private:
   boost::mpi::communicator world_;
   TaskData task_data_;
-
-  void ComputeGridSize();
-  static int GetNextHop(int current, int target, int width, int height);
-  int width_, height_;
+  int sizeX, sizeY;
+  int rankX, rankY;
+  int left, right, up, down;
 };
 
 }  // namespace komshina_d_grid_torus_mpi
