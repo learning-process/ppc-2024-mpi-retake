@@ -27,7 +27,7 @@ void CreateRandomData(std::vector<anikin_m_graham_scan_seq::Pt> &alg_in, int cou
 }  // namespace
 
 TEST(anikin_m_graham_scan_seq, test_pipeline_run) {
-  constexpr int kCount = 1000000;
+  constexpr int kCount = 2000000;
 
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
@@ -63,7 +63,7 @@ TEST(anikin_m_graham_scan_seq, test_pipeline_run) {
 }
 
 TEST(anikin_m_graham_scan_seq, test_task_run) {
-  constexpr int kCount = 1000000;
+  constexpr int kCount = 2000000;
 
   std::vector<anikin_m_graham_scan_seq::Pt> in;
   std::vector<anikin_m_graham_scan_seq::Pt> out;
