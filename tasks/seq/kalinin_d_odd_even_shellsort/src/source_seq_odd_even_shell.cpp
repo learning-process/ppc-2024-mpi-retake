@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <random>
-#include <utility>
 #include <vector>
 
 #include "seq/kalinin_d_odd_even_shellsort/include/header_seq_odd_even_shell.hpp"

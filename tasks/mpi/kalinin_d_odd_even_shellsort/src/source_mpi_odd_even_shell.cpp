@@ -4,7 +4,6 @@
 #include <boost/mpi/collectives/scatter.hpp>
 #include <limits>
 #include <random>
-#include <utility>
 #include <vector>
 
 #include "mpi/kalinin_d_odd_even_shellsort/include/header_mpi_odd_even_shell.hpp"
