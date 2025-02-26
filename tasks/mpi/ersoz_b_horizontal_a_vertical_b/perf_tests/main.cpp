@@ -4,7 +4,6 @@
 #include <mpi.h>
 
 #include <iostream>
-#include <vector>
 
 #include "mpi/ersoz_b_horizontal_a_vertical_b/include/ops_mpi.hpp"
 
@@ -39,7 +38,8 @@ TEST(ersoz_b_horizontal_a_vertical_b_mpi, test_task_run) {
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
 
-  double seq_time = 0.0, par_time = 0.0;
+  double seq_time = 0.0;
+  \n double par_time = 0.0;
   std::vector<int> res_seq;
   std::vector<int> res_par;
   if (rank == 0) {
