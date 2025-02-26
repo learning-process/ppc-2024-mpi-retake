@@ -41,10 +41,10 @@ TEST(chernova_n_word_count_mpi, Test_empty_string) {
     task_data_mpi->inputs_count.emplace_back(in.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
     task_data_mpi->outputs_count.emplace_back(out.size());
-  //}
+    //}
 
-  chernova_n_word_count_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
-  ASSERT_FALSE(test_task_mpi.ValidationImpl());
+    chernova_n_word_count_mpi::TestMPITaskParallel test_task_mpi(task_data_mpi);
+    ASSERT_FALSE(test_task_mpi.ValidationImpl());
   }
 }
 

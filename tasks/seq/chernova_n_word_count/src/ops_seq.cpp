@@ -42,9 +42,9 @@ bool chernova_n_word_count_seq::TestTaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool chernova_n_word_count_seq::TestTaskSequential::ValidationImpl() {  
-   return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1;  
-  }
+bool chernova_n_word_count_seq::TestTaskSequential::ValidationImpl() {
+  return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1;
+}
 
 bool chernova_n_word_count_seq::TestTaskSequential::RunImpl() {
   if (input_.empty()) {

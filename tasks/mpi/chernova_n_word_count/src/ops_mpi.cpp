@@ -49,8 +49,8 @@ bool chernova_n_word_count_mpi::TestMPITaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool chernova_n_word_count_mpi::TestMPITaskSequential::ValidationImpl() {   
-  return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1; 
+bool chernova_n_word_count_mpi::TestMPITaskSequential::ValidationImpl() {
+  return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1;
 }
 
 bool chernova_n_word_count_mpi::TestMPITaskSequential::RunImpl() {
@@ -96,7 +96,7 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::PreProcessingImpl() {
 
 bool chernova_n_word_count_mpi::TestMPITaskParallel::ValidationImpl() {
   if (world_.rank() == 0) {
-    return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1; 
+    return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1;
   }
   return true;
 }
@@ -146,7 +146,6 @@ bool chernova_n_word_count_mpi::TestMPITaskParallel::RunImpl() {
 
   return true;
 }
-
 
 bool chernova_n_word_count_mpi::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
