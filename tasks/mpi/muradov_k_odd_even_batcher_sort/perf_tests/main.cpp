@@ -10,7 +10,7 @@
 
 namespace mk = muradov_k_odd_even_batcher_sort;
 
-TEST(muradov_k_odd_even_batcher_sort_perf, test_pipeline_run) {
+TEST(muradov_k_odd_even_batcher_sort_mpi, test_pipeline_run) {
   int procRank, procCount;
   MPI_Comm_rank(MPI_COMM_WORLD, &procRank);
   MPI_Comm_size(MPI_COMM_WORLD, &procCount);
@@ -39,7 +39,7 @@ TEST(muradov_k_odd_even_batcher_sort_perf, test_pipeline_run) {
   SUCCEED();
 }
 
-TEST(muradov_k_odd_even_batcher_sort_perf, test_task_run) {
+TEST(muradov_k_odd_even_batcher_sort_mpi, test_task_run) {
   int procRank;
   MPI_Comm_rank(MPI_COMM_WORLD, &procRank);
   // Use a small vector for a single sort task.

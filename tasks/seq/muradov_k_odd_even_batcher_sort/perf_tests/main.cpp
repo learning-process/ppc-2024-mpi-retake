@@ -8,7 +8,7 @@
 
 namespace mk = muradov_k_odd_even_batcher_sort;
 
-TEST(muradov_k_odd_even_batcher_sort_seq_perf, test_pipeline_run) {
+TEST(muradov_k_odd_even_batcher_sort_seq, test_pipeline_run) {
   const int kIterations = 100;
   // Use a large vector (e.g., 256K integers)
   const int n = 256 * 1024;
@@ -25,7 +25,7 @@ TEST(muradov_k_odd_even_batcher_sort_seq_perf, test_pipeline_run) {
   SUCCEED();
 }
 
-TEST(muradov_k_odd_even_batcher_sort_seq_perf, test_task_run) {
+TEST(muradov_k_odd_even_batcher_sort_seq, test_task_run) {
   const int n = 1024;
   std::vector<int> v = mk::random_vector(n);
   auto start = std::chrono::high_resolution_clock::now();
