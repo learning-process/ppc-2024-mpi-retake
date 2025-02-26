@@ -3,8 +3,6 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <chrono>
-#include <iostream>
 #include <vector>
 
 #include "mpi/muradov_k_network_topology/include/ops_mpi.hpp"
@@ -13,7 +11,8 @@ namespace muradov_k_network_topology_mpi {
 
 TEST(muradov_k_network_topology_mpi, test_pipeline_run) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size, rank;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
@@ -38,7 +37,8 @@ TEST(muradov_k_network_topology_mpi, test_pipeline_run) {
 
 TEST(muradov_k_network_topology_mpi, test_task_run) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size, rank;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {

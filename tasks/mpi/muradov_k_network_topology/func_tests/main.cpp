@@ -9,7 +9,8 @@ namespace muradov_k_network_topology_mpi {
 
 TEST(muradov_k_network_topology_mpi, FullRingCommunication) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size, rank;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
@@ -29,7 +30,7 @@ TEST(muradov_k_network_topology_mpi, FullRingCommunication) {
 
 TEST(muradov_k_network_topology_mpi, SendWithoutTopology) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(comm, &rank);
 
   NetworkTopology topology(comm);
@@ -41,7 +42,7 @@ TEST(muradov_k_network_topology_mpi, SendWithoutTopology) {
 
 TEST(muradov_k_network_topology_mpi, ReceiveWithoutTopology) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(comm, &rank);
 
   NetworkTopology topology(comm);
@@ -52,7 +53,8 @@ TEST(muradov_k_network_topology_mpi, ReceiveWithoutTopology) {
 
 TEST(muradov_k_network_topology_mpi, MultipleRoundCommunication) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size, rank;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
@@ -74,7 +76,8 @@ TEST(muradov_k_network_topology_mpi, MultipleRoundCommunication) {
 
 TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size, rank;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
@@ -87,16 +90,16 @@ TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
   int message = rank + 500;
   int received = -1;
 
-  if (rank == 0 || rank == 1) {
-    if (rank == 0) {
-      ASSERT_TRUE(topology.Send(1, &message, 1, MPI_INT));
-    } else if (rank == 1) {
-      ASSERT_TRUE(topology.Receive(MPI_ANY_SOURCE, &received, 1, MPI_INT));
-      // Since process 0 sends message = 500.
-      ASSERT_EQ(received, 500);
-    }
-  } else {
+  if (rank != 0 && rank != 1) {
     GTEST_SKIP();
+  }
+
+  if (rank == 0) {
+    ASSERT_TRUE(topology.Send(1, &message, 1, MPI_INT));
+  } else if (rank == 1) {
+    ASSERT_TRUE(topology.Receive(MPI_ANY_SOURCE, &received, 1, MPI_INT));
+    // Since process 0 sends message = 500.
+    ASSERT_EQ(received, 500);
   }
 }
 
