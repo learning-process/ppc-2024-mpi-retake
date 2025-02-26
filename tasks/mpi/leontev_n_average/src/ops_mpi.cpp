@@ -4,9 +4,7 @@
 #include <cstdlib>
 #include <string>
 
-bool leontev_n_average_mpi::MPIVecAvgParallel::PreProcessingImpl() {
-  return true;
-}
+bool leontev_n_average_mpi::MPIVecAvgParallel::PreProcessingImpl() { return true; }
 
 bool leontev_n_average_mpi::MPIVecAvgParallel::ValidationImpl() {
   if (world.rank() == 0) {
