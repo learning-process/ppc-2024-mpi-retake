@@ -29,8 +29,8 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
   int world_size = world_.size();
-  int size_x = static_cast<int>(std::sqrt(world_.size()));
-  int size_y = static_cast<int>(world_.size() / std::sqrt(world_.size()));
+  int size_x_ = static_cast<int>(std::sqrt(world_.size()));
+  int size_y_ = static_cast<int>(world_.size() / std::sqrt(world_.size()));
   if (size_x_ * size_y_ != world_size) {
     return false;
   }
@@ -66,8 +66,10 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     task_data_.path.emplace_back(0);
     int next_hop = determine_next();
     world_.send(next_hop, 0, task_data_.payload);
+    
+    std::vector<char> buffer;
+    world_.recv(boost::mpi::any_source, 0, buffer);
 
-    world_.recv(boost::mpi::any_source, 0, task_data_.payload);
   } else {
     std::vector<char> buffer;
     world_.recv(boost::mpi::any_source, 0, buffer);
