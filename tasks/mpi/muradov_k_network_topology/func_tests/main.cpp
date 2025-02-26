@@ -13,7 +13,7 @@ TEST(muradov_k_network_topology_mpi, FullRingCommunication) {
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
-    GTEST_SKIP() << "Requires at least 2 processes";
+    GTEST_SKIP();
   }
 
   NetworkTopology topology(comm);
@@ -21,7 +21,6 @@ TEST(muradov_k_network_topology_mpi, FullRingCommunication) {
 
   int test_data = rank * 100;
   int received_data = -1;
-  // The new RingExchange method takes care of the ordering.
   ASSERT_TRUE(topology.RingExchange(&test_data, &received_data, 1, MPI_INT));
 
   int expected = ((rank - 1 + size) % size) * 100;
@@ -46,7 +45,6 @@ TEST(muradov_k_network_topology_mpi, ReceiveWithoutTopology) {
   MPI_Comm_rank(comm, &rank);
 
   NetworkTopology topology(comm);
-  // Do not call CreateRingTopology.
   int data = -1;
   bool result = topology.Receive(MPI_ANY_SOURCE, &data, 1, MPI_INT);
   ASSERT_FALSE(result);
@@ -58,21 +56,19 @@ TEST(muradov_k_network_topology_mpi, MultipleRoundCommunication) {
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
-    GTEST_SKIP() << "Requires at least 2 processes";
+    GTEST_SKIP();
   }
 
   NetworkTopology topology(comm);
   topology.CreateRingTopology();
 
-  // Each process starts with its rank.
   int value = rank;
-  const int rounds = size;  // After 'size' rounds, each message should return to its origin.
+  const int rounds = size;
   int temp = 0;
   for (int i = 0; i < rounds; ++i) {
     ASSERT_TRUE(topology.RingExchange(&value, &temp, 1, MPI_INT));
     value = temp;
   }
-  // After a full rotation, each process should have its original value.
   ASSERT_EQ(value, rank);
 }
 
@@ -82,7 +78,7 @@ TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
-    GTEST_SKIP() << "Requires at least 2 processes";
+    GTEST_SKIP();
   }
 
   NetworkTopology topology(comm);
@@ -91,7 +87,6 @@ TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
   int message = rank + 500;
   int received = -1;
 
-  // For clarity, only processes 0 and 1 are involved.
   if (rank == 0 || rank == 1) {
     if (rank == 0) {
       ASSERT_TRUE(topology.Send(1, &message, 1, MPI_INT));
@@ -101,7 +96,7 @@ TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
       ASSERT_EQ(received, 500);
     }
   } else {
-    GTEST_SKIP() << "Test applicable only to processes 0 and 1";
+    GTEST_SKIP();
   }
 }
 

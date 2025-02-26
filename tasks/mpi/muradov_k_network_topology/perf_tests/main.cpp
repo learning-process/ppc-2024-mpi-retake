@@ -1,6 +1,5 @@
 #define OMPI_SKIP_MPICXX 1
 
-
 #include <gtest/gtest.h>
 #include <mpi.h>
 
