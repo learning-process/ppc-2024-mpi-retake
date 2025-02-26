@@ -78,7 +78,7 @@ bool solovev_a_binary_image_marking::TestMPITaskSequential::RunImpl() {
 
   for (int i = 0; i < m_seq_; ++i) {
     for (int j = 0; j < n_seq_; ++j) {
-      if (shouldProcess(i, j, data_seq_, labels_seq_, n_seq_)) {
+      if (ShouldProcess(i, j, data_seq_, labels_seq_, n_seq_)) {
         Bfs(i, j, label, labels_seq_, data_seq_, m_seq_, n_seq_, directions);
         ++label;
       }

@@ -171,7 +171,7 @@ TEST(solovev_a_binary_image_marking, Whole_image) {
     expected_result = std::move(result_seq);
   }
 
-  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_MPI(task_data_par);
+  solovev_a_binary_image_marking::TestMPITaskParallel binary_marker_mpi(task_data_par);
   ASSERT_EQ(binary_marker_mpi.ValidationImpl(), true);
   binary_marker_mpi.PreProcessingImpl();
   binary_marker_mpi.RunImpl();
