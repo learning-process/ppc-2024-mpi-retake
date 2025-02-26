@@ -68,3 +68,12 @@ TEST(muradov_k_odd_even_batcher_sort_func, compare_with_std_sort) {
     ASSERT_EQ(v, v_copy);
   }
 }
+
+// Custom main to initialize and finalize MPI.
+int main(int argc, char **argv) {
+  MPI_Init(&argc, &argv);
+  ::testing::InitGoogleTest(&argc, argv);
+  int result = RUN_ALL_TESTS();
+  MPI_Finalize();
+  return result;
+}
