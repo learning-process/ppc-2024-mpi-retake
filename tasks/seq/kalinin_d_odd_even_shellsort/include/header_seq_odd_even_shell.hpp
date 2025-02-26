@@ -20,6 +20,5 @@ class OddEvenShellSeq : public ppc::core::Task {
   std::vector<int> input_;
   std::vector<int> output_;
 };
-void GimmeRandVec(std::vector<int>& vec);
 
 }  // namespace kalinin_d_odd_even_shell_seq

@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <random>
 #include <utility>
 #include <vector>
 
@@ -42,10 +41,4 @@ bool OddEvenShellSeq::PostProcessingImpl() {
   return true;
 }
 
-void GimmeRandVec(std::vector<int>& vec) {
-  std::random_device rd;
-  std::default_random_engine reng(rd());
-  std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::ranges::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
-}
 }  // namespace kalinin_d_odd_even_shell_seq

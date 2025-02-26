@@ -24,6 +24,5 @@ class OddEvenShellMpi : public ppc::core::Task {
   std::vector<int> output_;
   boost::mpi::communicator world_;
 };
-void GimmeRandVec(std::vector<int>& vec);
 
 }  // namespace kalinin_d_odd_even_shell_mpi

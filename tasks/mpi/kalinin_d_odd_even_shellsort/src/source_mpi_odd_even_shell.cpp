@@ -3,7 +3,6 @@
 #include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/collectives/scatter.hpp>
 #include <limits>
-#include <random>
 #include <utility>
 #include <vector>
 
@@ -22,12 +21,6 @@ void OddEvenShellMpi::ShellSort(std::vector<int>& vec) {
       vec[j] = temp;
     }
   }
-}
-void GimmeRandVec(std::vector<int>& vec) {
-  std::random_device rd;
-  std::default_random_engine reng(rd());
-  std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::ranges::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
 }
 
 bool OddEvenShellMpi::PreProcessingImpl() {
