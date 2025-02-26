@@ -4,6 +4,7 @@
 
 #include <mpi.h>
 
+#include <cstddef>
 #include <random>
 #include <vector>
 
@@ -13,7 +14,7 @@ std::vector<int> GetRandomMatrix(std::size_t row_count, std::size_t column_count
   std::vector<int> matrix(row_count * column_count);
   for (std::size_t i = 0; i < row_count; ++i) {
     for (std::size_t j = 0; j < column_count; ++j) {
-      matrix[i * column_count + j] = gen() % 100;
+      matrix[(i * column_count) + j] = static_cast<int>(gen() % 100);
     }
   }
   return matrix;
@@ -26,9 +27,9 @@ std::vector<int> GetSequentialOperations(const std::vector<int>& matrix1, const 
     for (std::size_t j = 0; j < b_cols; ++j) {
       int sum = 0;
       for (std::size_t k = 0; k < a_cols; ++k) {
-        sum += matrix1[i * a_cols + k] * matrix2[k * b_cols + j];
+        sum += matrix1[(i * a_cols) + k] * matrix2[(k * b_cols) + j];
       }
-      result[i * b_cols + j] = sum;
+      result[(i * b_cols) + j] = sum;
     }
   }
   return result;
@@ -37,8 +38,8 @@ std::vector<int> GetSequentialOperations(const std::vector<int>& matrix1, const 
 std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
                                        std::size_t a_rows, std::size_t a_cols) {
   std::size_t b_cols = a_rows;
-  int size;
-  int rank;
+  int size = 0;
+  int rank = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (size == 1) {
@@ -68,9 +69,9 @@ std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const st
     for (std::size_t j = 0; j < b_cols; j++) {
       int sum = 0;
       for (std::size_t k = 0; k < a_cols; k++) {
-        sum += local_matrix1[i * a_cols + k] * local_matrix2[k * b_cols + j];
+        sum += local_matrix1[(i * a_cols) + k] * local_matrix2[(k * b_cols) + j];
       }
-      local_result[i * b_cols + j] = sum;
+      local_result[(i * b_cols) + j] = sum;
     }
   }
   std::vector<int> recvcounts(size);

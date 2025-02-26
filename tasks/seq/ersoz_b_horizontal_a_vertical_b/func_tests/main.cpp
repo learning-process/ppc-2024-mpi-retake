@@ -34,7 +34,7 @@ TEST(Sequential_Operations_SEQ, GetSequentialOperations_works_correctly_with_squ
   std::vector<int> matrix2 = {2, 2, 2, 2};
   std::vector<int> expected = {4, 4, 4, 4};
   auto res = GetSequentialOperations(matrix1, matrix2, 2, 2, 2);
-  ASSERT_EQ(res, expected);
+  ASSERT_EQ(expected, res);
 }
 
 TEST(Sequential_Operations_SEQ, GetSequentialOperations_works_correctly_with_arbitrary_matrix) {
@@ -42,7 +42,7 @@ TEST(Sequential_Operations_SEQ, GetSequentialOperations_works_correctly_with_arb
   std::vector<int> matrix2 = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
   std::vector<int> expected = {8, 8, 8, 8, 8, 8};
   auto res = GetSequentialOperations(matrix1, matrix2, 2, 4, 3);
-  ASSERT_EQ(res, expected);
+  ASSERT_EQ(expected, res);
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_can_work_with_square_matrix) {
@@ -61,46 +61,51 @@ TEST(Parallel_Operations_SEQ, GetParallelOperations_can_work_with_arbitrary_matr
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_works_correctly_with_square_matrix) {
-  std::size_t rows = 20, cols = 20;
+  std::size_t rows = 20;
+  std::size_t cols = 20;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
   auto res_parallel = GetParallelOperations(matrix1, matrix2, rows, cols);
   auto res_sequential = GetSequentialOperations(matrix1, matrix2, rows, cols, rows);
-  ASSERT_EQ(res_parallel, res_sequential);
+  ASSERT_EQ(res_sequential, res_parallel);
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_works_correctly_with_more_columns) {
-  std::size_t rows = 20, cols = 30;
+  std::size_t rows = 20;
+  std::size_t cols = 30;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
   auto res_parallel = GetParallelOperations(matrix1, matrix2, rows, cols);
   auto res_sequential = GetSequentialOperations(matrix1, matrix2, rows, cols, rows);
-  ASSERT_EQ(res_parallel, res_sequential);
+  ASSERT_EQ(res_sequential, res_parallel);
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_works_correctly_with_more_rows) {
-  std::size_t rows = 30, cols = 20;
+  std::size_t rows = 30;
+  std::size_t cols = 20;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
   auto res_parallel = GetParallelOperations(matrix1, matrix2, rows, cols);
   auto res_sequential = GetSequentialOperations(matrix1, matrix2, rows, cols, rows);
-  ASSERT_EQ(res_parallel, res_sequential);
+  ASSERT_EQ(res_sequential, res_parallel);
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_works_correctly_with_odd_size_and_more_rows) {
-  std::size_t rows = 27, cols = 15;
+  std::size_t rows = 27;
+  std::size_t cols = 15;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
   auto res_parallel = GetParallelOperations(matrix1, matrix2, rows, cols);
   auto res_sequential = GetSequentialOperations(matrix1, matrix2, rows, cols, rows);
-  ASSERT_EQ(res_parallel, res_sequential);
+  ASSERT_EQ(res_sequential, res_parallel);
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_works_correctly_with_odd_size_and_more_columns) {
-  std::size_t rows = 15, cols = 27;
+  std::size_t rows = 15;
+  std::size_t cols = 27;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
   auto res_parallel = GetParallelOperations(matrix1, matrix2, rows, cols);
   auto res_sequential = GetSequentialOperations(matrix1, matrix2, rows, cols, rows);
-  ASSERT_EQ(res_parallel, res_sequential);
+  ASSERT_EQ(res_sequential, res_parallel);
 }
