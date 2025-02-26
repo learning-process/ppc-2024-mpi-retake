@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
+
 #include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <vector>
-#include <cstddef>
+
 #include "seq/ersoz_b_horizontal_a_vertical_b/include/ops_seq.hpp"
 
 TEST(ersoz_b_horizontal_a_vertical_b_seq, test_pipeline_run) {
@@ -42,8 +44,8 @@ TEST(ersoz_b_horizontal_a_vertical_b_seq, test_task_run) {
   auto end_par = std::chrono::high_resolution_clock::now();
   double par_time = std::chrono::duration<double>(end_par - start_par).count();
 
-  std::cout << "test_task_run - Sequential Time: " << seq_time 
-            << " seconds, Parallel Time: " << par_time << " seconds\n";
+  std::cout << "test_task_run - Sequential Time: " << seq_time << " seconds, Parallel Time: " << par_time
+            << " seconds\n";
 
   ASSERT_EQ(result_seq, result_par);
   SUCCEED();
