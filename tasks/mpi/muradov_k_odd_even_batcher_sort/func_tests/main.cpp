@@ -65,7 +65,7 @@ TEST(muradov_k_odd_even_batcher_sort_func, compare_with_std_sort) {
   std::vector<int> v_copy = v;
   mk::OddEvenBatcherSort(v);
   if (proc_rank == 0) {
-    std::sort(v_copy.begin(), v_copy.end());
+    std::ranges::sort(v_copy);
     ASSERT_EQ(v, v_copy);
   }
 }

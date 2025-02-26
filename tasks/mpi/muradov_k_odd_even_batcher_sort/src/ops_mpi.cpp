@@ -47,7 +47,7 @@ void QSortImpl(std::vector<int>& v, int l, int r) {
 }
 
 // Extracted merge for the descending case.
-void mergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
+void MergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
   int part_size = static_cast<int>(local_part.size());
   int idx1 = part_size - 1;
   int idx2 = part_size - 1;
@@ -68,7 +68,7 @@ void mergeDescending(std::vector<int>& local_part, const std::vector<int>& neigh
 }
 
 // Extracted merge for the ascending case.
-void mergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
+void MergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
   int part_size = static_cast<int>(local_part.size());
   int idx1 = 0;
   int idx2 = 0;
@@ -198,11 +198,11 @@ void OddEvenBatcherSort(std::vector<int>& v) {
     if (proc_rank == proc_second) {
       MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD, &status);
       MPI_Send(local_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD);
-      mergeDescending(local_part, neighbor_part, tmp);
+      MergeDescending(local_part, neighbor_part, tmp);
     } else if (proc_rank == proc_first) {
       MPI_Send(local_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD);
       MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD, &status);
-      mergeAscending(local_part, neighbor_part, tmp);
+      MergeAscending(local_part, neighbor_part, tmp);
     }
   }
 
