@@ -3,21 +3,10 @@
 #include <algorithm>
 #include <cstdint>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "seq/kalinin_d_odd_even_shellsort/include/header_seq_odd_even_shell.hpp"
-
-namespace {
-void GimmeRandVec(std::vector<int> &vec) {
-  std::random_device rd;
-  std::default_random_engine reng(rd());
-  std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::ranges::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
-}
-}  // namespace
-
 TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_0) {
   const int n = 0;
   // Create data
@@ -39,7 +28,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1000) {
   // Create data
   std::vector<int> arr(n);
   std::vector<int> out(n);
-  GimmeRandVec(arr);
+  kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
   task_data_seq->inputs_count.emplace_back(arr.size());
@@ -62,7 +51,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_999) {
   // Create data
   std::vector<int> arr(n);
   std::vector<int> out(n);
-  GimmeRandVec(arr);
+  kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
   task_data_seq->inputs_count.emplace_back(arr.size());
@@ -85,7 +74,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_9999) {
   // Create data
   std::vector<int> arr(n);
   std::vector<int> out(n);
-  GimmeRandVec(arr);
+  kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
   task_data_seq->inputs_count.emplace_back(arr.size());
@@ -108,7 +97,7 @@ TEST(kalinin_d_odd_even_shell_seq, Test_odd_even_sort_1021) {
   // Create data
   std::vector<int> arr(n);
   std::vector<int> out(n);
-  GimmeRandVec(arr);
+  kalinin_d_odd_even_shell_seq::GimmeRandVec(arr);
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
   task_data_seq->inputs_count.emplace_back(arr.size());

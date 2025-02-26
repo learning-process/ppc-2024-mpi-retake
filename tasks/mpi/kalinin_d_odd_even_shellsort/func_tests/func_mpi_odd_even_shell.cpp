@@ -4,20 +4,10 @@
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/kalinin_d_odd_even_shellsort/include/header_mpi_odd_even_shell.hpp"
-
-namespace {
-void GimmeRandVec(std::vector<int> &vec) {
-  std::random_device rd;
-  std::default_random_engine reng(rd());
-  std::uniform_int_distribution<int> dist(0, static_cast<int>(vec.size()));
-  std::ranges::generate(vec.begin(), vec.end(), [&dist, &reng] { return dist(reng); });
-}
-}  // namespace
 
 TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_0) {
   const int n = 0;
@@ -54,7 +44,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1000) {
   if (world.rank() == 0) {
     arr.resize(n);
     out.resize(n);
-    GimmeRandVec(arr);
+    kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
@@ -83,7 +73,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_999) {
   if (world.rank() == 0) {
     arr.resize(n);
     out.resize(n);
-    GimmeRandVec(arr);
+    kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
@@ -112,7 +102,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_9999) {
   if (world.rank() == 0) {
     arr.resize(n);
     out.resize(n);
-    GimmeRandVec(arr);
+    kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
@@ -141,7 +131,7 @@ TEST(kalinin_d_odd_even_shell_mpi, Test_odd_even_sort_1021) {
   if (world.rank() == 0) {
     arr.resize(n);
     out.resize(n);
-    GimmeRandVec(arr);
+    kalinin_d_odd_even_shell_mpi::GimmeRandVec(arr);
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data_mpi->inputs_count.emplace_back(arr.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));

@@ -12,7 +12,7 @@
 #include "mpi/kalinin_d_odd_even_shellsort/include/header_mpi_odd_even_shell.hpp"
 
 TEST(kalinin_d_odd_even_shellsort_mpi, test_pipeline_run) {
-  const int n = 2000000;
+  const int n = 3000000;
 
   boost::mpi::communicator world;
 
@@ -54,7 +54,7 @@ TEST(kalinin_d_odd_even_shellsort_mpi, test_pipeline_run) {
 }
 
 TEST(kalinin_d_odd_even_shellsort_mpi, test_task_run) {
-  const int n = 2000000;
+  const int n = 3000000;
 
   boost::mpi::communicator world;
 
