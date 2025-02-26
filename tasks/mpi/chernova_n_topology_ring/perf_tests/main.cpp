@@ -76,7 +76,7 @@ TEST(chernova_n_topology_ring_mpi, test_pipeline_run) {
 
 TEST(chernova_n_topology_ring_mpi, test_task_run) {
   boost::mpi::communicator world;
-  const int k = 300000;
+  const int k = 1000000;
   std::vector<char> test_data_parallel = GenerateDataPerf(k);
   std::vector<char> in = test_data_parallel;
   const int n = static_cast<int>(in.size());
