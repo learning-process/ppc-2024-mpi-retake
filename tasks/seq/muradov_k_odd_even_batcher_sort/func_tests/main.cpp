@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <ranges>
 #include <vector>
 
 #include "seq/muradov_k_odd_even_batcher_sort/include/ops_seq.hpp"

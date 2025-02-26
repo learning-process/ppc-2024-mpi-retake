@@ -23,6 +23,8 @@ std::vector<int> RandomVector(int size) {
 }
 
 namespace {
+
+// Partition function for quicksort.
 int Partition(std::vector<int>& v, int l, int r) {
   int pivot = v[r];
   int i = l - 1;
@@ -43,11 +45,49 @@ void QSortImpl(std::vector<int>& v, int l, int r) {
     QSortImpl(v, p + 1, r);
   }
 }
-}  // anonymous namespace
 
-void QSort(std::vector<int>& v, int l, int r) { QSortImpl(v, l, r); }
+// Extracted merge for the descending case.
+void mergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
+  int part_size = static_cast<int>(local_part.size());
+  int idx1 = part_size - 1;
+  int idx2 = part_size - 1;
+  for (int j = part_size - 1; j >= 0; --j) {
+    if (idx1 >= 0 && idx2 >= 0) {
+      if (local_part[idx1] > neighbor_part[idx2]) {
+        tmp[j] = local_part[idx1--];
+      } else {
+        tmp[j] = neighbor_part[idx2--];
+      }
+    } else if (idx1 >= 0) {
+      tmp[j] = local_part[idx1--];
+    } else {
+      tmp[j] = neighbor_part[idx2--];
+    }
+  }
+  local_part = tmp;
+}
 
-namespace {
+// Extracted merge for the ascending case.
+void mergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
+  int part_size = static_cast<int>(local_part.size());
+  int idx1 = 0;
+  int idx2 = 0;
+  for (int j = 0; j < part_size; ++j) {
+    if (idx1 < part_size && idx2 < part_size) {
+      if (local_part[idx1] < neighbor_part[idx2]) {
+        tmp[j] = local_part[idx1++];
+      } else {
+        tmp[j] = neighbor_part[idx2++];
+      }
+    } else if (idx1 < part_size) {
+      tmp[j] = local_part[idx1++];
+    } else {
+      tmp[j] = neighbor_part[idx2++];
+    }
+  }
+  local_part = tmp;
+}
+
 void OddEvenMerge(const std::vector<int>& l, const std::vector<int>& r, std::vector<std::pair<int, int>>& schedule) {
   int size = static_cast<int>(l.size() + r.size());
   if (size <= 1) {
@@ -106,7 +146,10 @@ std::vector<std::pair<int, int>> BuildAllocation(int proc_num) {
   Allocation(v, schedule);
   return schedule;
 }
+
 }  // anonymous namespace
+
+void QSort(std::vector<int>& v, int l, int r) { QSortImpl(v, l, r); }
 
 void OddEvenBatcherSort(std::vector<int>& v) {
   int proc_rank = 0;
@@ -155,41 +198,11 @@ void OddEvenBatcherSort(std::vector<int>& v) {
     if (proc_rank == proc_second) {
       MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD, &status);
       MPI_Send(local_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD);
-      int idx1 = part_size - 1;
-      int idx2 = part_size - 1;
-      for (int j = part_size - 1; j >= 0; --j) {
-        if (idx1 >= 0 && idx2 >= 0) {
-          if (local_part[idx1] > neighbor_part[idx2]) {
-            tmp[j] = local_part[idx1--];
-          } else {
-            tmp[j] = neighbor_part[idx2--];
-          }
-        } else if (idx1 >= 0) {
-          tmp[j] = local_part[idx1--];
-        } else {
-          tmp[j] = neighbor_part[idx2--];
-        }
-      }
-      local_part = tmp;
+      mergeDescending(local_part, neighbor_part, tmp);
     } else if (proc_rank == proc_first) {
       MPI_Send(local_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD);
       MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD, &status);
-      int idx1 = 0;
-      int idx2 = 0;
-      for (int j = 0; j < part_size; ++j) {
-        if (idx1 < part_size && idx2 < part_size) {
-          if (local_part[idx1] < neighbor_part[idx2]) {
-            tmp[j] = local_part[idx1++];
-          } else {
-            tmp[j] = neighbor_part[idx2++];
-          }
-        } else if (idx1 < part_size) {
-          tmp[j] = local_part[idx1++];
-        } else {
-          tmp[j] = neighbor_part[idx2++];
-        }
-      }
-      local_part = tmp;
+      mergeAscending(local_part, neighbor_part, tmp);
     }
   }
 
