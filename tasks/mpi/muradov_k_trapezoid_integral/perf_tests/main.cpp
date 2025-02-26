@@ -12,7 +12,7 @@
 namespace muradov_k_trapezoid_integral_mpi {
 
 TEST(muradov_k_trapezoid_integral_mpi, test_task_run) {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   std::function<double(double)> f = [](double x) { return x * sin(x); };
@@ -30,7 +30,7 @@ TEST(muradov_k_trapezoid_integral_mpi, test_task_run) {
 }
 
 TEST(muradov_k_trapezoid_integral_mpi, test_pipeline_run) {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   std::function<double(double)> f = [](double x) { return exp(x); };
