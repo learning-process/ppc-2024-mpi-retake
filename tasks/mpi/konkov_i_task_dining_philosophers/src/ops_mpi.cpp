@@ -23,14 +23,14 @@ void DiningPhilosophersMPI::PreProcessing() {
 }
 
 void DiningPhilosophersMPI::Run() {
-  for (int i = 0; i < 5; ++i) {  // Несколько итераций
+  for (int i = 0; i < 5; ++i) {
     for (int id = localStart; id < localEnd; ++id) {
       Think(id);
       PickUpForks(id);
       Eat(id);
       PutDownForks(id);
     }
-    MPI_Barrier(comm);  // Синхронизация всех процессов перед следующей итерацией
+    MPI_Barrier(comm);
   }
 }
 
