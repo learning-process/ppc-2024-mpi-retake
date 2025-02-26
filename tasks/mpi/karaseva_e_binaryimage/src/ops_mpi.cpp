@@ -5,7 +5,7 @@
 #include <set>
 #include <sstream>
 #include <vector>
-// NOLINTBEGIN
+
 // Finding the root of the label (smallest label in the object)
 int karaseva_e_binaryimage_mpi::GetRootLabel(std::map<int, std::set<int>>& label_parent_map, int label) {
   auto search = label_parent_map.find(label);
@@ -324,4 +324,3 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PostProcessingImpl() {
   }
   return true;
 }
-// NOLINTEND

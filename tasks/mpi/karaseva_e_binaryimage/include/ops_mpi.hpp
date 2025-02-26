@@ -9,7 +9,6 @@
 
 #include "core/task/include/task.hpp"
 
-// NOLINTBEGIN
 namespace karaseva_e_binaryimage_mpi {
 
 // Function declarations
@@ -57,4 +56,3 @@ class TestMPITaskParallel : public ppc::core::Task {
 };
 
 }  // namespace karaseva_e_binaryimage_mpi
-// NOLINTEND
