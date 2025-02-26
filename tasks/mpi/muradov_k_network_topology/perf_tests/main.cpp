@@ -1,4 +1,3 @@
-#define OMPI_SKIP_MPICXX
 #include <gtest/gtest.h>
 #include <mpi.h>
 
@@ -10,15 +9,13 @@
 
 namespace muradov_k_network_topology_mpi {
 
-// Performance Test 1: test_pipeline_run – measure the bandwidth over multiple iterations.
 TEST(muradov_k_network_topology_mpi, test_pipeline_run) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size = 0;
-  int rank = 0;
+  int size, rank;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
-    GTEST_SKIP() << "Requires at least 2 processes";
+    GTEST_SKIP();
   }
 
   NetworkTopology topology(comm);
@@ -27,36 +24,23 @@ TEST(muradov_k_network_topology_mpi, test_pipeline_run) {
   constexpr int kIterations = 100;
   constexpr int kMessageSize = 1024 * 1024;  // 1 MB
   std::vector<char> buffer(kMessageSize, static_cast<char>(rank));
-  double total_time = 0.0;
 
-  if (rank == 0) {
-    auto start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < kIterations; ++i) {
-      ASSERT_TRUE(topology.Send(1, buffer.data(), kMessageSize, MPI_BYTE));
-    }
-    auto end = std::chrono::high_resolution_clock::now();
-    total_time = std::chrono::duration<double>(end - start).count();
-    double bandwidth = (static_cast<double>(kMessageSize) * kIterations * 8) / (total_time * 1e6);  // Mbps
-    std::cout << "test_pipeline_run - Bandwidth: " << bandwidth << " Mbps\n";
-  } else if (rank == 1) {
-    for (int i = 0; i < kIterations; ++i) {
-      ASSERT_TRUE(topology.Receive(0, buffer.data(), kMessageSize, MPI_BYTE));
-    }
+  for (int i = 0; i < kIterations; ++i) {
+    std::vector<char> recv_buffer(kMessageSize, 0);
+    ASSERT_TRUE(topology.RingExchange(buffer.data(), recv_buffer.data(), kMessageSize, MPI_BYTE));
   }
 
   MPI_Barrier(comm);
   SUCCEED();
 }
 
-// Performance Test 2: test_task_run – measure the round-trip time for a single communication.
-TEST(muradov_k_network_topology_mpi, test_task_run) {  // NOLINT(readability-function-cognitive-complexity)
+TEST(muradov_k_network_topology_mpi, test_task_run) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int size = 0;
-  int rank = 0;
+  int size, rank;
   MPI_Comm_size(comm, &size);
   MPI_Comm_rank(comm, &rank);
   if (size < 2) {
-    GTEST_SKIP() << "Requires at least 2 processes";
+    GTEST_SKIP();
   }
 
   NetworkTopology topology(comm);
@@ -64,20 +48,10 @@ TEST(muradov_k_network_topology_mpi, test_task_run) {  // NOLINT(readability-fun
 
   constexpr int kMessageSize = 1024;  // 1 KB message
   std::vector<char> buffer(kMessageSize, static_cast<char>(rank));
+  std::vector<char> recv_buffer(kMessageSize, 0);
 
-  double start_time = MPI_Wtime();
-  if (rank == 0) {
-    ASSERT_TRUE(topology.Send(1, buffer.data(), kMessageSize, MPI_BYTE));
-    ASSERT_TRUE(topology.Receive(1, buffer.data(), kMessageSize, MPI_BYTE));
-  } else if (rank == 1) {
-    ASSERT_TRUE(topology.Receive(0, buffer.data(), kMessageSize, MPI_BYTE));
-    ASSERT_TRUE(topology.Send(0, buffer.data(), kMessageSize, MPI_BYTE));
-  }
-  double end_time = MPI_Wtime();
-  double elapsed = end_time - start_time;
-  if (rank == 0) {
-    std::cout << "test_task_run - Round Trip Time: " << elapsed << " seconds\n";
-  }
+  ASSERT_TRUE(topology.RingExchange(buffer.data(), recv_buffer.data(), kMessageSize, MPI_BYTE));
+
   MPI_Barrier(comm);
   SUCCEED();
 }

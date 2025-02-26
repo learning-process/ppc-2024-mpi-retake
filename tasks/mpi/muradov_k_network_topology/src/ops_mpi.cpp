@@ -65,4 +65,14 @@ bool NetworkTopology::Receive(int source, void* buffer, int count, MPI_Datatype 
   return false;
 }
 
+bool NetworkTopology::RingExchange(const void* send_data, void* recv_data, int count, MPI_Datatype datatype) {
+  if (topology_comm_ == MPI_COMM_NULL) {
+    return false;
+  }
+  // In a ring, send to the right neighbor and receive from the left neighbor.
+  MPI_Status status;
+  MPI_Sendrecv(send_data, count, datatype, right_, 0, recv_data, count, datatype, left_, 0, topology_comm_, &status);
+  return true;
+}
+
 }  // namespace muradov_k_network_topology_mpi

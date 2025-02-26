@@ -18,6 +18,9 @@ class NetworkTopology {
   bool Send(int dest, const void* data, int count, MPI_Datatype datatype);
   bool Receive(int source, void* buffer, int count, MPI_Datatype datatype);
 
+  // New method that encapsulates the ring exchange using MPI_Sendrecv.
+  bool RingExchange(const void* send_data, void* recv_data, int count, MPI_Datatype datatype);
+
  private:
   MPI_Comm global_comm_;
   MPI_Comm topology_comm_;
