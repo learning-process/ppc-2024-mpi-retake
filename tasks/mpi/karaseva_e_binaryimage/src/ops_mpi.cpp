@@ -1,6 +1,6 @@
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-#include <boost/mpi/operations.hpp>
+#include <cstddef>
 #include <iostream>
 #include <map>
 #include <set>
@@ -134,27 +134,27 @@ void karaseva_e_binaryimage_mpi::HandlePixelLabeling(std::vector<int>& input_ima
                                                      std::map<int, std::set<int>>& label_connection_map, int x, int y,
                                                      int rows, int cols, int& label_counter, const int dx[],
                                                      const int dy[]) {
-  int pos = x * cols + y;
-  std::vector<int> neighboringLabels;
+  int pos = (x * cols) + y;
+  std::vector<int> neighboring_labels;
 
   // Check neighboring pixels for existing labels.
   for (int i = 0; i < 3; ++i) {
     int nx = x + dx[i];
     int ny = y + dy[i];
-    int tmpPos = (nx * cols) + ny;
-    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[tmpPos] > 1) {
-      neighboringLabels.push_back(labeled_image[tmpPos]);
+    int tmp_pos = (nx * cols) + ny;
+    if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && labeled_image[tmp_pos] > 1) {
+      neighboring_labels.push_back(labeled_image[tmp_pos]);
     }
   }
 
-  if (neighboringLabels.empty() && labeled_image[pos] != 0) {  // If no neighbors, assign a new label.
+  if (neighboring_labels.empty() && labeled_image[pos] != 0) {  // If no neighbors, assign a new label.
     labeled_image[pos] = label_counter++;
   } else {
-    int minNeighborLabel = *std::min_element(neighboringLabels.begin(), neighboringLabels.end());
-    labeled_image[pos] = minNeighborLabel;
+    int min_neighbor_label = *std::min_element(neighboring_labels.begin(), neighboring_labels.end());
+    labeled_image[pos] = min_neighbor_label;
     // Combine the labels of the neighbors.
-    for (int label : neighboringLabels) {
-      CombineLabels(label_connection_map, minNeighborLabel, label);
+    for (int label : neighboring_labels) {
+      CombineLabels(label_connection_map, min_neighbor_label, label);
     }
   }
 }
@@ -261,11 +261,11 @@ void karaseva_e_binaryimage_mpi::SavelabelSet(std::ostringstream& oss, const std
 
 // Load label set from a string stream (for deserialization)
 void karaseva_e_binaryimage_mpi::LoadLabelSet(std::istringstream& iss, std::set<int>& label_set) {
-  size_t size;
+  size_t size = 0;
   iss >> size;
   label_set.clear();
   for (size_t i = 0; i < size; ++i) {
-    int item;
+    int item = 0;
     iss >> item;  // Read each element
     label_set.insert(item);
   }
@@ -287,7 +287,7 @@ void karaseva_e_binaryimage_mpi::DeserializelabelMap(std::istringstream& iss, st
   iss >> size;
   label_map.clear();
   for (size_t i = 0; i < size; ++i) {
-    int key;
+    int key = 0;
     iss >> key;
     std::set<int> value;
     LoadLabelSet(iss, value);  // Deserialize the set
