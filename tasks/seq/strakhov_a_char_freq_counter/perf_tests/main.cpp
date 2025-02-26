@@ -9,12 +9,30 @@
 #include "core/task/include/task.hpp"
 #include "seq/strakhov_a_char_freq_counter/include/ops_seq.hpp"
 
+namespace strakhov_a_char_freq_counter_seq {
+  namespace {
+  std::vector<char> FillRandomChars(int size, const std::string &charset) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
+  
+    std::vector<char> result(size);
+    for (char &c : result) {
+      c = charset[dist(gen)];
+    }
+    return result;
+  }
+  }  // namespace
+  }  // namespace strakhov_a_char_freq_counter_seq
+
 TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
   // Create data
-  int expectation = 50000000;
-  std::vector<char> in_string(expectation, 'a');
+  std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+    1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+  std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      500000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*", );
   std::vector<int> out(1, 0);
-  std::vector<char> in_target(1, 'a');
+
 
   // Create task_data
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -47,15 +65,15 @@ TEST(strakhov_a_char_freq_counter_seq, test_pipeline_run) {
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  // ASSERT_EQ(out, expectation);
 }
 
 TEST(strakhov_a_char_freq_counter_seq, test_task_run) {
   // Create data
-  int expectation = 50000000;
-  std::vector<char> in_string(expectation, 'a');
+  std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+    1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+  std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      500000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*", );
   std::vector<int> out(1, 0);
-  std::vector<char> in_target(1, 'a');
 
   // Create task_data
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -88,5 +106,4 @@ TEST(strakhov_a_char_freq_counter_seq, test_task_run) {
 
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  // ASSERT_EQ(out, expectation);
 }

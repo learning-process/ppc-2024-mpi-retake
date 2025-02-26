@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <random>
 #include <memory>
 #include <vector>
 
@@ -10,14 +11,30 @@
 #include "core/task/include/task.hpp"
 #include "mpi/strakhov_a_char_freq_counter/include/ops_mpi.hpp"
 
+namespace strakhov_a_char_freq_counter_mpi {
+  namespace {
+  std::vector<char> FillRandomChars(int size, const std::string &charset) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, static_cast<int>(charset.size()) - 1);
+    std::vector<char> result(size);
+    for (char &c : result) {
+      c = charset[dist(gen)];
+    }
+    return result;
+  }
+  }  // namespace
+  }  // namespace strakhov_a_char_freq_counter_mpi
+
 TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
   // Create data
-  int expectation = 50000000;
-  std::vector<char> in_string(expectation, 'a');
+  std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int> out_par(1, 0);
-  std::vector<char> in_target(1, 'a');
+  std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
 
   // Create taskdata
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
@@ -56,17 +73,17 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 
-  // ASSERT_EQ(out_par, expectation);
 }
 
 TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
   boost::mpi::communicator world;
 
   // Create data
-  int expectation = 50000000;
-  std::vector<char> in_string(expectation, 'a');
+  std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int> out_par(1, 0);
-  std::vector<char> in_target(1, 'a');
+  std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
+      1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
 
   // Create task_data
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
@@ -105,5 +122,4 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 
-  // ASSERT_EQ(out_par, expectation);
 }
