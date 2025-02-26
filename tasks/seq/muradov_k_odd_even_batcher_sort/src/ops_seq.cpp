@@ -8,7 +8,7 @@
 
 namespace muradov_k_odd_even_batcher_sort {
 
-std::vector<int> random_vector(int size) {
+std::vector<int> RandomVector(int size) {
   std::mt19937 rng(static_cast<unsigned int>(time(0)));
   std::vector<int> v(size);
   for (int i = 0; i < size; ++i) {
@@ -19,7 +19,7 @@ std::vector<int> random_vector(int size) {
 
 namespace {
 // Partition function for quicksort.
-int partition(std::vector<int>& v, int l, int r) {
+int Partition(std::vector<int>& v, int l, int r) {
   int pivot = v[r];
   int i = l - 1;
   for (int j = l; j < r; ++j) {
@@ -34,18 +34,18 @@ int partition(std::vector<int>& v, int l, int r) {
 
 void q_sort_impl(std::vector<int>& v, int l, int r) {
   if (l < r) {
-    int p = partition(v, l, r);
+    int p = Partition(v, l, r);
     q_sort_impl(v, l, p - 1);
     q_sort_impl(v, p + 1, r);
   }
 }
 }  // anonymous namespace
 
-void q_sort(std::vector<int>& v, int l, int r) { q_sort_impl(v, l, r); }
+void QSort(std::vector<int>& v, int l, int r) { q_sort_impl(v, l, r); }
 
-void odd_even_batcher_sort(std::vector<int>& v) {
+void OddEvenBatcherSort(std::vector<int>& v) {
   if (!v.empty()) {
-    q_sort(v, 0, static_cast<int>(v.size()) - 1);
+    QSort(v, 0, static_cast<int>(v.size()) - 1);
   }
 }
 
