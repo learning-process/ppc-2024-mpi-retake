@@ -1,3 +1,5 @@
+#define OMPI_SKIP_MPICXX
+
 #include "mpi/muradov_k_odd_even_batcher_sort/include/ops_mpi.hpp"
 
 #include <mpi.h>
