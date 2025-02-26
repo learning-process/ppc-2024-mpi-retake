@@ -25,7 +25,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_pipeline_run_Mpi) {
   std::ranges::generate(input_matrix_b.begin(), input_matrix_b.end(), [&] { return distribution(gen); });
   std::vector<double> output_matrix_c(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize);
+  std::vector<double> true_solution(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> true_sol(1, true_solution);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
@@ -82,7 +82,7 @@ TEST(deryabin_m_cannons_algorithm_mpi, test_task_run_Mpi) {
   std::ranges::generate(input_matrix_b.begin(), input_matrix_b.end(), [&] { return distribution(gen); });
   std::vector<double> output_matrix_c(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> out_matrix_c(1, output_matrix_c);
-  std::vector<double> true_solution = std::vector<double>(kMatrixSize * kMatrixSize);
+  std::vector<double> true_solution(kMatrixSize * kMatrixSize);
   std::vector<std::vector<double>> true_sol(1, true_solution);
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_matrix_a.data()));
