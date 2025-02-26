@@ -4,7 +4,6 @@
 #include <boost/mpi/communicator.hpp>
 #include <map>
 #include <set>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -23,6 +22,8 @@ void Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, in
               std::map<int, std::set<int>>& label_parent_map);
 void SaveLabelMapToStream(std::ostringstream& oss, const std::map<int, std::set<int>>& label_map);
 void LoadLabelMapFromStream(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
+void SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& labelSet);
+void LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& labelSet);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:

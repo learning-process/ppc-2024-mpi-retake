@@ -208,14 +208,14 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
   return true;
 }
 
-void SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& labelSet) {
+void karaseva_e_binaryimage_mpi::SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& labelSet) {
   oss << labelSet.size() << " ";  // Write the size of the set
   for (const auto& item : labelSet) {
     oss << item << " ";  // Write each item
   }
 }
 
-void LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& labelSet) {
+void karaseva_e_binaryimage_mpi::LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& labelSet) {
   size_t size;
   iss >> size;  // Read the size of the set
   labelSet.clear();
