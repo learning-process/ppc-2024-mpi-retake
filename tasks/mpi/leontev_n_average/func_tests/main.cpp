@@ -45,8 +45,10 @@ TEST(leontev_n_average_mpi, avg_mpi_50elem) {
   MPIVecAvgParallel.PreProcessingImpl();
   MPIVecAvgParallel.RunImpl();
   MPIVecAvgParallel.PostProcessingImpl();
-  expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
-  ASSERT_EQ(expected_avg, global_avg[0]);
+  if (world.rank() == 0) {
+    expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
+    ASSERT_EQ(expected_avg, global_avg[0]);
+  }
 }
 TEST(leontev_n_average_mpi, avg_mpi_0elem) {
   boost::mpi::communicator world;
@@ -79,8 +81,10 @@ TEST(leontev_n_average_mpi, avg_mpi_1000elem) {
   MPIVecAvgParallel.PreProcessingImpl();
   MPIVecAvgParallel.RunImpl();
   MPIVecAvgParallel.PostProcessingImpl();
-  expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
-  ASSERT_EQ(expected_avg, global_avg[0]);
+  if (world.rank() == 0) {
+    expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
+    ASSERT_EQ(expected_avg, global_avg[0]);
+  }
 }
 TEST(leontev_n_average_mpi, avg_mpi_20000elem) {
   boost::mpi::communicator world;
@@ -99,8 +103,10 @@ TEST(leontev_n_average_mpi, avg_mpi_20000elem) {
   MPIVecAvgParallel.PreProcessingImpl();
   MPIVecAvgParallel.RunImpl();
   MPIVecAvgParallel.PostProcessingImpl();
-  expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
-  ASSERT_EQ(expected_avg, global_avg[0]);
+  if (world.rank() == 0) {
+    expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
+    ASSERT_EQ(expected_avg, global_avg[0]);
+  }
 }
 TEST(leontev_n_average_mpi, avg_mpi_1elem) {
   boost::mpi::communicator world;
@@ -118,6 +124,8 @@ TEST(leontev_n_average_mpi, avg_mpi_1elem) {
   MPIVecAvgParallel.PreProcessingImpl();
   MPIVecAvgParallel.RunImpl();
   MPIVecAvgParallel.PostProcessingImpl();
-  expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
-  ASSERT_EQ(expected_avg, global_avg[0]);
+  if (world.rank() == 0) {
+    expected_avg = std::accumulate(global_vec.begin(), global_vec.end(), 0) / global_vec.size();
+    ASSERT_EQ(expected_avg, global_avg[0]);
+  }
 }
