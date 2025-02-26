@@ -124,7 +124,7 @@ bool solovev_a_binary_image_marking::TestMPITaskParallel::IsValidMPI(int nr, int
 
 void solovev_a_binary_image_marking::TestMPITaskParallel::BFSCheck(const int* p_local_image, int curr_label,
                                                                    int* p_local_labels, int local_pixel_count, Point cp,
-                                                                   std::queue<Point> bfs_queue) {
+                                                                   std::queue<Point> bfs_queue) const {
   std::vector<Point> directions = {{.x = -1, .y = 0}, {.x = 1, .y = 0}, {.x = 0, .y = -1}, {.x = 0, .y = 1}};
   for (const auto& step : directions) {
     int nr = cp.x + step.x;
