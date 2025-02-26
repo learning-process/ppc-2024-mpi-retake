@@ -9,6 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/anikin_m_graham_scan/include/ops_seq.hpp"
 
+namespace {
 static bool TestData(std::vector<anikin_m_graham_scan_seq::Pt> alg_out, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
@@ -98,19 +99,7 @@ static void CreateTestData(std::vector<anikin_m_graham_scan_seq::Pt> &alg_in, in
       break;
   }
 }
-
-static void CreateRandomData(std::vector<anikin_m_graham_scan_seq::Pt> &alg_in, int count) {
-  alg_in.clear();
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0.0, 100.0);
-  anikin_m_graham_scan_seq::Pt rand;
-  for (int i = 0; i < count; i++) {
-    rand.x = dis(gen);
-    rand.y = dis(gen);
-    alg_in.push_back(rand);
-  }
-}
+}  // namespace
 
 TEST(anikin_m_graham_scan_seq, case_0) {
   // Create data

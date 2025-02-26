@@ -10,7 +10,8 @@
 #include "core/task/include/task.hpp"
 #include "mpi/anikin_m_graham_scan/include/ops_mpi.hpp"
 
-static bool TestData(std::vector<anikin_m_graham_scan_mpi::Pt> alg_out, int test) {
+namespace {
+bool TestData(std::vector<anikin_m_graham_scan_mpi::Pt> alg_out, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -59,7 +60,7 @@ static bool TestData(std::vector<anikin_m_graham_scan_mpi::Pt> alg_out, int test
   return out;
 }
 
-static void CreateTestData(std::vector<anikin_m_graham_scan_mpi::Pt> &alg_in, int test) {
+void CreateTestData(std::vector<anikin_m_graham_scan_mpi::Pt> &alg_in, int test) {
   // case 0
   //  all_points  = [(0, 0), (4, 0), (4, 4), (0, 4), (2, 2)]
   //  hull_points = [(0, 0), (4, 0), (4, 4), (0, 4)]
@@ -99,19 +100,7 @@ static void CreateTestData(std::vector<anikin_m_graham_scan_mpi::Pt> &alg_in, in
       break;
   }
 }
-
-static void CreateRandomData(std::vector<anikin_m_graham_scan_mpi::Pt> &alg_in, int count) {
-  alg_in.clear();
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(0.0, 100.0);
-  anikin_m_graham_scan_mpi::Pt rand;
-  for (int i = 0; i < count; i++) {
-    rand.x = (int)dis(gen);
-    rand.y = (int)dis(gen);
-    alg_in.push_back(rand);
-  }
-}
+}  // namespace
 
 TEST(anikin_m_graham_scan_mpi, case_0) {
   // Create data
