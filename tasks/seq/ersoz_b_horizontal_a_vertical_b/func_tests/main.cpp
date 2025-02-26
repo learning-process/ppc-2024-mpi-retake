@@ -6,26 +6,26 @@
 
 TEST(Generation_Matrix, can_generate_square_matrix) {
   auto mat = getRandomMatrix(10, 10);
-  ASSERT_EQ(mat.size(), 100);
+  ASSERT_EQ(mat.size(), 100u);
 }
 
 TEST(Generation_Matrix, can_generate_arbitrary_matrix) {
   auto mat = getRandomMatrix(10, 15);
-  ASSERT_EQ(mat.size(), 150);
+  ASSERT_EQ(mat.size(), 150u);
 }
 
 TEST(Sequential_Operations_SEQ, getSequentialOperations_can_work_with_square_matrix) {
   std::vector<int> matrix1 = getRandomMatrix(10, 10);
   std::vector<int> matrix2 = getRandomMatrix(10, 10);
   auto res = getSequentialOperations(matrix1, matrix2, 10, 10, 10);
-  ASSERT_EQ(res.size(), 100);
+  ASSERT_EQ(res.size(), 100u);
 }
 
 TEST(Sequential_Operations_SEQ, getSequentialOperations_can_work_with_arbitrary_matrix) {
   std::vector<int> matrix1 = getRandomMatrix(10, 15);
   std::vector<int> matrix2 = getRandomMatrix(15, 10);
   auto res = getSequentialOperations(matrix1, matrix2, 10, 15, 10);
-  ASSERT_EQ(res.size(), 100);
+  ASSERT_EQ(res.size(), 100u);
 }
 
 TEST(Sequential_Operations_SEQ, getSequentialOperations_works_correctly_with_square_matrix) {
@@ -48,7 +48,7 @@ TEST(Parallel_Operations_SEQ, getParallelOperations_can_work_with_square_matrix)
   std::vector<int> matrix1 = getRandomMatrix(20, 20);
   std::vector<int> matrix2 = getRandomMatrix(20, 20);
   auto res = getParallelOperations(matrix1, matrix2, 20, 20);
-  ASSERT_EQ(res.size(), 20 * 20);
+  ASSERT_EQ(res.size(), 20u * 20u);
 }
 
 TEST(Parallel_Operations_SEQ, getParallelOperations_can_work_with_arbitrary_matrix) {
@@ -56,7 +56,7 @@ TEST(Parallel_Operations_SEQ, getParallelOperations_can_work_with_arbitrary_matr
   std::vector<int> matrix1 = getRandomMatrix(20, 30);
   std::vector<int> matrix2 = getRandomMatrix(30, 20);
   auto res = getParallelOperations(matrix1, matrix2, 20, 30);
-  ASSERT_EQ(res.size(), 20 * 20);
+  ASSERT_EQ(res.size(), 20u * 20u);
 }
 
 TEST(Parallel_Operations_SEQ, getParallelOperations_works_correctly_with_square_matrix) {
