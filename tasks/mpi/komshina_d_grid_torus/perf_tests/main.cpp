@@ -25,7 +25,7 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
 
   std::vector<int> expected_path = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
-      dest, std::sqrt(world.size()), world.size() / std::sqrt(world.size()));
+      dest, static_cast<int>(std::sqrt(world.size())), static_cast<int>(world.size() / std::sqrt(world.size())));
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&input_data));
@@ -68,7 +68,7 @@ TEST(komshina_d_grid_torus_mpi, test_task_run) {
   komshina_d_grid_torus_mpi::TestTaskMPI::TaskData output_data;
 
   std::vector<int> expected_path = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
-      dest, std::sqrt(world.size()), world.size() / std::sqrt(world.size()));
+      dest, static_cast<int>(std::sqrt(world.size())), static_cast<int>(world.size() / std::sqrt(world.size())));
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&input_data));
