@@ -178,6 +178,11 @@ bool karaseva_e_binaryimage_mpi::TestTaskMPI::RunImpl() {
 
   Labeling(input_, local_labeled_image_, rows, cols, 2, label_parent, start_row, end_row);
 
+  if (task_data->outputs[0] == nullptr) {
+    std::cerr << "[Rank " << rank << "] [WARNING] Output buffer is null. Allocating memory.\n";
+    task_data->outputs[0] = new uint8_t[rows * cols];
+  }
+
   std::vector<int> recv_counts(num_processes);
   std::vector<int> displs(num_processes);
 
