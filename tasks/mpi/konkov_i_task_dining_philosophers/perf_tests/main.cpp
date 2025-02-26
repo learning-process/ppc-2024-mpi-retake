@@ -1,89 +1,37 @@
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <chrono>
-#include <iostream>
 
 #include "mpi/konkov_i_task_dining_philosophers/include/ops_mpi.hpp"
 
-TEST(konkov_i_DiningPhilosophersPerformance, RunPipelinePerformance) {
-  int rank = 0;
-  int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+TEST(DiningPhilosophersPerf, test_pipeline_run_mpi) {
+  int argc = 0;
+  char** argv = nullptr;
+  MPI_Init(&argc, &argv);
 
-  int num_philosophers = 100;
-  konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
-
-  if (!dp.Validation()) {
-    if (rank == 0) {
-      std::cerr << "Validation failed for pipeline with " << num_philosophers << " philosophers." << '\n';
-    }
-    GTEST_SKIP();
-  }
-
-  if (!dp.PreProcessing()) {
-    if (rank == 0) {
-      std::cerr << "Pre-processing failed for pipeline." << '\n';
-    }
-    GTEST_SKIP();
-  }
-
+  dining_philosophers::DiningPhilosophersMPI philosophers(100);
   auto start = std::chrono::high_resolution_clock::now();
-  dp.Run();
+  philosophers.Run();
   auto end = std::chrono::high_resolution_clock::now();
 
-  if (!dp.PostProcessing()) {
-    if (rank == 0) {
-      std::cerr << "Post-processing failed for pipeline." << '\n';
-    }
-    GTEST_SKIP();
-  }
+  std::chrono::duration<double> duration = end - start;
+  std::cout << "Pipeline execution time: " << duration.count() << "s\n";
 
-  std::chrono::duration<double> elapsed = end - start;
-  if (rank == 0) {
-    std::cout << "Pipeline execution time with " << num_philosophers << " philosophers: " << elapsed.count()
-              << " seconds" << '\n';
-  }
+  MPI_Finalize();
 }
 
-TEST(konkov_i_DiningPhilosophersPerformance, RunTaskPerformance) {
-  int rank = 0;
-  int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+TEST(DiningPhilosophersPerf, test_task_run_mpi) {
+  int argc = 0;
+  char** argv = nullptr;
+  MPI_Init(&argc, &argv);
 
-  int num_philosophers = 100;
-  konkov_i_dining_philosophers::DiningPhilosophers dp(num_philosophers);
-
-  if (!dp.Validation()) {
-    if (rank == 0) {
-      std::cerr << "Validation failed for task with " << num_philosophers << " philosophers." << '\n';
-    }
-    GTEST_SKIP();
-  }
-
-  if (!dp.PreProcessing()) {
-    if (rank == 0) {
-      std::cerr << "Pre-processing failed for task." << '\n';
-    }
-    GTEST_SKIP();
-  }
-
+  dining_philosophers::DiningPhilosophersMPI philosophers(100);
   auto start = std::chrono::high_resolution_clock::now();
-  dp.Run();
+  philosophers.Run();
   auto end = std::chrono::high_resolution_clock::now();
 
-  if (!dp.PostProcessing()) {
-    if (rank == 0) {
-      std::cerr << "Post-processing failed for task." << '\n';
-    }
-    GTEST_SKIP();
-  }
+  std::chrono::duration<double> duration = end - start;
+  std::cout << "Task execution time: " << duration.count() << "s\n";
 
-  std::chrono::duration<double> elapsed = end - start;
-  if (rank == 0) {
-    std::cout << "Task execution time with " << num_philosophers << " philosophers: " << elapsed.count() << " seconds"
-              << '\n';
-  }
+  MPI_Finalize();
 }

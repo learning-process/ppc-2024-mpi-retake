@@ -1,71 +1,57 @@
 #include "mpi/konkov_i_task_dining_philosophers/include/ops_mpi.hpp"
 
-#include <mpi.h>
+#include <chrono>
+#include <iostream>
+#include <thread>
 
-#include <algorithm>
-#include <vector>
+using namespace dining_philosophers;
 
-namespace konkov_i_dining_philosophers {
-
-DiningPhilosophers::DiningPhilosophers(int num_philosophers)
-    : num_philosophers_(num_philosophers), fork_states_(num_philosophers, 0), philosopher_states_(num_philosophers, 0) {
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
-  MPI_Comm_size(MPI_COMM_WORLD, &size_);
+DiningPhilosophersMPI::DiningPhilosophersMPI(int num_philosophers) : num_philosophers(num_philosophers) {
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  states.resize(num_philosophers, 0);
 }
 
-bool DiningPhilosophers::Validation() const { return num_philosophers_ > 1; }
+DiningPhilosophersMPI::~DiningPhilosophersMPI() {}
 
-bool DiningPhilosophers::PreProcessing() {
-  if (rank_ == 0) {
-    InitPhilosophers();
-  }
-  MPI_Bcast(fork_states_.data(), num_philosophers_, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Barrier(MPI_COMM_WORLD);
-  return true;
-}
-
-bool DiningPhilosophers::Run() {
-  for (int i = 0; i < num_philosophers_; ++i) {
-    if (rank_ == i) {
-      PhilosopherActions(i);
+void DiningPhilosophersMPI::Validation() {
+  if (size < num_philosophers) {
+    if (rank == 0) {
+      std::cerr << "Error: Not enough processes for philosophers.\n";
     }
-    UpdateForkStates();
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Abort(MPI_COMM_WORLD, 1);
   }
-  return true;
 }
 
-bool DiningPhilosophers::PostProcessing() { return IsDeadlock() == 0; }
-
-int DiningPhilosophers::CheckDeadlock() { return IsDeadlock(); }
-
-void DiningPhilosophers::InitPhilosophers() {
-  std::ranges::fill(fork_states_, 0);
-  std::ranges::fill(philosopher_states_, 0);
-  ;
-}
-
-void DiningPhilosophers::PhilosopherActions(int id) {
-  int left_fork = id;
-  int right_fork = (id + 1) % num_philosophers_;
-
-  if (fork_states_[left_fork] == 0 && fork_states_[right_fork] == 0) {
-    fork_states_[left_fork] = 1;
-    fork_states_[right_fork] = 1;
-    philosopher_states_[id] = 1;  // Eating
+void DiningPhilosophersMPI::PreProcessing() {
+  if (rank == 0) {
+    std::cout << "Starting Dining Philosophers problem with " << num_philosophers << " philosophers.\n";
   }
-
-  fork_states_[left_fork] = 0;
-  fork_states_[right_fork] = 0;
-  philosopher_states_[id] = 0;  // Thinking
 }
 
-int DiningPhilosophers::IsDeadlock() {
-  return std::ranges::all_of(philosopher_states_, [](int state) { return state == 1; }) ? 1 : 0;
+void DiningPhilosophersMPI::Run() {
+  for (int i = 0; i < 5; ++i) {
+    Think(rank);
+    TakeForks(rank);
+    Eat(rank);
+    PutForks(rank);
+  }
 }
 
-void DiningPhilosophers::UpdateForkStates() {
-  MPI_Allgather(&fork_states_[rank_], 1, MPI_INT, fork_states_.data(), 1, MPI_INT, MPI_COMM_WORLD);
+void DiningPhilosophersMPI::PostProcessing() {
+  if (rank == 0) {
+    std::cout << "Dining Philosophers problem finished.\n";
+  }
 }
 
-}  // namespace konkov_i_dining_philosophers
+void DiningPhilosophersMPI::Think(int philosopher_id) { std::this_thread::sleep_for(std::chrono::milliseconds(100)); }
+
+void DiningPhilosophersMPI::Eat(int philosopher_id) { std::this_thread::sleep_for(std::chrono::milliseconds(100)); }
+
+void DiningPhilosophersMPI::TakeForks(int philosopher_id) {
+  MPI_Send(nullptr, 0, MPI_INT, (philosopher_id + 1) % num_philosophers, 0, MPI_COMM_WORLD);
+}
+
+void DiningPhilosophersMPI::PutForks(int philosopher_id) {
+  MPI_Recv(nullptr, 0, MPI_INT, (philosopher_id + 1) % num_philosophers, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+}

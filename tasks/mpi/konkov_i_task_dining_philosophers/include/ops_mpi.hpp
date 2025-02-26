@@ -1,32 +1,34 @@
-#ifndef MODULES_TASK_2_KONKOV_I_DINING_PHILOSOPHERS_OPS_MPI_HPP
-#define MODULES_TASK_2_KONKOV_I_DINING_PHILOSOPHERS_OPS_MPI_HPP
+#ifndef KONKOV_I_TASK_DINING_PHILOSOPHERS_OPS_MPI_HPP
+#define KONKOV_I_TASK_DINING_PHILOSOPHERS_OPS_MPI_HPP
+
+#include <mpi.h>
 
 #include <vector>
 
-namespace konkov_i_dining_philosophers {
+namespace dining_philosophers {
 
-class DiningPhilosophers {
+class DiningPhilosophersMPI {
  public:
-  explicit DiningPhilosophers(int num_philosophers);
-  [[nodiscard]] bool Validation() const;
-  bool PreProcessing();
-  bool Run();
-  bool PostProcessing();
-  int CheckDeadlock();
+  DiningPhilosophersMPI(int num_philosophers);
+  ~DiningPhilosophersMPI();
+
+  void Validation();
+  void PreProcessing();
+  void Run();
+  void PostProcessing();
 
  private:
-  int num_philosophers_;
-  int rank_;
-  int size_;
-  std::vector<int> fork_states_;
-  std::vector<int> philosopher_states_;
+  int num_philosophers;
+  int rank, size;
+  MPI_Comm comm;
+  std::vector<int> states;
 
-  void InitPhilosophers();
-  void PhilosopherActions(int id);
-  int IsDeadlock();
-  void UpdateForkStates();
+  void Think(int philosopher_id);
+  void Eat(int philosopher_id);
+  void TakeForks(int philosopher_id);
+  void PutForks(int philosopher_id);
 };
 
-}  // namespace konkov_i_dining_philosophers
+}  // namespace dining_philosophers
 
-#endif  // MODULES_TASK_2_KONKOV_I_DINING_PHILOSOPHERS_OPS_MPI_HPP
+#endif  // KONKOV_I_TASK_DINING_PHILOSOPHERS_OPS_MPI_HPP
