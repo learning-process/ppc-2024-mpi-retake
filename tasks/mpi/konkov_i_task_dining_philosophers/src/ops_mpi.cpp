@@ -65,7 +65,7 @@ int DiningPhilosophers::IsDeadlock() {
 }
 
 void DiningPhilosophers::UpdateForkStates() {
-  MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, fork_states_.data(), 1, MPI_INT, MPI_COMM_WORLD);
+  MPI_Allgather(&fork_states_[rank_], 1, MPI_INT, fork_states_.data(), 1, MPI_INT, MPI_COMM_WORLD);
 }
 
 }  // namespace konkov_i_dining_philosophers
