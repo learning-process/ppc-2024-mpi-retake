@@ -35,8 +35,3 @@ TEST(muradov_k_odd_even_batcher_sort_seq_perf, test_task_run) {
   std::cout << "test_task_run: Sequential sort round-trip time: " << elapsed.count() << " seconds." << std::endl;
   SUCCEED();
 }
-
-int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

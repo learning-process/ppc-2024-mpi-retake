@@ -45,8 +45,3 @@ TEST(muradov_k_odd_even_batcher_sort_seq_func, compare_with_std_sort) {
   std::sort(v_copy.begin(), v_copy.end());
   ASSERT_EQ(v, v_copy);
 }
-
-int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

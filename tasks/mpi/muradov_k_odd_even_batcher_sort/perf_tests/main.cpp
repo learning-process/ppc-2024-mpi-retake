@@ -56,11 +56,3 @@ TEST(muradov_k_odd_even_batcher_sort_perf, test_task_run) {
   }
   SUCCEED();
 }
-
-int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  MPI_Init(&argc, &argv);
-  int result = RUN_ALL_TESTS();
-  MPI_Finalize();
-  return result;
-}
