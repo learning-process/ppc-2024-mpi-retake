@@ -14,7 +14,7 @@
 
 namespace {
 int offset = 0;
-}
+} // namespace
 
 namespace {
 std::vector<int> CreateRandomVector(int v_size) {
