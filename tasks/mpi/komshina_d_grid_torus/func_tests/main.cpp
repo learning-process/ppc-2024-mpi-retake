@@ -200,15 +200,15 @@ TEST(komshina_d_grid_torus_mpi, route_calculation_same_source_and_destination) {
     GTEST_SKIP();
     return;
   }
-  
+
   int source_rank = 0;
   int dest_rank = 0;
 
   std::vector<int> expected_route = {source_rank};
 
   TestTaskMPI torus(std::make_shared<ppc::core::TaskData>());
-  std::vector<int> route = torus.CalculateRoute(dest_rank, 3, 3);
+  std::vector<int> route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(dest_rank, 3, 3);
   ASSERT_EQ(route, expected_route);
 }
 
-}  // namespace namespace komshina_d_grid_torus_mpi
+}  // namespace komshina_d_grid_torus_mpi

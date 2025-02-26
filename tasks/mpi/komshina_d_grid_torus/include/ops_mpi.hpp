@@ -17,7 +17,7 @@ class TestTaskMPI : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
-  
+
   struct TaskData {
     std::vector<int> path;
     std::vector<char> payload;
@@ -27,14 +27,14 @@ class TestTaskMPI : public ppc::core::Task {
     TaskData(const std::string& str, int trg) : payload(str.begin(), str.end()), target(trg) {}
   };
 
-  static std::vector<int> CalculateRoute(int dest, int sizeX, int sizeY);
+  static std::vector<int> CalculateRoute(int dest, int size_x, int size_y);
 
  private:
   boost::mpi::communicator world_;
   TaskData task_data_;
-  int sizeX, sizeY;
-  int rankX, rankY;
-  int left, right, up, down;
+  int size_x_, size_y_;
+  int rank_x_, rank_y_;
+  int left_, right_, up_, down_;
 };
 
 }  // namespace komshina_d_grid_torus_mpi
