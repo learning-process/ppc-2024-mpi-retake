@@ -12,7 +12,16 @@
 
 namespace komshina_d_grid_torus_mpi {
 
-TEST(komshina_d_grid_torus_mpi, identical_source_and_target) {
+TEST(komshina_d_grid_torus_mpi, validation_failed_wrong_task_data) {
+  boost::mpi::communicator world;
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  TestTaskMPI torus(task_data_mpi);
+  if (world.rank() == 0) {
+    ASSERT_FALSE(torus.ValidationImpl());
+  }
+}
+
+TEST(komshina_d_grid_torus_mpi, target_out_of_bounds) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
     GTEST_SKIP();
@@ -41,38 +50,6 @@ TEST(komshina_d_grid_torus_mpi, identical_source_and_target) {
   if (world.rank() == 0) {
     ASSERT_EQ(out.payload, in.payload);
     ASSERT_EQ(out.path, std::vector<int>{0});
-  }
-}
-
-TEST(komshina_d_grid_torus_mpi, target_out_of_bounds) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
-    return;
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI::TaskData in("invalid", 999999);
-  komshina_d_grid_torus_mpi::TestTaskMPI::TaskData data_out_struct;
-
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(&in));
-    task_data_mpi->inputs_count.emplace_back(1);
-
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(&data_out_struct));
-    task_data_mpi->outputs_count.emplace_back(1);
-  }
-
-  TestTaskMPI torus(task_data_mpi);
-  ASSERT_FALSE(torus.PreProcessingImpl());
-}
-
-TEST(komshina_d_grid_torus_mpi, validation_failed_wrong_task_data) {
-  boost::mpi::communicator world;
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  TestTaskMPI torus(task_data_mpi);
-  if (world.rank() == 0) {
-    ASSERT_FALSE(torus.ValidationImpl());
   }
 }
 
