@@ -4,6 +4,7 @@
 #include <boost/mpi/communicator.hpp>
 #include <cstring>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
 
@@ -14,6 +15,19 @@ namespace solovev_a_binary_image_marking {
 struct Point {
   int x, y;
 };
+
+using Matrix = std::vector<int>;
+using Directions = std::vector<Point>;
+
+void bfs(int i, int j, int label, Matrix& labels_tmp, const Matrix& data_tmp, int m_tmp, int n_tmp,
+         const Directions& directions);
+
+void processNeighbor(std::queue<Point>& q, int new_x, int new_y, Matrix& labels_tmp, const Matrix& data_tmp, int label,
+                     int n_tmp);
+
+bool shouldProcess(int i, int j, const Matrix& data_tmp, const Matrix& labels_tmp, int n_tmp);
+
+bool isValid(int x, int y, int m_tmp, int n_tmp);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
