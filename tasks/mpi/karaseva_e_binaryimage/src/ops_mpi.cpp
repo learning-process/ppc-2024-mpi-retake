@@ -364,11 +364,10 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
 
 // Post-processing for parallel task (copying the labeled image to output)
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PostProcessingImpl() {
-    if (world_.rank() == 0) {
-        auto* outputPtr = reinterpret_cast<int*>(task_data->outputs[0]);
-        std::copy(labeled_image_.begin(), labeled_image_.end(), outputPtr);
-    }
-  
-  return true;
+  if (world_.rank() == 0) {
+    auto* outputPtr = reinterpret_cast<int*>(task_data->outputs[0]);
+    std::copy(labeled_image_.begin(), labeled_image_.end(), outputPtr);
+   
+  }
 }
 // NOLINTEND
