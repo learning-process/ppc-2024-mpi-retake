@@ -4,7 +4,6 @@
 #include <mpi.h>
 
 #include <algorithm>
-#include <ranges>
 #include <vector>
 
 #include "mpi/muradov_k_odd_even_batcher_sort/include/ops_mpi.hpp"
