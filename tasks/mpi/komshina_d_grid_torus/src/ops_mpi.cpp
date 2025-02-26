@@ -3,7 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <utility>
 #include <vector>
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -50,7 +49,6 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
 bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
   int rank = world_.rank();
   auto determine_next = [this, &rank]() {
-    int rank = world_.rank();
     int dest_x = task_data_.target % size_x_;
     int dest_y = task_data_.target / size_x_;
 
@@ -65,8 +63,8 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
 
   if (world_.rank() == 0) {
     task_data_.path.push_back(0);
-    int NextHop = determine_next();
-    world_.send(NextHop, 0, task_data_.payload);
+    int next_hop = determine_next();
+    world_.send(next_hop, 0, task_data_.payload);
     world_.recv(boost::mpi::any_source, 0, task_data_.payload);
 
   } else {
@@ -77,8 +75,8 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     task_data_.path.push_back(rank);
 
     if (rank != task_data_.target) {
-      int NextHop = determine_next();
-      world_.send(NextHop, 0, task_data_.payload);
+      int next_hop = determine_next();
+      world_.send(next_hop, 0, task_data_.payload);
     } else {
       world_.send(0, 0, task_data_.payload);
     }
