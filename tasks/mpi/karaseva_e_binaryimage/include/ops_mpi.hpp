@@ -6,6 +6,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <sstream>
 
 #include "core/task/include/task.hpp"
 
@@ -21,8 +22,8 @@ void Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, in
               std::map<int, std::set<int>>& label_parent_map);
 void SaveLabelMapToStream(std::ostringstream& oss, const std::map<int, std::set<int>>& label_map);
 void LoadLabelMapFromStream(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
-void SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& labelSet);
-void LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& labelSet);
+void SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& label_set);
+void LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& label_set);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
@@ -34,9 +35,9 @@ class TestMPITaskSequential : public ppc::core::Task {
 
  private:
   std::vector<int> image_;
-  std::vector<int> labeled_image;
-  int rows;
-  int columns;
+  std::vector<int> labeled_image_;
+  int rows_;
+  int columns_;
 };
 
 class TestMPITaskParallel : public ppc::core::Task {
@@ -49,10 +50,10 @@ class TestMPITaskParallel : public ppc::core::Task {
 
  private:
   std::vector<int> image_, local_image_;
-  std::vector<int> labeled_image;
-  int rows;
-  int columns;
-  boost::mpi::communicator world;
+  std::vector<int> labeled_image_;
+  int rows_;
+  int columns_;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace karaseva_e_binaryimage_mpi
