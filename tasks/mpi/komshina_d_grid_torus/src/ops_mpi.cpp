@@ -29,9 +29,9 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
   int world_size = world_.size();
-  int size_x_ = static_cast<int>(std::sqrt(world_.size()));
-  int size_y_ = static_cast<int>(world_.size() / std::sqrt(world_.size()));
-  if (size_x_ * size_y_ != world_size) {
+  int size_x = static_cast<int>(std::sqrt(world_.size()));
+  int size_y = static_cast<int>(world_.size() / std::sqrt(world_.size()));
+  if (size_x * size_y != world_size) {
     return false;
   }
 
@@ -49,10 +49,11 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
 
 bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
   int rank = world_.rank();
-  int dest_x = task_data_.target % size_x_;
-  int dest_y = task_data_.target / size_x_;
+  auto determine_next = [this, &rank]() {
+    int rank = world_.rank();
+    int dest_x = task_data_.target % size_x_;
+    int dest_y = task_data_.target / size_x_;
 
-  auto determine_next = [this, dest_x, dest_y]() {
     if (rank_x_ != dest_x) {
       return (rank_x_ < dest_x) ? right_ : left_;
     }
@@ -62,25 +63,26 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
     return -1;
   };
 
-  if (rank == 0) {
-    task_data_.path.emplace_back(0);
-    int next_hop = determine_next();
-    world_.send(next_hop, 0, task_data_.payload);
-    
-    std::vector<char> buffer;
-    world_.recv(boost::mpi::any_source, 0, buffer);
+  if (world_.rank() == 0) {
+    task_data_.path.push_back(0);
+    int NextHop = determine_next();
+    world_.send(NextHop, 0, task_data_.payload);
+    world_.recv(boost::mpi::any_source, 0, task_data_.payload);
 
   } else {
-    std::vector<char> buffer;
-    world_.recv(boost::mpi::any_source, 0, buffer);
+    std::vector<char> received_data;
+    world_.recv(boost::mpi::any_source, 0, received_data);
 
-    task_data_.payload = std::move(buffer);
-    task_data_.path.emplace_back(rank);
+    task_data_.payload = received_data;
+    task_data_.path.push_back(rank);
 
-    int next_hop = (rank == task_data_.target) ? 0 : determine_next();
-    world_.send(next_hop, 0, task_data_.payload);
+    if (rank != task_data_.target) {
+      int NextHop = determine_next();
+      world_.send(NextHop, 0, task_data_.payload);
+    } else {
+      world_.send(0, 0, task_data_.payload);
+    }
   }
-
   return true;
 }
 
