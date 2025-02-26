@@ -15,7 +15,7 @@
 namespace {
 
 // Function to generate a random binary image of given size
-std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
+std::vector<uint8_t> createRandomBinaryImg(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (auto &px : img) {
     px = rand() % 2;
@@ -31,8 +31,8 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
   constexpr int kCols = 100;
 
   // Create binary image data
-  std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
-  std::vector<uint32_t> output(kRows * kCols, 0);
+  std::vector<uint8_t> image = createRandomBinaryImg(kRows, kCols);
+  std::vector<int> output(kRows * kCols, 0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -44,7 +44,7 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
   task_data_mpi->outputs_count.emplace_back(kCols);
 
   // Create Task
-  auto test_task_mpi = std::make_shared<karaseva_e_binaryimage_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<karaseva_e_binaryimage_mpi::TestMPITaskParallel>(task_data_mpi);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -72,12 +72,12 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
 
 // Test for the task run
 TEST(karaseva_e_binaryimage_mpi, test_task_run) {
-  constexpr int kRows = 10;
-  constexpr int kCols = 10;
+  constexpr int kRows = 100;
+  constexpr int kCols = 100;
 
   // Create binary image data
-  std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
-  std::vector<uint32_t> output(kRows * kCols, 0);
+  std::vector<uint8_t> image = createRandomBinaryImg(kRows, kCols);
+  std::vector<int> output(kRows * kCols, 0);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -89,7 +89,7 @@ TEST(karaseva_e_binaryimage_mpi, test_task_run) {
   task_data_mpi->outputs_count.emplace_back(kCols);
 
   // Create Task
-  auto test_task_mpi = std::make_shared<karaseva_e_binaryimage_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<karaseva_e_binaryimage_mpi::TestMPITaskParallel>(task_data_mpi);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

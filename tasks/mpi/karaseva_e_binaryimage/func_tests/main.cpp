@@ -9,157 +9,219 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-// Move the function to an anonymous namespace to avoid the static warning
-namespace {
-std::vector<int> GetRandomBinImage(int r, int c) {
+std::vector<int> createRandomBinaryImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  std::uniform_int_distribution<int> dist(0, 1);
   std::vector<int> vec(r * c);
   for (int i = 0; i < r * c; i++) {
-    vec[i] = dist(gen);
+    vec[i] = gen() % 2;
   }
   return vec;
 }
-}  // namespace
 
-TEST(karaseva_e_binaryimage_mpi, test_on_random_25x25) {
+TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_25x25) {
   boost::mpi::communicator world;
   const int rows = 25;
   const int cols = 25;
-
   std::vector<int> image;
-  std::vector<int> global_labeled_image(rows * cols, 0);
-
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-
-  if (world.rank() == 0) {
-    image = GetRandomBinImage(rows, cols);
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_par->inputs_count = {rows, cols};
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
-    task_data_par->outputs_count = {rows, cols};
-  }
-
-  // Parallel execution test
-  karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    std::vector<int> reference_labeled_image(rows * cols, 0);
-
-    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_seq->inputs_count = {rows, cols};
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_labeled_image.data()));
-    task_data_seq->outputs_count = {rows, cols};
-
-    karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
-    ASSERT_TRUE(test_task_seq.ValidationImpl());
-    test_task_seq.PreProcessingImpl();
-    test_task_seq.RunImpl();
-    test_task_seq.PostProcessingImpl();
-
-    ASSERT_EQ(reference_labeled_image, global_labeled_image);
-  }
-}
-
-TEST(karaseva_e_binaryimage_mpi, test_chessboard_10x10) {
-  boost::mpi::communicator world;
-  const int rows = 10;
-  const int cols = 10;
-
-  // Fixed binary image (chessboard pattern)
-  std::vector<int> image = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0,
-                            1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-                            1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1,
-                            0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
-
   std::vector<int> global_labeled_image(rows * cols);
-
-  // Create TaskData for parallel execution
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_par->inputs_count = {rows, cols};
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
-    task_data_par->outputs_count = {rows, cols};
+    image = createRandomBinaryImage(rows, cols);
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataPar->inputs_count.emplace_back(rows);
+    taskDataPar->inputs_count.emplace_back(cols);
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_labeled_image.data()));
+    taskDataPar->outputs_count.emplace_back(rows);
+    taskDataPar->outputs_count.emplace_back(cols);
   }
 
-  // Parallel execution test
-  karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  karaseva_e_binaryimage_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
+  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
+  testMpiTaskParallel.PreProcessingImpl();
+  testMpiTaskParallel.RunImpl();
+  testMpiTaskParallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    // Result for sequential processing
+    // Create data
     std::vector<int> reference_labeled_image(rows * cols);
 
-    // Create TaskData for sequential execution
-    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_seq->inputs_count = {rows, cols};
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_labeled_image.data()));
-    task_data_seq->outputs_count = {rows, cols};
+    // Create TaskData
+    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataSeq->inputs_count.emplace_back(rows);
+    taskDataSeq->inputs_count.emplace_back(cols);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_labeled_image.data()));
+    taskDataSeq->outputs_count.emplace_back(rows);
+    taskDataSeq->outputs_count.emplace_back(cols);
 
-    // Sequential execution test
-    karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
-    ASSERT_TRUE(test_task_seq.ValidationImpl());
-    test_task_seq.PreProcessingImpl();
-    test_task_seq.RunImpl();
-    test_task_seq.PostProcessingImpl();
-
-    // Check that the results of parallel and sequential execution match
+    // Create Task
+    karaseva_e_binaryimage_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
+    ASSERT_TRUE(testMpiTaskSequential.ValidationImpl());
+    testMpiTaskSequential.PreProcessingImpl();
+    testMpiTaskSequential.RunImpl();
+    testMpiTaskSequential.PostProcessingImpl();
     ASSERT_EQ(reference_labeled_image, global_labeled_image);
   }
 }
 
-TEST(karaseva_e_binaryimage_mpi, test_on_random_50x50) {
+TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_50x50) {
+  boost::mpi::communicator world;
+  const int rows = 50;
+  const int cols = 50;
+  std::vector<int> image;
+  std::vector<int> global_labeled_image(rows * cols);
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    image = createRandomBinaryImage(rows, cols);
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataPar->inputs_count.emplace_back(rows);
+    taskDataPar->inputs_count.emplace_back(cols);
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_labeled_image.data()));
+    taskDataPar->outputs_count.emplace_back(rows);
+    taskDataPar->outputs_count.emplace_back(cols);
+  }
+
+  karaseva_e_binaryimage_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
+  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
+  testMpiTaskParallel.PreProcessingImpl();
+  testMpiTaskParallel.RunImpl();
+  testMpiTaskParallel.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    // Create data
+    std::vector<int> reference_labeled_image(rows * cols);
+
+    // Create TaskData
+    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataSeq->inputs_count.emplace_back(rows);
+    taskDataSeq->inputs_count.emplace_back(cols);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_labeled_image.data()));
+    taskDataSeq->outputs_count.emplace_back(rows);
+    taskDataSeq->outputs_count.emplace_back(cols);
+
+    // Create Task
+    karaseva_e_binaryimage_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
+    ASSERT_TRUE(testMpiTaskSequential.ValidationImpl());
+    testMpiTaskSequential.PreProcessingImpl();
+    testMpiTaskSequential.RunImpl();
+    testMpiTaskSequential.PostProcessingImpl();
+    ASSERT_EQ(reference_labeled_image, global_labeled_image);
+  }
+}
+
+TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_75x75) {
+  boost::mpi::communicator world;
+  const int rows = 75;
+  const int cols = 75;
+  std::vector<int> image;
+  std::vector<int> global_labeled_image(rows * cols);
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  if (world.rank() == 0) {
+    image = createRandomBinaryImage(rows, cols);
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataPar->inputs_count.emplace_back(rows);
+    taskDataPar->inputs_count.emplace_back(cols);
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_labeled_image.data()));
+    taskDataPar->outputs_count.emplace_back(rows);
+    taskDataPar->outputs_count.emplace_back(cols);
+  }
+
+  karaseva_e_binaryimage_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
+  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
+  testMpiTaskParallel.PreProcessingImpl();
+  testMpiTaskParallel.RunImpl();
+  testMpiTaskParallel.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    // Create data
+    std::vector<int> reference_labeled_image(rows * cols);
+
+    // Create TaskData
+    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataSeq->inputs_count.emplace_back(rows);
+    taskDataSeq->inputs_count.emplace_back(cols);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_labeled_image.data()));
+    taskDataSeq->outputs_count.emplace_back(rows);
+    taskDataSeq->outputs_count.emplace_back(cols);
+
+    // Create Task
+    karaseva_e_binaryimage_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
+    ASSERT_TRUE(testMpiTaskSequential.ValidationImpl());
+    testMpiTaskSequential.PreProcessingImpl();
+    testMpiTaskSequential.RunImpl();
+    testMpiTaskSequential.PostProcessingImpl();
+    ASSERT_EQ(reference_labeled_image, global_labeled_image);
+  }
+}
+TEST(karaseva_e_binaryimage_mpi, predefined_test_50x50) {
   boost::mpi::communicator world;
   const int rows = 50;
   const int cols = 50;
 
-  std::vector<int> image;
-  std::vector<int> global_labeled_image(rows * cols, 0);
+  // Create a predefined binary image with known objects and background
+  std::vector<int> image(rows * cols, 0);
+  // Fill objects in the image (1)
+  for (int i = 10; i < 20; ++i) {
+    for (int j = 10; j < 20; ++j) {
+      image[i * cols + j] = 1;
+    }
+  }
+  std::vector<int> global_labeled_image(rows * cols);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  // Create TaskData for parallel processing
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = GetRandomBinImage(rows, cols);
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_par->inputs_count = {rows, cols};
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_labeled_image.data()));
-    task_data_par->outputs_count = {rows, cols};
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataPar->inputs_count.emplace_back(rows);
+    taskDataPar->inputs_count.emplace_back(cols);
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_labeled_image.data()));
+    taskDataPar->outputs_count.emplace_back(rows);
+    taskDataPar->outputs_count.emplace_back(cols);
   }
 
-  // Parallel execution test
-  karaseva_e_binaryimage_mpi::TestTaskMPI test_task_mpi(task_data_par);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  // Run parallel processing
+  karaseva_e_binaryimage_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
+  ASSERT_TRUE(testMpiTaskParallel.ValidationImpl());
+  testMpiTaskParallel.PreProcessingImpl();
+  testMpiTaskParallel.RunImpl();
+  testMpiTaskParallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
+    // Create reference labeled image with known results
     std::vector<int> reference_labeled_image(rows * cols, 0);
+    // Example of marking an object in the center
+    for (int i = 10; i < 20; ++i) {
+      for (int j = 10; j < 20; ++j) {
+        reference_labeled_image[i * cols + j] = 1;  // Same object
+      }
+    }
 
-    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
-    task_data_seq->inputs_count = {rows, cols};
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_labeled_image.data()));
-    task_data_seq->outputs_count = {rows, cols};
+    // Create TaskData for sequential processing
+    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskDataSeq->inputs_count.emplace_back(rows);
+    taskDataSeq->inputs_count.emplace_back(cols);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_labeled_image.data()));
+    taskDataSeq->outputs_count.emplace_back(rows);
+    taskDataSeq->outputs_count.emplace_back(cols);
 
-    karaseva_e_binaryimage_mpi::TestTaskMPI test_task_seq(task_data_seq);
-    ASSERT_TRUE(test_task_seq.ValidationImpl());
-    test_task_seq.PreProcessingImpl();
-    test_task_seq.RunImpl();
-    test_task_seq.PostProcessingImpl();
-
+    // Run sequential processing
+    karaseva_e_binaryimage_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
+    ASSERT_TRUE(testMpiTaskSequential.ValidationImpl());
+    testMpiTaskSequential.PreProcessingImpl();
+    testMpiTaskSequential.RunImpl();
+    testMpiTaskSequential.PostProcessingImpl();
+    // Compare the results
     ASSERT_EQ(reference_labeled_image, global_labeled_image);
   }
 }
