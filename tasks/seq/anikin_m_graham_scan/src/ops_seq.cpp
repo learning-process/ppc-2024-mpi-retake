@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <random>
 #include <vector>
 
 bool anikin_m_graham_scan_seq::Cmp(Pt a, Pt b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }

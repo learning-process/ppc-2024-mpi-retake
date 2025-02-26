@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <random>
 #include <vector>
 
 bool anikin_m_graham_scan_mpi::Cmp(const Pt& a, const Pt& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); }
@@ -61,7 +60,7 @@ bool anikin_m_graham_scan_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool anikin_m_graham_scan_mpi::TestTaskMPI::RunImpl() {
-  MPI_Datatype mpi_pt;
+  MPI_Datatype mpi_pt = MPI_DATATYPE_NULL;
   MPI_Type_contiguous(2, MPI_INT, &mpi_pt);
   MPI_Type_commit(&mpi_pt);
 

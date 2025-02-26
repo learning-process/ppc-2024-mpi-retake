@@ -1,4 +1,5 @@
 // Anikin Maksim 2025
+#pragma once
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
