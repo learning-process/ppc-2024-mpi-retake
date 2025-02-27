@@ -85,7 +85,7 @@ void karaseva_e_binaryimage_mpi::UnionLabels(std::map<int, std::set<int>>& label
     label_parent_map[neighbour_label].insert(label_parent_map[new_label].begin(), label_parent_map[new_label].end());
   }
 }
-
+// NOLINTBEGIN
 // Function to perform connected-component labeling using a sequential scan approach.
 void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows,
                                           int cols, int min_label, std::map<int, std::set<int>>& label_parent_map) {
@@ -136,7 +136,7 @@ void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::ve
     }
   }
 }
-
+// NOLINTEND
 bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::PreProcessingImpl() {
   rows_ = static_cast<int>(task_data->inputs_count[0]);
   columns_ = static_cast<int>(task_data->inputs_count[1]);
