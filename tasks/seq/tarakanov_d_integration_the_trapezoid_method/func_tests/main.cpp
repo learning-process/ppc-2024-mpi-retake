@@ -1,12 +1,14 @@
 // Copyright 2025 Tarakanov Denis
 #include <gtest/gtest.h>
 
+#include <cstdint>
 #include <memory>
 
+#include "core/task/include/task.hpp"
 #include "seq/tarakanov_d_integration_the_trapezoid_method/include/ops_seq.hpp"
 
-namespace tarakanov_d_integration_the_trapezoid_method_seq {
-static auto createTaskData(double* a, double* b, double* h, double* res) {
+namespace {
+auto CreateTaskData(double* a, double* b, double* h, double* res) {
   auto data = std::make_shared<ppc::core::TaskData>();
 
   data->inputs.push_back(reinterpret_cast<uint8_t*>(a));
@@ -19,7 +21,7 @@ static auto createTaskData(double* a, double* b, double* h, double* res) {
 
   return data;
 }
-}  // namespace tarakanov_d_integration_the_trapezoid_method_seq
+}  // namespace
 
 using namespace tarakanov_d_integration_the_trapezoid_method_seq;
 
@@ -28,7 +30,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationPositiveC
   double b = 1.0;
   double h = 0.1;
   double res = 0.0;
-  auto data = createTaskData(&a, &b, &h, &res);
+  auto data = CreateTaskData(&a, &b, &h, &res);
 
   IntegrationTheTrapezoidMethodSequential task(data);
 
@@ -40,7 +42,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationStepNegat
   double b = 1.0;
   double h = 0.0;
   double res = 0.0;
-  auto data = createTaskData(&a, &b, &h, &res);
+  auto data = CreateTaskData(&a, &b, &h, &res);
 
   IntegrationTheTrapezoidMethodSequential task(data);
 
@@ -52,7 +54,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PreProcessingPositi
   double b = 1.0;
   double h = 0.1;
   double res = 0.0;
-  auto data = createTaskData(&a, &b, &h, &res);
+  auto data = CreateTaskData(&a, &b, &h, &res);
 
   IntegrationTheTrapezoidMethodSequential task(data);
 
@@ -65,7 +67,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PostProcessingCheck
   double b = 1.0;
   double h = 0.1;
   double res = 0.0;
-  auto data = createTaskData(&a, &b, &h, &res);
+  auto data = CreateTaskData(&a, &b, &h, &res);
 
   IntegrationTheTrapezoidMethodSequential task(data);
 

@@ -3,10 +3,10 @@
 
 bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::PreProcessingImpl() {
   // Init value for input and output
-  a = *reinterpret_cast<double*>(task_data->inputs[0]);
-  b = *reinterpret_cast<double*>(task_data->inputs[1]);
-  h = *reinterpret_cast<double*>(task_data->inputs[2]);
-  res = 0.0;
+  a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
+  b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
+  h_ = *reinterpret_cast<double*>(task_data->inputs[2]);
+  res_ = 0.0;
 
   return true;
 }
@@ -18,27 +18,27 @@ bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMe
 }
 
 bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::RunImpl() {
-  int n = static_cast<int>((b - a) / h);
+  int n = static_cast<int>((b_ - a_) / h_);
   double integral = 0.0;
 
   for (int i = 0; i < n; ++i) {
-    double x0 = a + i * h;
-    double x1 = a + (i + 1) * h;
-    integral += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * h;
+    double x0 = a_ + (i * h_);
+    double x1 = a_ + ((i + 1) * h_);
+    integral += 0.5 * (FuncToIntegrate(x0) + FuncToIntegrate(x1)) * h_;
   }
 
-  if (n * h + a < b) {
-    double x0 = a + n * h;
-    double x1 = b;
-    integral += 0.5 * (func_to_integrate(x0) + func_to_integrate(x1)) * (b - n * h);
+  if (n * h_ + a_ < b_) {
+    double x0 = a_ + (n * h_);
+    double x1 = b_;
+    integral += 0.5 * (FuncToIntegrate(x0) + FuncToIntegrate(x1)) * (b_ - n * h_);
   }
 
-  res = integral;
+  res_ = integral;
 
   return true;
 }
 
 bool tarakanov_d_integration_the_trapezoid_method_seq::IntegrationTheTrapezoidMethodSequential::PostProcessingImpl() {
-  *reinterpret_cast<double*>(task_data->outputs[0]) = res;
+  *reinterpret_cast<double*>(task_data->outputs[0]) = res_;
   return true;
 }

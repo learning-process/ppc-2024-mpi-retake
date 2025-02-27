@@ -2,15 +2,18 @@
 #include <gtest/gtest.h>
 
 #include <boost/math/quadrature/trapezoidal.hpp>
-#include <iostream>
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/tarakanov_d_integration_the_trapezoid_method/include/ops_seq.hpp"
 
 using namespace tarakanov_d_integration_the_trapezoid_method_seq;
 
-#define my_test(test_name, test_function)                                                                    \
+#define MY_TEST(test_name, test_function)                                                                    \
   TEST(trapezoid_method_perf_test, test_name) {                                                              \
     double a = 0.0;                                                                                          \
     double b = 1.0;                                                                                          \
@@ -46,5 +49,5 @@ using namespace tarakanov_d_integration_the_trapezoid_method_seq;
     EXPECT_DOUBLE_EQ(out, expected_result);                                                                  \
   }
 
-my_test(test_pipeline_run, PipelineRun);
-my_test(test_task_run, TaskRun);
+MY_TEST(test_pipeline_run, PipelineRun);
+MY_TEST(test_task_run, TaskRun);
