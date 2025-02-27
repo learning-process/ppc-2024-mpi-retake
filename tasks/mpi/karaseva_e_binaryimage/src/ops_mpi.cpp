@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-// Finding the root of the label (smallest label in the object)
+// Function to get the root label of a given label from the label equivalence map.
 int karaseva_e_binaryimage_mpi::GetRootLabel(std::map<int, std::set<int>>& label_parent_map, int label) {
   auto search = label_parent_map.find(label);
   if (search != label_parent_map.end()) {
@@ -25,7 +25,7 @@ int karaseva_e_binaryimage_mpi::GetRootLabel(std::map<int, std::set<int>>& label
   return label;
 }
 
-// Correcting all the connections in the table after the first pass
+// Function to propagate label equivalences, ensuring all equivalent labels are grouped together.
 void karaseva_e_binaryimage_mpi::PropagateLabelEquivalences(std::map<int, std::set<int>>& label_parent_map) {
   for (auto& entry : label_parent_map) {
     for (auto value : entry.second) {
@@ -34,7 +34,7 @@ void karaseva_e_binaryimage_mpi::PropagateLabelEquivalences(std::map<int, std::s
   }
 }
 
-// Correcting all labels in the labeled image to proper values
+// Function to update labels in the labeled image with a continuous sequence of numbers.
 void karaseva_e_binaryimage_mpi::UpdateLabels(std::vector<int>& labeled_image, int rows, int cols) {
   std::map<int, int> label_mapping;
   int next_label = 2;
@@ -57,7 +57,7 @@ void karaseva_e_binaryimage_mpi::UpdateLabels(std::vector<int>& labeled_image, i
   }
 }
 
-// Merging two related labels
+// Function to merge two labels into the same equivalence group.
 void karaseva_e_binaryimage_mpi::UnionLabels(std::map<int, std::set<int>>& label_parent_map, int new_label,
                                              int neighbour_label) {
   if (new_label == neighbour_label) {
@@ -86,34 +86,42 @@ void karaseva_e_binaryimage_mpi::UnionLabels(std::map<int, std::set<int>>& label
   }
 }
 
-// Sequential labeling algorithm (used in each MPI process)
-void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows,
-                                          int cols, int min_label, std::map<int, std::set<int>>& label_parent_map) {
-  int current_label = min_label;
-  // Directions for neighboring pixels
+// Function to find valid neighbors
+std::vector<int> karaseva_e_binaryimage_mpi::FindNeighbors(const std::vector<int>& labeled_image, int x, int y,
+                                                           int rows, int cols) {
+  std::vector<int> neighbors;
   int dx[] = {-1, 0, -1};
   int dy[] = {0, -1, 1};
 
+  for (int i = 0; i < 3; i++) {
+    int nx = x + dx[i];
+    int ny = y + dy[i];
+    if (nx >= 0 && ny >= 0 && nx < rows && ny < cols) {
+      int tmp_pos = nx * cols + ny;
+      if (labeled_image[tmp_pos] > 1) {
+        neighbors.push_back(labeled_image[tmp_pos]);
+      }
+    }
+  }
+
+  return neighbors;
+}
+
+// Optimized Labeling function
+void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::vector<int>& labeled_image, int rows,
+                                          int cols, int min_label, std::map<int, std::set<int>>& label_parent_map) {
+  int current_label = min_label;
+
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < cols; y++) {
-      int position = (x * cols) + y;
-      if (input_image[position] == 0 || labeled_image[position] > 1) {
-        std::vector<int> neighbors;
+      int position = x * cols + y;
+      if (input_image[position] != 0 && labeled_image[position] <= 1) {
+        auto neighbors = FindNeighbors(labeled_image, x, y, rows, cols);
 
-        for (int i = 0; i < 3; i++) {
-          int nx = x + dx[i];
-          int ny = y + dy[i];
-          int tmp_pos = (nx * cols) + ny;
-          if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && (labeled_image[tmp_pos] > 1)) {
-            neighbors.push_back(labeled_image[tmp_pos]);
-          }
-        }
-
-        if (neighbors.empty() && labeled_image[position] != 0) {
-          labeled_image[position] = current_label;
-          current_label++;
+        if (neighbors.empty()) {
+          labeled_image[position] = current_label++;
         } else {
-          int min_neighbor_label = *std::ranges::min_element(neighbors.begin(), neighbors.end());
+          int min_neighbor_label = *std::min_element(neighbors.begin(), neighbors.end());
           labeled_image[position] = min_neighbor_label;
 
           for (int label : neighbors) {
@@ -128,18 +136,17 @@ void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::ve
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < cols; y++) {
-      int position = (x * cols) + y;
+      int position = x * cols + y;
       if (labeled_image[position] > 1) {
-        int root_label = GetRootLabel(label_parent_map, labeled_image[position]);
-        labeled_image[position] = root_label;
+        labeled_image[position] = GetRootLabel(label_parent_map, labeled_image[position]);
       }
     }
   }
 }
 
 bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::PreProcessingImpl() {
-  rows_ = task_data->inputs_count[0];
-  columns_ = task_data->inputs_count[1];
+  rows_ = static_cast<int>(task_data->inputs_count[0]);
+  columns_ = static_cast<int>(task_data->inputs_count[1]);
   int pixel_count = rows_ * columns_;
   image_ = std::vector<int>(pixel_count);
   auto* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
@@ -150,8 +157,8 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::PreProcessingImpl() {
 }
 
 bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::ValidationImpl() {
-  int tmp_rows = task_data->inputs_count[0];
-  int tmp_columns = task_data->inputs_count[1];
+  int tmp_rows = static_cast<int>(task_data->inputs_count[0]);
+  int tmp_columns = static_cast<int>(task_data->inputs_count[1]);
   auto* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
 
   for (int x = 0; x < tmp_rows; x++) {
@@ -182,8 +189,8 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskSequential::PostProcessingImpl() {
 
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    rows_ = task_data->inputs_count[0];
-    columns_ = task_data->inputs_count[1];
+    rows_ = static_cast<int>(task_data->inputs_count[0]);
+    columns_ = static_cast<int>(task_data->inputs_count[1]);
     int pixel_count = rows_ * columns_;
     image_ = std::vector<int>(pixel_count);
     auto* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
@@ -199,8 +206,8 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PreProcessingImpl() {
 
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
   if (world_.rank() == 0) {
-    int tmp_rows = task_data->inputs_count[0];
-    int tmp_columns = task_data->inputs_count[1];
+    int tmp_rows = static_cast<int>(task_data->inputs_count[0]);
+    int tmp_columns = static_cast<int>(task_data->inputs_count[1]);
     auto* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
 
     for (int x = 0; x < tmp_rows; x++) {
@@ -217,25 +224,27 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
   return true;
 }
 
+  // Store the size of the set first, followed by its elements
 void karaseva_e_binaryimage_mpi::SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& label_set) {
-  oss << label_set.size() << " ";  // Write the size of the set
+  oss << label_set.size() << " ";
   for (const auto& item : label_set) {
-    oss << item << " ";  // Write each item
+    oss << item << " ";
   }
 }
 
+  // Read the size of the set and populate it with values from the stream
 void karaseva_e_binaryimage_mpi::LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& label_set) {
   size_t size = 0;
-  iss >> size;  // Read the size of the set
+  iss >> size;
   label_set.clear();
   for (size_t i = 0; i < size; ++i) {
     int item = 0;
-    iss >> item;  // Read each item
+    iss >> item;
     label_set.insert(item);
   }
 }
 
-// Custom serialization for std::map
+  // Store the size of the map first, followed by each key and its corresponding set
 void karaseva_e_binaryimage_mpi::SaveLabelMapToStream(std::ostringstream& oss,
                                                       const std::map<int, std::set<int>>& label_map) {
   oss << label_map.size() << " ";
@@ -245,17 +254,17 @@ void karaseva_e_binaryimage_mpi::SaveLabelMapToStream(std::ostringstream& oss,
   }
 }
 
-// Custom deserialization for std::map
+  // Read the size of the map and reconstruct each key-value pair
 void karaseva_e_binaryimage_mpi::LoadLabelMapFromStream(std::istringstream& iss,
                                                         std::map<int, std::set<int>>& label_map) {
   size_t size = 0;
-  iss >> size;  // Read the size of the map
+  iss >> size;
   label_map.clear();
   for (size_t i = 0; i < size; ++i) {
     int key = 0;
-    iss >> key;  // Read the key
+    iss >> key;
     std::set<int> value;
-    LoadLabelSetFromStream(iss, value);  // Deserialize the set
+    LoadLabelSetFromStream(iss, value);
     label_map[key] = value;
   }
 }
@@ -276,7 +285,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
 
   std::cout << "Rank " << world_.rank() << " - Image data scattered\n";
 
-  // Local labeling
   std::vector<int> local_labeled_image(partition_sizes[world_.rank()], 1);
   int min_label = (100000 * world_.rank()) + 2;
   std::map<int, std::set<int>> local_parent_map;
@@ -285,7 +293,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
 
   boost::mpi::gatherv(world_, local_labeled_image, labeled_image_.data(), partition_sizes, 0);
 
-  // Prepare and serialize label map data
   std::ostringstream oss;
   SaveLabelMapToStream(oss, local_parent_map);
   std::string serialized_data = oss.str();

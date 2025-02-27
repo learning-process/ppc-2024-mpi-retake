@@ -27,8 +27,8 @@ std::vector<uint8_t> GenerateRandomBinImg(size_t rows, size_t cols) {
 
 // Test for the pipeline run
 TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
-  constexpr int kRows = 100;
-  constexpr int kCols = 100;
+  constexpr int kRows = 400;
+  constexpr int kCols = 400;
 
   // Create binary image data
   std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
