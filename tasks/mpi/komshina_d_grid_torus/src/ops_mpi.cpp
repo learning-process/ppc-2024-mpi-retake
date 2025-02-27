@@ -45,7 +45,7 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
   }
 
   auto* in_ptr = reinterpret_cast<TaskData*>(task_data->inputs[0]);
-  if (in_ptr->target < 0 || in_ptr->target >= world_size) {
+  if (!(in_ptr->target >= 0 && in_ptr->target < world_size)) {
     return false;
   }
 
