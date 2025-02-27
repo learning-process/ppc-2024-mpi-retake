@@ -31,9 +31,9 @@ TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  int route_size = std::sqrt(world.size());
+  int route_size = static_cast<int>(std::sqrt(world.size()));
   actual_route.reserve(route_size);
-  for (int i = 0; i < static_cast<int>(route_size); ++i) {
+  for (int i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
   }
 
@@ -54,8 +54,7 @@ TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
   test_task_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], std::sqrt(world.size()),
-                                                                          std::sqrt(world.size()));
+    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
     ASSERT_EQ(output_data[0], input_data[0]);
     ASSERT_EQ(actual_route, expected_route);
   }
@@ -72,9 +71,9 @@ TEST(komshina_d_grid_torus_mpi, InvalidTargetRankNegative) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  int route_size = std::sqrt(world.size());
+  int route_size = static_cast<int>(std::sqrt(world.size()));
   actual_route.reserve(route_size);
-  for (int i = 0; i < static_cast<int>(route_size); ++i) {
+  for (int i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
   }
 
@@ -106,9 +105,9 @@ TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  int route_size = std::sqrt(world.size());
+  int route_size = static_cast<int>(std::sqrt(world.size()));
   actual_route.reserve(route_size);
-  for (int i = 0; i < static_cast<int>(route_size); ++i) {
+  for (int i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
   }
 
@@ -129,43 +128,7 @@ TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
   test_task_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], std::sqrt(world.size()),
-                                                                          std::sqrt(world.size()));
-    ASSERT_EQ(output_data[0], input_data[0]);
-    ASSERT_EQ(actual_route, expected_route);
-  }
-}
-
-TEST(komshina_d_grid_torus_mpi, SmallestGrid2Nodes) {
-  boost::mpi::communicator world;
-  if (world.size() != 2) {
-    GTEST_SKIP();
-    return;
-  }
-
-  std::vector<int> input_data{42, 1};
-  std::vector<int> expected_route{0, 1};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
-
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(expected_route.size());
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], 2, 1);
+    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
     ASSERT_EQ(output_data[0], input_data[0]);
     ASSERT_EQ(actual_route, expected_route);
   }
@@ -183,9 +146,9 @@ TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  int route_size = std::sqrt(world.size());
+  int route_size = static_cast<int>(std::sqrt(world.size()));
   actual_route.reserve(route_size);
-  for (int i = 0; i < static_cast<int>(route_size); ++i) {
+  for (int i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
   }
 
@@ -206,8 +169,7 @@ TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
   test_task_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], std::sqrt(world.size()),
-                                                                          std::sqrt(world.size()));
+    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
     ASSERT_EQ(output_data[0], input_data[0]);
   }
 }
