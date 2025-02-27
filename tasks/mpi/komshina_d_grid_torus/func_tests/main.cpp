@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <cstdint>
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cmath>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -32,7 +32,7 @@ TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  size_t route_size = std::sqrt(world.size());
+  int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
   for (size_t i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
@@ -55,8 +55,8 @@ TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
   test_task_mpi.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(
-        input_data[1], std::sqrt(world.size()), std::sqrt(world.size()));
+    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], std::sqrt(world.size()),
+                                                                          std::sqrt(world.size()));
     ASSERT_EQ(output_data[0], input_data[0]);
     ASSERT_EQ(actual_route, expected_route);
   }
@@ -73,7 +73,7 @@ TEST(komshina_d_grid_torus_mpi, InvalidTargetRankNegative) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  size_t route_size = std::sqrt(world.size());
+  int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
   for (size_t i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
@@ -107,7 +107,7 @@ TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  size_t route_size = std::sqrt(world.size());
+  int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
   for (size_t i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
@@ -131,7 +131,7 @@ TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
 
   if (world.rank() == 0) {
     actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], std::sqrt(world.size()),
-                                                                           std::sqrt(world.size()));
+                                                                          std::sqrt(world.size()));
     ASSERT_EQ(output_data[0], input_data[0]);
     ASSERT_EQ(actual_route, expected_route);
   }
@@ -184,7 +184,7 @@ TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
-  size_t route_size = std::sqrt(world.size());
+  int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
   for (size_t i = 0; i < route_size; ++i) {
     actual_route.push_back(-1);
