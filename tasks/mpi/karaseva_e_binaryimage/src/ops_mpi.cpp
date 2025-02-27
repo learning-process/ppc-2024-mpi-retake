@@ -2,6 +2,10 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi/collectives/gather.hpp>
 #include <cstddef>
 #include <iostream>
 #include <map>
@@ -109,7 +113,7 @@ void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::ve
           labeled_image[position] = current_label;
           current_label++;
         } else {
-          int min_neighbor_label = *std::min_element(neighbors.begin(), neighbors.end());
+          int min_neighbor_label = *std::ranges::min_element(neighbors.begin(), neighbors.end());
           labeled_image[position] = min_neighbor_label;
 
           for (int label : neighbors) {
@@ -188,7 +192,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PreProcessingImpl() {
     labeled_image_ = std::vector<int>(rows_ * columns_, 1);
   }
 
-  std::cout << "Rank " << world_.rank() << " - PreProcessingImpl completed" << std::endl;
+  std::cout << "Rank " << world_.rank() << " - PreProcessingImpl completed\n";
 
   return true;
 }
@@ -201,7 +205,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
 
     for (int x = 0; x < tmp_rows; x++) {
       for (int y = 0; y < tmp_columns; y++) {
-        int pixel = input_ptr[x * tmp_columns + y];
+        int pixel = input_ptr[(x * tmp_columns) + y];
         if (pixel < 0 || pixel > 1) {
           return false;
         }
@@ -326,7 +330,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto* output_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
-    std::copy(labeled_image_.begin(), labeled_image_.end(), output_ptr);
+    std::ranges::copy(labeled_image_.begin(), labeled_image_.end(), output_ptr);
   }
   return true;
 }
