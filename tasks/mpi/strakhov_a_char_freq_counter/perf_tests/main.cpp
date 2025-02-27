@@ -32,7 +32,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_pipeline_run) {
 
   // Create data
   std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
-      300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      30000000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int> out_par(1, 0);
   std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
@@ -80,7 +80,7 @@ TEST(strakhov_a_char_freq_counter_mpi, test_task_run) {
 
   // Create data
   std::vector<char> in_string = strakhov_a_char_freq_counter_mpi::FillRandomChars(
-      300, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
+      30000000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
   std::vector<int> out_par(1, 0);
   std::vector<char> in_target = strakhov_a_char_freq_counter_mpi::FillRandomChars(
       1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*");
