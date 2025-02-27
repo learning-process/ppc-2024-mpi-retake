@@ -35,11 +35,11 @@ bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
   }
 
   if (world_.rank() == 0) {
-    if (task_data->inputs.empty() || task_data->inputs.size() != 1) {
+    if (task_data->inputs.empty() || task_data->inputs.size() < 1) {
       return false;
     }
 
-    if (task_data->outputs.empty() || task_data->outputs_count.size() != 1) {
+    if (task_data->outputs.empty() || task_data->outputs_count.size() < 1) {
       return false;
     }
   }
