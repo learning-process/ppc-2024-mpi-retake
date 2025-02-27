@@ -2,7 +2,6 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
