@@ -24,8 +24,7 @@ void SaveLabelMapToStream(std::ostringstream& oss, const std::map<int, std::set<
 void LoadLabelMapFromStream(std::istringstream& iss, std::map<int, std::set<int>>& label_map);
 void SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& label_set);
 void LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& label_set);
-std::vector<int> FindNeighbors(const std::vector<int>& labeled_image, int x, int y,
-                                                           int rows, int cols);
+std::vector<int> FindNeighbors(const std::vector<int>& labeled_image, int x, int y, int rows, int cols);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
