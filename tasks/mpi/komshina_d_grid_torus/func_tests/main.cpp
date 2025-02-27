@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -34,7 +33,7 @@ TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
 
   int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
-  for (size_t i = 0; i < route_size; ++i) {
+  for (int i = 0; i < static_cast<int>(route_size); ++i) {
     actual_route.push_back(-1);
   }
 
@@ -75,7 +74,7 @@ TEST(komshina_d_grid_torus_mpi, InvalidTargetRankNegative) {
 
   int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
-  for (size_t i = 0; i < route_size; ++i) {
+  for (int i = 0; i < static_cast<int>(route_size); ++i) {
     actual_route.push_back(-1);
   }
 
@@ -109,7 +108,7 @@ TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
 
   int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
-  for (size_t i = 0; i < route_size; ++i) {
+  for (int i = 0; i < static_cast<int>(route_size); ++i) {
     actual_route.push_back(-1);
   }
 
@@ -186,7 +185,7 @@ TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
 
   int route_size = std::sqrt(world.size());
   actual_route.reserve(route_size);
-  for (size_t i = 0; i < route_size; ++i) {
+  for (int i = 0; i < static_cast<int>(route_size); ++i) {
     actual_route.push_back(-1);
   }
 
