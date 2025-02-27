@@ -1,118 +1,79 @@
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <algorithm>
+#include <boost/mpi.hpp>
 #include <cmath>
+#include <cstdint>
+#include <iostream>
 #include <vector>
 
-bool komshina_d_grid_torus_mpi::TestTaskMPI::PreProcessingImpl() {
-  rank_x_ = world_.rank() % size_x_;
-  rank_y_ = world_.rank() / size_x_;
+using namespace std::chrono_literals;
 
-  left_ = (rank_x_ - 1 + size_x_) % size_x_ + rank_y_ * size_x_;
-  right_ = (rank_x_ + 1) % size_x_ + rank_y_ * size_x_;
-  up_ = rank_x_ + ((rank_y_ - 1 + size_y_) % size_y_) * size_x_;
-  down_ = rank_x_ + ((rank_y_ + 1) % size_y_) * size_x_;
+bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::PreProcessingImpl() { return ValidationImpl(); }
 
-  if (world_.rank() == 0) {
-    auto* in_ptr = reinterpret_cast<TaskData*>(task_data->inputs[0]);
-    task_data_ = *in_ptr;
-    if (task_data_.target >= world_.size() || task_data_.target < 0) {
-      return false;
-    }
-    task_data_.path.clear();
-  }
-
-  return true;
-}
-
-bool komshina_d_grid_torus_mpi::TestTaskMPI::ValidationImpl() {
-  int world_size = world_.size();
-  int size_x = static_cast<int>(std::sqrt(world_.size()));
-  int size_y = static_cast<int>(world_.size() / std::sqrt(world_.size()));
-  if (size_x * size_y != world_size) {
+bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::ValidationImpl() {
+  if (task_data->inputs.empty() || task_data->inputs_count.empty()) {
     return false;
   }
 
-  if (world_.rank() == 0) {
-    if (task_data->inputs.empty()) {
-      return false;
-    }
-
-    if (task_data->outputs.empty()) {
+  for (size_t i = 0; i < task_data->inputs.size(); ++i) {
+    if (task_data->inputs_count[i] <= 0 || task_data->inputs[i] == nullptr) {
       return false;
     }
   }
 
-  auto* in_ptr = reinterpret_cast<TaskData*>(task_data->inputs[0]);
-  if (!(in_ptr->target >= 0 && in_ptr->target < world_size)) {
+  if (task_data->inputs_count[0] != task_data->outputs_count[0]) {
     return false;
   }
 
+  int size = boost::mpi::communicator().size();
+  int sqrt_size = static_cast<int>(std::sqrt(size));
+  return sqrt_size * sqrt_size == size;
+}
+
+bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
+  int rank = world.rank();
+  int size = world.size();
+  int grid_size = std::sqrt(size);
+
+  world.barrier();
+
+  std::vector<uint8_t> send_data(task_data->inputs_count[0], 0);
+  std::copy(task_data->inputs[0], task_data->inputs[0] + task_data->inputs_count[0], send_data.begin());
+
+  for (int step = 0; step < grid_size; ++step) {
+    auto neighbors = compute_neighbors(rank, grid_size);
+
+    for (int neighbor : neighbors) {
+      if (neighbor >= size) {
+        continue;
+      }
+
+      world.send(neighbor, 0, send_data);
+
+      std::vector<uint8_t> recv_data(task_data->inputs_count[0]);
+      world.recv(neighbor, 0, recv_data);
+
+    }
+
+    world.barrier();
+  }
+
   return true;
 }
 
-bool komshina_d_grid_torus_mpi::TestTaskMPI::RunImpl() {
-  int rank = world_.rank();
-  auto determine_next = [this]() {
-    int dest_x = task_data_.target % size_x_;
-    int dest_y = task_data_.target / size_x_;
+bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::PostProcessingImpl() { return true; }
 
-    if (rank_x_ != dest_x) {
-      return (rank_x_ < dest_x) ? right_ : left_;
-    }
-    if (rank_y_ != dest_y) {
-      return (rank_y_ < dest_y) ? down_ : up_;
-    }
-    return -1;
-  };
+std::vector<int> komshina_d_grid_torus_topology_mpi::TestTaskMPI::compute_neighbors(int rank, int grid_size) {
 
-  if (world_.rank() == 0) {
-    task_data_.path.push_back(0);
-    int next_hop = determine_next();
-    world_.send(next_hop, 0, task_data_.payload);
-    world_.recv(boost::mpi::any_source, 0, task_data_.payload);
+  int x = rank % grid_size;
+  int y = rank / grid_size;
 
-  } else {
-    std::vector<char> received_data;
-    world_.recv(boost::mpi::any_source, 0, received_data);
+  int left = (x - 1 + grid_size) % grid_size + y * grid_size;
+  int right = (x + 1) % grid_size + y * grid_size;
 
-    task_data_.payload = received_data;
-    task_data_.path.push_back(rank);
+  int up = x + ((y - 1 + grid_size) % grid_size) * grid_size;
+  int down = x + ((y + 1) % grid_size) * grid_size;
 
-    if (rank != task_data_.target) {
-      int next_hop = determine_next();
-      world_.send(next_hop, 0, task_data_.payload);
-    } else {
-      world_.send(0, 0, task_data_.payload);
-    }
-  }
-  return true;
-}
-
-bool komshina_d_grid_torus_mpi::TestTaskMPI::PostProcessingImpl() {
-  world_.barrier();
-  if (world_.rank() == 0) {
-    auto* out_ptr = reinterpret_cast<TaskData*>(task_data->outputs[0]);
-    *out_ptr = task_data_;
-  }
-  return true;
-}
-
-std::vector<int> komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(int dest, int size_x, int size_y) {
-  std::vector<int> path = {0};
-  int current_x = 0;
-  int current_y = 0;
-  int dest_x = dest % size_x;
-  int dest_y = dest / size_x;
-
-  while (current_x != dest_x || current_y != dest_y) {
-    if (current_x != dest_x) {
-      current_x = (current_x + 1) % size_x;
-    } else {
-      current_y = (current_y + 1) % size_y;
-    }
-    path.push_back(current_x + (current_y * size_x));
-  }
-  return path;
+  return {left, right, up, down};
 }

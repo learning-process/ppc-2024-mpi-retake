@@ -1,275 +1,282 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
 #include <cmath>
-#include <cstdint>
-#include <memory>
 #include <vector>
 
-#include "core/task/include/task.hpp"
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
-TEST(komshina_d_grid_torus_mpi, validation_failed_wrong_task_data) {
+TEST(komshina_d_grid_torus_topology_mpi, TestInsufficientNodes) {
   boost::mpi::communicator world;
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  if (world.rank() == 0) {
-    ASSERT_FALSE(test_task_mpi.ValidationImpl());
+
+  int size = world.size();
+  int sqrt_size = static_cast<int>(std::sqrt(size));
+  if (sqrt_size * sqrt_size != size) {
+    std::vector<uint8_t> input_data(4);
+    std::iota(input_data.begin(), input_data.end(), 9);
+    std::vector<uint8_t> output_data(4);
+
+    auto task_data = std::make_shared<ppc::core::TaskData>();
+    task_data->inputs.emplace_back(input_data.data());
+    task_data->inputs_count.emplace_back(input_data.size());
+    task_data->outputs.emplace_back(output_data.data());
+    task_data->outputs_count.emplace_back(output_data.size());
+
+    komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+    ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with insufficient input data";
   }
 }
 
-TEST(komshina_d_grid_torus_mpi, InvalidTargetRankNegative) {
+TEST(komshina_d_grid_torus_topology_mpi, TestValidation) {
   boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
+  if (world.size() != 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
     return;
-  }
-
-  std::vector<int> input_data{1337, -5};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
-
-  int route_size = static_cast<int>(std::sqrt(world.size()));
-  actual_route.reserve(route_size);
-  for (int i = 0; i < route_size; ++i) {
-    actual_route.push_back(-1);
-  }
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(actual_route.size());
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  if (world.rank() == 0) {
-    ASSERT_EQ(test_task_mpi.ValidationImpl(), false);
-  }
-}
-
-TEST(komshina_d_grid_torus_mpi, DataTransferTest) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
   }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
   std::vector<uint8_t> output_data(4);
 
-  auto test_task_mpi = std::make_shared<ppc::core::TaskData>();
-  test_task_mpi->inputs.emplace_back(input_data.data());
-  test_task_mpi->inputs_count.emplace_back(input_data.size());
-  test_task_mpi->outputs.emplace_back(output_data.data());
-  test_task_mpi->outputs_count.emplace_back(output_data.size());
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
 
-  komshina_d_grid_torus_mpi::TestTaskMPI task(test_task_mpi);
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
 
-  EXPECT_TRUE(task.ValidationImpl());
-  EXPECT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+
+  task_data->inputs.clear();
+  task_data->inputs_count.clear();
+
+  ASSERT_FALSE(task.ValidationImpl());
 }
 
-TEST(komshina_d_grid_torus_mpi, TestLargeGridProcessing) {
+TEST(komshina_d_grid_torus_topology_mpi, TestNonSquareTopology) {
   boost::mpi::communicator world;
-  if (world.size() < 16) {
-    GTEST_SKIP();
+
+  int size = world.size();
+  int sqrt_size = static_cast<int>(std::sqrt(size));
+
+  if (sqrt_size * sqrt_size != size) {
+    std::vector<uint8_t> input_data(4);
+    std::vector<uint8_t> output_data(4);
+
+    auto task_data = std::make_shared<ppc::core::TaskData>();
+    task_data->inputs.emplace_back(input_data.data());
+    task_data->inputs_count.emplace_back(input_data.size());
+    task_data->outputs.emplace_back(output_data.data());
+    task_data->outputs_count.emplace_back(output_data.size());
+
+    komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+    ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail for a non-square topology";
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestDataTransmission) {
+  boost::mpi::communicator world;
+  if (world.size() < 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
   }
 
-  std::vector<uint8_t> input_data(16);
+  std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
-  std::vector<uint8_t> output_data(16);
+  std::vector<uint8_t> output_data(4);
 
-  auto test_task_mpi = std::make_shared<ppc::core::TaskData>();
-  test_task_mpi->inputs.emplace_back(input_data.data());
-  test_task_mpi->inputs_count.emplace_back(input_data.size());
-  test_task_mpi->outputs.emplace_back(output_data.data());
-  test_task_mpi->outputs_count.emplace_back(output_data.size());
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
 
-  komshina_d_grid_torus_mpi::TestTaskMPI task(test_task_mpi);
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
 
-  EXPECT_TRUE(task.ValidationImpl());
-  EXPECT_TRUE(task.PreProcessingImpl());
-  EXPECT_TRUE(task.RunImpl());
-  EXPECT_TRUE(task.PostProcessingImpl());
+  ASSERT_TRUE(task.ValidationImpl());
+
+  ASSERT_TRUE(task.PreProcessingImpl());
 }
 
-TEST(komshina_d_grid_torus_mpi, WrapAroundRoute) {
-  boost::mpi::communicator world;
-  int size_x = static_cast<int>(std::sqrt(world.size()));
-  if (world.size() < 9 || size_x * size_x != world.size()) {
-    GTEST_SKIP();
-    return;
-  }
-
-  std::vector<int> input_data{99, size_x - 1};
-  std::vector<int> expected_route{0, size_x - 1};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(expected_route.size());
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], size_x, size_x);
-    ASSERT_EQ(output_data[0], input_data[0]);
-    ASSERT_EQ(actual_route, expected_route);
-  }
-}
-
-TEST(komshina_d_grid_torus_mpi, LargeDataTransfer) {
+TEST(komshina_d_grid_torus_topology_mpi, TestLargeData) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
-    GTEST_SKIP();
-    return;
+    GTEST_SKIP() << "Not enough processes for this test.";
   }
 
-  std::vector<int> input_data(10000, 42);
-  std::vector<int> output_data(10000, 0);
+  size_t large_size = 1000;
+  std::vector<uint8_t> input_data(large_size);
+  std::iota(input_data.begin(), input_data.end(), 0);
+  std::vector<uint8_t> output_data(large_size);
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-  }
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
 
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
 
-  if (world.rank() == 0) {
-    ASSERT_EQ(output_data, input_data);
-  }
-}
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.RunImpl());
+  ASSERT_TRUE(task.PostProcessingImpl());
 
-TEST(komshina_d_grid_torus_mpi, RandomNodeMessagePassing) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
-    return;
-  }
-
-  int random_target = world.size() / 2;
-  std::vector<int> input_data{888, random_target};
-  std::vector<int> output_data(1, 0);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    ASSERT_EQ(output_data[0], input_data[0]);
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    EXPECT_EQ(output_data[i], input_data[i]) << "Mismatch at index " << i;
   }
 }
 
-TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
+TEST(komshina_d_grid_torus_topology_mpi, TestEmptyOutputData) {
+  boost::mpi::communicator world;
+
+  std::vector<uint8_t> input_data(4);
+  std::iota(input_data.begin(), input_data.end(), 1);
+  std::vector<uint8_t> output_data;
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+  ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with empty output data";
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestNullptrInput) {
+  boost::mpi::communicator world;
+
+  std::vector<uint8_t> output_data(4);
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(nullptr);
+  task_data->inputs_count.emplace_back(4);
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+  ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with nullptr in the input data";
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestNonMatchingInputOutputSizes) {
+  boost::mpi::communicator world;
+  if (world.size() < 4) return;
+
+  std::vector<uint8_t> input_data(4);
+  std::iota(input_data.begin(), input_data.end(), 9);
+
+  std::vector<uint8_t> output_data(2);
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+  ASSERT_FALSE(task.ValidationImpl());
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestSmallNumberOfProcesses) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
-    GTEST_SKIP();
+    GTEST_SKIP() << "Not enough processes for this test.";
     return;
   }
 
-  std::vector<int> input_data{1337, 0};
-  std::vector<int> expected_route{0};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
+  std::vector<uint8_t> input_data(4);
+  std::iota(input_data.begin(), input_data.end(), 9);
+  std::vector<uint8_t> output_data(4);
 
-  int route_size = static_cast<int>(std::sqrt(world.size()));
-  actual_route.reserve(route_size);
-  for (int i = 0; i < route_size; ++i) {
-    actual_route.push_back(-1);
-  }
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(actual_route.size());
-  }
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
 
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
 
-  if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
-    ASSERT_EQ(output_data[0], input_data[0]);
-    ASSERT_EQ(actual_route, expected_route);
+  ASSERT_TRUE(task.RunImpl());
+
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    EXPECT_EQ(output_data[i], input_data[i]);
   }
 }
 
-TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
+TEST(komshina_d_grid_torus_topology_mpi, TestEmptyInputsOnly) {
+  std::vector<uint8_t> output_data(4);
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs_count.emplace_back(4);
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+  ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with empty inputs but non-empty inputs_count";
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestEmptyInputsCountOnly) {
+  std::vector<uint8_t> input_data(4);
+  std::vector<uint8_t> output_data(4);
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+  ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with non-empty inputs but empty inputs_count";
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestNeighborOutOfBounds) {
+  int grid_size = 2;
+  int rank = 0;
+  int size = 2;
+
+  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::compute_neighbors(rank, grid_size);
+
+  ASSERT_TRUE(std::any_of(neighbors.begin(), neighbors.end(), [&](int neighbor) { return neighbor >= size; }))
+      << "At least one neighbor should be out of bounds for this test";
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestSmallOutputBuffer) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
-    GTEST_SKIP();
+    GTEST_SKIP() << "Not enough processes for this test.";
     return;
   }
 
-  std::vector<int> input_data{1337, 3};
-  std::vector<int> expected_route{0, 1, 3};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
+  std::vector<uint8_t> input_data(4);
+  std::iota(input_data.begin(), input_data.end(), 9);
+  std::vector<uint8_t> output_data(2);
 
-  int route_size = static_cast<int>(std::sqrt(world.size()));
-  actual_route.reserve(route_size);
-  for (int i = 0; i < route_size; ++i) {
-    actual_route.push_back(-1);
-  }
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(actual_route.size());
-  }
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
 
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_TRUE(task.ValidationImpl());
 
-  if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
-    ASSERT_EQ(output_data[0], input_data[0]);
-    ASSERT_EQ(actual_route, expected_route);
+  ASSERT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.RunImpl());
+
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    EXPECT_EQ(output_data[i], 0) << "Output buffer should remain unchanged due to insufficient size";
   }
 }
