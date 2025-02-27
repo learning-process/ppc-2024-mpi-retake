@@ -116,7 +116,7 @@ void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::ve
           labeled_image[position] = min_neighbor_label;
 
           for (int label : neighbors) {
-            UnionLabels(label_parent_map, min_neighbor_label, label);
+            UnionLabels(label_parent_map, label, min_neighbor_label);
           }
         }
       }
