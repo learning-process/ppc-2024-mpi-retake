@@ -43,7 +43,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   if (world.rank() == 0) {
-    int checker;
+    int checker = 0;
     somov_i_num_of_alternations_signs_mpi::CheckForAlternationSigns(arr, checker);
     ASSERT_EQ(out, checker);
   }
@@ -82,7 +82,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   if (world.rank() == 0) {
-    int checker;
+    int checker = 0;
     somov_i_num_of_alternations_signs_mpi::CheckForAlternationSigns(arr, checker);
     ASSERT_EQ(out, checker);
   }

@@ -42,7 +42,7 @@ TEST(somov_i_num_of_alternations_signs_seq, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
@@ -80,7 +80,7 @@ TEST(somov_i_num_of_alternations_signs_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
