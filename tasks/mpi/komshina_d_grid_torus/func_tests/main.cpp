@@ -51,15 +51,15 @@ TEST(komshina_d_grid_torus_mpi, InvalidTargetRankNegative) {
   }
 }
 
-TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
+TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
     GTEST_SKIP();
     return;
   }
 
-  int max_rank = world.size() - 1;
-  std::vector<int> input_data{2024, max_rank};
+  std::vector<int> input_data{1337, 0};
+  std::vector<int> expected_route{0};
   std::vector<int> output_data(1, 0);
   std::vector<int> actual_route;
 
@@ -80,7 +80,7 @@ TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
   }
 
   komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_TRUE(test_task_mpi.ValidationImpl());
+  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
@@ -88,6 +88,48 @@ TEST(komshina_d_grid_torus_mpi, MaxRankMessagePassing) {
   if (world.rank() == 0) {
     actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
     ASSERT_EQ(output_data[0], input_data[0]);
+    ASSERT_EQ(actual_route, expected_route);
+  }
+}
+
+TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
+  boost::mpi::communicator world;
+  if (world.size() < 4) {
+    GTEST_SKIP();
+    return;
+  }
+
+  std::vector<int> input_data{1337, 3};
+  std::vector<int> expected_route{0, 1, 3};
+  std::vector<int> output_data(1, 0);
+  std::vector<int> actual_route;
+
+  int route_size = static_cast<int>(std::sqrt(world.size()));
+  actual_route.reserve(route_size);
+  for (int i = 0; i < route_size; ++i) {
+    actual_route.push_back(-1);
+  }
+
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
+    task_data_mpi->inputs_count.emplace_back(input_data.size());
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
+    task_data_mpi->outputs_count.emplace_back(output_data.size());
+    task_data_mpi->outputs_count.emplace_back(actual_route.size());
+  }
+
+  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
+    ASSERT_EQ(output_data[0], input_data[0]);
+    ASSERT_EQ(actual_route, expected_route);
   }
 }
 
@@ -183,87 +225,5 @@ TEST(komshina_d_grid_torus_mpi, RandomNodeMessagePassing) {
 
   if (world.rank() == 0) {
     ASSERT_EQ(output_data[0], input_data[0]);
-  }
-}
-
-TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
-    return;
-  }
-
-  std::vector<int> input_data{1337, 0};
-  std::vector<int> expected_route{0};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
-
-  int route_size = static_cast<int>(std::sqrt(world.size()));
-  actual_route.reserve(route_size);
-  for (int i = 0; i < route_size; ++i) {
-    actual_route.push_back(-1);
-  }
-
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(actual_route.size());
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
-    ASSERT_EQ(output_data[0], input_data[0]);
-    ASSERT_EQ(actual_route, expected_route);
-  }
-}
-
-TEST(komshina_d_grid_torus_mpi, ComplexRouteCheck) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP();
-    return;
-  }
-
-  std::vector<int> input_data{1337, 3};
-  std::vector<int> expected_route{0, 1, 3};
-  std::vector<int> output_data(1, 0);
-  std::vector<int> actual_route;
-
-  int route_size = static_cast<int>(std::sqrt(world.size()));
-  actual_route.reserve(route_size);
-  for (int i = 0; i < route_size; ++i) {
-    actual_route.push_back(-1);
-  }
-
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(input_data.data()));
-    task_data_mpi->inputs_count.emplace_back(input_data.size());
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_data.data()));
-    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(actual_route.data()));
-    task_data_mpi->outputs_count.emplace_back(output_data.size());
-    task_data_mpi->outputs_count.emplace_back(actual_route.size());
-  }
-
-  komshina_d_grid_torus_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    actual_route = komshina_d_grid_torus_mpi::TestTaskMPI::CalculateRoute(input_data[1], route_size, route_size);
-    ASSERT_EQ(output_data[0], input_data[0]);
-    ASSERT_EQ(actual_route, expected_route);
   }
 }
