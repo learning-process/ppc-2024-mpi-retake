@@ -97,7 +97,7 @@ std::vector<int> karaseva_e_binaryimage_mpi::FindNeighbors(const std::vector<int
     int nx = x + dx[i];
     int ny = y + dy[i];
     if (nx >= 0 && ny >= 0 && nx < rows && ny < cols) {
-      int tmp_pos = nx * cols + ny;
+      int tmp_pos = (nx * cols) + ny;
       if (labeled_image[tmp_pos] > 1) {
         neighbors.push_back(labeled_image[tmp_pos]);
       }
@@ -114,18 +114,18 @@ void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::ve
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < cols; y++) {
-      int position = x * cols + y;
+      int position = (x * cols) + y;
       if (input_image[position] != 0 && labeled_image[position] <= 1) {
         auto neighbors = FindNeighbors(labeled_image, x, y, rows, cols);
 
         if (neighbors.empty()) {
           labeled_image[position] = current_label++;
         } else {
-          int min_neighbor_label = *std::min_element(neighbors.begin(), neighbors.end());
+          int min_neighbor_label = *std::ranges::min_element(neighbors.begin(), neighbors.end());
           labeled_image[position] = min_neighbor_label;
 
           for (int label : neighbors) {
-            UnionLabels(label_parent_map, min_neighbor_label, label);
+            UnionLabels(label_parent_map, label, min_neighbor_label);
           }
         }
       }
@@ -136,7 +136,7 @@ void karaseva_e_binaryimage_mpi::Labeling(std::vector<int>& input_image, std::ve
 
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < cols; y++) {
-      int position = x * cols + y;
+      int position = (x * cols) + y;
       if (labeled_image[position] > 1) {
         labeled_image[position] = GetRootLabel(label_parent_map, labeled_image[position]);
       }

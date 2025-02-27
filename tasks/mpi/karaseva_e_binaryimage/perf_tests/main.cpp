@@ -72,8 +72,8 @@ TEST(karaseva_e_binaryimage_mpi, test_pipeline_run) {
 
 // Test for the task run
 TEST(karaseva_e_binaryimage_mpi, test_task_run) {
-  constexpr int kRows = 10;
-  constexpr int kCols = 10;
+  constexpr int kRows = 300;
+  constexpr int kCols = 300;
 
   // Create binary image data
   std::vector<uint8_t> image = GenerateRandomBinImg(kRows, kCols);
