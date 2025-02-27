@@ -3,7 +3,6 @@
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -50,7 +49,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, Test_vec_1) {
   test1.Run();
   test1.PostProcessing();
   if (world.rank() == 0) {
-    int checker;
+    int checker = 0;
     somov_i_num_of_alternations_signs_mpi::CheckForAlternationSigns(arr, checker);
     ASSERT_EQ(out, checker);
   }
@@ -78,7 +77,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, Test_vec_999) {
   test1.Run();
   test1.PostProcessing();
   if (world.rank() == 0) {
-    int checker;
+    int checker = 0;
     somov_i_num_of_alternations_signs_mpi::CheckForAlternationSigns(arr, checker);
     ASSERT_EQ(out, checker);
   }
@@ -106,7 +105,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, Test_vec_10000) {
   test1.Run();
   test1.PostProcessing();
   if (world.rank() == 0) {
-    int checker;
+    int checker = 0;
     somov_i_num_of_alternations_signs_mpi::CheckForAlternationSigns(arr, checker);
     ASSERT_EQ(out, checker);
   }
@@ -134,7 +133,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, Test_vec_731) {
   test1.Run();
   test1.PostProcessing();
   if (world.rank() == 0) {
-    int checker;
+    int checker = 0;
     somov_i_num_of_alternations_signs_mpi::CheckForAlternationSigns(arr, checker);
     ASSERT_EQ(out, checker);
   }

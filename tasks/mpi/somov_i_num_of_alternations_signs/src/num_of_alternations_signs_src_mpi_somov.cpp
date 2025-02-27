@@ -3,7 +3,7 @@
 #include <boost/mpi/collectives/scatter.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstring>
-#include <numeric>
+#include <functional>
 #include <random>
 #include <vector>
 
@@ -86,7 +86,7 @@ bool NumOfAlternationsSigns::RunImpl() {
   }
 
   int global_output = 0;
-  reduce(world_, output_, global_output, std::plus<int>(), 0);
+  reduce(world_, output_, global_output, std::plus<>(), 0);
 
   if (id == 0) {
     output_ = global_output;

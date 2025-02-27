@@ -25,7 +25,7 @@ TEST(somov_i_num_of_alternations_signs_seq, Test_vec_0) {
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
@@ -48,7 +48,7 @@ TEST(somov_i_num_of_alternations_signs_seq, Test_vec_1) {
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
@@ -71,7 +71,7 @@ TEST(somov_i_num_of_alternations_signs_seq, Test_vec_1000) {
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
@@ -94,7 +94,7 @@ TEST(somov_i_num_of_alternations_signs_seq, Test_vec_10000) {
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
@@ -117,7 +117,7 @@ TEST(somov_i_num_of_alternations_signs_seq, Test_vec_731) {
   test1.PreProcessing();
   test1.Run();
   test1.PostProcessing();
-  int checker;
+  int checker = 0;
   somov_i_num_of_alternations_signs_seq::CheckForAlternationSigns(arr, checker);
   ASSERT_EQ(out, checker);
 }
