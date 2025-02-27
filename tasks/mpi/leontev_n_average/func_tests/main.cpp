@@ -11,7 +11,6 @@
 #include "core/task/include/task.hpp"
 #include "mpi/leontev_n_average/include/ops_mpi.hpp"
 
-namespace leontev_n_average_mpi {
 std::vector<int> get_random_vector(int sz) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -21,7 +20,6 @@ std::vector<int> get_random_vector(int sz) {
   }
   return vec;
 }
-}  // namespace leontev_n_average_mpi
 
 inline void task_emplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<int>& global_vec,
                              std::vector<int32_t>& global_avg) {
@@ -40,7 +38,7 @@ TEST(leontev_n_average_mpi, avg_mpi_50elem) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     const int vector_size = 50;
-    global_vec = leontev_n_average_mpi::get_random_vector(vector_size);
+    global_vec = get_random_vector(vector_size);
     task_emplacement(task_data_par, global_vec, global_avg);
   }
   leontev_n_average_mpi::MPIVecAvgParallel mpi_vec_avg_parallel(task_data_par);
@@ -76,7 +74,7 @@ TEST(leontev_n_average_mpi, avg_mpi_1000elem) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     const int vector_size = 1000;
-    global_vec = leontev_n_average_mpi::get_random_vector(vector_size);
+    global_vec = get_random_vector(vector_size);
     task_emplacement(task_data_par, global_vec, global_avg);
   }
   leontev_n_average_mpi::MPIVecAvgParallel mpi_vec_avg_parallel(task_data_par);
@@ -98,7 +96,7 @@ TEST(leontev_n_average_mpi, avg_mpi_20000elem) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     const int vector_size = 20000;
-    global_vec = leontev_n_average_mpi::get_random_vector(vector_size);
+    global_vec = get_random_vector(vector_size);
     task_emplacement(task_data_par, global_vec, global_avg);
   }
   leontev_n_average_mpi::MPIVecAvgParallel mpi_vec_avg_parallel(task_data_par);
@@ -119,7 +117,7 @@ TEST(leontev_n_average_mpi, avg_mpi_1elem) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     const int vector_size = 1;
-    global_vec = leontev_n_average_mpi::get_random_vector(vector_size);
+    global_vec = get_random_vector(vector_size);
     task_emplacement(task_data_par, global_vec, global_avg);
   }
   leontev_n_average_mpi::MPIVecAvgParallel mpi_vec_avg_parallel(task_data_par);
