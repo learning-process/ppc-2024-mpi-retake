@@ -18,14 +18,14 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
 
   const std::string data_input(100000, 'a');
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  
- if (world.rank() == 0) {
+
+  if (world.rank() == 0) {
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(data_input.data())));
     task_data_mpi->inputs_count.emplace_back(data_input.size());
     task_data_mpi->outputs.emplace_back(new uint8_t[data_input.size()]);
     task_data_mpi->outputs_count.emplace_back(data_input.size());
   }
-  
+
   auto test_task_mpi = std::make_shared<komshina_d_grid_torus_topology_mpi::TestTaskMPI>(task_data_mpi);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

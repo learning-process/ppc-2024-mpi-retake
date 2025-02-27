@@ -1,10 +1,8 @@
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
 #include <vector>
 
 using namespace std::chrono_literals;
@@ -32,31 +30,30 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
-  int rank = world.rank();
-  int size = world.size();
-  int grid_size = std::sqrt(size);
+  int rank = world_.rank();
+  int size = world_.size();
+  int grid_size = static_cast<int>(std::sqrt(size));
 
-  world.barrier();
+  world_.barrier();
 
   std::vector<uint8_t> send_data(task_data->inputs_count[0], 0);
   std::copy(task_data->inputs[0], task_data->inputs[0] + task_data->inputs_count[0], send_data.begin());
 
   for (int step = 0; step < grid_size; ++step) {
-    auto neighbors = compute_neighbors(rank, grid_size);
+    auto neighbors = ComputeNeighbors(rank, grid_size);
 
     for (int neighbor : neighbors) {
       if (neighbor >= size) {
         continue;
       }
 
-      world.send(neighbor, 0, send_data);
+      world_.send(neighbor, 0, send_data);
 
       std::vector<uint8_t> recv_data(task_data->inputs_count[0]);
-      world.recv(neighbor, 0, recv_data);
-
+      world_.recv(neighbor, 0, recv_data);
     }
 
-    world.barrier();
+    world_.barrier();
   }
 
   return true;
@@ -64,16 +61,15 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
 
 bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::PostProcessingImpl() { return true; }
 
-std::vector<int> komshina_d_grid_torus_topology_mpi::TestTaskMPI::compute_neighbors(int rank, int grid_size) {
-
+std::vector<int> komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(int rank, int grid_size) {
   int x = rank % grid_size;
   int y = rank / grid_size;
 
-  int left = (x - 1 + grid_size) % grid_size + y * grid_size;
-  int right = (x + 1) % grid_size + y * grid_size;
+  int left = ((x - 1 + grid_size) % grid_size) + (y * grid_size);
+  int right = ((x + 1) % grid_size) + (y * grid_size);
 
-  int up = x + ((y - 1 + grid_size) % grid_size) * grid_size;
-  int down = x + ((y + 1) % grid_size) * grid_size;
+  int up = x + (((y - 1 + grid_size) % grid_size) * grid_size);
+  int down = x + (((y + 1) % grid_size) * grid_size);
 
   return {left, right, up, down};
 }

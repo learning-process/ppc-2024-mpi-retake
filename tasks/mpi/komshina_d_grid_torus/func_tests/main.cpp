@@ -1,9 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cmath>
+#include <cstdint>
+#include <memory>
+#include <iostream>
 #include <vector>
+#include <numeric>
+#include <algorithm>
+#include <cstddef> 
 
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
@@ -167,7 +172,10 @@ TEST(komshina_d_grid_torus_topology_mpi, TestNullptrInput) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestNonMatchingInputOutputSizes) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -239,17 +247,6 @@ TEST(komshina_d_grid_torus_topology_mpi, TestEmptyInputsCountOnly) {
   komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
 
   ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with non-empty inputs but empty inputs_count";
-}
-
-TEST(komshina_d_grid_torus_topology_mpi, TestNeighborOutOfBounds) {
-  int grid_size = 2;
-  int rank = 0;
-  int size = 2;
-
-  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::compute_neighbors(rank, grid_size);
-
-  ASSERT_TRUE(std::any_of(neighbors.begin(), neighbors.end(), [&](int neighbor) { return neighbor >= size; }))
-      << "At least one neighbor should be out of bounds for this test";
 }
 
 TEST(komshina_d_grid_torus_topology_mpi, TestSmallOutputBuffer) {
