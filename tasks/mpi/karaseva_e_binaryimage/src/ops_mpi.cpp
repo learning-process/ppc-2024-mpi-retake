@@ -224,7 +224,7 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::ValidationImpl() {
   return true;
 }
 
-  // Store the size of the set first, followed by its elements
+// Store the size of the set first, followed by its elements
 void karaseva_e_binaryimage_mpi::SaveLabelSetToStream(std::ostringstream& oss, const std::set<int>& label_set) {
   oss << label_set.size() << " ";
   for (const auto& item : label_set) {
@@ -232,7 +232,7 @@ void karaseva_e_binaryimage_mpi::SaveLabelSetToStream(std::ostringstream& oss, c
   }
 }
 
-  // Read the size of the set and populate it with values from the stream
+// Read the size of the set and populate it with values from the stream
 void karaseva_e_binaryimage_mpi::LoadLabelSetFromStream(std::istringstream& iss, std::set<int>& label_set) {
   size_t size = 0;
   iss >> size;
@@ -244,7 +244,7 @@ void karaseva_e_binaryimage_mpi::LoadLabelSetFromStream(std::istringstream& iss,
   }
 }
 
-  // Store the size of the map first, followed by each key and its corresponding set
+// Store the size of the map first, followed by each key and its corresponding set
 void karaseva_e_binaryimage_mpi::SaveLabelMapToStream(std::ostringstream& oss,
                                                       const std::map<int, std::set<int>>& label_map) {
   oss << label_map.size() << " ";
@@ -254,7 +254,7 @@ void karaseva_e_binaryimage_mpi::SaveLabelMapToStream(std::ostringstream& oss,
   }
 }
 
-  // Read the size of the map and reconstruct each key-value pair
+// Read the size of the map and reconstruct each key-value pair
 void karaseva_e_binaryimage_mpi::LoadLabelMapFromStream(std::istringstream& iss,
                                                         std::map<int, std::set<int>>& label_map) {
   size_t size = 0;
