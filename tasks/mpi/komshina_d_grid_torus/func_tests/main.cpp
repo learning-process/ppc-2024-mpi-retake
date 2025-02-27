@@ -2,11 +2,11 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <cstddef> 
+#include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <numeric>
-#include <cstring>
 #include <vector>
 
 #include "core/task/include/task.hpp"
