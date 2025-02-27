@@ -2,14 +2,14 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
+#include <cstddef> 
 #include <cstdint>
 #include <memory>
-#include <iostream>
-#include <vector>
 #include <numeric>
-#include <algorithm>
-#include <cstddef> 
+#include <cstring>
+#include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/komshina_d_grid_torus/include/ops_mpi.hpp"
 
 TEST(komshina_d_grid_torus_topology_mpi, TestInsufficientNodes) {

@@ -21,7 +21,7 @@ class TestTaskMPI : public ppc::core::Task {
 
  private:
   boost::mpi::communicator world_;
-  boost::mpi::status stat_;
+  boost::mpi::status status_;
   friend class TestNeighborOutOfBounds_Test;
 };
 

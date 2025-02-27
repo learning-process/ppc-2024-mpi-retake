@@ -2,8 +2,10 @@
 
 #include <chrono>
 #include <cmath>
+#include <cstddef> 
 #include <cstdint>
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -14,7 +16,9 @@
 
 TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   const std::string data_input(100000, 'a');
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -49,7 +53,9 @@ TEST(komshina_d_grid_torus_mpi, test_pipeline_run) {
 
 TEST(komshina_d_grid_torus_mpi, test_task_run) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    return;
+  }
 
   const std::string data_input(100000, 'a');
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
