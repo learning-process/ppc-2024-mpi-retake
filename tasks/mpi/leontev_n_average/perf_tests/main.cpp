@@ -1,18 +1,23 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
+#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/leontev_n_average/include/ops_mpi.hpp"
 
-inline void taskEmplacement(std::shared_ptr<ppc::core::TaskData>& taskDataPar, std::vector<int>& global_vec,
-                            std::vector<int32_t>& global_avg) {
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
-  taskDataPar->inputs_count.emplace_back(global_vec.size());
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_avg.data()));
-  taskDataPar->outputs_count.emplace_back(global_avg.size());
+inline void task_emplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<int>& global_vec,
+                             std::vector<int32_t>& global_avg) {
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
+  task_data_par->inputs_count.emplace_back(global_vec.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_avg.data()));
+  task_data_par->outputs_count.emplace_back(global_avg.size());
 }
 
 TEST(leontev_n_average_mpi, test_pipeline_run) {
@@ -20,18 +25,18 @@ TEST(leontev_n_average_mpi, test_pipeline_run) {
   std::vector<int> global_vec;
   std::vector<int32_t> global_avg(1, 0);
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   int count_size_vector;
   if (world.rank() == 0) {
     count_size_vector = 30000000;
     global_vec = std::vector<int>(count_size_vector, 1);
-    taskEmplacement(taskDataPar, global_vec, global_avg);
+    task_emplacement(task_data_par, global_vec, global_avg);
   }
-  auto MPIVecAvgParallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(taskDataPar);
-  ASSERT_EQ(MPIVecAvgParallel->ValidationImpl(), true);
-  MPIVecAvgParallel->PreProcessingImpl();
-  MPIVecAvgParallel->RunImpl();
-  MPIVecAvgParallel->PostProcessingImpl();
+  auto mpi_vec_avg_parallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(task_data_par);
+  ASSERT_EQ(mpi_vec_avg_parallel->Validation(), true);
+  mpi_vec_avg_parallel->PreProcessing();
+  mpi_vec_avg_parallel->Run();
+  mpi_vec_avg_parallel->PostProcessing();
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -43,7 +48,7 @@ TEST(leontev_n_average_mpi, test_pipeline_run) {
   };
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(MPIVecAvgParallel);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(mpi_vec_avg_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
   if (world.rank() == 0) {
@@ -57,18 +62,18 @@ TEST(leontev_n_average_mpi, test_task_run) {
   std::vector<int> global_vec;
   std::vector<int32_t> global_avg(1, 0);
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   int count_size_vector;
   if (world.rank() == 0) {
     count_size_vector = 30000000;
     global_vec = std::vector<int>(count_size_vector, 1);
-    taskEmplacement(taskDataPar, global_vec, global_avg);
+    task_emplacement(task_data_par, global_vec, global_avg);
   }
-  auto MPIVecAvgParallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(taskDataPar);
-  ASSERT_EQ(MPIVecAvgParallel->ValidationImpl(), true);
-  MPIVecAvgParallel->PreProcessingImpl();
-  MPIVecAvgParallel->RunImpl();
-  MPIVecAvgParallel->PostProcessingImpl();
+  auto mpi_vec_avg_parallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(task_data_par);
+  ASSERT_EQ(mpi_vec_avg_parallel->Validation(), true);
+  mpi_vec_avg_parallel->PreProcessing();
+  mpi_vec_avg_parallel->Run();
+  mpi_vec_avg_parallel->PostProcessing();
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -80,7 +85,7 @@ TEST(leontev_n_average_mpi, test_task_run) {
   };
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(MPIVecAvgParallel);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(mpi_vec_avg_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
   if (world.rank() == 0) {

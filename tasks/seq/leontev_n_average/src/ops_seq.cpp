@@ -1,4 +1,7 @@
 // Copyright 2024 Nesterov Alexander
+#include <numeric>
+#include <vector>
+
 #include "seq/leontev_n_average/include/ops_seq.hpp"
 
 template <class InOutType>

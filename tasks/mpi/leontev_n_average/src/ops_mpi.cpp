@@ -1,8 +1,14 @@
 // Copyright 2023 Nesterov Alexander
 #include "mpi/leontev_n_average/include/ops_mpi.hpp"
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <cmath>
+#include <cstddef>
 #include <cstdlib>
-#include <string>
+#include <numeric>
+#include <vector>
 
 bool leontev_n_average_mpi::MPIVecAvgParallel::PreProcessingImpl() { return true; }
 
@@ -44,10 +50,11 @@ bool leontev_n_average_mpi::MPIVecAvgParallel::RunImpl() {
     int recv_size = (world.rank() == world.size() - 1) ? divres.quot + divres.rem : divres.quot;
     world.recv(0, 0, local_input_.data(), recv_size);
   }
-  int local_res;
-  local_res = std::accumulate(local_input_.begin(), local_input_.end(), 0);
+  int local_res = std::accumulate(local_input_.begin(), local_input_.end(), 0);
   reduce(world, local_res, res, std::plus(), 0);
-  res = res / input_.size();
+  if (world.rank() == 0) {
+    res = res / input_.size();
+  }
   return true;
 }
 
