@@ -1,8 +1,8 @@
 // Copyright 2024 Nesterov Alexander
+#include "seq/leontev_n_average/include/ops_seq.hpp"
+
 #include <numeric>
 #include <vector>
-
-#include "seq/leontev_n_average/include/ops_seq.hpp"
 
 template <class InOutType>
 bool leontev_n_average_seq::VecAvgSequential<InOutType>::PreProcessingImpl() {
