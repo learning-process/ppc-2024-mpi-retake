@@ -192,7 +192,6 @@ TEST(komshina_d_grid_torus_mpi, RandomNodeMessagePassing) {
   }
 }
 
-
 TEST(komshina_d_grid_torus_mpi, SelfMessagePassing) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
