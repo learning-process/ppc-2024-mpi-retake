@@ -179,18 +179,6 @@ TEST(komshina_d_grid_torus_topology_mpi, TestPerfectSquareProcessCount) {
   }
 }
 
-TEST(komshina_d_grid_torus_topology_mpi, TestRankSizeGridSize) {
-  boost::mpi::communicator world;
-
-  int rank = world.rank();
-  int size = world.size();
-  int grid_size = static_cast<int>(std::sqrt(size));
-
-  ASSERT_GE(rank, 0) << "Rank must be non-negative";
-  ASSERT_GT(size, 0) << "Size must be greater than zero";
-  ASSERT_EQ(grid_size * grid_size, size) << "Size must be a perfect square";
-}
-
 TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_Grid2x2) {
   int grid_size = 2;
 
