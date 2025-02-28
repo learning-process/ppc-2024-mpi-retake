@@ -42,7 +42,6 @@ class TestTaskMPI : public ppc::core::Task {
   double epsilon{};
   double result{};
 
-
   std::function<double(double)> f;
   boost::mpi::communicator world;
 
