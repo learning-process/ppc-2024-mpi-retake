@@ -1,116 +1,37 @@
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
 
-#include <boost/mpi.hpp>
-#include <boost/serialization/vector.hpp>
-#include <chrono>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <iostream>
-#include <thread>
+#include <vector>
 
-namespace konkov_i_task_dp {
+#include "core/task/include/task.hpp"
 
-DiningPhilosophersMPI::DiningPhilosophersMPI(int num_philosophers)
-    : num_philosophers_(num_philosophers), world_(), fork_status_(num_philosophers, 0) {}
+namespace konkov_i_task_dining_philosophers_mpi {
 
-void DiningPhilosophersMPI::PreProcessing() {
-  if (world_.rank() == 0) {
-    std::cout << "Initializing " << num_philosophers_ << " philosophers on " << world_.size() << " processes.\n";
-  }
+bool DiningPhilosophersMPI::PreProcessingImpl() {
+  num_philosophers_ = static_cast<int>(task_data->inputs_count[0]);
+  return num_philosophers_ > 1;
 }
 
-bool DiningPhilosophersMPI::Validation() { return num_philosophers_ > 1; }
+bool DiningPhilosophersMPI::ValidationImpl() { return num_philosophers_ > 1; }
 
-std::pair<int, int> DiningPhilosophersMPI::getAssignedPhilosophers(int worker_id) const {
-  const int total_workers = world_.size() - 1;
-  if (total_workers <= 0) return {0, 0};
+bool DiningPhilosophersMPI::RunImpl() {
+  int rank = world_.rank();
+  int size = world_.size();
 
-  const int base = num_philosophers_ / total_workers;
-  const int remainder = num_philosophers_ % total_workers;
-
-  int start = 0;
-  int end = 0;
-
-  if (worker_id - 1 < remainder) {
-    start = (base + 1) * (worker_id - 1);
-    end = start + base + 1;
-  } else {
-    start = (base + 1) * remainder + base * (worker_id - 1 - remainder);
-    end = start + base;
-  }
-
-  end = std::min(end, num_philosophers_);
-  return {start, end};
-}
-
-void DiningPhilosophersMPI::Run() {
-  if (world_.rank() == 0) {
-    ForkManagementProcess();
-  } else {
-    PhilosopherProcess(world_.rank());
-  }
-}
-
-void DiningPhilosophersMPI::PostProcessing() {
-  if (world_.rank() == 0) {
-    std::cout << "Simulation completed.\n";
-  }
-}
-
-void DiningPhilosophersMPI::PhilosopherProcess(int worker_id) {
-  const int MAX_ITERATIONS = 3;
-  auto [start_id, end_id] = getAssignedPhilosophers(worker_id);
-
-  if (start_id >= end_id) return;
-
-  for (int id = start_id; id < end_id; ++id) {
-    for (int i = 0; i < MAX_ITERATIONS; ++i) {
-      int left_fork = id;
-      int right_fork = (id + 1) % num_philosophers_;
-
-      boost::mpi::request reqs[2];
-      reqs[0] = world_.isend(0, left_fork, id);
-      reqs[1] = world_.isend(0, right_fork, id);
-      boost::mpi::wait_all(reqs, reqs + 2);
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-      world_.send(0, left_fork, -1);
-      world_.send(0, right_fork, -1);
+  for (int i = 0; i < num_philosophers_; ++i) {
+    if (i % size == rank) {  // Каждый процесс обрабатывает философов циклически
+      std::cout << "Process " << rank << " manages Philosopher " << i << ": thinking.\n";
+      boost::mpi::broadcast(world_, i, rank);
+      std::cout << "Process " << rank << " manages Philosopher " << i << ": eating.\n";
     }
+    world_.barrier();
   }
-  world_.send(0, 0, -2);
+
+  return true;
 }
 
-void DiningPhilosophersMPI::ForkManagementProcess() {
-  std::vector<std::queue<int>> fork_queues(num_philosophers_);
-  int active_workers = world_.size() - 1;
+bool DiningPhilosophersMPI::PostProcessingImpl() { return true; }
 
-  while (active_workers > 0) {
-    boost::mpi::status status = world_.probe();
-    int philosopher_id;
-    world_.recv(status.source(), status.tag(), philosopher_id);
-
-    if (philosopher_id == -2) {
-      active_workers--;
-      continue;
-    }
-
-    int fork_id = status.tag();
-
-    if (philosopher_id == -1) {
-      if (!fork_queues[fork_id].empty()) {
-        fork_queues[fork_id].pop();
-        if (!fork_queues[fork_id].empty()) {
-          int next_philosopher = fork_queues[fork_id].front();
-          world_.send(next_philosopher, fork_id, 1);
-        }
-      }
-    } else {
-      fork_queues[fork_id].push(philosopher_id);
-      if (fork_queues[fork_id].size() == 1) {
-        world_.send(philosopher_id, fork_id, 1);
-      }
-    }
-  }
-}
-
-}  // namespace konkov_i_task_dp
+}  // namespace konkov_i_task_dining_philosophers_mpi

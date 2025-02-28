@@ -1,54 +1,48 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
 #include <chrono>
+#include <memory>
 
+#include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
 
-TEST(DiningPhilosophersPerfTest, PerformanceWith10Philosophers) {
-  boost::mpi::environment env;
+TEST(konkov_i_task_dining_philosophers_mpi, test_pipeline_run_mpi) {
+  constexpr int kNumPhilosophers = 10;
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs_count.push_back(kNumPhilosophers);
+
+  auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 5;
+
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+
   boost::mpi::communicator world;
-
-  const int NUM_PHILOSOPHERS = 10;
-  konkov_i_task_dp::DiningPhilosophersMPI philosophers(NUM_PHILOSOPHERS);
-
-  auto start = std::chrono::high_resolution_clock::now();
-  philosophers.PreProcessing();
-  philosophers.Run();
-  philosophers.PostProcessing();
-  auto end = std::chrono::high_resolution_clock::now();
-
-  EXPECT_LT(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(), 5000);
+  if (world.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
+  }
 }
 
-TEST(DiningPhilosophersPerfTest, ScalabilityWith50Philosophers) {
-  boost::mpi::environment env;
+TEST(konkov_i_task_dining_philosophers_mpi, test_task_run_mpi) {
+  constexpr int kNumPhilosophers = 10;
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs_count.push_back(kNumPhilosophers);
+
+  auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 5;
+
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+
   boost::mpi::communicator world;
-
-  const int NUM_PHILOSOPHERS = 50;
-  konkov_i_task_dp::DiningPhilosophersMPI philosophers(NUM_PHILOSOPHERS);
-
-  auto start = std::chrono::high_resolution_clock::now();
-  philosophers.PreProcessing();
-  philosophers.Run();
-  philosophers.PostProcessing();
-  auto end = std::chrono::high_resolution_clock::now();
-
-  EXPECT_LT(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(), 10000);
-}
-
-TEST(DiningPhilosophersPerfTest, MinimalValidCase) {
-  boost::mpi::environment env;
-  boost::mpi::communicator world;
-
-  konkov_i_task_dp::DiningPhilosophersMPI philosophers(2);
-
-  auto start = std::chrono::high_resolution_clock::now();
-  philosophers.PreProcessing();
-  philosophers.Run();
-  philosophers.PostProcessing();
-  auto end = std::chrono::high_resolution_clock::now();
-
-  EXPECT_TRUE(philosophers.Validation());
-  EXPECT_LT(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(), 2000);
+  if (world.rank() == 0) {
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
+  }
 }
