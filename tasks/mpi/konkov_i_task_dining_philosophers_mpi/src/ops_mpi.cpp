@@ -21,11 +21,29 @@ bool DiningPhilosophersMPI::RunImpl() {
   int size = world_.size();
 
   for (int i = 0; i < num_philosophers_; ++i) {
-    if (i % size == rank) {  // Каждый процесс обрабатывает философов циклически
-      std::cout << "Process " << rank << " manages Philosopher " << i << ": thinking.\n";
-      boost::mpi::broadcast(world_, i, rank);
-      std::cout << "Process " << rank << " manages Philosopher " << i << ": eating.\n";
+    if (i % size == rank) {
+      int left_fork = i;
+      int right_fork = (i + 1) % num_philosophers_;
+
+      if (i % 2 == 0) {
+        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for left fork " << left_fork << ".\n";
+        boost::mpi::broadcast(world_, left_fork, rank);
+
+        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for right fork " << right_fork << ".\n";
+        boost::mpi::broadcast(world_, right_fork, rank);
+      } else {
+        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for right fork " << right_fork << ".\n";
+        boost::mpi::broadcast(world_, right_fork, rank);
+
+        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for left fork " << left_fork << ".\n";
+        boost::mpi::broadcast(world_, left_fork, rank);
+      }
+
+      std::cout << "Philosopher " << i << " (Process " << rank << ") is eating.\n";
+
+      std::cout << "Philosopher " << i << " (Process " << rank << ") releases forks.\n";
     }
+
     world_.barrier();
   }
 
