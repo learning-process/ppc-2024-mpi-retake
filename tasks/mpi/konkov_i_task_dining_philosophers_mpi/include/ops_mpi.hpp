@@ -16,8 +16,9 @@ class DiningPhilosophersMPI {
   void PostProcessing();
 
  private:
-  void PhilosopherProcess(int id);
+  void PhilosopherProcess(int worker_id);
   void ForkManagementProcess();
+  std::pair<int, int> getAssignedPhilosophers(int worker_id) const;
 
   int num_philosophers_;
   boost::mpi::communicator world_;
