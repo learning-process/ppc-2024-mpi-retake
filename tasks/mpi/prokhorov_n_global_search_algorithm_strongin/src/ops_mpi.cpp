@@ -1,6 +1,7 @@
 #include "mpi/prokhorov_n_global_search_algorithm_strongin/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi.hpp>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -68,38 +69,22 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::str
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
-    if (task_data->inputs.empty() || task_data->inputs.size() < 3) {
-      throw std::runtime_error("Not enough input data.");
-    }
-
-    if (task_data->inputs[0] == nullptr || task_data->inputs[1] == nullptr || task_data->inputs[2] == nullptr) {
-      throw std::runtime_error("Input data is null.");
-    }
-
+    result = 0;
     a = *reinterpret_cast<double*>(task_data->inputs[0]);
     b = *reinterpret_cast<double*>(task_data->inputs[1]);
     epsilon = *reinterpret_cast<double*>(task_data->inputs[2]);
   }
 
-  boost::mpi::broadcast(world, a, 0);
-  boost::mpi::broadcast(world, b, 0);
-  boost::mpi::broadcast(world, epsilon, 0);
-
-  if (world.rank() != 0) {
-    if (a == 0.0 && b == 0.0 && epsilon == 0.0) {
-      throw std::runtime_error("Data was not broadcasted correctly.");
-    }
-  }
-
   f = [](double x) { return x * x; };
 
-  result = 0.0;
   return true;
 }
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::ValidationImpl() {
-  return task_data->inputs_count[0] == 1 && task_data->inputs_count[1] == 1 && task_data->inputs_count[2] == 1 &&
-         task_data->outputs_count[0] == 1;
+  if (world.rank() == 0) {
+    return task_data->outputs_count[0] == 1;
+  }
+  return true;
 }
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::RunImpl() {
@@ -111,6 +96,60 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::RunImpl() {
 
   return true;
 }
+double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAlgorithmParallel() {
+  double local_a, local_b;
+  int rank = world.rank();
+  int size = world.size();
+
+  double interval_length = (b - a) / size;
+  local_a = a + rank * interval_length;
+  local_b = local_a + interval_length;
+
+  double local_x_min = local_a;
+  double local_f_min = f(local_x_min);
+
+  while ((local_b - local_a) > epsilon) {
+    double x1 = local_a + (local_b - local_a) / 3.0;
+    double x2 = local_b - (local_b - local_a) / 3.0;
+
+    double f1 = f(x1);
+    double f2 = f(x2);
+
+    if (f1 < f2) {
+      local_b = x2;
+      if (f1 < local_f_min) {
+        local_f_min = f1;
+        local_x_min = x1;
+      }
+    } else {
+      local_a = x1;
+      if (f2 < local_f_min) {
+        local_f_min = f2;
+        local_x_min = x2;
+      }
+    }
+  }
+
+  std::vector<double> all_x_mins(size);
+  boost::mpi::gather(world, local_x_min, all_x_mins, 0);
+
+  if (rank == 0) {
+    double global_x_min = all_x_mins[0];
+    double global_f_min = f(global_x_min);
+
+    for (int i = 1; i < size; ++i) {
+      double current_f = f(all_x_mins[i]);
+      if (current_f < global_f_min) {
+        global_f_min = current_f;
+        global_x_min = all_x_mins[i];
+      }
+    }
+
+    return global_x_min;
+  }
+
+  return 0.0;
+}
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world.rank() == 0) {
@@ -118,61 +157,6 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PostProcessi
   }
   return true;
 }
-
-double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAlgorithmParallel() {
-  double global_min = std::numeric_limits<double>::max();
-  double global_x_min = a;
-
-  while ((b - a) > epsilon) {
-    double step = (b - a) / world.size();
-    double local_a = a + step * world.rank();
-    double local_b = a + step * (world.rank() + 1);
-
-    double x1 = local_a + (local_b - local_a) / 3.0;
-    double x2 = local_b - (local_b - local_a) / 3.0;
-
-    double f1 = f(x1);
-    double f2 = f(x2);
-
-    double local_min, local_x_min;
-    if (f1 < f2) {
-      local_min = f1;
-      local_x_min = x1;
-    } else {
-      local_min = f2;
-      local_x_min = x2;
-    }
-
-    std::vector<double> all_mins(world.size());
-    std::vector<double> all_x_mins(world.size());
-    boost::mpi::gather(world, local_min, all_mins, 0);
-    boost::mpi::gather(world, local_x_min, all_x_mins, 0);
-
-    world.barrier();
-
-    if (world.rank() == 0) {
-      for (int i = 0; i < world.size(); ++i) {
-        if (all_mins[i] < global_min) {
-          global_min = all_mins[i];
-          global_x_min = all_x_mins[i];
-        }
-      }
-
-      a = global_x_min - step;
-      b = global_x_min + step;
-    }
-
-    boost::mpi::broadcast(world, a, 0);
-    boost::mpi::broadcast(world, b, 0);
-
-    if (a == 0.0 && b == 0.0 && epsilon == 0.0) {
-      throw std::runtime_error("Data was not broadcasted correctly.");
-    }
-  }
-
-  return global_x_min;
-}
-
 double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::stronginAlgorithm() {
   double x_min = a;
   double f_min = f(x_min);
