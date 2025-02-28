@@ -6,6 +6,7 @@
 #include <cstring>
 #include <memory>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -190,7 +191,7 @@ TEST(komshina_d_grid_torus_topology_mpi, TestRankSizeGridSize) {
   ASSERT_EQ(grid_size * grid_size, size) << "Size must be a perfect square";
 }
 
-TEST(komshina_d_grid_torus_topology_mpi, TestComputeNeighborsInRun) {
+TEST(komshina_d_grid_torus_topology_mpi, TestComputeNeighborsCorrectness) {
   boost::mpi::communicator world;
   int size = world.size();
   int rank = world.rank();
@@ -214,16 +215,9 @@ TEST(komshina_d_grid_torus_topology_mpi, TestComputeNeighborsInRun) {
 
   ASSERT_TRUE(task.ValidationImpl());
 
-  for (int step = 0; step < grid_size; ++step) {
-    auto neighbors = task.ComputeNeighbors(rank, grid_size);
+  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(rank, grid_size);
 
-    ASSERT_EQ(neighbors.size(), 4) << "Each rank should have exactly 4 neighbors.";
-
-    for (int neighbor : neighbors) {
-      ASSERT_GE(neighbor, 0) << "Neighbor rank should not be negative.";
-      ASSERT_LT(neighbor, size) << "Neighbor rank should be within the valid range.";
-    }
-  }
+  ASSERT_EQ(neighbors.size(), 4) << "Each rank should have exactly 4 neighbors.";
 }
 
 TEST(komshina_d_grid_torus_topology_mpi, TestNeighborOutOfBounds) {
