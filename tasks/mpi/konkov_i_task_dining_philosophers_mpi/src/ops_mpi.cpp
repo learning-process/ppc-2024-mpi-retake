@@ -18,9 +18,7 @@ void DiningPhilosophersMPI::PreProcessing() {
   }
 }
 
-bool DiningPhilosophersMPI::Validation() {
-  return num_philosophers_ > 1;
-}
+bool DiningPhilosophersMPI::Validation() { return num_philosophers_ > 1; }
 
 std::pair<int, int> DiningPhilosophersMPI::getAssignedPhilosophers(int worker_id) const {
   const int total_workers = world_.size() - 1;
