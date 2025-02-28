@@ -97,17 +97,7 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::PreProcessingImpl() {
     }
   }
 
-  boost::mpi::broadcast(world_, success, 0);
-
-  if (!success) {
-    return false;
-  }
-
-  boost::mpi::broadcast(world_, lower_bound_, 0);
-  boost::mpi::broadcast(world_, upper_bound_, 0);
-  boost::mpi::broadcast(world_, n_, 0);
-
-  return true;
+  return success;
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ValidationImpl() {
@@ -135,6 +125,10 @@ bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool prokhorov_n_rectangular_integration_mpi::TestTaskMPI::RunImpl() {
+  boost::mpi::broadcast(world_, lower_bound_, 0);
+  boost::mpi::broadcast(world_, upper_bound_, 0);
+  boost::mpi::broadcast(world_, n_, 0);
+
   result_ = ParallelIntegrate(f_, lower_bound_, upper_bound_, n_);
   return true;
 }
