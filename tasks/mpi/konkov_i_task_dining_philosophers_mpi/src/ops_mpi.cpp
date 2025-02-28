@@ -3,7 +3,6 @@
 #include <boost/mpi.hpp>
 #include <boost/serialization/vector.hpp>
 #include <chrono>
-#include <cmath>
 #include <iostream>
 #include <thread>
 
