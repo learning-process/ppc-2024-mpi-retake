@@ -267,7 +267,7 @@ TEST(komshina_d_grid_torus_topology_mpi, TestNeighborOutOfBounds) {
 
 TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_Grid2x2) {
   int grid_size = 2;
-  
+
   std::vector<std::vector<int>> expected_neighbors = {{1, 1, 2, 2}, {0, 0, 3, 3}, {3, 3, 0, 0}, {2, 2, 1, 1}};
 
   for (int rank = 0; rank < 4; ++rank) {
