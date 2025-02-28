@@ -215,48 +215,10 @@ TEST(komshina_d_grid_torus_topology_mpi, TestComputeNeighborsCorrectness) {
 
   ASSERT_TRUE(task.ValidationImpl());
 
-  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(rank, grid_size);
+  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(
+      static_cast<unsigned int>(rank), static_cast<unsigned int>(grid_size));
 
   ASSERT_EQ(neighbors.size(), 4) << "Each rank should have exactly 4 neighbors.";
-}
-
-TEST(komshina_d_grid_torus_topology_mpi, TestNeighborOutOfBounds) {
-  boost::mpi::communicator world;
-  int size = world.size();
-  int rank = world.rank();
-  int grid_size = static_cast<int>(std::sqrt(size));
-
-  if (grid_size * grid_size != size) {
-    GTEST_SKIP() << "Skipping test: number of processes is not a perfect square.";
-    return;
-  }
-
-  std::vector<uint8_t> input_data(4, rank);
-  std::vector<uint8_t> output_data(4);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(input_data.data());
-  task_data_mpi->inputs_count.emplace_back(input_data.size());
-  task_data_mpi->outputs.emplace_back(output_data.data());
-  task_data_mpi->outputs_count.emplace_back(output_data.size());
-
-  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_TRUE(task.ValidationImpl());
-
-  std::vector<int> invalid_neighbors = {size, size + 1, rank + 1, rank - 1};
-
-  for (int neighbor : invalid_neighbors) {
-    if (neighbor >= size) {
-      ASSERT_NO_FATAL_FAILURE({
-        if (neighbor >= size) {
-          SUCCEED() << "Neighbor out of bounds correctly skipped.";
-        } else {
-          FAIL() << "Out-of-bounds neighbor was processed incorrectly.";
-        }
-      });
-    }
-  }
 }
 
 TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_Grid2x2) {
