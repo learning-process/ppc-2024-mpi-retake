@@ -98,7 +98,6 @@ TEST(muradov_k_network_topology_mpi, AnySourceReceive) {
     ASSERT_TRUE(topology.Send(1, &message, 1, MPI_INT));
   } else if (rank == 1) {
     ASSERT_TRUE(topology.Receive(MPI_ANY_SOURCE, &received, 1, MPI_INT));
-    // Since process 0 sends message = 500.
     ASSERT_EQ(received, 500);
   }
 }
