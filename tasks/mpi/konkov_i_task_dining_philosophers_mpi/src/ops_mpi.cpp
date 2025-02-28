@@ -22,7 +22,7 @@ bool DiningPhilosophersMPI::Validation() { return num_philosophers_ > 1; }
 
 std::pair<int, int> DiningPhilosophersMPI::getAssignedPhilosophers(int worker_id) const {
   const int total_workers = world_.size() - 1;
-  if (total_workers <= 0) return {0, 0};  // Защита от отсутствия рабочих процессов
+  if (total_workers <= 0) return {0, 0};
 
   const int base = num_philosophers_ / total_workers;
   const int remainder = num_philosophers_ % total_workers;
@@ -60,14 +60,13 @@ void DiningPhilosophersMPI::PhilosopherProcess(int worker_id) {
   const int MAX_ITERATIONS = 3;
   auto [start_id, end_id] = getAssignedPhilosophers(worker_id);
 
-  if (start_id >= end_id) return;  // Нет философов для обработки
+  if (start_id >= end_id) return;
 
   for (int id = start_id; id < end_id; ++id) {
     for (int i = 0; i < MAX_ITERATIONS; ++i) {
       int left_fork = id;
       int right_fork = (id + 1) % num_philosophers_;
 
-      // Всегда отправляем запросы только процессу 0
       boost::mpi::request reqs[2];
       reqs[0] = world_.isend(0, left_fork, id);
       reqs[1] = world_.isend(0, right_fork, id);
