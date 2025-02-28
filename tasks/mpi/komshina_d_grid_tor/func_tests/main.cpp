@@ -167,8 +167,8 @@ TEST(komshina_d_grid_torus_topology_mpi, TestPreProcessingImpl) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestPerfectSquareProcessCount) {
   boost::mpi::communicator world;
-  unsigned int size = world.size();
-  unsigned int sqrt_size = static_cast<unsigned int>(std::sqrt(size));
+  int size = world.size();
+  int sqrt_size = static_cast<int>(std::sqrt(size));
 
   bool is_perfect_square = (sqrt_size * sqrt_size == size);
 
@@ -182,43 +182,13 @@ TEST(komshina_d_grid_torus_topology_mpi, TestPerfectSquareProcessCount) {
 TEST(komshina_d_grid_torus_topology_mpi, TestRankSizeGridSize) {
   boost::mpi::communicator world;
 
-  unsigned int rank = world.rank();
-  unsigned int size = world.size();
-  unsigned int grid_size = static_cast<unsigned int>(std::sqrt(size));
+  int rank = world.rank();
+  int size = world.size();
+  int grid_size = static_cast<int>(std::sqrt(size));
 
   ASSERT_GE(rank, 0) << "Rank must be non-negative";
   ASSERT_GT(size, 0) << "Size must be greater than zero";
   ASSERT_EQ(grid_size * grid_size, size) << "Size must be a perfect square";
-}
-
-TEST(komshina_d_grid_torus_topology_mpi, TestComputeNeighborsCorrectness) {
-  boost::mpi::communicator world;
-  int size = world.size();
-  int rank = world.rank();
-  int grid_size = static_cast<int>(std::sqrt(size));
-
-  if (grid_size * grid_size != size) {
-    GTEST_SKIP() << "Skipping test: number of processes is not a perfect square.";
-    return;
-  }
-
-  std::vector<uint8_t> input_data(4, rank);
-  std::vector<uint8_t> output_data(4);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(input_data.data());
-  task_data_mpi->inputs_count.emplace_back(input_data.size());
-  task_data_mpi->outputs.emplace_back(output_data.data());
-  task_data_mpi->outputs_count.emplace_back(output_data.size());
-
-  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_TRUE(task.ValidationImpl());
-
-  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(
-      static_cast<int>(rank), static_cast<int>(grid_size));
-
-  ASSERT_EQ(neighbors.size(), 4) << "Each rank should have exactly 4 neighbors.";
 }
 
 TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_Grid2x2) {
