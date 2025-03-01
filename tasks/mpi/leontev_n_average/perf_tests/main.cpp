@@ -1,19 +1,19 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
 
-#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/leontev_n_average/include/ops_mpi.hpp"
 
-inline void task_emplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<int>& global_vec,
-                             std::vector<int32_t>& global_avg) {
+inline static void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<int>& global_vec,
+                                   std::vector<int32_t>& global_avg) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
   task_data_par->inputs_count.emplace_back(global_vec.size());
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_avg.data()));
@@ -26,11 +26,10 @@ TEST(leontev_n_average_mpi, test_pipeline_run) {
   std::vector<int32_t> global_avg(1, 0);
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  int count_size_vector;
   if (world.rank() == 0) {
-    count_size_vector = 30000000;
+    int count_size_vector = 30000000;
     global_vec = std::vector<int>(count_size_vector, 1);
-    task_emplacement(task_data_par, global_vec, global_avg);
+    TaskEmplacement(task_data_par, global_vec, global_avg);
   }
   auto mpi_vec_avg_parallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(task_data_par);
   ASSERT_EQ(mpi_vec_avg_parallel->Validation(), true);
@@ -63,11 +62,10 @@ TEST(leontev_n_average_mpi, test_task_run) {
   std::vector<int32_t> global_avg(1, 0);
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  int count_size_vector;
   if (world.rank() == 0) {
-    count_size_vector = 30000000;
+    int count_size_vector = 30000000;
     global_vec = std::vector<int>(count_size_vector, 1);
-    task_emplacement(task_data_par, global_vec, global_avg);
+    TaskEmplacement(task_data_par, global_vec, global_avg);
   }
   auto mpi_vec_avg_parallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(task_data_par);
   ASSERT_EQ(mpi_vec_avg_parallel->Validation(), true);

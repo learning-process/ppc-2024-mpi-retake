@@ -14,7 +14,7 @@ namespace leontev_n_average_mpi {
 
 class MPIVecAvgParallel : public ppc::core::Task {
  public:
-  explicit MPIVecAvgParallel(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+  explicit MPIVecAvgParallel(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -22,8 +22,8 @@ class MPIVecAvgParallel : public ppc::core::Task {
 
  private:
   std::vector<int> input_, local_input_;
-  int res{};
-  boost::mpi::communicator world;
+  int res_{};
+  boost::mpi::communicator world_;
 };
 
 }  // namespace leontev_n_average_mpi

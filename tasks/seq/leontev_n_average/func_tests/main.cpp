@@ -3,9 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -13,8 +11,8 @@
 #include "seq/leontev_n_average/include/ops_seq.hpp"
 
 template <class InOutType>
-void task_emplacement(std::shared_ptr<ppc::core::TaskData> &task_data_par, std::vector<InOutType> &global_vec,
-                      std::vector<InOutType> &global_avg) {
+static void TaskEmplacement(std::shared_ptr<ppc::core::TaskData> &task_data_par, std::vector<InOutType> &global_vec,
+                            std::vector<InOutType> &global_avg) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_vec.data()));
   task_data_par->inputs_count.emplace_back(global_vec.size());
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_avg.data()));
@@ -29,7 +27,7 @@ TEST(leontev_n_average_seq, int_vector_avg) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_emplacement<int32_t>(task_data_seq, in, out);
+  TaskEmplacement<int32_t>(task_data_seq, in, out);
 
   // Create Task
   leontev_n_average_seq::VecAvgSequential<int32_t> vec_avg_sequential(task_data_seq);
@@ -48,7 +46,7 @@ TEST(leontev_n_average_seq, double_vector_avg) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_emplacement<double>(task_data_seq, in, out);
+  TaskEmplacement<double>(task_data_seq, in, out);
 
   // Create Task
   leontev_n_average_seq::VecAvgSequential<double> vec_avg_sequential(task_data_seq);
@@ -67,7 +65,7 @@ TEST(leontev_n_average_seq, float_vector_avg) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_emplacement<float>(task_data_seq, in, out);
+  TaskEmplacement<float>(task_data_seq, in, out);
 
   // Create Task
   leontev_n_average_seq::VecAvgSequential<float> vec_avg_sequential(task_data_seq);
@@ -88,7 +86,7 @@ TEST(leontev_n_average_seq, int32_vector_avg) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_emplacement<int32_t>(task_data_seq, in, out);
+  TaskEmplacement<int32_t>(task_data_seq, in, out);
 
   // Create Task
   leontev_n_average_seq::VecAvgSequential<int32_t> vec_avg_sequential(task_data_seq);
@@ -109,7 +107,7 @@ TEST(leontev_n_average_seq, uint32_vector_avg) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_emplacement<uint32_t>(task_data_seq, in, out);
+  TaskEmplacement<uint32_t>(task_data_seq, in, out);
 
   // Create Task
   leontev_n_average_seq::VecAvgSequential<uint32_t> vec_avg_sequential(task_data_seq);
@@ -128,7 +126,7 @@ TEST(leontev_n_average_seq, vector_avg_0) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_emplacement<int32_t>(task_data_seq, in, out);
+  TaskEmplacement<int32_t>(task_data_seq, in, out);
 
   // Create Task
   leontev_n_average_seq::VecAvgSequential<int32_t> vec_avg_sequential(task_data_seq);

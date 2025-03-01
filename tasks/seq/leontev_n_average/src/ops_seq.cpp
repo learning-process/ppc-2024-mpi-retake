@@ -11,7 +11,7 @@ bool leontev_n_average_seq::VecAvgSequential<InOutType>::PreProcessingImpl() {
   for (size_t i = 0; i < task_data->inputs_count[0]; i++) {
     input_[i] = vec_ptr[i];
   }
-  res = 0;
+  res_ = 0;
   return true;
 }
 
@@ -23,13 +23,13 @@ bool leontev_n_average_seq::VecAvgSequential<InOutType>::ValidationImpl() {
 
 template <class InOutType>
 bool leontev_n_average_seq::VecAvgSequential<InOutType>::RunImpl() {
-  res = std::accumulate(input_.begin(), input_.end(), 0) / input_.size();
+  res_ = std::accumulate(input_.begin(), input_.end(), 0) / input_.size();
   return true;
 }
 
 template <class InOutType>
 bool leontev_n_average_seq::VecAvgSequential<InOutType>::PostProcessingImpl() {
-  reinterpret_cast<InOutType*>(task_data->outputs[0])[0] = res;
+  reinterpret_cast<InOutType*>(task_data->outputs[0])[0] = res_;
   return true;
 }
 
