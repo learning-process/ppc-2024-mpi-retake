@@ -48,8 +48,7 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   data.insert(data.end(), positives.begin(), positives.end());
 }
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::radixSort(
-    std::vector<double>& data) {
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::radixSort(std::vector<double>& data) {
   constexpr int num_bits = sizeof(double) * 8;
   constexpr int radix = 2;
   std::vector<std::vector<double>> buckets(radix);
