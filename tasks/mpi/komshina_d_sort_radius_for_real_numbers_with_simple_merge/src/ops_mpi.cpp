@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring> 
 #include <functional>
 #include <vector>
 
@@ -74,7 +75,8 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 
   for (int bit = 0; bit < total_bits; ++bit) {
     for (double num : data) {
-      uint64_t key = *reinterpret_cast<uint64_t*>(&num);
+      uint64_t key;
+      std::memcpy(&key, &num, sizeof(num));
       bins[(key >> bit) & 1].push_back(num);
     }
 
