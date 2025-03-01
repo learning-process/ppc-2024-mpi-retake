@@ -1,42 +1,39 @@
 #include "mpi/sharamygina_i_vector_dot_product/include/ops_mpi.h"
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
-#include <boost/mpi.hpp>
-#include <random>
-#include <thread>
+#include <algorithm>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
 #include <vector>
 
 // #include <boost/mpi/collectives.hpp>
 // #include <boost/mpi/collectives/broadcast.hpp>
-// #include <boost/mpi/collectives/gatherv.hpp>
+//
 // #include <boost/mpi/collectives/scatterv.hpp>
 // #include <boost/mpi/communicator.hpp>
 // #include <iostream>
 
-bool sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi::PreProcessingImpl() {
-  if (world.rank() == 0) {
-    (int)(task_data->inputs_count[0]) < world.size() ? delta = task_data->inputs_count[0]
-                                                     : delta = task_data->inputs_count[0] / world.size();
-    for (size_t i = 0; i < task_data->inputs.size(); ++i) {
+bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::PreProcessingImpl() {
+  if (world_.rank() == 0) {
+    (int)(task_data->inputs_count[0]) < world_.size() ? delta_ = task_data->inputs_count[0]
+                                                      : delta_ = task_data->inputs_count[0] / world_.size();
+    for (unsigned int i = 0; i < task_data->inputs.size(); ++i) {
       if (task_data->inputs[i] == nullptr || task_data->inputs_count[i] == 0) {
         return false;
       }
     }
-    v1.resize(task_data->inputs_count[0]);
+    v1_.resize(task_data->inputs_count[0]);
     int* source_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
-    std::copy(source_ptr, source_ptr + task_data->inputs_count[0], v1.begin());
+    std::copy(source_ptr, source_ptr + task_data->inputs_count[0], v1_.begin());
 
-    v2.resize(task_data->inputs_count[1]);
+    v2_.resize(task_data->inputs_count[1]);
     source_ptr = reinterpret_cast<int*>(task_data->inputs[1]);
-    std::copy(source_ptr, source_ptr + task_data->inputs_count[1], v2.begin());
+    std::copy(source_ptr, source_ptr + task_data->inputs_count[1], v2_.begin());
   }
   return true;
 }
 
-bool sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi::ValidationImpl() {
-  if (world.rank() == 0) {
+bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::ValidationImpl() {
+  if (world_.rank() == 0) {
     if (task_data->inputs.empty() || task_data->outputs.empty() ||
         task_data->inputs_count[0] != task_data->inputs_count[1] || task_data->outputs_count[0] == 0) {
       return false;
@@ -45,48 +42,48 @@ bool sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi::ValidationImp
   return true;
 }
 
-bool sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi::RunImpl() {
-  broadcast(world, delta, 0);
-  if (world.rank() == 0) {
-    for (int proc = 1; proc < world.size(); ++proc) {
-      world.send(proc, 0, v1.data() + proc * delta, delta);
-      world.send(proc, 1, v2.data() + proc * delta, delta);
+bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::RunImpl() {
+  broadcast(world_, delta_, 0);
+  if (world_.rank() == 0) {
+    for (int proc = 1; proc < world_.size(); ++proc) {
+      world_.send(proc, 0, v1_.data() + (proc * delta_), delta_);
+      world_.send(proc, 1, v2_.data() + (proc * delta_), delta_);
     }
   }
-  local_v1.resize(delta);
-  local_v2.resize(delta);
-  if (world.rank() == 0) {
-    std::copy(v1.begin(), v1.begin() + delta, local_v1.begin());
-    std::copy(v2.begin(), v2.begin() + delta, local_v2.begin());
+  local_v1_.resize(delta_);
+  local_v2_.resize(delta_);
+  if (world_.rank() == 0) {
+    std::copy(v1_.begin(), v1_.begin() + delta_, local_v1_.begin());
+    std::copy(v2_.begin(), v2_.begin() + delta_, local_v2_.begin());
   } else {
-    world.recv(0, 0, local_v1.data(), delta);
-    world.recv(0, 1, local_v2.data(), delta);
+    world_.recv(0, 0, local_v1_.data(), delta_);
+    world_.recv(0, 1, local_v2_.data(), delta_);
   }
   int local_result = 0;
-  for (size_t i = 0; i < local_v1.size(); ++i) {
-    local_result += local_v1[i] * local_v2[i];
+  for (unsigned int i = 0; i < local_v1_.size(); ++i) {
+    local_result += local_v1_[i] * local_v2_[i];
   }
   std::vector<int> full_results;
-  gather(world, local_result, full_results, 0);
-  res = 0;
-  if (world.rank() == 0) {
+  gather(world_, local_result, full_results, 0);
+  res_ = 0;
+  if (world_.rank() == 0) {
     for (int result : full_results) {
-      res += result;
+      res_ += result;
     }
   }
-  if (world.rank() == 0 && (int)(task_data->inputs_count[0]) < world.size()) {
-    res = 0;
-    for (size_t i = 0; i < v1.size(); ++i) {
-      res += v1[i] * v2[i];
+  if (world_.rank() == 0 && (int)(task_data->inputs_count[0]) < world_.size()) {
+    res_ = 0;
+    for (unsigned int i = 0; i < v1_.size(); ++i) {
+      res_ += v1_[i] * v2_[i];
     }
   }
   return true;
 }
 
-bool sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi::PostProcessingImpl() {
-  if (world.rank() == 0) {
+bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::PostProcessingImpl() {
+  if (world_.rank() == 0) {
     if (!task_data->outputs.empty()) {
-      reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
+      reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
     } else {
       return false;
     }
