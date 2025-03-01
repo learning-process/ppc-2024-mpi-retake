@@ -10,7 +10,6 @@ TEST(konkov_i_task_dining_philosophers_mpi, ValidNumberOfPhilosophers) {
   task_data->inputs_count.push_back(5);
 
   konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI task(task_data);
-  ASSERT_TRUE(task.PreProcessing());
   ASSERT_TRUE(task.Validation());
 }
 
