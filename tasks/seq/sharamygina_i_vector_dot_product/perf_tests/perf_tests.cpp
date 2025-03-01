@@ -25,17 +25,17 @@ std::vector<int> GetVector(unsigned int size) {
 }  // namespace sharamygina_i_vector_dot_product_seq
 
 TEST(sharamygina_i_vector_dot_product_seq, LargeImage) {
-  constexpr unsigned int lenght = 10000000;
+  constexpr unsigned int kLenght = 10000000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
-  task_data->inputs_count.emplace_back(lenght);
-  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(kLenght);
+  task_data->inputs_count.emplace_back(kLenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(lenght);
-  std::vector<int> v2(lenght);
-  v1 = sharamygina_i_vector_dot_product_seq::GetVector(lenght);
-  v2 = sharamygina_i_vector_dot_product_seq::GetVector(lenght);
+  std::vector<int> v1(kLenght);
+  std::vector<int> v2(kLenght);
+  v1 = sharamygina_i_vector_dot_product_seq::GetVector(kLenght);
+  v2 = sharamygina_i_vector_dot_product_seq::GetVector(kLenght);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));
@@ -62,17 +62,17 @@ TEST(sharamygina_i_vector_dot_product_seq, LargeImage) {
 }
 
 TEST(sharamygina_i_vector_dot_product_seq, LargeImageRun) {
-  constexpr unsigned int lenght = 10000000;
+  constexpr unsigned int kLenght = 10000000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
-  task_data->inputs_count.emplace_back(lenght);
-  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(kLenght);
+  task_data->inputs_count.emplace_back(kLenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(lenght);
-  std::vector<int> v2(lenght);
-  v1 = sharamygina_i_vector_dot_product_seq::GetVector(lenght);
-  v2 = sharamygina_i_vector_dot_product_seq::GetVector(lenght);
+  std::vector<int> v1(kLenght);
+  std::vector<int> v2(kLenght);
+  v1 = sharamygina_i_vector_dot_product_seq::GetVector(kLenght);
+  v2 = sharamygina_i_vector_dot_product_seq::GetVector(kLenght);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));
