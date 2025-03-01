@@ -17,7 +17,7 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
       std::cout << "[DEBUG] First input value: " << num_philosophers_ << std::endl;
     }
   }
-   
+
   world_.barrier();
   
   boost::mpi::broadcast(world_, num_philosophers_, 0);
