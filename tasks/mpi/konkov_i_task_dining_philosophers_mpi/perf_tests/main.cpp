@@ -1,10 +1,8 @@
 #include <memory>
 
 #include "boost/mpi/communicator.hpp"
-
-#include "gtest/gtest.h"
-
 #include "core/task/include/task.hpp"
+#include "gtest/gtest.h"
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
 
 TEST(DiningPhilosophersMPIPerfTest, test_pipeline_run_mpi) {
