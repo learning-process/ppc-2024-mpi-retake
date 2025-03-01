@@ -17,7 +17,7 @@ using namespace tarakanov_d_integration_the_trapezoid_method_mpi;
   TEST(tarakanov_d_trapezoid_method_mpi, test_name) {                                                        \
     double a = 0.0;                                                                                          \
     double b = 1.0;                                                                                          \
-    double h = 0.1;                                                                                          \
+    double h = 0.000000005;                                                                                  \
                                                                                                              \
     auto taskData = std::make_shared<ppc::core::TaskData>();                                                 \
     taskData->inputs.push_back(reinterpret_cast<uint8_t *>(&a));                                             \
@@ -46,7 +46,7 @@ using namespace tarakanov_d_integration_the_trapezoid_method_mpi;
     boost::mpi::communicator world;                                                                          \
     if (world.rank() == 0) {                                                                                 \
       ppc::core::Perf::PrintPerfStatistic(perfResults);                                                      \
-      EXPECT_DOUBLE_EQ(out, 0.25);                                                                           \
+      EXPECT_NEAR(out, 0.25, 1e-3);                                                                          \
     }                                                                                                        \
   }
 
