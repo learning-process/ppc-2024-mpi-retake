@@ -106,7 +106,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_ru
 
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-  
+
   // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
