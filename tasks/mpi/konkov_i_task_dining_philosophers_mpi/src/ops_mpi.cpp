@@ -20,7 +20,10 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
 
   world_.barrier();
 
+  std::cout << "[Rank " << world_.rank() << "] Before broadcast, num_philosophers_ = " << num_philosophers_
+            << std::endl;
   boost::mpi::broadcast(world_, num_philosophers_, 0);
+  std::cout << "[Rank " << world_.rank() << "] After broadcast, num_philosophers_ = " << num_philosophers_ << std::endl;
 
   world_.barrier();
 
