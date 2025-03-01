@@ -1,6 +1,7 @@
 #include "mpi/prokhorov_n_global_search_algorithm_strongin/include/ops_mpi.hpp"
 
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cmath>

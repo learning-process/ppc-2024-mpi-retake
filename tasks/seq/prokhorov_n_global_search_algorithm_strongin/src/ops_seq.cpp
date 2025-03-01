@@ -27,7 +27,7 @@ bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::Valid
 
 bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::RunImpl() {
   result_ = StronginAlgorithm();
-  std::this_thread::sleep_for(20ms);
+  std::this_thread::sleep_for(std::chrono::milliseconds(20)); 
   return true;
 }
 
