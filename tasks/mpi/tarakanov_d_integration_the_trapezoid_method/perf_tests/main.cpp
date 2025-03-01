@@ -1,7 +1,6 @@
 // Copyright 2025 Tarakanov Denis
 #include <gtest/gtest.h>
 
-#include <boost/math/quadrature/trapezoidal.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstdint>
@@ -47,8 +46,7 @@ using namespace tarakanov_d_integration_the_trapezoid_method_mpi;
     boost::mpi::communicator world;                                                                          \
     if (world.rank() == 0) {                                                                                 \
       ppc::core::Perf::PrintPerfStatistic(perfResults);                                                      \
-      double expected_result = boost::math::quadrature::trapezoidal([](double x) { return x / 2; }, a, b);   \
-      EXPECT_DOUBLE_EQ(out, expected_result);                                                                \
+      EXPECT_DOUBLE_EQ(out, 0.25);                                                                           \
     }                                                                                                        \
   }
 
