@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <utility> 
+#include <utility>
 
 #include "core/task/include/task.hpp"
 
