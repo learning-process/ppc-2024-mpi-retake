@@ -3,9 +3,7 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/gatherv.hpp>
-#include <boost/mpi/collectives/scatter.hpp>
-#include <boost/mpi/collectives/scatterv.hpp>
+#include <boost/mpi/collectives/gather.hpp>
 #include <vector>
 
 bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::PreProcessingImpl() {
