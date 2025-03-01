@@ -37,23 +37,22 @@ TEST(sharamygina_i_vector_dot_product_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
   // Create data
-  constexpr unsigned int k_size1 = 12000000;
-  constexpr unsigned int k_size2 = 12000000;
+  constexpr unsigned int lenght = 12000000;
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
-  std::vector<int> v2(k_size2);
+  std::vector<int> v1(lenght);
+  std::vector<int> v2(lenght);
   int expected_res = 0;
 
   // Create task_data
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    v1 = sharamygina_i_vector_dot_product_mpi::GetVector(k_size1);
-    v2 = sharamygina_i_vector_dot_product_mpi::GetVector(k_size2);
+    v1 = sharamygina_i_vector_dot_product_mpi::GetVector(lenght);
+    v2 = sharamygina_i_vector_dot_product_mpi::GetVector(lenght);
     expected_res = sharamygina_i_vector_dot_product_mpi::Resulting(v1, v2);
 
-    task_data->inputs_count.emplace_back(k_size1);
-    task_data->inputs_count.emplace_back(k_size2);
+    task_data->inputs_count.emplace_back(lenght);
+    task_data->inputs_count.emplace_back(lenght);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
@@ -87,21 +86,20 @@ TEST(sharamygina_i_vector_dot_product_mpi, test_task_run) {
   boost::mpi::communicator world;
 
   // Create data
-  constexpr unsigned int k_size1 = 10000000;
-  constexpr unsigned int k_size2 = 10000000;
+  constexpr unsigned int lenght = 10000000;
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
-  std::vector<int> v2(k_size2);
+  std::vector<int> v1(lenght);
+  std::vector<int> v2(lenght);
 
-  v1 = sharamygina_i_vector_dot_product_mpi::GetVector(k_size1);
-  v2 = sharamygina_i_vector_dot_product_mpi::GetVector(k_size2);
+  v1 = sharamygina_i_vector_dot_product_mpi::GetVector(lenght);
+  v2 = sharamygina_i_vector_dot_product_mpi::GetVector(lenght);
 
   // Create task_data
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    task_data->inputs_count.emplace_back(k_size1);
-    task_data->inputs_count.emplace_back(k_size2);
+    task_data->inputs_count.emplace_back(lenght);
+    task_data->inputs_count.emplace_back(lenght);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));

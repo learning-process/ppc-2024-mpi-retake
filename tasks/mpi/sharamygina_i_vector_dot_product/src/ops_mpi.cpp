@@ -1,16 +1,12 @@
 #include "mpi/sharamygina_i_vector_dot_product/include/ops_mpi.h"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi/collectives/scatter.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
 #include <vector>
-// #include <boost/mpi/collectives.hpp>
-// #include <boost/mpi/collectives.hpp>
-// #include <boost/mpi/collectives/broadcast.hpp>
-// #include <boost/mpi/collectives/gatherv.hpp>
-//
-// #include <boost/mpi/collectives/scatterv.hpp>
-// #include <boost/mpi/communicator.hpp>
-// #include <iostream>
 
 bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::PreProcessingImpl() {
   if (world_.rank() == 0) {
