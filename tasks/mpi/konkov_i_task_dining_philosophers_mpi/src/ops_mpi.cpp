@@ -61,26 +61,21 @@ bool DiningPhilosophersMPI::RunImpl() {
   }
 
   for (int i = 0; i < num_philosophers_; ++i) {
+    int left_fork = i;
+    int right_fork = (i + 1) % num_philosophers_;
+
     if (i % size == rank) {
-      int left_fork = i;
-      int right_fork = (i + 1) % num_philosophers_;
+      std::cout << "Philosopher " << i << " (Process " << rank << ") waits for left fork " << left_fork << ".\n";
+    }
+    boost::mpi::broadcast(world_, left_fork, i % size);
 
-      if (i % 2 == 0) {
-        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for left fork " << left_fork << ".\n";
-        boost::mpi::broadcast(world_, left_fork, rank);
+    if (i % size == rank) {
+      std::cout << "Philosopher " << i << " (Process " << rank << ") waits for right fork " << right_fork << ".\n";
+    }
+    boost::mpi::broadcast(world_, right_fork, i % size);
 
-        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for right fork " << right_fork << ".\n";
-        boost::mpi::broadcast(world_, right_fork, rank);
-      } else {
-        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for right fork " << right_fork << ".\n";
-        boost::mpi::broadcast(world_, right_fork, rank);
-
-        std::cout << "Philosopher " << i << " (Process " << rank << ") waits for left fork " << left_fork << ".\n";
-        boost::mpi::broadcast(world_, left_fork, rank);
-      }
-
+    if (i % size == rank) {
       std::cout << "Philosopher " << i << " (Process " << rank << ") is eating.\n";
-
       std::cout << "Philosopher " << i << " (Process " << rank << ") releases forks.\n";
     }
 
