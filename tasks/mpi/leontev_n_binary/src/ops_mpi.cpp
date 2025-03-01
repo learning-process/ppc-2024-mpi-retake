@@ -1,5 +1,6 @@
 #include "mpi/leontev_n_binary/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
@@ -9,11 +10,11 @@
 #include <cstdint>
 #include <cstdlib>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace leontev_n_binary_mpi {
 
+namespace {
 bool CompNotZero(uint32_t a, uint32_t b) {
   if (a == 0) {
     return false;
@@ -23,8 +24,9 @@ bool CompNotZero(uint32_t a, uint32_t b) {
   }
   return a < b;
 }
+}  // namespace
 
-size_t BinarySegmentsMPI::GetIndex(size_t i, size_t j) { return i * cols_ + j; }
+size_t BinarySegmentsMPI::GetIndex(size_t i, size_t j) const { return (i * cols_) + j; }
 
 bool BinarySegmentsMPI::ValidationImpl() {
   if (world_.rank() == 0) {
@@ -61,9 +63,10 @@ bool BinarySegmentsMPI::RunImpl() {
   }
   size_t local_size = (world_.rank() == 0) ? (rows_for_proc + (rows_ % world_.size())) : rows_for_proc;
   local_image_.resize(local_size * cols_);
-  boost::mpi::scatterv(world_, input_image_.data(), send_counts, offsets, local_image_.data(), local_size * cols_, 0);
+  boost::mpi::scatterv(world_, input_image_.data(), send_counts, offsets, local_image_.data(),
+                       static_cast<int>(local_size) * cols_, 0);
   uint32_t next_label = 1 + offsets[world_.rank()];
-  std::vector<uint32_t> local_labels_(local_size * cols_);
+  std::vector<uint32_t> local_labels(local_size * cols_);
   std::unordered_map<uint32_t, uint32_t> local_label_equivalences;
   for (size_t row = 0; row < local_size; ++row) {
     for (size_t col = 0; col < cols_; ++col) {
@@ -71,15 +74,15 @@ bool BinarySegmentsMPI::RunImpl() {
       if (local_image_[cur_ind] == 0) {
         continue;
       }
-      uint32_t label_B = (col > 0) ? local_labels_[cur_ind - 1] : 0;
-      uint32_t label_C = (row > 0) ? local_labels_[cur_ind - cols_] : 0;
-      uint32_t label_D = (row > 0 && col > 0) ? local_labels_[cur_ind - cols_ - 1] : 0;
-      if (label_B == 0 && label_C == 0 && label_D == 0) {
-        local_labels_[cur_ind] = next_label++;
+      uint32_t label_b = (col > 0) ? local_labels[cur_ind - 1] : 0;
+      uint32_t label_c = (row > 0) ? local_labels[cur_ind - cols_] : 0;
+      uint32_t label_d = (row > 0 && col > 0) ? local_labels[cur_ind - cols_ - 1] : 0;
+      if (label_b == 0 && label_c == 0 && label_d == 0) {
+        local_labels[cur_ind] = next_label++;
       } else {
-        uint32_t min_label = std::min({label_B, label_C, label_D}, CompNotZero);
-        local_labels_[cur_ind] = min_label;
-        for (uint32_t label : {label_B, label_C, label_D}) {
+        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+        local_labels[cur_ind] = min_label;
+        for (uint32_t label : {label_b, label_c, label_d}) {
           if (label != 0 && label != min_label && label > min_label) {
             local_label_equivalences[label] = min_label;
           }
@@ -90,19 +93,20 @@ bool BinarySegmentsMPI::RunImpl() {
       }
     }
   }
-
-  for (auto& label : local_labels_) {
+  for (auto& label : local_labels) {
     while (local_label_equivalences.contains(label)) {
       label = local_label_equivalences[label];
     }
   }
-  if (world_.rank() == 0) labels_.resize(rows_ * cols_);
-  boost::mpi::gatherv(world_, local_labels_, labels_.data(), send_counts, offsets, 0);
+  if (world_.rank() == 0) {
+    labels_.resize(rows_ * cols_);
+  }
+  boost::mpi::gatherv(world_, local_labels, labels_.data(), send_counts, offsets, 0);
   if (world_.rank() == 0) {
     std::unordered_map<uint32_t, uint32_t> label_equivalences;
     for (int section = 1; section < world_.size(); ++section) {
       int border = offsets[section];
-      if (border >= rows_ * cols_) {
+      if (border >= static_cast<int>(rows_ * cols_)) {
         break;
       }
       for (size_t col = 0; col < cols_; ++col) {
@@ -110,13 +114,13 @@ bool BinarySegmentsMPI::RunImpl() {
         if (labels_[cur_ind] == 0) {
           continue;
         }
-        uint32_t label_B = (col > 0) ? labels_[cur_ind - 1] : 0;
-        uint32_t label_C = labels_[cur_ind - cols_];
-        uint32_t label_D = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
-        if (label_B != 0 || label_C != 0 || label_D != 0) {
-          uint32_t min_label = std::min({label_B, label_C, label_D}, CompNotZero);
+        uint32_t label_b = (col > 0) ? labels_[cur_ind - 1] : 0;
+        uint32_t label_c = labels_[cur_ind - cols_];
+        uint32_t label_d = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
+        if (label_b != 0 || label_c != 0 || label_d != 0) {
+          uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
           label_equivalences[labels_[cur_ind]] = min_label;
-          for (uint32_t label2 : {label_B, label_C, label_D}) {
+          for (uint32_t label2 : {label_b, label_c, label_d}) {
             if (label2 != 0 && label2 != min_label && label2 > min_label) {
               label_equivalences[label2] = min_label;
             } else if (label2 != 0 && label2 != min_label && label2 < min_label) {
@@ -131,7 +135,7 @@ bool BinarySegmentsMPI::RunImpl() {
         label = label_equivalences[label];
       }
     }
-    std::vector<size_t> arrived(rows_ * cols_ + 1, 0);
+    std::vector<size_t> arrived((rows_ * cols_) + 1, 0);
     size_t cur_mark = 1;
     for (size_t i = 0; i < rows_ * cols_; i++) {
       if (labels_[i] != 0) {

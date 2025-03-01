@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <utility>
 #include <vector>
 
@@ -16,7 +19,7 @@ class BinarySegmentsSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  size_t GetIndex(size_t i, size_t j);
+  size_t GetIndex(size_t i, size_t j) const;
   std::vector<uint8_t> input_image_;
   std::vector<uint32_t> labels_;
   size_t rows_;

@@ -1,14 +1,15 @@
 #include "seq/leontev_n_binary/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace leontev_n_binary_seq {
 
+namespace {
 bool CompNotZero(uint32_t a, uint32_t b) {
   if (a == 0) {
     return false;
@@ -18,8 +19,9 @@ bool CompNotZero(uint32_t a, uint32_t b) {
   }
   return a < b;
 }
+}  // namespace
 
-size_t BinarySegmentsSeq::GetIndex(size_t i, size_t j) { return i * cols_ + j; }
+size_t BinarySegmentsSeq::GetIndex(size_t i, size_t j) const { return (i * cols_) + j; }
 
 bool BinarySegmentsSeq::ValidationImpl() {
   return !task_data->inputs.empty() && !task_data->outputs.empty() && task_data->inputs_count.size() == 2 &&
@@ -46,16 +48,16 @@ bool BinarySegmentsSeq::RunImpl() {
         continue;
       }
 
-      uint32_t label_B = (col > 0) ? labels_[GetIndex(row, col - 1)] : 0;
-      uint32_t label_C = (row > 0) ? labels_[GetIndex(row - 1, col)] : 0;
-      uint32_t label_D = (row > 0 && col > 0) ? labels_[GetIndex(row - 1, col - 1)] : 0;
+      uint32_t label_b = (col > 0) ? labels_[GetIndex(row, col - 1)] : 0;
+      uint32_t label_c = (row > 0) ? labels_[GetIndex(row - 1, col)] : 0;
+      uint32_t label_d = (row > 0 && col > 0) ? labels_[GetIndex(row - 1, col - 1)] : 0;
 
-      if (label_B == 0 && label_C == 0 && label_D == 0) {
+      if (label_b == 0 && label_c == 0 && label_d == 0) {
         labels_[GetIndex(row, col)] = cur_label++;
       } else {
-        uint32_t min_label = std::min({label_B, label_C, label_D}, CompNotZero);
+        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
         labels_[GetIndex(row, col)] = min_label;
-        for (uint32_t label : {label_B, label_C, label_D}) {
+        for (uint32_t label : {label_b, label_c, label_d}) {
           if (label != 0 && label != min_label) {
             if (label != 0 && label != min_label && label > min_label) {
               label_equivalences[label] = min_label;
