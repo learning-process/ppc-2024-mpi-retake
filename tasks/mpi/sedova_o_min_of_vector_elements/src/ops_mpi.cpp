@@ -1,15 +1,15 @@
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
-#include <climits>
-#include <random>
+
 #include <algorithm>
+#include <climits>
 #include <cmath>
 #include <cstddef>
-#include <vector>
 #include <functional>
+#include <random>
 #include <string>
+#include <vector>
 
 using namespace std::chrono_literals;
-
 
 std::vector<int> sedova_o_min_of_vector_elements_mpi::getRandomVector(int size, int min, int max) {
   std::random_device dev;
@@ -77,11 +77,11 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
   return true;
 }
 
-
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
   if (world_== 0) {
-  return (task_data->inputs_count.size() >= 2) && (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) &&
-         (task_data->outputs_count.size() >= 1) && (task_data->outputs_count[0] == 1);
+    return (task_data->inputs_count.size() >= 2) &&
+           (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) &&
+           (task_data->outputs_count.size() >= 1) && (task_data->outputs_count[0] == 1);
   }
   return true;
 }
@@ -106,7 +106,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
       }
     }
   }
-  
+
   std::vector<std::vector<int>> local_input;
   local_input.resize(end_row - start_row);
   for (int i = 0; i < (end_row - start_row); ++i) {

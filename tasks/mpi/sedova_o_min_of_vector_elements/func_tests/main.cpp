@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <climits>
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
-#include <climits>
-#include <random>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
@@ -24,14 +24,14 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_10x10) {
   std::vector<int> output(1, INT_MAX);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if(world_.rank() == 0) {
-     global_matrix = sedova_o_min_of_vector_elements_mpi::getRandomMatrix(rows, columns, min, max);
-     for (unsigned int i = 0; i < global_matrix.size(); i++)
-       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
-     task_data_par->inputs_count.emplace_back(rows);
-     task_data_par->inputs_count.emplace_back(columns);
+    global_matrix = sedova_o_min_of_vector_elements_mpi::getRandomMatrix(rows, columns, min, max);
+    for (unsigned int i = 0; i < global_matrix.size(); i++)
+      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
+    task_data_par->inputs_count.emplace_back(rows);
+    task_data_par->inputs_count.emplace_back(columns);
 
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
-     task_data_par->outputs_count.emplace_back(output.size());
+    task_data_par->outputs_count.emplace_back(output.size());
   }
 
   sedova_o_min_of_vector_elements_mpi::TestTaskMPI test_task_parallel(task_data_par);

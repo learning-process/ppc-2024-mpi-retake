@@ -3,6 +3,7 @@
 #include <climits>
 #include <random>
 #include <vector>
+
 #include "seq/sedova_o_min_of_vector_elements/include/ops_seq.hpp"
 
 TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {
@@ -17,8 +18,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {
 
   // Create data
   std::vector<int> output(1, INT_MAX);
-  std::vector<std::vector<int>> input =
-      sedova_o_min_of_vector_elements_seq::getRandomMatrix(rows, columns, min, max);
+  std::vector<std::vector<int>> input = sedova_o_min_of_vector_elements_seq::getRandomMatrix(rows, columns, min, max);
 
   int index = gen() % (rows * columns);
   input[index / columns][index / rows] = ref;
@@ -42,7 +42,6 @@ TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {
 
   ASSERT_EQ(ref, output[0]);
 }
-
 
 TEST(sedova_o_min_of_vector_elements_seq, test_100x100) {
   std::random_device dev;
