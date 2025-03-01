@@ -10,15 +10,49 @@
 namespace konkov_i_task_dining_philosophers_mpi {
 
 bool DiningPhilosophersMPI::PreProcessingImpl() {
-  num_philosophers_ = static_cast<int>(task_data->inputs_count[0]);
+  if (world_.rank() == 0) {
+    std::cout << "[DEBUG] inputs_count size: " << task_data->inputs_count.size() << std::endl;
+    if (!task_data->inputs_count.empty()) {
+      std::cout << "[DEBUG] First input value: " << task_data->inputs_count[0] << std::endl;
+    }
+  }
+
+  
+  // Рассылаем значение всем процессам
+  boost::mpi::broadcast(world_, num_philosophers_, 0);
+
+  // Синхронизированный вывод для отладки
+  for (int r = 0; r < world_.size(); ++r) {
+    world_.barrier();
+    if (world_.rank() == r) {
+      std::cout << "[Rank " << r << "] PreProcessing: philosophers = " << num_philosophers_ << std::endl;
+    }
+  }
+
   return num_philosophers_ > 1;
 }
 
-bool DiningPhilosophersMPI::ValidationImpl() { return num_philosophers_ > 1; }
+// В ValidationImpl
+bool DiningPhilosophersMPI::ValidationImpl() {
+  // Синхронизированный вывод
+  for (int r = 0; r < world_.size(); ++r) {
+    world_.barrier();
+    if (world_.rank() == r) {
+      std::cout << "[Rank " << r << "] Validation: philosophers = " << num_philosophers_ << std::endl;
+    }
+  }
+  return num_philosophers_ > 1;
+}
+
 
 bool DiningPhilosophersMPI::RunImpl() {
   int rank = world_.rank();
   int size = world_.size();
+
+  if (rank >= num_philosophers_) {
+    world_.barrier();
+    return true;
+  }
 
   for (int i = 0; i < num_philosophers_; ++i) {
     if (i % size == rank) {
