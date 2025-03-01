@@ -1,14 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/makadrai_a_sobel/include/ops_seq.hpp"
 
 TEST(makadrai_a_sobel_seq, test_2_2) {

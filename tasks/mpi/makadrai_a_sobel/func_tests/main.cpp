@@ -1,14 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
+#include "boost/mpi/communicator.hpp"
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/makadrai_a_sobel/include/ops_mpi.hpp"
 
 TEST(makadrai_a_sobel_mpi, test_2_2) {

@@ -18,13 +18,13 @@ class Sobel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  int height_img;
-  int width_img;
-  int peding = 2;
+  int height_img_;
+  int width_img_;
+  int peding_ = 2;
 
-  std::vector<int> img;
-  std::vector<int> simg;
-  boost::mpi::communicator world;
+  std::vector<int> img_;
+  std::vector<int> simg_;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace makadrai_a_sobel_mpi
