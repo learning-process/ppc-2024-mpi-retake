@@ -18,7 +18,6 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
   }
 
   
-  // Рассылаем значение всем процессам
   boost::mpi::broadcast(world_, num_philosophers_, 0);
 
   for (int r = 0; r < world_.size(); ++r) {
