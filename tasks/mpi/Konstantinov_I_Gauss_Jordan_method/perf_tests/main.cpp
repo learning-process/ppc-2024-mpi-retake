@@ -13,7 +13,7 @@
 #include "mpi/Konstantinov_I_Gauss_Jordan_method/include/ops_mpi.hpp"
 
 namespace konstantinov_i_gauss_jordan_method_mpi {
-
+namespace {
 std::vector<double> GetRandomMatrix(int rows, int cols) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -24,10 +24,10 @@ std::vector<double> GetRandomMatrix(int rows, int cols) {
   }
   return matrix;
 }
-
+}  // namespace
 }  // namespace konstantinov_i_gauss_jordan_method_mpi
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 
@@ -100,7 +100,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, task_run) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, task_run) {
   boost::mpi::environment env;
   boost::mpi::communicator world;
 

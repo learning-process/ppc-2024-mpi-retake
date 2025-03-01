@@ -11,7 +11,7 @@
 #include "seq/Konstantinov_I_Gauss_Jordan_method/include/ops_seq.hpp"
 
 namespace konstantinov_i_gauss_jordan_method_seq {
-
+namespace {
 std::vector<double> GetRandomMatrix(int rows, int cols) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -22,10 +22,10 @@ std::vector<double> GetRandomMatrix(int rows, int cols) {
   }
   return matrix;
 }
-
+}  // namespace
 }  // namespace konstantinov_i_gauss_jordan_method_seq
 
-TEST(konstantinov_i_gauss_jordan_method_seq, pipeline_run) {
+TEST(Konstantinov_i_gauss_jordan_method_seq, pipeline_run) {
   int n = 500;
   std::vector<double> global_matrix = konstantinov_i_gauss_jordan_method_seq::GetRandomMatrix(n, n + 1);
   std::vector<double> global_result(n * (n + 1));
@@ -63,7 +63,7 @@ TEST(konstantinov_i_gauss_jordan_method_seq, pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
 
-TEST(konstantinov_i_gauss_jordan_method_seq, task_run) {
+TEST(Konstantinov_i_gauss_jordan_method_seq, task_run) {
   int n = 500;
   std::vector<double> global_matrix = konstantinov_i_gauss_jordan_method_seq::GetRandomMatrix(n, n + 1);
   std::vector<double> global_result(n * (n + 1));

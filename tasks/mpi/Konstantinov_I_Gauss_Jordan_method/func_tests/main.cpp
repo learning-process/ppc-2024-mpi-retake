@@ -11,7 +11,7 @@
 #include "mpi/Konstantinov_I_Gauss_Jordan_method/include/ops_mpi.hpp"
 
 namespace konstantinov_i_gauss_jordan_method_mpi {
-
+namespace {
 std::vector<double> GetRandomMatrix(int rows, int cols, double min = -20.0, double max = 20.0) {
   std::random_device dev;
   std::mt19937 gen(dev());
@@ -22,10 +22,10 @@ std::vector<double> GetRandomMatrix(int rows, int cols, double min = -20.0, doub
   }
   return matrix;
 }
-
+}  // namespace
 }  // namespace konstantinov_i_gauss_jordan_method_mpi
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, simple_three_not_solve_at_1_iter) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, simple_three_not_solve_at_1_iter) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -59,7 +59,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, simple_three_not_solve_at_1_iter) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, simple_five_not_solve_at_2_iter) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, simple_five_not_solve_at_2_iter) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -93,7 +93,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, simple_five_not_solve_at_2_iter) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_three) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_three) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -157,7 +157,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_three) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_four) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_four) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -221,7 +221,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_four) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_five) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_five) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -285,7 +285,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_five) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_six) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_six) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -349,7 +349,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_six) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_seven) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_seven) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -413,7 +413,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_seven) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_ten) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_ten) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
@@ -477,7 +477,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_ten) {
   }
 }
 
-TEST(konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
+TEST(Konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
