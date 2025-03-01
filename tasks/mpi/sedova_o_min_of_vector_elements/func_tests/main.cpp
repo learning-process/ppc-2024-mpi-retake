@@ -6,70 +6,61 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <climits>
+#include <random>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
-#include "mpi/example/include/ops_mpi.hpp"
+#include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
 
-TEST(nesterov_a_test_task_mpi, test_matmul_50) {
-  constexpr size_t kCount = 50;
+TEST(sedova_o_min_of_vector_elements_mpi, test_10x10) {
+  const int rows = 10;
+  const int columns = 10;
+  const int min = -500;
+  const int max = 500;
 
-  // Create data
-  std::vector<int> in(kCount * kCount, 0);
-  std::vector<int> out(kCount * kCount, 0);
+  boost::mpi::communicator world_;
+  std::vector<std::vector<int>> global_matrix;
+  std::vector<int> output(1, INT_MAX);
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  if(world_.rank() == 0) {
+     global_matrix = sedova_o_min_of_vector_elements_mpi::getRandomMatrix(rows, columns, min, max);
+     for (unsigned int i = 0; i < global_matrix.size(); i++)
+       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
+     task_data_par->inputs_count.emplace_back(rows);
+     task_data_par->inputs_count.emplace_back(columns);
 
-  for (size_t i = 0; i < kCount; i++) {
-    in[(i * kCount) + i] = 1;
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
+     task_data_par->outputs_count.emplace_back(output.size());
   }
 
-  // Create task_data
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
+  sedova_o_min_of_vector_elements_mpi::TestTaskMPI test_task_parallel(task_data_par);
+  ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
+  test_task_parallel.PreProcessingImpl();
+  test_task_parallel.RunImpl();
+  test_task_parallel.PostProcessingImpl();
 
-  // Create Task
-  nesterov_a_test_task_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
+  if (world_.rank() == 0) {
+    // Create data
+    std::vector<int> output1(1, INT_MAX);
 
-  EXPECT_EQ(in, out);
-}
+    // Create TaskData
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    for (unsigned int i = 0; i < global_matrix.size(); i++)
+      task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->inputs_count.emplace_back(columns);
 
-TEST(nesterov_a_test_task_mpi, test_matmul_100_from_file) {
-  std::string line;
-  std::ifstream test_file(ppc::util::GetAbsolutePath("mpi/example/data/test.txt"));
-  if (test_file.is_open()) {
-    getline(test_file, line);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output1.data()));
+    task_data_seq->outputs_count.emplace_back(output1.size());
+
+    // Create Task
+    sedova_o_min_of_vector_elements_mpi::TestTaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+    test_task_sequential.PreProcessingImpl();
+    test_task_sequential.RunImpl();
+    test_task_sequential.PostProcessingImpl();
+
+    ASSERT_EQ(output1[0], output[0]);
   }
-  test_file.close();
-
-  const size_t count = std::stoi(line);
-
-  // Create data
-  std::vector<int> in(count * count, 0);
-  std::vector<int> out(count * count, 0);
-
-  for (size_t i = 0; i < count; i++) {
-    in[(i * count) + i] = 1;
-  }
-
-  // Create task_data
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
-
-  // Create Task
-  nesterov_a_test_task_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-
-  EXPECT_EQ(in, out);
 }
