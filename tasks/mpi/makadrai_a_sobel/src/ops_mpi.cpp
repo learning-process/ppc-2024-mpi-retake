@@ -20,9 +20,9 @@ bool makadrai_a_sobel_mpi::Sobel::PreProcessingImpl() {
   if (world.rank() == 0) {
     img.resize((width_img + peding) * (height_img + peding));
     simg.resize(width_img * height_img, 0);
-    const auto* in = reinterpret_cast<size_t*>(task_data->inputs[0]);
+    const auto* in = reinterpret_cast<int*>(task_data->inputs[0]);
 
-    for (size_t i = 0; i < height_img; i++) {
+    for (int i = 0; i < height_img; i++) {
       std::copy(in + (i * width_img), in + ((i + 1) * width_img), img.begin() + ((i + 1) * (width_img + peding) + 1));
     }
   }
@@ -69,16 +69,16 @@ bool makadrai_a_sobel_mpi::Sobel::RunImpl() {
     }
   }
 
-  size_t local_height_img = (world.rank() == 0) ? ost : del;
-  std::vector<size_t> local_img(send_counts[world.rank()]);
-  std::vector<size_t> local_simg(local_height_img * width_img);
+  int local_height_img = (world.rank() == 0) ? ost : del;
+  std::vector<int> local_img(send_counts[world.rank()]);
+  std::vector<int> local_simg(local_height_img * width_img);
   int local_max_z = 1;
 
   boost::mpi::scatterv(world, img, send_counts, displacements, local_img.data(), send_counts[world.rank()], 0);
 
   if (local_height_img != 0) {
-    for (size_t i = 1; i < local_height_img + 1; i++) {
-      for (size_t j = 1; j < width_img + 1; j++) {
+    for (int i = 1; i < local_height_img + 1; i++) {
+      for (int j = 1; j < width_img + 1; j++) {
         int G_x = -1 * local_img[(i - 1) * (width_img + peding) + (j - 1)] +
                   -1 * local_img[(i - 1) * (width_img + peding) + (j + 1)] +
                   -2 * local_img[(i - 1) * (width_img + peding) + j] +
@@ -108,8 +108,8 @@ bool makadrai_a_sobel_mpi::Sobel::RunImpl() {
                       displacements_res, 0);
 
   if (world.rank() == 0) {
-    for (size_t i = 0; i < width_img; i++) {
-      for (size_t j = 0; j < height_img; j++) {
+    for (int i = 0; i < width_img; i++) {
+      for (int j = 0; j < height_img; j++) {
         simg[i * height_img + j] = ((double)simg[i * height_img + j] / max_z) * 255;
       }
     }
@@ -120,7 +120,7 @@ bool makadrai_a_sobel_mpi::Sobel::RunImpl() {
 
 bool makadrai_a_sobel_mpi::Sobel::PostProcessingImpl() {
   if (world.rank() == 0) {
-    std::copy(simg.begin(), simg.end(), reinterpret_cast<size_t*>(task_data->outputs[0]));
+    std::copy(simg.begin(), simg.end(), reinterpret_cast<int*>(task_data->outputs[0]));
   }
   return true;
 }

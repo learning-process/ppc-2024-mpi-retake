@@ -13,11 +13,11 @@
 
 TEST(makadrai_a_sobel_mpi, test_2_2) {
   boost::mpi::communicator world;
-  size_t height_img = 2;
-  size_t width_img = 2;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
-  std::vector<size_t> ans;
+  int height_img = 2;
+  int width_img = 2;
+  std::vector<int> img;
+  std::vector<int> res;
+  std::vector<int> ans;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -50,11 +50,11 @@ TEST(makadrai_a_sobel_mpi, test_2_2) {
 
 TEST(makadrai_a_sobel_mpi, test_3_3) {
   boost::mpi::communicator world;
-  size_t height_img = 3;
-  size_t width_img = 3;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
-  std::vector<size_t> ans;
+  int height_img = 3;
+  int width_img = 3;
+  std::vector<int> img;
+  std::vector<int> res;
+  std::vector<int> ans;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -87,11 +87,11 @@ TEST(makadrai_a_sobel_mpi, test_3_3) {
 
 TEST(makadrai_a_sobel_mpi, test_1_1) {
   boost::mpi::communicator world;
-  size_t height_img = 1;
-  size_t width_img = 1;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
-  std::vector<size_t> ans;
+  int height_img = 1;
+  int width_img = 1;
+  std::vector<int> img;
+  std::vector<int> res;
+  std::vector<int> ans;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -124,11 +124,11 @@ TEST(makadrai_a_sobel_mpi, test_1_1) {
 
 TEST(makadrai_a_sobel_mpi, test_error_1) {
   boost::mpi::communicator world;
-  size_t height_img = 3;
-  size_t width_img = 3;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
-  std::vector<size_t> ans;
+  int height_img = 3;
+  int width_img = 3;
+  std::vector<int> img;
+  std::vector<int> res;
+  std::vector<int> ans;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -154,11 +154,11 @@ TEST(makadrai_a_sobel_mpi, test_error_1) {
 
 TEST(makadrai_a_sobel_mpi, test_error_2) {
   boost::mpi::communicator world;
-  size_t height_img = 3;
-  size_t width_img = 3;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
-  std::vector<size_t> ans;
+  int height_img = 3;
+  int width_img = 3;
+  std::vector<int> img;
+  std::vector<int> res;
+  std::vector<int> ans;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -184,11 +184,11 @@ TEST(makadrai_a_sobel_mpi, test_error_2) {
 
 TEST(makadrai_a_sobel_mpi, test_error_3) {
   boost::mpi::communicator world;
-  size_t height_img = 3;
-  size_t width_img = 3;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
-  std::vector<size_t> ans;
+  int height_img = 3;
+  int width_img = 3;
+  std::vector<int> img;
+  std::vector<int> res;
+  std::vector<int> ans;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 

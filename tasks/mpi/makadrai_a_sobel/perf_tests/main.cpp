@@ -13,10 +13,10 @@
 
 TEST(makadrai_a_sobel_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  size_t height_img = 2500;
-  size_t width_img = 2500;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
+  int height_img = 2500;
+  int width_img = 2500;
+  std::vector<int> img;
+  std::vector<int> res;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -60,10 +60,10 @@ TEST(makadrai_a_sobel_mpi, test_pipeline_run) {
 
 TEST(makadrai_a_sobel_mpi, test_task_run) {
   boost::mpi::communicator world;
-  size_t height_img = 2500;
-  size_t width_img = 2500;
-  std::vector<size_t> img;
-  std::vector<size_t> res;
+  int height_img = 2500;
+  int width_img = 2500;
+  std::vector<int> img;
+  std::vector<int> res;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 

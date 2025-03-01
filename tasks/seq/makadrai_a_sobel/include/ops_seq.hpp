@@ -16,12 +16,12 @@ class Sobel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  size_t height_img;
-  size_t width_img;
-  size_t peding = 2;
+  int height_img;
+  int width_img;
+  int peding = 2;
 
-  std::vector<size_t> img;
-  std::vector<size_t> simg;
+  std::vector<int> img;
+  std::vector<int> simg;
 };
 
 }  // namespace makadrai_a_sobel_seq

@@ -11,10 +11,10 @@
 #include "seq/makadrai_a_sobel/include/ops_seq.hpp"
 
 TEST(makadrai_a_sobel_seq, test_pipeline_run) {
-  size_t height_img = 2500;
-  size_t width_img = 2500;
-  std::vector<size_t> img(height_img * width_img);
-  std::vector<size_t> res(height_img * width_img);
+  int height_img = 2500;
+  int width_img = 2500;
+  std::vector<int> img(height_img * width_img);
+  std::vector<int> res(height_img * width_img);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -47,10 +47,10 @@ TEST(makadrai_a_sobel_seq, test_pipeline_run) {
 }
 
 TEST(makadrai_a_sobel_seq, test_task_run) {
-  size_t height_img = 2500;
-  size_t width_img = 2500;
-  std::vector<size_t> img(height_img * width_img);
-  std::vector<size_t> res(height_img * width_img);
+  int height_img = 2500;
+  int width_img = 2500;
+  std::vector<int> img(height_img * width_img);
+  std::vector<int> res(height_img * width_img);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
