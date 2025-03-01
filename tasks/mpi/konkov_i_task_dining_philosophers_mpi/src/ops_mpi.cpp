@@ -19,11 +19,11 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
   }
 
   world_.barrier();
-  
+
   boost::mpi::broadcast(world_, num_philosophers_, 0);
-  
+
   world_.barrier();
-  
+
   for (int r = 0; r < world_.size(); ++r) {
     world_.barrier();
     if (world_.rank() == r) {
