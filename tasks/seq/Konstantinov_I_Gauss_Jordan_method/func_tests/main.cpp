@@ -14,22 +14,22 @@ TEST(konstantinov_i_gauss_jordan_method_seq, three_simple_matrix) {
   int n = 3;
   std::vector<double> output_result(n * (n + 1));
 
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<double*>(input_matrix.data())));
-  taskDataSeq->inputs_count.emplace_back(input_matrix.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<double*>(input_matrix.data())));
+  task_data_seq->inputs_count.emplace_back(input_matrix.size());
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_result.data()));
-  taskDataSeq->outputs_count.emplace_back(output_result.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_result.data()));
+  task_data_seq->outputs_count.emplace_back(output_result.size());
 
-  konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq taskSequential(taskDataSeq);
-  ASSERT_TRUE(taskSequential.ValidationImpl());
-  taskSequential.PreProcessingImpl();
-  taskSequential.RunImpl();
-  taskSequential.PostProcessingImpl();
+  konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq task_sequential(task_data_seq);
+  ASSERT_TRUE(task_sequential.ValidationImpl());
+  task_sequential.PreProcessingImpl();
+  task_sequential.RunImpl();
+  task_sequential.PostProcessingImpl();
 
   std::vector<double> expected_result = {1, 0, 0, 250, 0, 1, 0, -130, 0, 0, 1, 20};
   ASSERT_EQ(output_result, expected_result);
@@ -41,20 +41,20 @@ TEST(konstantinov_i_gauss_jordan_method_seq, five_simple_matrix_at_1_iter) {
   int n = 5;
   std::vector<double> output_result(n * (n + 1));
 
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<double*>(input_matrix.data())));
-  taskDataSeq->inputs_count.emplace_back(input_matrix.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<double*>(input_matrix.data())));
+  task_data_seq->inputs_count.emplace_back(input_matrix.size());
 
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-  taskDataSeq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
+  task_data_seq->inputs_count.emplace_back(1);
 
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_result.data()));
-  taskDataSeq->outputs_count.emplace_back(output_result.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(output_result.data()));
+  task_data_seq->outputs_count.emplace_back(output_result.size());
 
-  konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq taskSequential(taskDataSeq);
-  ASSERT_TRUE(taskSequential.ValidationImpl());
-  taskSequential.PreProcessingImpl();
-  EXPECT_FALSE(taskSequential.RunImpl());
-  taskSequential.PostProcessingImpl();
+  konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq task_sequential(task_data_seq);
+  ASSERT_TRUE(task_sequential.ValidationImpl());
+  task_sequential.PreProcessingImpl();
+  EXPECT_FALSE(task_sequential.RunImpl());
+  task_sequential.PostProcessingImpl();
 }

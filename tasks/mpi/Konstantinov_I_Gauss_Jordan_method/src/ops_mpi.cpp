@@ -258,7 +258,7 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::ValidationImp
   return n_val * (n_val + 1) == matrix_size;
 }
 
-bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::PpeProcessingImpl() {
+bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::PreProcessingImpl() {
   auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
   int matrix_size = task_data->inputs_count[0];
   n = *reinterpret_cast<int*>(task_data->inputs[1]);
