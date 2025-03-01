@@ -1,8 +1,9 @@
 #include "seq/sedova_o_min_of_vector_elements/include/ops_seq.hpp"
-#include <vector>
+
+#include <algorithm>
 #include <climits>
 #include <random>
-#include <algorithm>
+#include <vector>
 
 using namespace std::chrono_literals;
 

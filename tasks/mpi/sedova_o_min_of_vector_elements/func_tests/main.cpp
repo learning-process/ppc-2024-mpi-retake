@@ -23,7 +23,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_10x10) {
   std::vector<std::vector<int>> global_matrix;
   std::vector<int> output(1, INT_MAX);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  if(world_.rank() == 0) {
+  if (world_.rank() == 0) {
     global_matrix = sedova_o_min_of_vector_elements_mpi::getRandomMatrix(rows, columns, min, max);
     for (unsigned int i = 0; i < global_matrix.size(); i++)
       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
