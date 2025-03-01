@@ -26,6 +26,6 @@ class RibbonHorSchemeOnlyMatA : public ppc::core::Task {
   int b_c_ = 0;
 };
 void GetRndVector(std::vector<int>& vec);
-void LiterallyMult(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& c, int a_c_, int a_r_,
-                   int b_c_);
+void LiterallyMult(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& c, int a_c, int a_r,
+                   int b_c);
 }  // namespace somov_i_ribbon_hor_scheme_only_mat_a_mpi
