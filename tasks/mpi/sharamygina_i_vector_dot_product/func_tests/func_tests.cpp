@@ -180,7 +180,7 @@ TEST(sharamygina_i_vector_dot_product_mpi, EmptyVecValidationTest) {
   }
 }
 
-TEST(sharamygina_i_vector_dot_product_mpi, OneSizeValidationTest) {
+TEST(sharamygina_i_vector_dot_product_mpi, DifferentSizeValidationTest) {
   boost::mpi::communicator world;
   unsigned int lenght = 200;
 
@@ -192,6 +192,7 @@ TEST(sharamygina_i_vector_dot_product_mpi, OneSizeValidationTest) {
 
   if (world.rank() == 0) {
     task_data->inputs_count.emplace_back(lenght);
+    task_data->inputs_count.emplace_back(lenght - 100);
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
