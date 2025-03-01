@@ -13,7 +13,8 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
     std::cout << "[DEBUG] inputs_count size: " << task_data->inputs_count.size() << std::endl;
     if (!task_data->inputs_count.empty()) {
-      std::cout << "[DEBUG] First input value: " << task_data->inputs_count[0] << std::endl;
+      num_philosophers_ = task_data->inputs_count[0];
+      std::cout << "[DEBUG] First input value: " << num_philosophers_ << std::endl;
     }
   }
 
