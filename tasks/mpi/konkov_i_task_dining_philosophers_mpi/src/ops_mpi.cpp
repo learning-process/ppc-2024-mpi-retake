@@ -18,8 +18,8 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
     }
   }
   
-  world_.barrier();
-
+  world_.barrier():
+    
   boost::mpi::broadcast(world_, num_philosophers_, 0);
 
   world_.barrier();
