@@ -72,7 +72,7 @@ TEST(leontev_n_average_seq, float_vector_avg) {
   ASSERT_TRUE(vec_avg_sequential.Validation());
   vec_avg_sequential.PreProcessing();
   vec_avg_sequential.Run();
-  vec_avg_sequential.PostProcessing(); 
+  vec_avg_sequential.PostProcessing();
   EXPECT_NEAR(out[0], expected_avg, 1e-3F);
 }
 

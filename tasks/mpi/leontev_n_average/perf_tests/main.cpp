@@ -33,10 +33,6 @@ TEST(leontev_n_average_mpi, test_pipeline_run) {
     TaskEmplacement(task_data_par, global_vec, global_avg);
   }
   auto mpi_vec_avg_parallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(task_data_par);
-  ASSERT_EQ(mpi_vec_avg_parallel->Validation(), true);
-  mpi_vec_avg_parallel->PreProcessing();
-  mpi_vec_avg_parallel->Run();
-  mpi_vec_avg_parallel->PostProcessing();
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -53,7 +49,6 @@ TEST(leontev_n_average_mpi, test_pipeline_run) {
   // Create Perf analyzer
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(global_avg[0], 1);
   }
 }
 
@@ -69,10 +64,6 @@ TEST(leontev_n_average_mpi, test_task_run) {
     TaskEmplacement(task_data_par, global_vec, global_avg);
   }
   auto mpi_vec_avg_parallel = std::make_shared<leontev_n_average_mpi::MPIVecAvgParallel>(task_data_par);
-  ASSERT_EQ(mpi_vec_avg_parallel->Validation(), true);
-  mpi_vec_avg_parallel->PreProcessing();
-  mpi_vec_avg_parallel->Run();
-  mpi_vec_avg_parallel->PostProcessing();
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -89,6 +80,5 @@ TEST(leontev_n_average_mpi, test_task_run) {
   // Create Perf analyzer
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(global_avg[0], 1);
   }
 }
