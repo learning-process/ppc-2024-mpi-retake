@@ -138,7 +138,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_three) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
@@ -202,7 +202,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_four) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
@@ -266,7 +266,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_five) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
@@ -330,7 +330,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_six) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
@@ -394,7 +394,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_seven) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
@@ -458,7 +458,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_ten) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
@@ -522,7 +522,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = 
+      auto task_sequential =
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();

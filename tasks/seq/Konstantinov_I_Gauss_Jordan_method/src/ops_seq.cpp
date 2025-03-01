@@ -5,7 +5,7 @@
 #include <limits>
 #include <thread>
 
-std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n, int k, 
+std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n, int k,
                                                                           const std::vector<double>& matrix) {
   std::vector<double> result_vec(n * (n - k + 1));
 
