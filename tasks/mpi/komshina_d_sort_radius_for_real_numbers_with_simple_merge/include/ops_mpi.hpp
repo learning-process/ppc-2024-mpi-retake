@@ -20,13 +20,19 @@ class TestTaskMPI : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
+  void setInputData(const std::vector<double>& input);
+  const std::vector<double>& getSortedData() const;
+  static std::vector<double> generateRandomData(int size, double minValue = -10.0, double maxValue = 10.0);
 
  private:
-  int rank, size;
-  std::vector<double> input_data_, sorted_data_;
+  std::vector<double> input_data_;
+  std::vector<double> sorted_data_;
   void parallelSort();
-  static void radixSort(std::vector<double>& data);
-  static void handleSignAndSort(std::vector<double>& data);
+
+  int rank;
+  int size;
 };
+void radixSortWithSignHandling(std::vector<double>& data);
+void radixSort(std::vector<double>& data, int num_bits, int radix);
 
 }  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi
