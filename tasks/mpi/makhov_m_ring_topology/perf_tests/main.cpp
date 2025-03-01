@@ -12,7 +12,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/makhov_m_ring_topology/include/ops_mpi.hpp"
 
-TEST(mpi_makhov_m_ring_topology_perf_test, test_pipeline_run) {
+TEST(makhov_m_ring_topology_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   size_t size = 10000000;
   std::vector<int32_t> input_vector(size, 1);
@@ -53,7 +53,7 @@ TEST(mpi_makhov_m_ring_topology_perf_test, test_pipeline_run) {
   }
 }
 
-TEST(mpi_makhov_m_ring_topology_perf_test, test_task_run) {
+TEST(makhov_m_ring_topology_mpi, test_task_run) {
   boost::mpi::communicator world;
   size_t size = 10000000;
   std::vector<int32_t> input_vector(size, 1);
