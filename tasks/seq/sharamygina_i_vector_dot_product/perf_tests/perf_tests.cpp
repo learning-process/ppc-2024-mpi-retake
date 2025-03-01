@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <limits>
 #include <memory>
 #include <random>
 #include <vector>
@@ -18,7 +17,7 @@ std::vector<int> GetVector(unsigned int size) {
   std::mt19937 gen(dev());
   std::vector<int> v(size);
   for (unsigned int i = 0; i < size; i++) {
-    v[i] = gen() % 320 + gen() % 11;
+    v[i] = static_cast<int>((gen() % 320) + (gen() % 11));
   }
   return v;
 }
