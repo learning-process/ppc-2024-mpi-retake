@@ -17,9 +17,9 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
       std::cout << "[DEBUG] First input value: " << num_philosophers_ << std::endl;
     }
   }
+   
+  world_.barrier();
   
-  world_.barrier():
-    
   boost::mpi::broadcast(world_, num_philosophers_, 0);
 
   world_.barrier();
@@ -44,9 +44,9 @@ bool DiningPhilosophersMPI::ValidationImpl() {
       std::cout << "[Rank " << r << "] Validation: philosophers = " << num_philosophers_ << std::endl;
     }
   }
-  
-  return num_philosophers_ > 1;
-}
+
+   return num_philosophers_ > 1;
+ }
 
 bool DiningPhilosophersMPI::RunImpl() {
   int rank = world_.rank();
