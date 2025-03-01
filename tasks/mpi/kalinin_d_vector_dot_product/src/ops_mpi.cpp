@@ -65,22 +65,12 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::ValidationImpl() {
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() {
   int total_elements = 0;
-  int delta = 0;
-  int remainder = 0;
-
   if (world_.rank() == 0) {
     total_elements = static_cast<int>(task_data->inputs_count[0]);
     num_processes_ = world_.size();
-    delta = total_elements / num_processes_;      // Calculate base size for each process
-    remainder = total_elements % num_processes_;  // Calculate remaining elements
-  }
-  if (world_.rank() == 0) {
-    // Distribute sizes to each process
-    for (int i = 0; i < num_processes_; ++i) {
-      counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
-    }
-  }
-  if (world_.rank() == 0) {
+    delta = total_elements / num_processes_;
+    remainder = total_elements % num_processes_;
+
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
     for (size_t i = 0; i < input_.size(); i++) {
       auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[i]);
@@ -96,11 +86,28 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
+  if (world_.rank() == 0) {
+    num_processes_ = world_.size();
+  }
   boost::mpi::broadcast(world_, num_processes_, 0);
 
-  counts_.resize(num_processes_);  // Vector to store counts for each process
+  int total_elements = 0;
+  int delta = 0;
+  int remainder = 0;
 
-  boost::mpi::broadcast(world_, counts_.data(), num_processes_, 0);
+  if (world_.rank() == 0) {
+    total_elements = static_cast<int>(task_data->inputs_count[0]);
+    delta = total_elements / num_processes_;
+    remainder = total_elements % num_processes_;
+  }
+
+  boost::mpi::broadcast(world_, delta, 0);
+  boost::mpi::broadcast(world_, remainder, 0);
+
+  counts_.resize(num_processes_);
+  for (int i = 0; i < num_processes_; ++i) {
+    counts_[i] = delta + (i < remainder ? 1 : 0);
+  }
 
   if (world_.rank() == 0) {
     size_t offset_remainder = counts_[0];
@@ -124,10 +131,10 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   }
 
   int local_res = 0;
-
   for (size_t i = 0; i < local_input1_.size(); i++) {
     local_res += local_input1_[i] * local_input2_[i];
   }
+
   boost::mpi::reduce(world_, local_res, res_, std::plus<>(), 0);
   return true;
 }
