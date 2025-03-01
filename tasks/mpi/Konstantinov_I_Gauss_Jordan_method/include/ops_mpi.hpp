@@ -15,6 +15,7 @@ std::vector<double> ProcessMatrix(int n, int k, const std::vector<double>& matri
 void CalcSizesDispls(int n, int k, int world_size, std::vector<int>& sizes, std::vector<int>& displs);
 std::vector<std::pair<int, int>> GetIndicies(int rows, int cols);
 void UpdateMatrix(int n, int k, std::vector<double>& matrix, const std::vector<double>& iter_result);
+bool IsNonSingularSystem(const std::vector<double>& A, int n);
 
 class GaussJordanMethodMPI : public ppc::core::Task {
  public:

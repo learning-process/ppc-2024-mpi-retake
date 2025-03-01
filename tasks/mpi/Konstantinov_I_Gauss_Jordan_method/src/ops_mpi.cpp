@@ -12,9 +12,7 @@
 
 #define EPSILON 1e-9
 
-namespace konstantinov_i_gauss_jordan_method_mpi {
-
-bool IsNonSingularSystem(const std::vector<double>& A, int n) {
+bool konstantinov_i_gauss_jordan_method_mpi::IsNonSingularSystem(const std::vector<double>& A, int n) {
   std::vector<double> tempMatrix(n * n);
 
   for (int i = 0; i < n; ++i) {
@@ -52,8 +50,6 @@ bool IsNonSingularSystem(const std::vector<double>& A, int n) {
   }
   return true;
 }
-
-}  // namespace konstantinov_i_gauss_jordan_method_mpi
 
 std::vector<double> konstantinov_i_gauss_jordan_method_mpi::ProcessMatrix(int n, int k,
                                                                           const std::vector<double>& matrix) {
