@@ -1,4 +1,5 @@
 #include "mpi/Konstantinov_I_Gauss_Jordan_method/include/ops_mpi.hpp"
+
 #include <algorithm>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/vector.hpp>
@@ -13,49 +14,49 @@
 
 namespace konstantinov_i_gauss_jordan_method_mpi {
 
-  bool IsNonSingularSystem(const std::vector<double>& A, int n) {
-    std::vector<double> tempMatrix(n * n);
+bool IsNonSingularSystem(const std::vector<double>& A, int n) {
+  std::vector<double> tempMatrix(n * n);
 
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        tempMatrix[i * n + j] = A[i * (n + 1) + j];
-      }
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      tempMatrix[i * n + j] = A[i * (n + 1) + j];
     }
-
-    for (int k = 0; k < n; ++k) {
-      double max = fabs(tempMatrix[k * n + k]);
-      int maxRow = k;
-      for (int i = k + 1; i < n; ++i) {
-        if (fabs(tempMatrix[i * n + k]) > max) {
-          max = fabs(tempMatrix[i * n + k]);
-          maxRow = i;
-        }
-      }
-
-      if (fabs(tempMatrix[maxRow * n + k]) < EPSILON) {
-        return false;
-      }
-
-      if (maxRow != k) {
-        for (int j = 0; j < n; ++j) {
-          std::swap(tempMatrix[k * n + j], tempMatrix[maxRow * n + j]);
-        }
-      }
-
-      for (int i = k + 1; i < n; ++i) {
-        double factor = tempMatrix[i * n + k] / tempMatrix[k * n + k];
-        for (int j = k; j < n; ++j) {
-          tempMatrix[i * n + j] -= factor * tempMatrix[k * n + j];
-        }
-      }
-    }
-    return true;
   }
+
+  for (int k = 0; k < n; ++k) {
+    double max = fabs(tempMatrix[k * n + k]);
+    int maxRow = k;
+    for (int i = k + 1; i < n; ++i) {
+      if (fabs(tempMatrix[i * n + k]) > max) {
+        max = fabs(tempMatrix[i * n + k]);
+        maxRow = i;
+      }
+    }
+
+    if (fabs(tempMatrix[maxRow * n + k]) < EPSILON) {
+      return false;
+    }
+
+    if (maxRow != k) {
+      for (int j = 0; j < n; ++j) {
+        std::swap(tempMatrix[k * n + j], tempMatrix[maxRow * n + j]);
+      }
+    }
+
+    for (int i = k + 1; i < n; ++i) {
+      double factor = tempMatrix[i * n + k] / tempMatrix[k * n + k];
+      for (int j = k; j < n; ++j) {
+        tempMatrix[i * n + j] -= factor * tempMatrix[k * n + j];
+      }
+    }
+  }
+  return true;
+}
 
 }  // namespace konstantinov_i_gauss_jordan_method_mpi
 
 std::vector<double> konstantinov_i_gauss_jordan_method_mpi::ProcessMatrix(int n, int k,
-                                                                       const std::vector<double>& matrix) {
+                                                                          const std::vector<double>& matrix) {
   std::vector<double> result_vec(n * (n - k + 1));
 
   for (int i = 0; i < (n - k + 1); i++) {
@@ -78,7 +79,7 @@ std::vector<double> konstantinov_i_gauss_jordan_method_mpi::ProcessMatrix(int n,
 }
 
 void konstantinov_i_gauss_jordan_method_mpi::CalcSizesDispls(int n, int k, int world_size, std::vector<int>& sizes,
-                                                          std::vector<int>& displs) {
+                                                             std::vector<int>& displs) {
   int r = n - 1;
   int c = n - k;
   sizes.resize(world_size, 0);
@@ -119,7 +120,7 @@ std::vector<std::pair<int, int>> konstantinov_i_gauss_jordan_method_mpi::GetIndi
 }
 
 void konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(int n, int k, std::vector<double>& matrix,
-                                                       const std::vector<double>& iter_result) {
+                                                          const std::vector<double>& iter_result) {
   for (int i = 0; i < k; i++) {
     for (int j = 0; j < (n - k); j++) {
       matrix[i * (n + 1) + k + 1 + j] = iter_result[i * (n - k) + j];
@@ -158,7 +159,6 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::ValidationImp
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::PreProcessingImpl() {
-
   if (world.rank() == 0) {
     auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
     int matrix_size = task_data->inputs_count[0];
@@ -172,7 +172,6 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::PreProcessing
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::RunImpl() {
-
   boost::mpi::broadcast(world, n, 0);
 
   for (int k = 0; k < n; k++) {

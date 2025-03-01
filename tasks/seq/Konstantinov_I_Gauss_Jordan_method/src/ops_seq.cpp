@@ -1,10 +1,12 @@
 #include "seq/Konstantinov_I_Gauss_Jordan_method/include/ops_seq.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <thread>
 
-std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n, int k, const std::vector<double>& matrix) {
+std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n, int k, 
+                                                                          const std::vector<double>& matrix) {
   std::vector<double> result_vec(n * (n - k + 1));
 
   for (int i = 0; i < (n - k + 1); i++) {
@@ -27,7 +29,7 @@ std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n,
 }
 
 void konstantinov_i_gauss_jordan_method_seq::UpdateMatrix(int n, int k, std::vector<double>& matrix,
-                                                       const std::vector<double>& iter_result) {
+                                                          const std::vector<double>& iter_result) {
   for (int i = 0; i < k; i++) {
     for (int j = 0; j < (n - k); j++) {
       matrix[i * (n + 1) + k + 1 + j] = iter_result[i * (n - k) + j];
@@ -50,14 +52,12 @@ void konstantinov_i_gauss_jordan_method_seq::UpdateMatrix(int n, int k, std::vec
 }
 
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::ValidationImpl() {
-
   int n_val = *reinterpret_cast<int*>(task_data->inputs[1]);
   int matrix_size = task_data->inputs_count[0];
   return n_val * (n_val + 1) == matrix_size;
 }
 
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::PreProcessingImpl() {
-
   auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
   int matrix_size = task_data->inputs_count[0];
   n = *reinterpret_cast<int*>(task_data->inputs[1]);
@@ -67,7 +67,6 @@ bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::PreProcessing
 }
 
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::RunImpl() {
-
   for (int k = 0; k < n; k++) {
     if (matrix[k * (n + 1) + k] == 0) {
       int change;
@@ -105,7 +104,6 @@ bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::RunImpl() {
 }
 
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::PostProcessingImpl() {
- 
   auto* output_data = reinterpret_cast<double*>(task_data->outputs[0]);
   std::copy(matrix.begin(), matrix.end(), output_data);
 

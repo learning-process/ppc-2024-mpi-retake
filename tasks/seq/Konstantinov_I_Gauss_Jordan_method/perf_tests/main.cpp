@@ -4,26 +4,24 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <vector>
 #include <random>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "seq/Konstantinov_I_Gauss_Jordan_method/include/ops_seq.hpp"
 
-
-
 namespace konstantinov_i_gauss_jordan_method_seq {
 
-  std::vector<double> GetRandomMatrix(int rows, int cols) {
-    std::random_device dev;
-    std::mt19937 gen(dev());
-    std::uniform_real_distribution<double> dist(-20.0, 20.0);
-    std::vector<double> matrix(rows * cols);
-    for (int i = 0; i < rows * cols; i++) {
-      matrix[i] = dist(gen);
-    }
-    return matrix;
+std::vector<double> GetRandomMatrix(int rows, int cols) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::uniform_real_distribution<double> dist(-20.0, 20.0);
+  std::vector<double> matrix(rows * cols);
+  for (int i = 0; i < rows * cols; i++) {
+    matrix[i] = dist(gen);
   }
+  return matrix;
+}
 
 }  // namespace konstantinov_i_gauss_jordan_method_seq
 
@@ -42,8 +40,7 @@ TEST(konstantinov_i_gauss_jordan_method_seq, pipeline_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
   task_data_seq->outputs_count.emplace_back(global_result.size());
 
-  auto task_sequential =
-      std::make_shared<konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq>(task_data_seq);
+  auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq>(task_data_seq);
   EXPECT_TRUE(task_sequential->ValidationImpl());
   task_sequential->PreProcessingImpl();
   task_sequential->RunImpl();
@@ -81,8 +78,7 @@ TEST(konstantinov_i_gauss_jordan_method_seq, task_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
   task_data_seq->outputs_count.emplace_back(global_result.size());
 
-  auto task_sequential =
-      std::make_shared<konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq>(task_data_seq);
+  auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq>(task_data_seq);
   EXPECT_TRUE(task_sequential->ValidationImpl());
   task_sequential->PreProcessingImpl();
   task_sequential->RunImpl();

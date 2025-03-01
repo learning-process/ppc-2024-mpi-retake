@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <vector>
 #include <random>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
@@ -14,16 +14,16 @@
 
 namespace konstantinov_i_gauss_jordan_method_mpi {
 
-  std::vector<double> GetRandomMatrix(int rows, int cols) {
-    std::random_device dev;
-    std::mt19937 gen(dev());
-    std::uniform_real_distribution<double> dist(-20.0, 20.0);
-    std::vector<double> matrix(rows * cols);
-    for (int i = 0; i < rows * cols; i++) {
-      matrix[i] = dist(gen);
-    }
-    return matrix;
+std::vector<double> GetRandomMatrix(int rows, int cols) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::uniform_real_distribution<double> dist(-20.0, 20.0);
+  std::vector<double> matrix(rows * cols);
+  for (int i = 0; i < rows * cols; i++) {
+    matrix[i] = dist(gen);
   }
+  return matrix;
+}
 
 }  // namespace konstantinov_i_gauss_jordan_method_mpi
 
@@ -53,8 +53,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
     task_data_par->outputs_count.emplace_back(global_result.size());
   }
 
-  auto task_parallel =
-      std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
+  auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
   ASSERT_TRUE(task_parallel->ValidationImpl());
   task_parallel->PreProcessingImpl();
   bool parRunRes = task_parallel->RunImpl();
@@ -85,8 +84,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
     task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-    auto task_sequential =
-        std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+    auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
     ASSERT_TRUE(task_sequential->ValidationImpl());
     task_sequential->PreProcessingImpl();
     bool seqRunRes = task_sequential->RunImpl();
@@ -127,8 +125,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, task_run) {
     task_data_par->outputs_count.emplace_back(global_result.size());
   }
 
-  auto task_parallel =
-      std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
+  auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
   ASSERT_TRUE(task_parallel->ValidationImpl());
   task_parallel->PreProcessingImpl();
   bool parRunRes = task_parallel->RunImpl();
@@ -159,8 +156,7 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, task_run) {
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
     task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-    auto task_sequential =
-        std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+    auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
     ASSERT_TRUE(task_sequential->ValidationImpl());
     task_sequential->PreProcessingImpl();
     bool seqRunRes = task_sequential->RunImpl();
