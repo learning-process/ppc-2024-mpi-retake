@@ -42,7 +42,7 @@ bool makadrai_a_sobel_seq::Sobel::RunImpl() {
                 (2 * img_[(i * (width_img_ + peding_)) + (j - 1)]) +
                 (1 * img_[((i + 1) * (width_img_ + peding_)) + (j - 1)]) +
                 (-1 * img_[((i - 1) * (width_img_ + peding_)) + (j + 1)]) -
-                (2 * img_[(i * (width_img_ + peding_)) + (j + 1)]) + 
+                (2 * img_[(i * (width_img_ + peding_)) + (j + 1)]) +
                 -1 * img_[(i + 1) * (width_img_ + peding_) + (j + 1)];
 
       int temp = (int)std::sqrt(std::pow(g_x, 2) + std::pow(g_y, 2));
