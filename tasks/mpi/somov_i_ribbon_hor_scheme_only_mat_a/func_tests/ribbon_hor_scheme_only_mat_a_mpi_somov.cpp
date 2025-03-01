@@ -39,7 +39,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Test_3x3_fixed) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -76,7 +76,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Test_3x3) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -112,7 +112,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Test_10x10) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -148,7 +148,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Test_100x100) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -184,7 +184,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Test_17x17) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -220,7 +220,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Non_square_matrix_1) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -254,7 +254,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Non_square_matrix_2) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
   ASSERT_TRUE(true);
@@ -291,7 +291,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, Non_square_matrix_3) {
   test1.PostProcessing();
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }

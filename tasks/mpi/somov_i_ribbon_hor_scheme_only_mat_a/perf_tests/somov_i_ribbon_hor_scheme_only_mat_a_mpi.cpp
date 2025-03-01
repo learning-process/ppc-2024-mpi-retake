@@ -56,7 +56,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }
@@ -106,7 +106,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, test_task_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   if (world.rank() == 0) {
     std::vector<int> checker(a_r * b_c, 0);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::ClearMult(a, b, checker, a_c, a_r, b_c);
+    somov_i_ribbon_hor_scheme_only_mat_a_mpi::LiterallyMult(a, b, checker, a_c, a_r, b_c);
     ASSERT_EQ(checker, c);
   }
 }

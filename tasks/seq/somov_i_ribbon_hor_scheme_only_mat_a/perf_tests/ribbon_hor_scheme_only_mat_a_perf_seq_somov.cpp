@@ -52,7 +52,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -99,6 +99,6 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }

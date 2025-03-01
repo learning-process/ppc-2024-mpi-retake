@@ -35,7 +35,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Test_3x3_matirx) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -68,7 +68,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Test_10x10_matirx) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -100,7 +100,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Test_17x17_matirx) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -132,7 +132,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Test_100x100_matirx) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -165,7 +165,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Non_square_matrix_1) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -197,7 +197,7 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Non_square_matrix_2) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }
 
@@ -229,6 +229,6 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_seq, Non_square_matrix_3) {
   test1.Run();
   test1.PostProcessing();
   std::vector<int> checker(a_r * b_c, 0);
-  somov_i_ribbon_hor_scheme_only_mat_a_seq::ClearMult(a, b, checker, a_c, a_r, b_c);
+  somov_i_ribbon_hor_scheme_only_mat_a_seq::LiterallyMult(a, b, checker, a_c, a_r, b_c);
   ASSERT_EQ(checker, c);
 }

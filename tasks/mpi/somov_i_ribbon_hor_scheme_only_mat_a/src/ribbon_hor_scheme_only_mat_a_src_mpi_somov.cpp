@@ -4,19 +4,18 @@
 #include <boost/mpi/collectives/scatter.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstring>
-#include <functional>
 #include <random>
 #include <utility>
 #include <vector>
 
 #include "mpi/somov_i_ribbon_hor_scheme_only_mat_a/include/somov_i_ribbon_hor_scheme_only_mat_a_mpi.hpp"
 namespace somov_i_ribbon_hor_scheme_only_mat_a_mpi {
-void ClearMult(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& c, int a_c_, int a_r_,
-               int b_c_) {
-  for (size_t i = 0; i < a_r_; ++i) {
-    for (size_t j = 0; j < b_c_; ++j) {
-      for (size_t p = 0; p < a_c_; ++p) {
-        c[i * b_c_ + j] += a[i * a_c_ + p] * b[p * b_c_ + j];
+void LiterallyMult(const std::vector<int>& a, const std::vector<int>& b, std::vector<int>& c, int a_c, int a_r,
+                   int b_c) {
+  for (int i = 0; i < a_r; ++i) {
+    for (int j = 0; j < b_c; ++j) {
+      for (int p = 0; p < a_c; ++p) {
+        c[(i * b_c) + j] += a[(i * a_c) + p] * b[(p * b_c) + j];
       }
     }
   }
@@ -39,10 +38,10 @@ bool RibbonHorSchemeOnlyMatA::PreProcessingImpl() {
     c_.resize(a_r_ * b_c_);
 
     std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[0]),
-                      reinterpret_cast<int*>(task_data->inputs[0]) + a_c_ * a_r_, a_.begin());
+                      reinterpret_cast<int*>(task_data->inputs[0]) + (a_c_ * a_r_), a_.begin());
 
     std::ranges::copy(reinterpret_cast<int*>(task_data->inputs[1]),
-                      reinterpret_cast<int*>(task_data->inputs[1]) + b_c_ * b_r_, b_.begin());
+                      reinterpret_cast<int*>(task_data->inputs[1]) + (b_c_ * b_r_), b_.begin());
   }
 
   return true;
@@ -68,7 +67,7 @@ bool RibbonHorSchemeOnlyMatA::RunImpl() {
 
   if (size == 1) {
     std::ranges::fill(c_, 0);
-    ClearMult(a_, b_, c_, a_c_, a_r_, b_c_);
+    LiterallyMult(a_, b_, c_, a_c_, a_r_, b_c_);
     return true;
   }
 
@@ -104,7 +103,7 @@ bool RibbonHorSchemeOnlyMatA::RunImpl() {
   c_.resize(loc_rows_number * b_c_);
   std::ranges::fill(c_, 0);
 
-  ClearMult(local_data, b_, c_, a_c_, loc_rows_number, b_c_);
+  LiterallyMult(local_data, b_, c_, a_c_, loc_rows_number, b_c_);
 
   std::vector<int> gathered_c;
   if (id == 0) {
