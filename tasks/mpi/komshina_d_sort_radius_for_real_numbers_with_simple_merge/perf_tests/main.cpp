@@ -13,7 +13,7 @@
 
 namespace {
 
-void GenerateComputedData(std::vector<double> &data, int s, double min = -1e9, double max = 1e9) {
+void GenerateComputedData(std::vector<double> &data, int s, double min = -1e10, double max = 1e10) {
   data.resize(s);
 
   for (int i = 0; i < s; ++i) {
@@ -47,7 +47,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
   // Create Task
   auto test_task_mpi =
       std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(task_data_mpi);
-  
+
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -56,12 +56,11 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
-    
   };
-  
+
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
- 
+
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
