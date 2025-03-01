@@ -8,7 +8,7 @@
 #include "core/task/include/task.hpp"
 
 namespace leontev_n_binary_mpi {
-	
+
 class BinarySegmentsMPI : public ppc::core::Task {
  public:
   explicit BinarySegmentsMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}

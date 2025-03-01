@@ -11,10 +11,10 @@ namespace leontev_n_binary_seq {
 
 bool CompNotZero(uint32_t a, uint32_t b) {
   if (a == 0) {
-	return false;
+    return false;
   }
   if (b == 0) {
-	return true;
+    return true;
   }
   return a < b;
 }
@@ -60,10 +60,10 @@ bool BinarySegmentsSeq::RunImpl() {
             if (label != 0 && label != min_label && label > min_label) {
               label_equivalences[label] = min_label;
             }
-	        if (label != 0 && label != min_label && label < min_label) {
+            if (label != 0 && label != min_label && label < min_label) {
               label_equivalences[min_label] = label;
             }
-		  }
+          }
         }
       }
     }
