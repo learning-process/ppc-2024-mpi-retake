@@ -1,9 +1,9 @@
+#include "gtest/gtest.h"
 #include <memory>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
-#include "gtest/gtest.h"
 
 TEST(DiningPhilosophersMPIPerfTest, test_pipeline_run_mpi) {
   boost::mpi::communicator world;
