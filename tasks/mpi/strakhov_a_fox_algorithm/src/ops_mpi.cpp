@@ -1,5 +1,6 @@
 #include "mpi/strakhov_a_fox_algorithm/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <vector>
@@ -9,10 +10,10 @@ bool strakhov_a_fox_algorithm::TestTaskMPI::PreProcessingImpl() {
 
   auto* in_ptr1 = reinterpret_cast<double*>(task_data->inputs[0]);
   auto* in_ptr2 = reinterpret_cast<double*>(task_data->inputs[1]);
-  matrA_ = std::vector<double>(in_ptr1, in_ptr1 + rc_size_ * rc_size_);
-  matrB_ = std::vector<double>(in_ptr2, in_ptr2 + rc_size_ * rc_size_);
+  matrA_ = std::vector<double>(in_ptr1, in_ptr1 + (rc_size_ * rc_size_));
+  matrB_ = std::vector<double>(in_ptr2, in_ptr2 + (rc_size_ * rc_size_));
 
-  if (world_.rank() >= rc_size_) {
+  if (world_.rank() >= static_cast<int>(rc_size_)) {
     return true;
   }
   return true;
@@ -27,28 +28,30 @@ bool strakhov_a_fox_algorithm::TestTaskMPI::ValidationImpl() {
 bool strakhov_a_fox_algorithm::TestTaskMPI::RunImpl() {
   std::vector<double> output_local(rc_size_ * rc_size_, 0);
   size_t actual_size = world_.size();
-  if (actual_size > rc_size_) actual_size = rc_size_;
-  if (rc_size_ <= world_.rank()) return true;
+  actual_size = std::min(actual_size, rc_size_);
+  if (static_cast<int>(rc_size_) <= world_.rank()) {
+    return true;
+  }
   size_t d = rc_size_ / actual_size;
   size_t b = d * world_.rank();
   size_t e = b + d;
-  if (world_.rank() == (actual_size - 1)) {
+  if (world_.rank() == static_cast<int>(actual_size - 1)) {
     e = rc_size_;
   }
-  for (int k = b; k < e; k++) {
-    for (int i = 0; i < rc_size_; i++) {
-      for (int j = 0; j < rc_size_; j++) {
+  for (int k = static_cast<int>(b); k < e; k++) {
+    for (int i = 0; i < static_cast<int>(rc_size_); i++) {
+      for (int j = 0; j < static_cast<int>(rc_size_); j++) {
         size_t xA = (i + k + j) % rc_size_;
         size_t yB = (i + j + k) % rc_size_;
-        double ans = matrA_[xA + (i * rc_size_)] * matrB_[(yB * rc_size_ + j)];
-        output_local[(rc_size_ * i) + j] += ans;
+        double ans = matrA_[xA + (i * static_cast<int>(rc_size_))] * matrB_[(yB * static_cast<int>(rc_size_) + j)];
+        output_local[(static_cast<int>(rc_size_) * i) + j] += ans;
       }
     }
   }
   if (world_.rank() == 0) {
-    std::vector<double> local_ans(rc_size_ * rc_size_, 0);
+    std::vector<double> local_ans(static_cast<int>(rc_size_) * static_cast<int>(rc_size_), 0);
     for (int i = 1; i < actual_size; i++) {
-      world_.recv(i, 0, local_ans.data(), rc_size_ * rc_size_);
+      world_.recv(i, 0, local_ans.data(), static_cast<int>(rc_size_) * static_cast<int>(rc_size_));
       for (size_t j = 0; j < local_ans.size(); j++) {
         output_local[j] += local_ans[j];
       }
