@@ -21,7 +21,6 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
   // Рассылаем значение всем процессам
   boost::mpi::broadcast(world_, num_philosophers_, 0);
 
-  // Синхронизированный вывод для отладки
   for (int r = 0; r < world_.size(); ++r) {
     world_.barrier();
     if (world_.rank() == r) {
@@ -34,7 +33,6 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
 
 // В ValidationImpl
 bool DiningPhilosophersMPI::ValidationImpl() {
-  // Синхронизированный вывод
   for (int r = 0; r < world_.size(); ++r) {
     world_.barrier();
     if (world_.rank() == r) {
