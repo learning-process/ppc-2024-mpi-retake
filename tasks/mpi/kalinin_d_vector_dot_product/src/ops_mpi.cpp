@@ -68,8 +68,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
   if (world_.rank() == 0) {
     total_elements = static_cast<int>(task_data->inputs_count[0]);
     num_processes_ = world_.size();
-    delta = total_elements / num_processes_;
-    remainder = total_elements % num_processes_;
 
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
     for (size_t i = 0; i < input_.size(); i++) {
@@ -138,7 +136,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
   boost::mpi::reduce(world_, local_res, res_, std::plus<>(), 0);
   return true;
 }
-
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     reinterpret_cast<int*>(task_data->outputs[0])[0] = res_;
