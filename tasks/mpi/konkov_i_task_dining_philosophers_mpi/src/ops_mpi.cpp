@@ -30,7 +30,7 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
   return num_philosophers_ > 1;
 }
 
-// Â ValidationImpl
+// ValidationImpl
 bool DiningPhilosophersMPI::ValidationImpl() {
   for (int r = 0; r < world_.size(); ++r) {
     world_.barrier();
