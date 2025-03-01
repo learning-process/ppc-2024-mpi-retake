@@ -86,14 +86,14 @@ bool makadrai_a_sobel_mpi::Sobel::RunImpl() {
                   (-2 * local_img[((i - 1) * (width_img_ + peding_)) + j]) +
                   (2 * local_img[((i + 1) * (width_img_ + peding_)) + j]) +
                   (1 * local_img[((i + 1) * (width_img_ + peding_)) + (j - 1)]) +
-                  1 * local_img[((i + 1) * (width_img_ + peding_)) + (j + 1)];
+                  (1 * local_img[((i + 1) * (width_img_ + peding_)) + (j + 1)]);
 
         int g_y = (1 * local_img[((i - 1) * (width_img_ + peding_)) + (j - 1)]) +
                   (2 * local_img[(i * (width_img_ + peding_)) + (j - 1)]) +
                   (1 * local_img[((i + 1) * (width_img_ + peding_)) + (j - 1)]) +
                   (-1 * local_img[((i - 1) * (width_img_ + peding_)) + (j + 1)]) +
                   (-2 * local_img[(i * (width_img_ + peding_)) + (j + 1)]) +
-                  -1 * local_img[((i + 1) * (width_img_ + peding_)) + (j + 1)];
+                  (-1 * local_img[((i + 1) * (width_img_ + peding_)) + (j + 1)]);
 
         int temp = (int)std::sqrt(std::pow(g_x, 2) + std::pow(g_y, 2));
         local_max_z = std::max(local_max_z, temp);
@@ -112,7 +112,7 @@ bool makadrai_a_sobel_mpi::Sobel::RunImpl() {
   if (world_.rank() == 0) {
     for (int i = 0; i < width_img_; i++) {
       for (int j = 0; j < height_img_; j++) {
-        simg_[(i * height_img_) + j] = (int)((double)simg_[(i * height_img_) + j] / max_z) * 255;
+        simg_[(i * height_img_) + j] = (int)(((double)simg_[(i * height_img_) + j] / max_z) * 255);
       }
     }
   }
