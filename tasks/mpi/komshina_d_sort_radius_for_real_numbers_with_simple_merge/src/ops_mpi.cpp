@@ -56,7 +56,9 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 
   for (int exp = 0; exp < num_bits; ++exp) {
     for (double num : data) {
-      int digit = (*reinterpret_cast<uint64_t*>(&num) >> exp) & 1;
+      uint64_t bits;
+      std::memcpy(&bits, &num, sizeof(double));
+      int digit = (bits >> exp) & 1;
       buckets[digit].push_back(num);
     }
     data.clear();
