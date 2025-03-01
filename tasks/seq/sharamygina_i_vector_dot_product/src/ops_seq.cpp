@@ -14,10 +14,9 @@ bool sharamygina_i_vector_dot_product_seq::VectorDotProductSeq::PreProcessingImp
 }
 
 bool sharamygina_i_vector_dot_product_seq::VectorDotProductSeq::ValidationImpl() {
-  return (task_data->inputs_count[0] == task_data->inputs_count[1]) &&
-         (task_data->inputs.size() == task_data->inputs_count.size() && task_data->inputs.size() == 2) &&
-         task_data->outputs_count[0] == 1 && (task_data->outputs.size() == task_data->outputs_count.size()) &&
-         task_data->outputs.size() == 1;
+  return (task_data->inputs.size() == task_data->inputs_count.size() && task_data->inputs.size() == 2) &&
+         (task_data->inputs_count[0] == task_data->inputs_count[1]) && task_data->outputs_count[0] == 1 &&
+         (task_data->outputs.size() == task_data->outputs_count.size()) && task_data->outputs.size() == 1;
 }
 
 bool sharamygina_i_vector_dot_product_seq::VectorDotProductSeq::RunImpl() {
