@@ -16,7 +16,7 @@ bool DiningPhilosophersMPI::PreProcessingImpl() {
       std::cout << "[DEBUG] First input value: " << task_data->inputs_count[0] << std::endl;
     }
   }
-  
+
   boost::mpi::broadcast(world_, num_philosophers_, 0);
 
   for (int r = 0; r < world_.size(); ++r) {
