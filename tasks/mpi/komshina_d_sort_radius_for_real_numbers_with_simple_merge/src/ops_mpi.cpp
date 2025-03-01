@@ -11,106 +11,92 @@
 #include <vector>
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PreProcessingImpl() {
-  if (world_rank_ == 0) {
-    auto* in_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-    input_data_.insert(input_data_.end(), in_ptr, in_ptr + task_data->inputs_count[0]);
-    std::ranges::sort(input_data_, std::greater<>{});
+  if (rank == 0) {
+    double* input_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
+    input_data_.assign(input_ptr, input_ptr + task_data->inputs_count[0]);
+    std::sort(input_data_.rbegin(), input_data_.rend());
   }
   return true;
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ValidationImpl() {
-  if (world_rank_ == 0) {
-    return task_data->inputs_count == task_data->outputs_count;
-  }
-  return true;
+  return (rank != 0 || task_data->inputs_count == task_data->outputs_count);
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::RunImpl() {
-  ExecuteParallelSorting();
+  parallelSort();
   return true;
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (world_rank_ == 0) {
-    auto* out_ptr = reinterpret_cast<double*>(task_data->outputs[0]);
-    std::ranges::copy(sortedData_, out_ptr);
+  if (rank == 0) {
+    std::copy(sorted_data_.begin(), sorted_data_.end(), reinterpret_cast<double*>(task_data->outputs[0]));
   }
   return true;
 }
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ProcessAndSortSignedNumbers(
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::handleSignAndSort(
     std::vector<double>& data) {
   std::vector<double> positives, negatives;
   for (double num : data) {
     (num < 0 ? negatives : positives).push_back(std::abs(num));
   }
-
-  ApplyRadixSorting(positives);
-  ApplyRadixSorting(negatives);
-
+  radixSort(positives);
+  radixSort(negatives);
   for (double& num : negatives) num = -num;
-
-  data.clear();
-  data.insert(data.end(), negatives.rbegin(), negatives.rend());
+  data.assign(negatives.rbegin(), negatives.rend());
   data.insert(data.end(), positives.begin(), positives.end());
 }
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ApplyRadixSorting(
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::radixSort(
     std::vector<double>& data) {
-  constexpr int BITS = sizeof(double) * 8;
-  constexpr int RADIX = 2;
-  std::vector<std::vector<double>> buckets(RADIX);
-  std::vector<double> temp(data.size());
+  constexpr int num_bits = sizeof(double) * 8;
+  constexpr int radix = 2;
+  std::vector<std::vector<double>> buckets(radix);
+  std::vector<double> output(data.size());
 
-  for (int exp = 0; exp < BITS; ++exp) {
+  for (int exp = 0; exp < num_bits; ++exp) {
     for (double num : data) {
-      uint64_t bits = 0;
-      std::memcpy(&bits, &num, sizeof(num));
-      buckets[(bits >> exp) & 1].push_back(num);
+      int digit = (*reinterpret_cast<uint64_t*>(&num) >> exp) & 1;
+      buckets[digit].push_back(num);
     }
-
-    size_t idx = 0;
+    data.clear();
     for (auto& bucket : buckets) {
-      for (double num : bucket) temp[idx++] = num;
+      data.insert(data.end(), bucket.begin(), bucket.end());
       bucket.clear();
     }
-    data.swap(temp);
   }
 }
 
 namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi {
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ExecuteParallelSorting() {
-  int total_size = (world_rank_ == 0) ? input_data_.size() : 0;
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::parallelSort() {
+  int total_size = (rank == 0) ? input_data_.size() : 0;
   MPI_Bcast(&total_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  std::vector<int> send_counts(size_), displacements(size_);
-  int base = total_size / size_, remainder = total_size % size_;
-
-  for (int i = 0; i < size_; ++i) {
-    send_counts[i] = base + (i < remainder);
-    displacements[i] = (i > 0) ? (displacements[i - 1] + send_counts[i - 1]) : 0;
+  std::vector<int> send_counts(size), displacements(size);
+  int base_size = total_size / size, remainder = total_size % size;
+  for (int i = 0; i < size; ++i) {
+    send_counts[i] = base_size + (i < remainder);
+    displacements[i] = (i == 0) ? 0 : (displacements[i - 1] + send_counts[i - 1]);
   }
 
-  std::vector<double> local_data(send_counts[world_rank_]);
+  std::vector<double> local_data(send_counts[rank]);
   MPI_Scatterv(input_data_.data(), send_counts.data(), displacements.data(), MPI_DOUBLE, local_data.data(),
-               send_counts[world_rank_], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+               send_counts[rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-  ProcessAndSortSignedNumbers(local_data);
+  handleSignAndSort(local_data);
 
-  if (world_rank_ == 0) {
-    sortedData_ = std::move(local_data);
-    std::vector<double> recv_data;
+  if (rank == 0) {
+    sorted_data_ = local_data;
+    std::vector<double> recv_data(base_size + 1), merged_data;
     MPI_Status status;
-
-    for (int proc = 1; proc < size_; ++proc) {
-      recv_data.resize(send_counts[proc]);
+    for (int proc = 1; proc < size; proc++) {
       MPI_Recv(recv_data.data(), send_counts[proc], MPI_DOUBLE, proc, 0, MPI_COMM_WORLD, &status);
-      std::vector<double> merged;
-      std::merge(sortedData_.begin(), sortedData_.end(), recv_data.begin(), recv_data.end(),
-                 std::back_inserter(merged));
-      sortedData_ = std::move(merged);
+      merged_data.resize(sorted_data_.size() + send_counts[proc]);
+      std::merge(sorted_data_.begin(), sorted_data_.end(), recv_data.begin(), recv_data.begin() + send_counts[proc],
+                 merged_data.begin());
+      sorted_data_.swap(merged_data);
     }
   } else {
     MPI_Send(local_data.data(), local_data.size(), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
