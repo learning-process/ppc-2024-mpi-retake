@@ -26,7 +26,7 @@ auto CreateTaskData(double* a, double* b, double* h, double* res) {
 
 using namespace tarakanov_d_integration_the_trapezoid_method_mpi;
 
-TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationPositiveCheck) {
+TEST(tarakanov_d_trapezoid_method_mpi, ValidationPositiveCheck) {
   double a = 0.0;
   double b = 1.0;
   double h = 0.1;
@@ -38,7 +38,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationPositiveC
   EXPECT_TRUE(task.ValidationImpl());
 }
 
-TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationStepNegativeCheck) {
+TEST(tarakanov_d_trapezoid_method_mpi, ValidationStepNegativeCheck) {
   double a = 0.0;
   double b = 1.0;
   double h = 0.0;
@@ -50,7 +50,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, ValidationStepNegat
   EXPECT_TRUE(task.ValidationImpl());
 }
 
-TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PreProcessingPositiveCheck) {
+TEST(tarakanov_d_trapezoid_method_mpi, PreProcessingPositiveCheck) {
   double a = 0.0;
   double b = 1.0;
   double h = 0.1;
@@ -63,7 +63,7 @@ TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PreProcessingPositi
   EXPECT_TRUE(task.PreProcessingImpl());
 }
 
-TEST(tarakanov_d_integration_the_trapezoid_method_func_test, PostProcessingCheck) {
+TEST(tarakanov_d_trapezoid_method_mpi, PostProcessingCheck) {
   double a = 0.0;
   double b = 1.0;
   double h = 0.1;

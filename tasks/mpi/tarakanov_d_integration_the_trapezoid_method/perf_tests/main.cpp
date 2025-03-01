@@ -14,7 +14,7 @@
 using namespace tarakanov_d_integration_the_trapezoid_method_mpi;
 
 #define MY_TEST(test_name, test_function)                                                                    \
-  TEST(trapezoid_method_perf_test, test_name) {                                                              \
+  TEST(tarakanov_d_trapezoid_method_mpi, test_name) {                                                        \
     double a = 0.0;                                                                                          \
     double b = 1.0;                                                                                          \
     double h = 0.1;                                                                                          \
