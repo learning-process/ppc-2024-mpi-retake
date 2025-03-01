@@ -26,8 +26,8 @@ TEST(konkov_i_task_dining_philosophers_mpi, DeadlockFreeExecution) {
   task_data->inputs_count.push_back(4);
 
   konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI task(task_data);
+  ASSERT_TRUE(task.Validation())
   ASSERT_TRUE(task.PreProcessing());
-  ASSERT_TRUE(task.Validation());
   ASSERT_TRUE(task.Run());
   ASSERT_TRUE(task.PostProcessing());
 }
