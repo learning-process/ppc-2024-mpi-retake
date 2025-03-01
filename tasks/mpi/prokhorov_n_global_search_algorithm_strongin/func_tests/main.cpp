@@ -3,6 +3,7 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
@@ -18,40 +19,40 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_strongin_algorithm_q
   std::vector<double> global_epsilon = {0.001};
   std::vector<double> global_result(1, 0.0);
 
-  auto taskDataPar = std::make_shared<ppc::core::TaskData>();
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  taskDataPar->inputs_count.emplace_back(global_a.size());
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  taskDataPar->inputs_count.emplace_back(global_b.size());
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  taskDataPar->inputs_count.emplace_back(global_epsilon.size());
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  taskDataPar->outputs_count.emplace_back(global_result.size());
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
+  task_data_par->inputs_count.emplace_back(global_a.size());
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
+  task_data_par->inputs_count.emplace_back(global_b.size());
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
+  task_data_par->inputs_count.emplace_back(global_epsilon.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
+  task_data_par->outputs_count.emplace_back(global_result.size());
 
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI testTaskMPI(taskDataPar);
-  ASSERT_EQ(testTaskMPI.Validation(), true);
-  testTaskMPI.PreProcessing();
-  testTaskMPI.Run();
-  testTaskMPI.PostProcessing();
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_par);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
     std::vector<double> reference_result(1, 0.0);
 
-    auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-    taskDataSeq->inputs_count.emplace_back(global_a.size());
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-    taskDataSeq->inputs_count.emplace_back(global_b.size());
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-    taskDataSeq->inputs_count.emplace_back(global_epsilon.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_result.size());
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
+    task_data_seq->inputs_count.emplace_back(global_a.size());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
+    task_data_seq->inputs_count.emplace_back(global_b.size());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
+    task_data_seq->inputs_count.emplace_back(global_epsilon.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
+    task_data_seq->outputs_count.emplace_back(reference_result.size());
 
-    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential testTaskSequential(taskDataSeq);
-    ASSERT_EQ(testTaskSequential.Validation(), true);
-    testTaskSequential.PreProcessing();
-    testTaskSequential.Run();
-    testTaskSequential.PostProcessing();
+    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
 
     EXPECT_NEAR(reference_result[0], global_result[0], 0.001);
   }
@@ -68,40 +69,40 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_strongin_algorithm_s
   std::vector<double> global_epsilon = {0.001};
   std::vector<double> global_result(1, 0.0);
 
-  auto taskDataPar = std::make_shared<ppc::core::TaskData>();
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  taskDataPar->inputs_count.emplace_back(global_a.size());
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  taskDataPar->inputs_count.emplace_back(global_b.size());
-  taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  taskDataPar->inputs_count.emplace_back(global_epsilon.size());
-  taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  taskDataPar->outputs_count.emplace_back(global_result.size());
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
+  task_data_par->inputs_count.emplace_back(global_a.size());
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
+  task_data_par->inputs_count.emplace_back(global_b.size());
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
+  task_data_par->inputs_count.emplace_back(global_epsilon.size());
+  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
+  task_data_par->outputs_count.emplace_back(global_result.size());
 
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI testTaskMPI(taskDataPar);
-  ASSERT_EQ(testTaskMPI.Validation(), true);
-  testTaskMPI.PreProcessing();
-  testTaskMPI.Run();
-  testTaskMPI.PostProcessing();
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_par);
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
 
   if (world.rank() == 0) {
     std::vector<double> reference_result(1, 0.0);
 
-    auto taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-    taskDataSeq->inputs_count.emplace_back(global_a.size());
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-    taskDataSeq->inputs_count.emplace_back(global_b.size());
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-    taskDataSeq->inputs_count.emplace_back(global_epsilon.size());
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    taskDataSeq->outputs_count.emplace_back(reference_result.size());
+    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
+    task_data_seq->inputs_count.emplace_back(global_a.size());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
+    task_data_seq->inputs_count.emplace_back(global_b.size());
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
+    task_data_seq->inputs_count.emplace_back(global_epsilon.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
+    task_data_seq->outputs_count.emplace_back(reference_result.size());
 
-    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential testTaskSequential(taskDataSeq);
-    ASSERT_EQ(testTaskSequential.Validation(), true);
-    testTaskSequential.PreProcessing();
-    testTaskSequential.Run();
-    testTaskSequential.PostProcessing();
+    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential test_task_sequential(task_data_seq);
+    ASSERT_EQ(test_task_sequential.Validation(), true);
+    test_task_sequential.PreProcessing();
+    test_task_sequential.Run();
+    test_task_sequential.PostProcessing();
 
     EXPECT_NEAR(reference_result[0], global_result[0], 0.001);
   }

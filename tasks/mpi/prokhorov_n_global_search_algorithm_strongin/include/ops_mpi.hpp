@@ -2,6 +2,7 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -19,13 +20,13 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  double a{};
-  double b{};
-  double epsilon{};
-  double result{};
+  double a_{};
+  double b_{};
+  double epsilon_{};
+  double result_{};
 
-  std::function<double(double)> f;
-  double stronginAlgorithm();
+  std::function<double(double)> f_;
+  double StronginAlgorithm();
 };
 
 class TestTaskMPI : public ppc::core::Task {
@@ -37,16 +38,16 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  double a{};
-  double b{};
-  double epsilon{};
-  double result{};
+  double a_{};
+  double b_{};
+  double epsilon_{};
+  double result_{};
 
-  std::function<double(double)> f;
-  boost::mpi::communicator world;
+  std::function<double(double)> f_;
+  boost::mpi::communicator world_;
 
-  double stronginAlgorithm();
-  double stronginAlgorithmParallel();
+  double StronginAlgorithm();
+  double StronginAlgorithmParallel();
 };
 
 }  // namespace prokhorov_n_global_search_algorithm_strongin_mpi

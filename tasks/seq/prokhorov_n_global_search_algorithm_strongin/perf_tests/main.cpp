@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/prokhorov_n_global_search_algorithm_strongin/include/ops_seq.hpp"
 
 TEST(prokhorov_n_global_search_algorithm_strongin_seq, test_pipeline_run) {

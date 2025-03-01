@@ -1,10 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 
@@ -19,13 +15,13 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  double a{};
-  double b{};
-  double epsilon{};
-  double result{};
+  double a_{};
+  double b_{};
+  double epsilon_{};
+  double result_{};
 
-  std::function<double(double)> f;
-  double stronginAlgorithm();
+  std::function<double(double)> f_;
+  double StronginAlgorithm();
 };
 
 }  // namespace prokhorov_n_global_search_algorithm_strongin_seq
