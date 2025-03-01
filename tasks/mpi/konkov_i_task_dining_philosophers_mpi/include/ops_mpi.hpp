@@ -9,7 +9,11 @@ namespace konkov_i_task_dining_philosophers_mpi {
 
 class DiningPhilosophersMPI : public ppc::core::Task {
  public:
-  explicit DiningPhilosophersMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  explicit DiningPhilosophersMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {
+    if (!this->task_data->inputs_count.empty()) {
+      num_philosophers_ = this->task_data->inputs_count[0];
+    }
+  }
 
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
