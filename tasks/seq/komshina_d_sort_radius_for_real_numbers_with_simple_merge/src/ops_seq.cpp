@@ -1,7 +1,10 @@
 #include "seq/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <ranges>
 #include <vector>
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequential::PreProcessingImpl() {
@@ -15,30 +18,30 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequ
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequential::RunImpl() {
-  sortWithSignHandling(input_);
+  SortWithSignHandling(input_);
   output_ = input_;
   return true;
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequential::PostProcessingImpl() {
   auto* out_ptr = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::copy(output_.begin(), output_.end(), out_ptr);
+  std::ranges::copy(output_.begin(), output_.end(), out_ptr);
   return true;
 }
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequential::sortWithSignHandling(
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequential::SortWithSignHandling(
     std::vector<double>& values) {
   std::vector<double> positives;
   std::vector<double> negatives;
   positives.reserve(values.size());
   negatives.reserve(values.size());
-
-   for (double num : values) {
+  
+  for (double num : values) {
     (num < 0 ? negatives : positives).push_back(std::fabs(num));
   }
 
-  bucketRadixSort(positives);
-  bucketRadixSort(negatives);
+  BucketRadixSort(positives);
+  BucketRadixSort(negatives);
 
   for (double& num : negatives) {
     num = -num;
@@ -50,7 +53,7 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequ
   values.insert(values.end(), positives.begin(), positives.end());
 }
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::bucketRadixSort(std::vector<double>& values) {
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::BucketRadixSort(std::vector<double>& values) {
   const int total_bits = sizeof(double) * 8;
   std::vector<std::vector<double>> bins(2);
   bins[0].reserve(values.size());

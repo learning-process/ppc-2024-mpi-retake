@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include <random>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -26,10 +27,10 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, AlreadySorte
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  auto* resultSeq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
+  auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
 
   for (int i = 0; i < size; ++i) {
-    double diff = std::fabs(in[i] - resultSeq[i]);
+    double diff = std::fabs(in[i] - result_seq[i]);
     EXPECT_LT(diff, 1e-12) << "Values at index " << i << " differ by more than the allowed tolerance.";
   }
 }
@@ -51,11 +52,11 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, AlreadySorte
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  auto* resultSeq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
-  std::sort(in.begin(), in.end());
+  auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
+  std::ranges::sort(in);
 
   for (int i = 0; i < size; ++i) {
-    double diff = std::fabs(in[i] - resultSeq[i]);
+    double diff = std::fabs(in[i] - result_seq[i]);
     EXPECT_LT(diff, 1e-12) << "Values at index " << i << " differ by more than the allowed tolerance.";
   }
 }
@@ -77,10 +78,10 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, AllEqualNumb
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  auto* resultSeq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
+  auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
 
   for (int i = 0; i < size; ++i) {
-    double diff = std::fabs(in[i] - resultSeq[i]);
+    double diff = std::fabs(in[i] - result_seq[i]);
     EXPECT_LT(diff, 1e-12) << "Values at index " << i << " differ by more than the allowed tolerance.";
   }
 }
@@ -102,11 +103,11 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, MixedPositiv
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  auto* resultSeq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
-  std::sort(in.begin(), in.end());
+  auto* result_seq = reinterpret_cast<double*>(task_data_seq->outputs[0]);
+  std::ranges::sort(in);
 
   for (int i = 0; i < size; ++i) {
-    double diff = std::fabs(in[i] - resultSeq[i]);
+    double diff = std::fabs(in[i] - result_seq[i]);
     EXPECT_LT(diff, 1e-12) << "Values at index " << i << " differ by more than the allowed tolerance.";
   }
 }

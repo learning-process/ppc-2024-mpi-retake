@@ -1,27 +1,22 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <random>
-#include <vector>
 
-#include "boost/mpi/communicator.hpp"
+#include <mpi.h>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
-namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi {
+namespace {
 
-void generate_computed_data(std::vector<double> &data, int N, double min = -1e9, double max = 1e9) {
-  data.resize(N);
+void GenerateComputedData(std::vector<double> &data, int s, double min = -1e9, double max = 1e9) {
+  data.resize(s);
 
-  for (int i = 0; i < N; ++i) {
+  for (int i = 0; i < s; ++i) {
     data[i] = min + (max - min) * (std::sin(i * 0.1) + 1) / 2;
   }
 }
@@ -29,24 +24,24 @@ void generate_computed_data(std::vector<double> &data, int N, double min = -1e9,
 }  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipeline_run) {
-  int rank, size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  int world_rank_ = 0;
+  int size = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  int S = 1000000;
-  std::vector<double> in(S);
-  std::vector<double> out(S, 0.0);
+  int s = 1000000;
+  std::vector<double> in(s);
+  std::vector<double> out(s, 0.0);
 
-  if (rank == 0) {
-    komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::generate_computed_data(in, S);
+  if (world_rank_ == 0) {GenerateComputedData(in, s);
   }
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(S);
+  task_data_mpi->inputs_count.emplace_back(s);
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(S);
+  task_data_mpi->outputs_count.emplace_back(s);
 
   // Create Task
   auto test_task_mpi =
@@ -68,32 +63,30 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
-  boost::mpi::communicator world;
-  if (world.rank() == 0) {
+  if (world_rank_ == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_run) {
-  int rank, size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  int world_rank_ = 0;
+  int size = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  int S = 1000000;
-  std::vector<double> in(S);
-  std::vector<double> out(S, 0.0);
+  int s = 1000000;
+  std::vector<double> in(s);
+  std::vector<double> out(s, 0.0);
 
-  if (rank == 0) {
-    komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::generate_computed_data(in, S);
+  if (world_rank_ == 0) {GenerateComputedData(in, s);
   }
-
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(S);
+  task_data_mpi->inputs_count.emplace_back(s);
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(S);
+  task_data_mpi->outputs_count.emplace_back(s);
 
   // Create Task
   auto test_task_mpi =
@@ -116,8 +109,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_ru
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   // Create Perf analyzer
-  boost::mpi::communicator world;
-  if (world.rank() == 0) {
+  if (world_rank_ == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }

@@ -6,22 +6,25 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <ranges>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_seq.hpp"
 
-std::vector<double> generate_deterministic_input(size_t size) {
+namespace {
+std::vector<double> GenerateDeterministicInput(size_t size) {
   std::vector<double> input(size);
   for (size_t i = 0; i < size; ++i) {
-    input[i] = 1.0 + (i % 100) / 100.0;
+    input[i] = 1.0 + static_cast<double>(i % 100) / 100.0;
   }
   return input;
 }
+}  // namespace
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipeline_run) {
   const int count = 1000000;
-  std::vector<double> in = generate_deterministic_input(count);
+  std::vector<double> in = GenerateDeterministicInput(count);
   std::vector<double> out(count);
 
   // Create task_data
@@ -54,13 +57,13 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipelin
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<double> sorted_in = in;
-  std::sort(sorted_in.begin(), sorted_in.end());
+  std::ranges::sort(sorted_in);
   ASSERT_EQ(out, sorted_in);
 }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_task_run) {
   const int count = 1000000;
-  std::vector<double> in = generate_deterministic_input(count);
+  std::vector<double> in = GenerateDeterministicInput(count);
   std::vector<double> out(count);
 
   // Create task_data
@@ -93,6 +96,6 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_task_ru
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<double> sorted_in = in;
-  std::sort(sorted_in.begin(), sorted_in.end());
+  std::ranges::sort(sorted_in);
   ASSERT_EQ(out, sorted_in);
 }

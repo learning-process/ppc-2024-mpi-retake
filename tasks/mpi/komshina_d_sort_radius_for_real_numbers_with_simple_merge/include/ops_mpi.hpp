@@ -1,11 +1,8 @@
 #pragma once
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <mpi.h>
 #include <utility>
-#include <algorithm>
 #include <vector>
-#include <memory>
 
 #include "core/task/include/task.hpp"
 
@@ -28,9 +25,9 @@ class TestTaskMPI : public ppc::core::Task {
   void ProcessAndSortSignedNumbers(std::vector<double>& data);
 
   int world_rank_;
-  int size;
+  int size_;
   std::vector<double> input_data_;
-  std::vector<double> sortedData;
+  std::vector<double> sortedData_;
 };
 
 }  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi
