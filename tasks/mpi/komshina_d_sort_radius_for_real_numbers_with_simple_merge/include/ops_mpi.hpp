@@ -23,7 +23,7 @@ class TestTaskMPI : public ppc::core::Task {
  private:
   void ExecuteParallelSorting();
   static void ApplyRadixSorting(std::vector<double>& data);
-  void ProcessAndSortSignedNumbers(std::vector<double>& data);
+  static void ProcessAndSortSignedNumbers(std::vector<double>& data);
 
   int world_rank_;
   int size_;

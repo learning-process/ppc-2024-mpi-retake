@@ -6,15 +6,14 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <ranges>
-#include <vector>
 #include <functional>
+#include <vector>
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_rank_ == 0) {
     auto* in_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
     input_data_.insert(input_data_.end(), in_ptr, in_ptr + task_data->inputs_count[0]);
-    std::ranges::sort(input_data_, std::greater<>{}); 
+    std::ranges::sort(input_data_, std::greater<>{});
   }
   return true;
 }
@@ -104,7 +103,8 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   std::vector<int> displacements(size_);
 
   if (world_rank_ == 0) {
-    int base = total_size / size_, remainder = total_size % size_;
+    int base = total_size / size_;
+    int remainder = total_size % size_;
     for (int i = 0; i < size_; ++i) {
       send_counts[i] = base + static_cast<int>(i < remainder);
       displacements[i] = (i > 0) ? (displacements[i - 1] + send_counts[i - 1]) : 0;

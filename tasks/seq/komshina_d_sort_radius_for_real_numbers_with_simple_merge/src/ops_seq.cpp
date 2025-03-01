@@ -4,7 +4,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <ranges>
 #include <vector>
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequential::PreProcessingImpl() {
@@ -35,7 +34,7 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq::TestTaskSequ
   std::vector<double> negatives;
   positives.reserve(values.size());
   negatives.reserve(values.size());
-  
+
   for (double num : values) {
     (num < 0 ? negatives : positives).push_back(std::fabs(num));
   }

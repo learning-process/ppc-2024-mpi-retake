@@ -32,7 +32,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
   int s = 1000000;
   std::vector<double> in(s);
   std::vector<double> out(s, 0.0);
-  
+
   if (world_rank == 0) {
     GenerateComputedData(in, s);
   }
@@ -47,7 +47,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
   // Create Task
   auto test_task_mpi =
       std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(task_data_mpi);
-
+  
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -56,11 +56,12 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
+    
   };
-
+  
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
+ 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
@@ -78,9 +79,10 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_ru
   int s = 1000000;
   std::vector<double> in(s);
   std::vector<double> out(s, 0.0);
-  
+
   if (world_rank == 0) {
     GenerateComputedData(in, s);
+  }
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -105,7 +107,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_ru
 
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
+  
   // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
