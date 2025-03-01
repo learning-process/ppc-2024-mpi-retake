@@ -30,12 +30,11 @@ std::vector<int> GetVector(unsigned int size) {
 }  // namespace sharamygina_i_vector_dot_product_seq
 
 TEST(sharamygina_i_vector_dot_product, SampleVecTest) {
-  unsigned int k_size1 = 4;
-  unsigned int k_size2 = 4;
+  unsigned int lenght = 4;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
-  task_data->inputs_count.emplace_back(k_size2);
+  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(lenght);
 
   std::vector<int> received_res(1);
   int expected_res = 30;
@@ -57,18 +56,17 @@ TEST(sharamygina_i_vector_dot_product, SampleVecTest) {
 }
 
 TEST(sharamygina_i_vector_dot_product, BigVecTest) {
-  unsigned int k_size1 = 200;
-  unsigned int k_size2 = 200;
+  unsigned int lenght = 200;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
-  task_data->inputs_count.emplace_back(k_size2);
+  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(lenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
-  std::vector<int> v2(k_size2);
-  v1 = sharamygina_i_vector_dot_product_seq::GetVector(k_size1);
-  v2 = sharamygina_i_vector_dot_product_seq::GetVector(k_size2);
+  std::vector<int> v1(lenght);
+  std::vector<int> v2(lenght);
+  v1 = sharamygina_i_vector_dot_product_seq::GetVector(lenght);
+  v2 = sharamygina_i_vector_dot_product_seq::GetVector(lenght);
   int expected_res = sharamygina_i_vector_dot_product_seq::Resulting(v1, v2);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
@@ -86,16 +84,15 @@ TEST(sharamygina_i_vector_dot_product, BigVecTest) {
 }
 
 TEST(sharamygina_i_vector_dot_product, DifferentVecValidationTest) {
-  unsigned int k_size1 = 200;
-  unsigned int k_size2 = 100;
+  unsigned int lenght = 200;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
-  task_data->inputs_count.emplace_back(k_size2);
+  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(lenght - 100);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
-  std::vector<int> v2(k_size2);
+  std::vector<int> v1(lenght, 0);
+  std::vector<int> v2(lenght, 0);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));
@@ -107,14 +104,14 @@ TEST(sharamygina_i_vector_dot_product, DifferentVecValidationTest) {
 }
 
 TEST(sharamygina_i_vector_dot_product, OneSizeValidationTest) {
-  unsigned int k_size1 = 200;
+  unsigned int lenght = 200;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
+  task_data->inputs_count.emplace_back(lenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
-  std::vector<int> v2(k_size1);
+  std::vector<int> v1(lenght, 0);
+  std::vector<int> v2(lenght, 0);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));
@@ -126,14 +123,14 @@ TEST(sharamygina_i_vector_dot_product, OneSizeValidationTest) {
 }
 
 TEST(sharamygina_i_vector_dot_product, OneVecValidationTest) {
-  unsigned int k_size1 = 200;
+  unsigned int lenght = 200;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
-  task_data->inputs_count.emplace_back(k_size1);
+  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(lenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
+  std::vector<int> v1(lenght, 0);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_res.data()));
@@ -144,13 +141,13 @@ TEST(sharamygina_i_vector_dot_product, OneVecValidationTest) {
 }
 
 TEST(sharamygina_i_vector_dot_product, OneVecAndSizeValidationTest) {
-  unsigned int k_size1 = 200;
+  unsigned int lenght = 200;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
+  task_data->inputs_count.emplace_back(lenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
+  std::vector<int> v1(lenght, 0);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_res.data()));
@@ -161,16 +158,15 @@ TEST(sharamygina_i_vector_dot_product, OneVecAndSizeValidationTest) {
 }
 
 TEST(sharamygina_i_vector_dot_product, MoreOutputCountValidationTest) {
-  unsigned int k_size1 = 10;
-  unsigned int k_size2 = 10;
+  unsigned int lenght = 10;
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.emplace_back(k_size1);
-  task_data->inputs_count.emplace_back(k_size2);
+  task_data->inputs_count.emplace_back(lenght);
+  task_data->inputs_count.emplace_back(lenght);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(k_size1);
-  std::vector<int> v2(k_size2);
+  std::vector<int> v1(lenght);
+  std::vector<int> v2(lenght);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));
