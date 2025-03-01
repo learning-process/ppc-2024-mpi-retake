@@ -65,8 +65,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::ValidationImpl() {
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() {
   int total_elements = 0;
-  int delta = 0;
-  int remainder = 0;
 
   if (world_.rank() == 0) {
     total_elements = static_cast<int>(task_data->inputs_count[0]);
@@ -91,6 +89,8 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
+  int delta = 0;
+  int remainder = 0;
   boost::mpi::broadcast(world_, num_processes_, 0);
 
   counts_.resize(num_processes_);  // Vector to store counts for each process
