@@ -1,229 +1,233 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <random>
+#include <vector>
 
-#include "core/task/include/task.hpp"
-#include "seq/sharamygina_i_horizontal_line_filtration/include/ops_seq.h"
+#include "mpi/sharamygina_i_vector_dot_product/include/ops_mpi.h"
 
-namespace sharamygina_i_horizontal_line_filtration_seq {
+namespace sharamygina_i_vector_dot_product_mpi {
 namespace {
-void ToFiltSeq(const std::vector<unsigned int>& input, int rows, int cols, std::vector<unsigned int>& output) {
-  const int kernel[3][3] = {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
-  output.assign(rows * cols, 0);
-
-  for (int r = 1; r < rows - 1; ++r) {
-    for (int c = 1; c < cols - 1; ++c) {
-      unsigned int sum = 0;
-      for (int kr = -1; kr <= 1; ++kr) {
-        for (int kc = -1; kc <= 1; ++kc) {
-          sum += input[(r + kr) * cols + (c + kc)] * kernel[kr + 1][kc + 1];
-        }
-      }
-      output[r * cols + c] = sum / 16;
-    }
+int resulting(const std::vector<int> &v1, const std::vector<int> &v2) {
+  int res = 0;
+  for (size_t i = 0; i < v1.size(); ++i) {
+    res += v1[i] * v2[i];
   }
+  return res;
 }
-
-std::vector<unsigned int> GetImage(int rows, int cols) {
-  std::vector<unsigned int> temporaryIm(rows * cols);
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
-  for (int i = 0; i < rows; i++)
-    for (int j = 0; j < cols; j++) temporaryIm[i * cols + j] = dist(gen);
-  return temporaryIm;
+std::vector<int> GetVector(int size) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::vector<int> v(size);
+  for (int i = 0; i < size; i++) {
+    v[i] = gen() % 320 + gen() % 11;
+  }
+  return v;
 }
 }  // namespace
-}  // namespace sharamygina_i_horizontal_line_filtration_seq
+}  // namespace sharamygina_i_vector_dot_product_mpi
 
-TEST(sharamygina_i_horizontal_line_filtration, SampleImageTest) {
-  int rows = 4;
-  int cols = 4;
+TEST(sharamygina_i_vector_dot_product_mpi, SampleVecTest) {
+  boost::mpi::communicator world;
+  int size1 = 12;
+  int size2 = 12;
 
   std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
-  taskData->inputs_count.emplace_back(rows);
-  taskData->inputs_count.emplace_back(cols);
 
-  std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-  std::vector<unsigned int> expected_image = {0, 0, 0, 0, 0, 6, 7, 0, 0, 10, 11, 0, 0, 0, 0, 0};
-  std::vector<unsigned int> expected_image_new(rows * cols);
-  sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image_new);
+  std::vector<int> received_res(1);
+  int expected_res = 90;
+  std::vector<int> v1 = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
+  std::vector<int> v2 = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
 
-  taskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
+    taskData->inputs_count.emplace_back(size2);
 
-  received_image.resize(rows * cols);
-  taskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  taskData->outputs_count.emplace_back(received_image.size());
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
+    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
+    taskData->outputs_count.emplace_back(received_res.size());
+  }
 
-  sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq testTask(taskData);
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
   ASSERT_TRUE(testTask.ValidationImpl());
   ASSERT_TRUE(testTask.PreProcessingImpl());
   ASSERT_TRUE(testTask.RunImpl());
   ASSERT_TRUE(testTask.PostProcessingImpl());
 
-  ASSERT_EQ(received_image.size(), expected_image.size());
-  for (size_t i = 0; i < received_image.size(); i++) {
-    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  if (world.rank() == 0) {
+    ASSERT_EQ(received_res[0], expected_res);
   }
 }
 
-TEST(sharamygina_i_horizontal_line_filtration, BigImageTest) {
-  int rows = 200;
-  int cols = 160;
+TEST(sharamygina_i_vector_dot_product_mpi, BigVecTest1) {
+  boost::mpi::communicator world;
+  int size1 = 3000;
+  int size2 = 3000;
 
   std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
-  taskData->inputs_count.emplace_back(rows);
-  taskData->inputs_count.emplace_back(cols);
 
-  std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
+  std::vector<int> received_res(1);
+  std::vector<int> v1 = sharamygina_i_vector_dot_product_mpi::GetVector(size1);
+  std::vector<int> v2 = sharamygina_i_vector_dot_product_mpi::GetVector(size2);
+  int expected_res = sharamygina_i_vector_dot_product_mpi::resulting(v1, v2);
 
-  image = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image);
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
+    taskData->inputs_count.emplace_back(size2);
 
-  taskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
+    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
+    taskData->outputs_count.emplace_back(received_res.size());
+  }
 
-  received_image.resize(rows * cols);
-  taskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  taskData->outputs_count.emplace_back(received_image.size());
-
-  sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq testTask(taskData);
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
   ASSERT_TRUE(testTask.ValidationImpl());
   ASSERT_TRUE(testTask.PreProcessingImpl());
   ASSERT_TRUE(testTask.RunImpl());
   ASSERT_TRUE(testTask.PostProcessingImpl());
 
-  for (size_t i = 0; i < received_image.size(); i++) {
-    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  if (world.rank() == 0) {
+    ASSERT_EQ(received_res[0], expected_res);
   }
 }
 
-TEST(sharamygina_i_horizontal_line_filtration, SmallImageTest) {
-  int rows = 5;
-  int cols = 4;
+TEST(sharamygina_i_vector_dot_product_mpi, BigVecTest2) {
+  boost::mpi::communicator world;
+  int size1 = 6000;
+  int size2 = 6000;
 
   std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
-  taskData->inputs_count.emplace_back(rows);
-  taskData->inputs_count.emplace_back(cols);
 
-  std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
+  std::vector<int> received_res(1);
+  std::vector<int> v1 = sharamygina_i_vector_dot_product_mpi::GetVector(size1);
+  std::vector<int> v2 = sharamygina_i_vector_dot_product_mpi::GetVector(size2);
+  int expected_res = sharamygina_i_vector_dot_product_mpi::resulting(v1, v2);
 
-  image = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  taskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
+    taskData->inputs_count.emplace_back(size2);
 
-  sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image);
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
+    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
+    taskData->outputs_count.emplace_back(received_res.size());
+  }
 
-  received_image.resize(rows * cols);
-  taskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  taskData->outputs_count.emplace_back(received_image.size());
-
-  sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq testTask(taskData);
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
   ASSERT_TRUE(testTask.ValidationImpl());
   ASSERT_TRUE(testTask.PreProcessingImpl());
   ASSERT_TRUE(testTask.RunImpl());
   ASSERT_TRUE(testTask.PostProcessingImpl());
 
-  for (size_t i = 0; i < received_image.size(); i++) {
-    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  if (world.rank() == 0) {
+    ASSERT_EQ(received_res[0], expected_res);
   }
 }
 
-TEST(sharamygina_i_horizontal_line_filtration, SquareImageTest) {
-  int rows = 5;
-  int cols = 5;
+TEST(sharamygina_i_vector_dot_product_mpi, BigVecTest3) {
+  boost::mpi::communicator world;
+  int size1 = 9000;
+  int size2 = 9000;
 
   std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
-  taskData->inputs_count.emplace_back(rows);
-  taskData->inputs_count.emplace_back(cols);
 
-  std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
+  std::vector<int> received_res(1);
+  std::vector<int> v1 = sharamygina_i_vector_dot_product_mpi::GetVector(size1);
+  std::vector<int> v2 = sharamygina_i_vector_dot_product_mpi::GetVector(size2);
+  int expected_res = sharamygina_i_vector_dot_product_mpi::resulting(v1, v2);
 
-  image = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image);
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
+    taskData->inputs_count.emplace_back(size2);
 
-  taskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
+    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
+    taskData->outputs_count.emplace_back(received_res.size());
+  }
 
-  received_image.resize(rows * cols);
-  taskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  taskData->outputs_count.emplace_back(received_image.size());
-
-  sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq testTask(taskData);
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
   ASSERT_TRUE(testTask.ValidationImpl());
   ASSERT_TRUE(testTask.PreProcessingImpl());
   ASSERT_TRUE(testTask.RunImpl());
   ASSERT_TRUE(testTask.PostProcessingImpl());
 
-  for (size_t i = 0; i < received_image.size(); i++) {
-    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  if (world.rank() == 0) {
+    ASSERT_EQ(received_res[0], expected_res);
   }
 }
 
-TEST(sharamygina_i_horizontal_line_filtration, HorizontalImageTest) {
-  int rows = 5;
-  int cols = 10;
+TEST(sharamygina_i_vector_dot_product_mpi, EmptyVecValidationTest) {
+  boost::mpi::communicator world;
+  int size1 = 200;
+  int size2 = 200;
 
   std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
-  taskData->inputs_count.emplace_back(rows);
-  taskData->inputs_count.emplace_back(cols);
 
-  std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
+  std::vector<int> received_res(1);
 
-  image = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image);
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
+    taskData->inputs_count.emplace_back(size2);
+    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
+    taskData->outputs_count.emplace_back(received_res.size());
+  }
 
-  taskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-  received_image.resize(rows * cols);
-  taskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  taskData->outputs_count.emplace_back(received_image.size());
-
-  sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq testTask(taskData);
-  ASSERT_TRUE(testTask.ValidationImpl());
-  ASSERT_TRUE(testTask.PreProcessingImpl());
-  ASSERT_TRUE(testTask.RunImpl());
-  ASSERT_TRUE(testTask.PostProcessingImpl());
-
-  for (size_t i = 0; i < received_image.size(); i++) {
-    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
+  if (world.rank() == 0) {
+    ASSERT_FALSE(testTask.ValidationImpl());
   }
 }
 
-TEST(sharamygina_i_horizontal_line_filtration, VerticalImageTest) {
-  int rows = 10;
-  int cols = 5;
+TEST(sharamygina_i_vector_dot_product_mpi, OneSizeValidationTest) {
+  boost::mpi::communicator world;
+  int size1 = 200;
 
   std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
-  taskData->inputs_count.emplace_back(rows);
-  taskData->inputs_count.emplace_back(cols);
 
-  std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
+  std::vector<int> received_res(1);
+  std::vector<int> v1(size1);
+  std::vector<int> v2(size1);
 
-  image = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image);
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
 
-  taskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
+    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_res.data()));
+    taskData->outputs_count.emplace_back(received_res.size());
+  }
 
-  received_image.resize(rows * cols);
-  taskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  taskData->outputs_count.emplace_back(received_image.size());
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
+  if (world.rank() == 0) {
+    ASSERT_FALSE(testTask.ValidationImpl());
+  }
+}
 
-  sharamygina_i_horizontal_line_filtration_seq::horizontal_line_filtration_seq testTask(taskData);
-  ASSERT_TRUE(testTask.ValidationImpl());
-  ASSERT_TRUE(testTask.PreProcessingImpl());
-  ASSERT_TRUE(testTask.RunImpl());
-  ASSERT_TRUE(testTask.PostProcessingImpl());
+TEST(sharamygina_i_vector_dot_product_mpi, EmptyOutputCountValidationTest) {
+  boost::mpi::communicator world;
+  int size1 = 200;
+  int size2 = 200;
 
-  for (size_t i = 0; i < received_image.size(); i++) {
-    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<int> v1(size1);
+  std::vector<int> v2(size2);
+
+  if (world.rank() == 0) {
+    taskData->inputs_count.emplace_back(size1);
+    taskData->inputs_count.emplace_back(size2);
+
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v1.data()));
+    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(v2.data()));
+    taskData->outputs_count.emplace_back(1);
+  }
+
+  sharamygina_i_vector_dot_product_mpi::vector_dot_product_mpi testTask(taskData);
+  if (world.rank() == 0) {
+    ASSERT_FALSE(testTask.ValidationImpl());
   }
 }
