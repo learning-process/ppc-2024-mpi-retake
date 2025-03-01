@@ -10,7 +10,7 @@
 namespace sharamygina_i_vector_dot_product_mpi {
 class VectorDotProductMpi : public ppc::core::Task {
  public:
-  explicit VectorDotProductMpi(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit VectorDotProductMpi(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -23,6 +23,6 @@ class VectorDotProductMpi : public ppc::core::Task {
   std::vector<int> local_v2_;
   int res_{};
   boost::mpi::communicator world_;
-  int delta_;
+  unsigned int delta_;
 };
 }  // namespace sharamygina_i_vector_dot_product_mpi
