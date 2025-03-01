@@ -74,17 +74,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
     delta = total_elements / num_processes_;      // Calculate base size for each process
     remainder = total_elements % num_processes_;  // Calculate remaining elements
   }
-  boost::mpi::broadcast(world_, num_processes_, 0);
-
-  counts_.resize(num_processes_);  // Vector to store counts for each process
-
-  if (world_.rank() == 0) {
-    // Distribute sizes to each process
-    for (int i = 0; i < num_processes_; ++i) {
-      counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
-    }
-  }
-  boost::mpi::broadcast(world_, counts_.data(), num_processes_, 0);
 
   if (world_.rank() == 0) {
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
@@ -102,6 +91,18 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() 
 }
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::RunImpl() {
+  boost::mpi::broadcast(world_, num_processes_, 0);
+
+  counts_.resize(num_processes_);  // Vector to store counts for each process
+
+  if (world_.rank() == 0) {
+    // Distribute sizes to each process
+    for (int i = 0; i < num_processes_; ++i) {
+      counts_[i] = delta + (i < remainder ? 1 : 0);  // Assign 1 additional element to the first 'remainder' processes
+    }
+  }
+  boost::mpi::broadcast(world_, counts_.data(), num_processes_, 0);
+
   if (world_.rank() == 0) {
     size_t offset_remainder = counts_[0];
     for (int proc = 1; proc < num_processes_; proc++) {
