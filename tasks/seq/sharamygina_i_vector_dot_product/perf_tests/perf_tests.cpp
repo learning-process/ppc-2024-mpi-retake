@@ -25,18 +25,18 @@ std::vector<int> GetVector(unsigned int size) {
 }  // namespace sharamygina_i_vector_dot_product_seq
 
 TEST(sharamygina_i_vector_dot_product_seq, LargeImage) {
-  constexpr unsigned int kSize1 = 10000000;
-  constexpr unsigned int kSize2 = 10000000;
+  constexpr unsigned int k_size1 = 10000000;
+  constexpr unsigned int k_size2 = 10000000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
-  task_data->inputs_count.emplace_back(kSize1);
-  task_data->inputs_count.emplace_back(kSize2);
+  task_data->inputs_count.emplace_back(k_size1);
+  task_data->inputs_count.emplace_back(k_size2);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(kSize1);
-  std::vector<int> v2(kSize2);
-  v1 = sharamygina_i_vector_dot_product_seq::GetVector(kSize1);
-  v2 = sharamygina_i_vector_dot_product_seq::GetVector(kSize2);
+  std::vector<int> v1(k_size1);
+  std::vector<int> v2(k_size2);
+  v1 = sharamygina_i_vector_dot_product_seq::GetVector(k_size1);
+  v2 = sharamygina_i_vector_dot_product_seq::GetVector(k_size2);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));
@@ -63,18 +63,18 @@ TEST(sharamygina_i_vector_dot_product_seq, LargeImage) {
 }
 
 TEST(sharamygina_i_vector_dot_product_seq, LargeImageRun) {
-  constexpr unsigned int kSize1 = 10000000;
-  constexpr unsigned int kSize2 = 10000000;
+  constexpr unsigned int k_size1 = 10000000;
+  constexpr unsigned int k_size2 = 10000000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
-  task_data->inputs_count.emplace_back(kSize1);
-  task_data->inputs_count.emplace_back(kSize2);
+  task_data->inputs_count.emplace_back(k_size1);
+  task_data->inputs_count.emplace_back(k_size2);
 
   std::vector<int> received_res(1);
-  std::vector<int> v1(kSize1);
-  std::vector<int> v2(kSize2);
-  v1 = sharamygina_i_vector_dot_product_seq::GetVector(kSize1);
-  v2 = sharamygina_i_vector_dot_product_seq::GetVector(kSize2);
+  std::vector<int> v1(k_size1);
+  std::vector<int> v2(k_size2);
+  v1 = sharamygina_i_vector_dot_product_seq::GetVector(k_size1);
+  v2 = sharamygina_i_vector_dot_product_seq::GetVector(k_size2);
 
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v1.data()));
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(v2.data()));

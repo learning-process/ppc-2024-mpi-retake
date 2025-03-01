@@ -1,5 +1,7 @@
 #include "seq/sharamygina_i_vector_dot_product/include/ops_seq.h"
 
+#include <algorithm>
+
 bool sharamygina_i_vector_dot_product_seq::VectorDotProductSeq::PreProcessingImpl() {
   v1_.resize(task_data->inputs_count[0]);
   v2_.resize(task_data->inputs_count[1]);
@@ -20,7 +22,6 @@ bool sharamygina_i_vector_dot_product_seq::VectorDotProductSeq::ValidationImpl()
 
 bool sharamygina_i_vector_dot_product_seq::VectorDotProductSeq::RunImpl() {
   for (unsigned int i = 0; i < v1_.size(); i++) {
-    res_ += v1_[i] * v2_[i];
     res_ += v1_[i] * v2_[i];
   }
   return true;
