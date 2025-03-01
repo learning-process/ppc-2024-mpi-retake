@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <vector>
 
@@ -11,13 +12,15 @@
 #include "core/task/include/task.hpp"
 #include "mpi/leontev_n_binary/include/ops_mpi.hpp"
 
-static std::vector<uint8_t> GetRandomVector(size_t rows, size_t cols) {
+namespace {
+std::vector<uint8_t> GetRandomVector(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (size_t i = 0; i < img.size(); i++) {
     img[i] = rand() % 2;
   }
   return img;
 }
+}  // namespace
 
 TEST(leontev_n_binary_mpi, test_pipeline_run) {
   boost::mpi::communicator world;

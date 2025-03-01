@@ -9,7 +9,7 @@ namespace leontev_n_binary_seq {
 
 class BinarySegmentsSeq : public ppc::core::Task {
  public:
-  explicit BinarySegmentsSeq(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+  explicit BinarySegmentsSeq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool ValidationImpl() override;
   bool PreProcessingImpl() override;
   bool RunImpl() override;

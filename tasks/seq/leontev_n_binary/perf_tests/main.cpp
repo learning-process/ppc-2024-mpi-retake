@@ -1,19 +1,23 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/leontev_n_binary/include/ops_seq.hpp"
 
-static std::vector<uint8_t> GetRandomVector(size_t rows, size_t cols) {
+namespace {
+std::vector<uint8_t> GetRandomVector(size_t rows, size_t cols) {
   std::vector<uint8_t> img(rows * cols);
   for (size_t i = 0; i < img.size(); i++) {
     img[i] = rand() % 2;
   }
   return img;
 }
+}  // namespace
 
 TEST(leontev_n_binary_seq, test_pipeline_run) {
   size_t rows = 3000;

@@ -1,12 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <string>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "seq/leontev_n_binary/include/ops_seq.hpp"
 
-static inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_seq, std::vector<uint8_t>& input,
-                                   size_t rows, size_t cols, std::vector<uint32_t>& output) {
+namespace {
+inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_seq, std::vector<uint8_t>& input,
+                            size_t rows, size_t cols, std::vector<uint32_t>& output) {
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
   task_data_seq->inputs_count.emplace_back(rows);
   task_data_seq->inputs_count.emplace_back(cols);
@@ -14,6 +19,7 @@ static inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_da
   task_data_seq->outputs_count.emplace_back(rows);
   task_data_seq->outputs_count.emplace_back(cols);
 }
+}  // namespace
 
 TEST(leontev_n_binary_seq, full_square_test) {
   std::vector<uint8_t> img = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};

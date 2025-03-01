@@ -11,7 +11,7 @@ namespace leontev_n_binary_mpi {
 	
 class BinarySegmentsMPI : public ppc::core::Task {
  public:
-  explicit BinarySegmentsMPI(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+  explicit BinarySegmentsMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool ValidationImpl() override;
   bool PreProcessingImpl() override;
   bool RunImpl() override;

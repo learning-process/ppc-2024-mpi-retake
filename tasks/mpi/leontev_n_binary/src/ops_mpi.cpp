@@ -1,14 +1,13 @@
 #include "mpi/leontev_n_binary/include/ops_mpi.hpp"
 
-#include <algorithm>
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>
-#include <cassert>
+#include <cstddef>
 #include <cstdint>
-#include <iostream>
-#include <queue>
+#include <cstdlib>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -51,12 +50,12 @@ bool BinarySegmentsMPI::RunImpl() {
   boost::mpi::broadcast(world_, cols_, 0);
   std::vector<int> send_counts(world_.size(), 0);
   std::vector<int> offsets(world_.size(), 0);
-  int rows_for_proc = rows_ / world_.size();
+  int rows_for_proc = static_cast<int>(rows_) / world_.size();
   for (int i = 0; i < world_.size(); ++i) {
     if (i == 0) {
-      send_counts[i] = (rows_for_proc + (rows_ % world_.size())) * cols_;
+      send_counts[i] = (rows_for_proc + (static_cast<int>(rows_) % world_.size())) * static_cast<int>(cols_);
     } else {
-      send_counts[i] = rows_for_proc * cols_;
+      send_counts[i] = rows_for_proc * static_cast<int>(cols_);
       offsets[i] = offsets[i - 1] + send_counts[i - 1];
     }
   }
@@ -116,7 +115,7 @@ bool BinarySegmentsMPI::RunImpl() {
         uint32_t label_D = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
         if (label_B != 0 || label_C != 0 || label_D != 0) {
           uint32_t min_label = std::min({label_B, label_C, label_D}, CompNotZero);
-          labels_[cur_ind] = min_label;
+          label_equivalences[labels_[cur_ind]] = min_label;
           for (uint32_t label2 : {label_B, label_C, label_D}) {
             if (label2 != 0 && label2 != min_label && label2 > min_label) {
               label_equivalences[label2] = min_label;
@@ -126,9 +125,6 @@ bool BinarySegmentsMPI::RunImpl() {
           }
         }
       }
-    }
-    for (auto const& i : label_equivalences) {
-      std::cout << i.first << " " << i.second << std::endl;
     }
     for (auto& label : labels_) {
       while (label_equivalences.contains(label)) {

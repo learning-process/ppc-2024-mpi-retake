@@ -1,7 +1,10 @@
 #include "seq/leontev_n_binary/include/ops_seq.hpp"
 
-#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace leontev_n_binary_seq {

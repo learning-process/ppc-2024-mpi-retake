@@ -2,16 +2,18 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/leontev_n_binary/include/ops_mpi.hpp"
 
-static inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<uint8_t>& input,
-                                   size_t rows, size_t cols, std::vector<uint32_t>& output) {
+namespace {
+inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<uint8_t>& input,
+                            size_t rows, size_t cols, std::vector<uint32_t>& output) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
   task_data_par->inputs_count.emplace_back(rows);
   task_data_par->inputs_count.emplace_back(cols);
@@ -19,6 +21,7 @@ static inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_da
   task_data_par->outputs_count.emplace_back(rows);
   task_data_par->outputs_count.emplace_back(cols);
 }
+}  // namespace
 
 TEST(leontev_n_binary_mpi, input_1) {
   boost::mpi::communicator world;
@@ -36,7 +39,6 @@ TEST(leontev_n_binary_mpi, input_1) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
@@ -58,7 +60,6 @@ TEST(leontev_n_binary_mpi, input_2) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
@@ -80,7 +81,6 @@ TEST(leontev_n_binary_mpi, input_3) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
@@ -102,7 +102,6 @@ TEST(leontev_n_binary_mpi, input_4) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
@@ -126,13 +125,12 @@ TEST(leontev_n_binary_mpi, input_5) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
 }
 
-TEST(leontev_n_binary_mpi, input_6) {
+TEST(leontev_n_binary_mpi, empty_test) {
   boost::mpi::communicator world;
   size_t rows = 7;
   size_t cols = 7;
@@ -150,13 +148,12 @@ TEST(leontev_n_binary_mpi, input_6) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
 }
 
-TEST(leontev_n_binary_mpi, input_7) {
+TEST(leontev_n_binary_mpi, lines_test) {
   boost::mpi::communicator world;
   size_t rows = 7;
   size_t cols = 7;
@@ -174,7 +171,6 @@ TEST(leontev_n_binary_mpi, input_7) {
   binary_segments.PreProcessing();
   binary_segments.Run();
   binary_segments.PostProcessing();
-  // check if segmentation is ok
   if (world.rank() == 0) {
     ASSERT_EQ(actual, expected);
   }
