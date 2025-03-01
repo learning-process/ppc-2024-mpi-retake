@@ -16,7 +16,7 @@ bool makadrai_a_sobel_seq::Sobel::PreProcessingImpl() {
 
   for (int i = 0; i < height_img_; i++) {
     std::copy(in + (i * width_img_), in + ((i + 1) * width_img_),
-              img.begin() + (((i + 1) * (width_img_ + peding_)) + 1));
+              img_.begin() + (((i + 1) * (width_img_ + peding_)) + 1));
   }
   return true;
 }

@@ -67,7 +67,7 @@ bool makadrai_a_sobel_mpi::Sobel::RunImpl() {
   if (world_.size() != 1) {
     for (int i = 1; i < world_.size(); i++) {
       displacements[i] = (i - 1) * del * (width_img_ + peding_) + ost * (width_img_ + peding_);
-      displacements_res[i] = (i - 1) * del * width_img_ + ost * width_img;
+      displacements_res[i] = (i - 1) * del * width_img_ + ost * width_img_;
     }
   }
 
