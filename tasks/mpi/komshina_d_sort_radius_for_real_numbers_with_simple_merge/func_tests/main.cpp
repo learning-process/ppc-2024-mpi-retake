@@ -11,7 +11,6 @@
 #include "core/util/include/util.hpp"
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
-
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, VerifySortingWithPreGeneratedData) {
   std::vector<double> testData = {11.5, 3.3, 5.7, 9.0, 2.2, 4.5, 8.8, 7.1, 6.1};
   int rank;
