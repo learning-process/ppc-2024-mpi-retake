@@ -1,10 +1,10 @@
 #include "mpi/makadrai_a_sobel/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives/all_reduce.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
-#include <boost/mpi/collectives/all_reduce.hpp>
 #include <boost/mpi/operations.hpp>
 #include <cmath>
 #include <vector>
@@ -24,7 +24,8 @@ bool makadrai_a_sobel_mpi::Sobel::PreProcessingImpl() {
     const auto* in = reinterpret_cast<int*>(task_data->inputs[0]);
 
     for (int i = 0; i < height_img_; i++) {
-      std::copy(in + (i * width_img_), in + ((i + 1) * width_img_), img_.begin() + (((i + 1) * (width_img_ + peding_)) + 1));
+      std::copy(in + (i * width_img_), in + ((i + 1) * width_img_),
+                img_.begin() + (((i + 1) * (width_img_ + peding_)) + 1));
     }
   }
 

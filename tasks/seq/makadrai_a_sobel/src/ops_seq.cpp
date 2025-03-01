@@ -15,7 +15,8 @@ bool makadrai_a_sobel_seq::Sobel::PreProcessingImpl() {
   const auto* in = reinterpret_cast<int*>(task_data->inputs[0]);
 
   for (int i = 0; i < height_img_; i++) {
-    std::copy(in + (i * width_img_), in + ((i + 1) * width_img_), img.begin() + (((i + 1) * (width_img_ + peding_)) + 1));
+    std::copy(in + (i * width_img_), in + ((i + 1) * width_img_),
+              img.begin() + (((i + 1) * (width_img_ + peding_)) + 1));
   }
   return true;
 }
@@ -31,13 +32,18 @@ bool makadrai_a_sobel_seq::Sobel::RunImpl() {
   for (int i = 1; i < height_img_ + 1; i++) {
     for (int j = 1; j < width_img_ + 1; j++) {
       int g_x = (-1 * img_[((i - 1) * (width_img_ + peding_)) + (j - 1)]) +
-                (-1 * img_[((i - 1) * (width_img_ + peding_)) + (j + 1)]) - (2 * img_[((i - 1) * (width_img_ + peding_)) + j]) +
-                (2 * img_[((i + 1) * (width_img_ + peding_)) + j]) + (1 * img_[((i + 1) * (width_img_ + peding_)) + (j - 1)]) +
+                (-1 * img_[((i - 1) * (width_img_ + peding_)) + (j + 1)]) -
+                (2 * img_[((i - 1) * (width_img_ + peding_)) + j]) +
+                (2 * img_[((i + 1) * (width_img_ + peding_)) + j]) +
+                (1 * img_[((i + 1) * (width_img_ + peding_)) + (j - 1)]) +
                 1 * img_[((i + 1) * (width_img_ + peding_)) + (j + 1)];
 
-      int g_y = (1 * img_[((i - 1) * (width_img_ + peding_)) + (j - 1)]) + (2 * img_[(i * (width_img_ + peding_)) + (j - 1)]) +
-                (1 * img_[((i + 1) * (width_img_ + peding_)) + (j - 1)]) + (-1 * img_[((i - 1) * (width_img_ + peding_)) + (j + 1)]) -
-                (2 * img_[(i * (width_img_ + peding_)) + (j + 1)]) + -1 * img_[(i + 1) * (width_img_ + peding_) + (j + 1)];
+      int g_y = (1 * img_[((i - 1) * (width_img_ + peding_)) + (j - 1)]) +
+                (2 * img_[(i * (width_img_ + peding_)) + (j - 1)]) +
+                (1 * img_[((i + 1) * (width_img_ + peding_)) + (j - 1)]) +
+                (-1 * img_[((i - 1) * (width_img_ + peding_)) + (j + 1)]) -
+                (2 * img_[(i * (width_img_ + peding_)) + (j + 1)]) + 
+                -1 * img_[(i + 1) * (width_img_ + peding_) + (j + 1)];
 
       int temp = (int)std::sqrt(std::pow(g_x, 2) + std::pow(g_y, 2));
       max_z = std::max(max_z, temp);
