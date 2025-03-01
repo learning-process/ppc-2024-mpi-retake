@@ -21,7 +21,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ValidationImpl() {
-  if(rank == 0) {
+  if (rank == 0) {
     if (task_data->inputs_count.size() != task_data->outputs_count.size()) {
       return false;
     }
@@ -37,18 +37,18 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::RunImpl() {
-    parallelSort();
-    return true;
-  }
+  parallelSort();
+  return true;
+}
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PostProcessingImpl() {
-    if (rank == 0) {
+  if (rank == 0) {
     auto* output_ptr = reinterpret_cast<double*>(task_data->outputs[0]);
-      std::copy(sorted_data_.begin(), sorted_data_.end(), output_ptr);
-    }
-
-    return true;
+    std::copy(sorted_data_.begin(), sorted_data_.end(), output_ptr);
   }
+
+  return true;
+}
 void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::radixSortWithSignHandling(
     std::vector<double>& data) {
   const int num_bits = sizeof(double) * 8;
@@ -77,8 +77,8 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::radixSortWit
   data.insert(data.end(), positives.begin(), positives.end());
 }
 
-void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::radixSort(std::vector<double>& data,
-                                                                                     int num_bits, int radix) {
+void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::radixSort(std::vector<double>& data, int num_bits,
+                                                                              int radix) {
   std::vector<std::vector<double>> buckets(radix);
   std::vector<double> output(data.size());
 

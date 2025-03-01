@@ -47,8 +47,7 @@ TEST(sotskov_a_radix_sort_for_numbers_type_double_with_simple_merging_mpi, test_
   }
 
   auto parallelRadixSort =
-      std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(
-          taskDataPar);
+      std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(taskDataPar);
 
   ASSERT_TRUE(parallelRadixSort->ValidationImpl()) << "Validation failed!";
   parallelRadixSort->PreProcessingImpl();
@@ -96,8 +95,7 @@ TEST(sotskov_a_radix_sort_for_numbers_type_double_with_simple_merging_mpi, test_
   }
 
   auto parallelRadixSort =
-      std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(
-          taskDataPar);
+      std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(taskDataPar);
 
   ASSERT_TRUE(parallelRadixSort->ValidationImpl()) << "Validation failed!";
   parallelRadixSort->PreProcessingImpl();
