@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mpi.h>
+
 #include <utility>
 #include <vector>
 
@@ -12,7 +13,7 @@ class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &size_);
   }
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
@@ -21,7 +22,7 @@ class TestTaskMPI : public ppc::core::Task {
 
  private:
   void ExecuteParallelSorting();
-  void ApplyRadixSorting(std::vector<double>& data);
+  static void ApplyRadixSorting(std::vector<double>& data);
   void ProcessAndSortSignedNumbers(std::vector<double>& data);
 
   int world_rank_;

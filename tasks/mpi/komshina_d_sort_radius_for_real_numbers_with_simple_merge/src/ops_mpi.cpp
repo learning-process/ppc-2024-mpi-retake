@@ -1,13 +1,14 @@
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
 #include <mpi.h>
+
 #include <algorithm>
-#include <numeric>
-#include <ranges>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <ranges>
 #include <vector>
+#include <functional>
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_rank_ == 0) {
@@ -99,11 +100,13 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   int local_size = (total_size / size_) + ((world_rank_ < (total_size % size_)) ? 1 : 0);
   std::vector<double> local_data(local_size);
 
-  std::vector<int> send_counts(size_), displacements(size_);
+  std::vector<int> send_counts(size_);
+  std::vector<int> displacements(size_);
+
   if (world_rank_ == 0) {
     int base = total_size / size_, remainder = total_size % size_;
     for (int i = 0; i < size_; ++i) {
-      send_counts[i] = base + (i < remainder);
+      send_counts[i] = base + static_cast<int>(i < remainder);
       displacements[i] = (i > 0) ? (displacements[i - 1] + send_counts[i - 1]) : 0;
     }
   }
@@ -129,7 +132,7 @@ void komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
               recv_displacements.data(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   if (world_rank_ == 0) {
-    std::inplace_merge(sortedData_.begin(), sortedData_.begin() + recv_counts[0], sortedData_.end());
+    std::ranges::inplace_merge(sortedData_.begin(), sortedData_.begin() + recv_counts[0], sortedData_.end());
   }
   MPI_Barrier(MPI_COMM_WORLD);
 }

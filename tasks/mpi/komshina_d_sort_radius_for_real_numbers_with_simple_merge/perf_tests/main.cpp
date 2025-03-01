@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <mpi.h>
 
 #include <chrono>
 #include <cmath>
@@ -6,7 +7,6 @@
 #include <memory>
 #include <vector>
 
-#include <mpi.h>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
@@ -21,19 +21,20 @@ void GenerateComputedData(std::vector<double> &data, int s, double min = -1e9, d
   }
 }
 
-}  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi
+}  // namespace
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipeline_run) {
-  int world_rank_ = 0;
+  int world_rank = 0;
   int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int s = 1000000;
   std::vector<double> in(s);
   std::vector<double> out(s, 0.0);
-
-  if (world_rank_ == 0) {GenerateComputedData(in, s);
+  
+  if (world_rank == 0) {
+    GenerateComputedData(in, s);
   }
 
   // Create task_data
@@ -63,23 +64,23 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipelin
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
-  if (world_rank_ == 0) {
+  if (world_rank == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_run) {
-  int world_rank_ = 0;
+  int world_rank = 0;
   int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank_);
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   int s = 1000000;
   std::vector<double> in(s);
   std::vector<double> out(s, 0.0);
-
-  if (world_rank_ == 0) {GenerateComputedData(in, s);
-  }
+  
+  if (world_rank == 0) {
+    GenerateComputedData(in, s);
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -109,7 +110,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_ru
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   // Create Perf analyzer
-  if (world_rank_ == 0) {
+  if (world_rank == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }
