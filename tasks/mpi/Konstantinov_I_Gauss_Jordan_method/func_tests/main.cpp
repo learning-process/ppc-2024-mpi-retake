@@ -7,7 +7,6 @@
 #include <random>
 #include <vector>
 
-
 #include "core/task/include/task.hpp"
 #include "mpi/Konstantinov_I_Gauss_Jordan_method/include/ops_mpi.hpp"
 
@@ -24,7 +23,7 @@ std::vector<double> GetRandomMatrix(int rows, int cols, double min = -20.0, doub
   return matrix;
 }
 
-}  // konstantinov_i_gauss_jordan_method_mpi
+}  // namespace konstantinov_i_gauss_jordan_method_mpi
 
 TEST(konstantinov_i_gauss_jordan_method_mpi, simple_three_not_solve_at_1_iter) {
   boost::mpi::communicator world;
@@ -139,7 +138,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_three) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
@@ -202,7 +202,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_four) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
@@ -265,7 +266,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_five) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
@@ -328,7 +330,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_six) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
@@ -391,7 +394,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_seven) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
@@ -454,7 +458,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_ten) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
@@ -517,7 +522,8 @@ TEST(konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
       task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
       task_data_seq->outputs_count.emplace_back(seq_result.size());
 
-      auto task_sequential = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
+      auto task_sequential = 
+          std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
       bool seqRunRes = task_sequential->RunImpl();
