@@ -1,12 +1,12 @@
 #include "mpi/sharamygina_i_vector_dot_product/include/ops_mpi.h"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi.hpp>
 #include <vector>
 // #include <boost/mpi/collectives.hpp>
-//
+// #include <boost/mpi/collectives.hpp>
+// #include <boost/mpi/collectives/broadcast.hpp>
+// #include <boost/mpi/collectives/gatherv.hpp>
 //
 // #include <boost/mpi/collectives/scatterv.hpp>
 // #include <boost/mpi/communicator.hpp>
@@ -46,8 +46,8 @@ bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::RunImpl() {
   broadcast(world_, delta_, 0);
   if (world_.rank() == 0) {
     for (int proc = 1; proc < world_.size(); ++proc) {
-      world_.send(proc, 0, v1_.data() + (proc * delta_), delta_);
-      world_.send(proc, 1, v2_.data() + (proc * delta_), delta_);
+      world_.send(proc, 0, v1_.data() + (proc * delta_), static_cast<int>(delta_));
+      world_.send(proc, 1, v2_.data() + (proc * delta_), static_cast<int>(delta_));
     }
   }
   local_v1_.resize(delta_);
@@ -56,8 +56,8 @@ bool sharamygina_i_vector_dot_product_mpi::VectorDotProductMpi::RunImpl() {
     std::copy(v1_.begin(), v1_.begin() + delta_, local_v1_.begin());
     std::copy(v2_.begin(), v2_.begin() + delta_, local_v2_.begin());
   } else {
-    world_.recv(0, 0, local_v1_.data(), delta_);
-    world_.recv(0, 1, local_v2_.data(), delta_);
+    world_.recv(0, 0, local_v1_.data(), static_cast<int>(delta_));
+    world_.recv(0, 1, local_v2_.data(), static_cast<int>(delta_));
   }
   int local_result = 0;
   for (unsigned int i = 0; i < local_v1_.size(); ++i) {
