@@ -11,7 +11,7 @@ class DiningPhilosophersMPI : public ppc::core::Task {
  public:
   explicit DiningPhilosophersMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {
     if (!this->task_data->inputs_count.empty()) {
-      num_philosophers_ = this->task_data->inputs_count[0];
+      num_philosophers_ = static_cast<int>(this->task_data->inputs_count[0]);
     }
   }
 
