@@ -1,23 +1,23 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/leontev_n_average/include/ops_seq.hpp"
 
+namespace {
 template <class InOutType>
-static void TaskEmplacement(std::shared_ptr<ppc::core::TaskData> &task_data_par, std::vector<InOutType> &global_vec,
-                            std::vector<InOutType> &global_avg) {
+void TaskEmplacement(std::shared_ptr<ppc::core::TaskData> &task_data_par, std::vector<InOutType> &global_vec,
+                     std::vector<InOutType> &global_avg) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_vec.data()));
   task_data_par->inputs_count.emplace_back(global_vec.size());
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_avg.data()));
   task_data_par->outputs_count.emplace_back(global_avg.size());
 }
+}  // namespace
 
 TEST(leontev_n_average_seq, int_vector_avg) {
   // Create data
@@ -59,9 +59,9 @@ TEST(leontev_n_average_seq, double_vector_avg) {
 
 TEST(leontev_n_average_seq, float_vector_avg) {
   // Create data
-  std::vector<float> in(5, 1.f);
-  std::vector<float> out(1, 0.f);
-  const float expected_avg = 1.f;
+  std::vector<float> in(5, 1.F);
+  std::vector<float> out(1, 0.F);
+  const float expected_avg = 1.F;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -72,8 +72,8 @@ TEST(leontev_n_average_seq, float_vector_avg) {
   ASSERT_TRUE(vec_avg_sequential.Validation());
   vec_avg_sequential.PreProcessing();
   vec_avg_sequential.Run();
-  vec_avg_sequential.PostProcessing();
-  EXPECT_NEAR(out[0], expected_avg, 1e-3f);
+  vec_avg_sequential.PostProcessing(); 
+  EXPECT_NEAR(out[0], expected_avg, 1e-3F);
 }
 
 TEST(leontev_n_average_seq, int32_vector_avg) {

@@ -3,7 +3,6 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -12,13 +11,15 @@
 #include "core/task/include/task.hpp"
 #include "mpi/leontev_n_average/include/ops_mpi.hpp"
 
-inline static void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<int>& global_vec,
-                                   std::vector<int32_t>& global_avg) {
+namespace {
+inline void TaskEmplacement(std::shared_ptr<ppc::core::TaskData>& task_data_par, std::vector<int>& global_vec,
+                            std::vector<int32_t>& global_avg) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_vec.data()));
   task_data_par->inputs_count.emplace_back(global_vec.size());
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_avg.data()));
   task_data_par->outputs_count.emplace_back(global_avg.size());
 }
+}  // namespace
 
 TEST(leontev_n_average_mpi, test_pipeline_run) {
   boost::mpi::communicator world;

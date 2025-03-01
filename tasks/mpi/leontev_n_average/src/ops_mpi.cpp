@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
+#include <functional>
 #include <numeric>
 #include <vector>
 
@@ -25,7 +26,7 @@ bool leontev_n_average_mpi::MPIVecAvgParallel::RunImpl() {
   std::div_t divres;
 
   if (world_.rank() == 0) {
-    divres = std::div(task_data->inputs_count[0], world_.size());
+    divres = std::div(static_cast<int>(task_data->inputs_count[0]), world_.size());
   }
 
   broadcast(world_, divres.quot, 0);
@@ -54,7 +55,7 @@ bool leontev_n_average_mpi::MPIVecAvgParallel::RunImpl() {
   int local_res = std::accumulate(local_input_.begin(), local_input_.end(), 0);
   reduce(world_, local_res, res_, std::plus(), 0);
   if (world_.rank() == 0) {
-    res_ = res_ / input_.size();
+    res_ = res_ / static_cast<int>(input_.size());
   }
   return true;
 }

@@ -1,6 +1,9 @@
 // Copyright 2024 Nesterov Alexander
 #include "seq/leontev_n_average/include/ops_seq.hpp"
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <numeric>
 #include <vector>
 
@@ -23,7 +26,7 @@ bool leontev_n_average_seq::VecAvgSequential<InOutType>::ValidationImpl() {
 
 template <class InOutType>
 bool leontev_n_average_seq::VecAvgSequential<InOutType>::RunImpl() {
-  res_ = std::accumulate(input_.begin(), input_.end(), 0) / input_.size();
+  res_ = std::accumulate<InOutType>(input_.begin(), input_.end(), 0) / input_.size();
   return true;
 }
 
