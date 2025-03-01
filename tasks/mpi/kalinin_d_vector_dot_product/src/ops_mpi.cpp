@@ -65,8 +65,6 @@ bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::ValidationImpl() {
 
 bool kalinin_d_vector_dot_product_mpi::TestMPITaskParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    int total_elements = 0;
-    total_elements = static_cast<int>(task_data->inputs_count[0]);
     num_processes_ = world_.size();
 
     input_ = std::vector<std::vector<int>>(task_data->inputs.size());
