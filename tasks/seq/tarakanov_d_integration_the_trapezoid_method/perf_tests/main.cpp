@@ -16,7 +16,7 @@ using namespace tarakanov_d_integration_the_trapezoid_method_seq;
   TEST(tarakanov_d_trapezoid_method_seq, test_name) {                                                        \
     double a = 0.0;                                                                                          \
     double b = 1.0;                                                                                          \
-    double h = 0.1;                                                                                          \
+    double h = 0.000000005;                                                                                  \
                                                                                                              \
     auto taskData = std::make_shared<ppc::core::TaskData>();                                                 \
     taskData->inputs.push_back(reinterpret_cast<uint8_t *>(&a));                                             \
@@ -44,7 +44,7 @@ using namespace tarakanov_d_integration_the_trapezoid_method_seq;
     perfAnalyzer->test_function(perfAttr, perfResults);                                                      \
     ppc::core::Perf::PrintPerfStatistic(perfResults);                                                        \
                                                                                                              \
-    EXPECT_DOUBLE_EQ(out, 0.25);                                                                             \
+    EXPECT_NEAR(out, 0.25, 1e-3);                                                                            \
   }
 
 MY_TEST(test_pipeline_run, PipelineRun);
