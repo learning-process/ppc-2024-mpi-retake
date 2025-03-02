@@ -1,11 +1,11 @@
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstddef>
 #include <vector>
-#include <algorithm>
 
 namespace mpi = boost::mpi;
 
