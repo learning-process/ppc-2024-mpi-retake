@@ -24,7 +24,6 @@ class TestTaskMPI : public ppc::core::Task {
   int remel_;
   std::vector<T> local_input_;
   T result_;
-
 };
 
 }  // namespace karaseva_e_reduce_mpi

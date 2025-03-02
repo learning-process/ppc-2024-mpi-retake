@@ -2,7 +2,6 @@
 
 #include <mpi.h>
 
-#include <algorithm>
 #include <cstring>
 #include <numeric>
 #include <vector>
@@ -32,7 +31,8 @@ MPI_Datatype GetMPIType<double>() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
-  int rank, size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -50,7 +50,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   if (rank == 0) {
     local_input_.assign(input_.begin(), input_.begin() + local_size_ + remel_);
     for (int proc = 1; proc < size; proc++) {
-      MPI_Send(input_.data() + remel_ + proc * local_size_, local_size_, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD);
+      MPI_Send(input_.data() + remel_ + (proc * local_size_), local_size_, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD);
     }
   } else {
     local_input_.resize(local_size_);
@@ -74,7 +74,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank == 0) {
     std::memcpy(task_data->outputs[0], &result_, sizeof(T));
