@@ -16,14 +16,14 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   std::vector<int> out(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   karaseva_e_reduce_mpi::TestTaskMPI<int> test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
@@ -39,14 +39,14 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   std::vector<double> out(1, 0.0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   karaseva_e_reduce_mpi::TestTaskMPI<double> test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
@@ -62,14 +62,14 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   std::vector<float> out(1, 0.0F);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   karaseva_e_reduce_mpi::TestTaskMPI<float> test_task_mpi(task_data_mpi);
 
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();

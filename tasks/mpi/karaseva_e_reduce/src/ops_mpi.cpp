@@ -11,7 +11,7 @@ namespace {
 
 // Utility function to get MPI datatype based on template type
 template <typename T>
-MPI_Datatype GetMPIType();
+static MPI_Datatype GetMPIType();
 
 template <>
 MPI_Datatype GetMPIType<int>() {
@@ -33,7 +33,7 @@ MPI_Datatype GetMPIType<double>() {
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   unsigned int input_size = task_data->inputs_count[0];
-  auto* in_ptr = reinterpret_cast<T*>(task_data->inputs[0]);
+  auto* in_ptr = static_cast<T*>(static_cast<void*>(task_data->inputs[0]));
   input_ = std::vector<T>(in_ptr, in_ptr + input_size);
 
   unsigned int output_size = task_data->outputs_count[0];
@@ -86,7 +86,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (task_data->outputs_count[0] > 0 && rank == 0) {
-    std::memcpy(task_data->outputs[0], output_.data(), sizeof(T));
+    std::memcpy(static_cast<T*>(static_cast<void*>(task_data->outputs[0])), output_.data(), sizeof(T));
   }
   return true;
 }
