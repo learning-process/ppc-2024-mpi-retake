@@ -9,8 +9,8 @@
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"
-#include "core/task/include/task.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
 
 TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
