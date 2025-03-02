@@ -59,12 +59,7 @@ bool BinarySegmentsSeq::RunImpl() {
         labels_[GetIndex(row, col)] = min_label;
         for (uint32_t label : {label_b, label_c, label_d}) {
           if (label != 0 && label != min_label) {
-            if (label != 0 && label != min_label && label > min_label) {
-              label_equivalences[label] = min_label;
-            }
-            if (label != 0 && label != min_label && label < min_label) {
-              label_equivalences[min_label] = label;
-            }
+            label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
           }
         }
       }
