@@ -47,6 +47,81 @@ bool BinarySegmentsMPI::PreProcessingImpl() {
   return true;
 }
 
+void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
+  std::unordered_map<uint32_t, uint32_t> label_equivalences;
+  for (int section = 1; section < world_.size(); ++section) {
+    int border = offsets[section];
+    if (border >= static_cast<int>(rows_ * cols_)) {
+      break;
+    }
+    for (size_t col = 0; col < cols_; ++col) {
+      size_t cur_ind = border + col;
+      if (labels_[cur_ind] == 0) {
+        continue;
+      }
+      uint32_t label_b = (col > 0) ? labels_[cur_ind - 1] : 0;
+      uint32_t label_c = labels_[cur_ind - cols_];
+      uint32_t label_d = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
+      if (label_b != 0 || label_c != 0 || label_d != 0) {
+        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+        label_equivalences[labels_[cur_ind]] = min_label;
+        for (uint32_t label2 : {label_b, label_c, label_d}) {
+          if (label2 != 0 && label2 != min_label) {
+            label_equivalences[std::max(label2, min_label)] = std::min(label2, min_label);
+          }
+        }
+      }
+    }
+  }
+  for (auto& label : labels_) {
+    while (label_equivalences.contains(label)) {
+      label = label_equivalences[label];
+    }
+  }
+  std::vector<size_t> arrived((rows_ * cols_) + 1, 0);
+  size_t cur_mark = 1;
+  for (size_t i = 0; i < rows_ * cols_; i++) {
+    if (labels_[i] != 0) {
+      if (arrived[labels_[i]] != 0) {
+        labels_[i] = arrived[labels_[i]];
+      } else {
+        labels_[i] = arrived[labels_[i]] = cur_mark++;
+      }
+    }
+  }
+}
+
+void BinarySegmentsMPI::LocalLoop(size_t local_size, uint32_t next_label, std::vector<uint32_t>& local_labels,
+                                  std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
+  for (size_t row = 0; row < local_size; ++row) {
+    for (size_t col = 0; col < cols_; ++col) {
+      size_t cur_ind = GetIndex(row, col);
+      if (local_image_[cur_ind] == 0) {
+        continue;
+      }
+      uint32_t label_b = (col > 0) ? local_labels[cur_ind - 1] : 0;
+      uint32_t label_c = (row > 0) ? local_labels[cur_ind - cols_] : 0;
+      uint32_t label_d = (row > 0 && col > 0) ? local_labels[cur_ind - cols_ - 1] : 0;
+      if (label_b == 0 && label_c == 0 && label_d == 0) {
+        local_labels[cur_ind] = next_label++;
+      } else {
+        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+        local_labels[cur_ind] = min_label;
+        for (uint32_t label : {label_b, label_c, label_d}) {
+          if (label != 0 && label != min_label) {
+            local_label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+          }
+        }
+      }
+    }
+  }
+  for (auto& label : local_labels) {
+    while (local_label_equivalences.contains(label)) {
+      label = local_label_equivalences[label];
+    }
+  }
+}
+
 bool BinarySegmentsMPI::RunImpl() {
   boost::mpi::broadcast(world_, rows_, 0);
   boost::mpi::broadcast(world_, cols_, 0);
@@ -68,84 +143,13 @@ bool BinarySegmentsMPI::RunImpl() {
   uint32_t next_label = 1 + offsets[world_.rank()];
   std::vector<uint32_t> local_labels(local_size * cols_);
   std::unordered_map<uint32_t, uint32_t> local_label_equivalences;
-  for (size_t row = 0; row < local_size; ++row) {
-    for (size_t col = 0; col < cols_; ++col) {
-      size_t cur_ind = GetIndex(row, col);
-      if (local_image_[cur_ind] == 0) {
-        continue;
-      }
-      uint32_t label_b = (col > 0) ? local_labels[cur_ind - 1] : 0;
-      uint32_t label_c = (row > 0) ? local_labels[cur_ind - cols_] : 0;
-      uint32_t label_d = (row > 0 && col > 0) ? local_labels[cur_ind - cols_ - 1] : 0;
-      if (label_b == 0 && label_c == 0 && label_d == 0) {
-        local_labels[cur_ind] = next_label++;
-      } else {
-        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-        local_labels[cur_ind] = min_label;
-        for (uint32_t label : {label_b, label_c, label_d}) {
-          if (label != 0 && label != min_label && label > min_label) {
-            local_label_equivalences[label] = min_label;
-          }
-          if (label != 0 && label != min_label && label < min_label) {
-            local_label_equivalences[min_label] = label;
-          }
-        }
-      }
-    }
-  }
-  for (auto& label : local_labels) {
-    while (local_label_equivalences.contains(label)) {
-      label = local_label_equivalences[label];
-    }
-  }
+  LocalLoop(local_size, next_label, local_labels, local_label_equivalences);
   if (world_.rank() == 0) {
     labels_.resize(rows_ * cols_);
   }
   boost::mpi::gatherv(world_, local_labels, labels_.data(), send_counts, offsets, 0);
   if (world_.rank() == 0) {
-    std::unordered_map<uint32_t, uint32_t> label_equivalences;
-    for (int section = 1; section < world_.size(); ++section) {
-      int border = offsets[section];
-      if (border >= static_cast<int>(rows_ * cols_)) {
-        break;
-      }
-      for (size_t col = 0; col < cols_; ++col) {
-        size_t cur_ind = border + col;
-        if (labels_[cur_ind] == 0) {
-          continue;
-        }
-        uint32_t label_b = (col > 0) ? labels_[cur_ind - 1] : 0;
-        uint32_t label_c = labels_[cur_ind - cols_];
-        uint32_t label_d = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
-        if (label_b != 0 || label_c != 0 || label_d != 0) {
-          uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-          label_equivalences[labels_[cur_ind]] = min_label;
-          for (uint32_t label2 : {label_b, label_c, label_d}) {
-            if (label2 != 0 && label2 != min_label && label2 > min_label) {
-              label_equivalences[label2] = min_label;
-            } else if (label2 != 0 && label2 != min_label && label2 < min_label) {
-              label_equivalences[min_label] = label2;
-            }
-          }
-        }
-      }
-    }
-    for (auto& label : labels_) {
-      while (label_equivalences.contains(label)) {
-        label = label_equivalences[label];
-      }
-    }
-    std::vector<size_t> arrived((rows_ * cols_) + 1, 0);
-    size_t cur_mark = 1;
-    for (size_t i = 0; i < rows_ * cols_; i++) {
-      if (labels_[i] != 0) {
-        if (arrived[labels_[i]] != 0) {
-          labels_[i] = arrived[labels_[i]];
-        } else {
-          labels_[i] = arrived[labels_[i]] = cur_mark++;
-        }
-      }
-    }
+    RootLoop(offsets);
   }
   return true;
 }

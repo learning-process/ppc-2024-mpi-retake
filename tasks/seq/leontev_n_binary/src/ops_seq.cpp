@@ -38,6 +38,25 @@ bool BinarySegmentsSeq::PreProcessingImpl() {
   return true;
 }
 
+void BinarySegmentsSeq::LoopProcess(size_t col, size_t row, uint32_t cur_label,
+                                    std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+  uint32_t label_b = (col > 0) ? labels_[GetIndex(row, col - 1)] : 0;
+  uint32_t label_c = (row > 0) ? labels_[GetIndex(row - 1, col)] : 0;
+  uint32_t label_d = (row > 0 && col > 0) ? labels_[GetIndex(row - 1, col - 1)] : 0;
+
+  if (label_b == 0 && label_c == 0 && label_d == 0) {
+    labels_[GetIndex(row, col)] = cur_label++;
+  } else {
+    uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+    labels_[GetIndex(row, col)] = min_label;
+    for (uint32_t label : {label_b, label_c, label_d}) {
+      if (label != 0 && label != min_label) {
+        label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+      }
+    }
+  }
+}
+
 bool BinarySegmentsSeq::RunImpl() {
   std::unordered_map<uint32_t, uint32_t> label_equivalences;
   uint32_t cur_label = 1;
@@ -48,21 +67,7 @@ bool BinarySegmentsSeq::RunImpl() {
         continue;
       }
 
-      uint32_t label_b = (col > 0) ? labels_[GetIndex(row, col - 1)] : 0;
-      uint32_t label_c = (row > 0) ? labels_[GetIndex(row - 1, col)] : 0;
-      uint32_t label_d = (row > 0 && col > 0) ? labels_[GetIndex(row - 1, col - 1)] : 0;
-
-      if (label_b == 0 && label_c == 0 && label_d == 0) {
-        labels_[GetIndex(row, col)] = cur_label++;
-      } else {
-        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-        labels_[GetIndex(row, col)] = min_label;
-        for (uint32_t label : {label_b, label_c, label_d}) {
-          if (label != 0 && label != min_label) {
-            label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
-          }
-        }
-      }
+      LoopProcess(col, row, cur_label, label_equivalences);
     }
   }
   for (auto& label : labels_) {
