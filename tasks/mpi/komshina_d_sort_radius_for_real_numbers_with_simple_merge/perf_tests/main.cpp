@@ -2,10 +2,10 @@
 
 #include <boost/mpi.hpp>
 #include <chrono>
-#include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <vector>
+#include <cmath>
+#include <boost/mpi.hpp> 
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
@@ -15,7 +15,7 @@
 namespace mpi = boost::mpi;
 using namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi;
 
-double computeValue(int i) { return std::sin(i) * 1e9 + std::cos(i * 0.5) * 1e8; }
+static double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pipeline_run) {
   mpi::environment env;
@@ -28,7 +28,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pi
   if (world.rank() == 0) {
     in.resize(size);
     for (int i = 0; i < size; ++i) {
-      in[i] = computeValue(i);
+      in[i] = ComputeValue(i);
     }
   }
 
@@ -41,11 +41,11 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pi
     task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
   }
 
-  auto sortTask = std::make_shared<TestTaskMPI>(task_data_mpi);
-  ASSERT_TRUE(sortTask->ValidationImpl());
-  sortTask->PreProcessingImpl();
-  sortTask->RunImpl();
-  sortTask->PostProcessingImpl();
+  auto sort_task = std::make_shared<TestTaskMPI>(task_data_mpi);
+  ASSERT_TRUE(sort_task->ValidationImpl());
+  sort_task->PreProcessingImpl();
+  sort_task->RunImpl();
+  sort_task->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -56,12 +56,12 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pi
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sortTask);
-  perfAnalyzer->PipelineRun(perf_attr, perfResults);
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(sort_task);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perfResults);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }
 
@@ -76,24 +76,24 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_ta
   if (world.rank() == 0) {
     in.resize(size);
     for (int i = 0; i < size; ++i) {
-      in[i] = computeValue(i);
+      in[i] = ComputeValue(i);
     }
   }
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-
-   if (world.rank() == 0) {
+  
+  if (world.rank() == 0) {
     task_data_mpi->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
     task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
     task_data_mpi->outputs = {reinterpret_cast<uint8_t *>(out.data())};
     task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
   }
 
-  auto sortTask = std::make_shared<TestTaskMPI>(task_data_mpi);
-  ASSERT_TRUE(sortTask->ValidationImpl());
-  sortTask->PreProcessingImpl();
-  sortTask->RunImpl();
-  sortTask->PostProcessingImpl();
+  auto sort_task = std::make_shared<TestTaskMPI>(task_data_mpi);
+  ASSERT_TRUE(sort_task->ValidationImpl());
+  sort_task->PreProcessingImpl();
+  sort_task->RunImpl();
+  sort_task->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -104,11 +104,11 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_ta
     return static_cast<double>(duration) * 1e-9;
   };
 
-  auto perfResults = std::make_shared<ppc::core::PerfResults>();
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sortTask);
-  perfAnalyzer->TaskRun(perf_attr, perfResults);
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(sort_task);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perfResults);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }

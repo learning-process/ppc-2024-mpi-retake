@@ -2,6 +2,7 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -18,12 +19,12 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> numbers;
-  int total_size = 0;
+  std::vector<double> numbers_;
+  int total_size_ = 0;
 
-  void sort_doubles(std::vector<double>& arr);
-  void sort_uint64(std::vector<uint64_t>& keys);
-  boost::mpi::communicator world;
+  void SortDoubles(std::vector<double>& arr);
+  static void SortUint64(std::vector<uint64_t>& keys);
+  boost::mpi::communicator world_;
 };
 
 }  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi

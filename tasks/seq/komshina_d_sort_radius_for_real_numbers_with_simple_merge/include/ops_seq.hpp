@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 #include "core/task/include/task.hpp"
 
@@ -16,8 +17,8 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> values;
-  int size = 0;
+  std::vector<double> values_;
+  int size_ = 0;
 
   static void SortValues(std::vector<double>& values);
   static void RadixSort(std::vector<uint64_t>& keys);

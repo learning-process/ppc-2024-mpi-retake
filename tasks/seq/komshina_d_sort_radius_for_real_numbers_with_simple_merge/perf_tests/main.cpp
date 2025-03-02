@@ -1,34 +1,35 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <chrono>
-#include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <random>
 #include <vector>
+#include <cmath>
+#include <ranges>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_seq.hpp"
 
-double computeValue(int i) { return std::sin(i) * 1e9 + std::cos(i * 0.5) * 1e8; }
+static double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipeline_run) {
-  int N = 10000000;
-  std::vector<double> in(N);
-  std::vector<double> out(N, 0.0);
+  int size = 10000000;
+  std::vector<double> in(size);
+  std::vector<double> out(size, 0.0);
 
-  in.resize(N);
-  for (int i = 0; i < N; ++i) {
-    in[i] = computeValue(i);
+  in.resize(size);
+  for (int i = 0; i < size; ++i) {
+    in[i] = ComputeValue(i);
   }
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs = {reinterpret_cast<uint8_t *>(&N), reinterpret_cast<uint8_t *>(in.data())};
-  task_data_seq->inputs_count = {1, static_cast<unsigned int>(N)};
+  task_data_seq->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
+  task_data_seq->inputs_count = {1, static_cast<unsigned int>(size)};
   task_data_seq->outputs = {reinterpret_cast<uint8_t *>(out.data())};
-  task_data_seq->outputs_count = {static_cast<unsigned int>(N)};
+  task_data_seq->outputs_count = {static_cast<unsigned int>(size)};
 
   // Create Task
   auto test_task_sequential =
@@ -53,28 +54,28 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipelin
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<double> refData = in;
-  std::sort(refData.begin(), refData.end());
-  for (int i = 0; i < N; ++i) {
+  std::ranges::sort(refData);
+  for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(refData[i], out[i], 1e-12);
   }
 }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_task_run) {
-  int N = 10000000;
-  std::vector<double> in(N);
-  std::vector<double> out(N, 0.0);
+  int size = 10000000;
+  std::vector<double> in(size);
+  std::vector<double> out(size, 0.0);
 
-  in.resize(N);
-  for (int i = 0; i < N; ++i) {
-    in[i] = computeValue(i);
+  in.resize(size);
+  for (int i = 0; i < size; ++i) {
+    in[i] = ComputeValue(i);
   }
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs = {reinterpret_cast<uint8_t *>(&N), reinterpret_cast<uint8_t *>(in.data())};
-  task_data_seq->inputs_count = {1, static_cast<unsigned int>(N)};
+  task_data_seq->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
+  task_data_seq->inputs_count = {1, static_cast<unsigned int>(size)};
   task_data_seq->outputs = {reinterpret_cast<uint8_t *>(out.data())};
-  task_data_seq->outputs_count = {static_cast<unsigned int>(N)};
+  task_data_seq->outputs_count = {static_cast<unsigned int>(size)};
 
   // Create Task
   auto test_task_sequential =
@@ -99,8 +100,8 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_task_ru
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<double> refData = in;
-  std::sort(refData.begin(), refData.end());
-  for (int i = 0; i < N; ++i) {
+  std::ranges::sort(refData);
+  for (int i = 0; i < size; ++i) {
     ASSERT_NEAR(refData[i], out[i], 1e-12);
   }
 }

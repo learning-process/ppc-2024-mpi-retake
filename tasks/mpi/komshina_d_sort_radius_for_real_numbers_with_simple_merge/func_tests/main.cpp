@@ -5,7 +5,14 @@
 #include <memory>
 #include <random>
 #include <vector>
+#include <cstdint>
+#include <boost/mpi.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <ranges>
 
+#include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
 namespace mpi = boost::mpi;
@@ -37,7 +44,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, SimpleData) 
   if (world.rank() == 0) {
     auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
     std::vector<double> expected = in;
-    std::sort(expected.begin(), expected.end());
+    std::ranges::sort(expected);
     for (int i = 0; i < size; ++i) {
       ASSERT_NEAR(result[i], expected[i], 1e-12);
     }
@@ -57,7 +64,9 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, RandomData) 
   std::uniform_real_distribution<double> dist(-1000.0, 1000.0);
 
   if (world.rank() == 0) {
-    for (double& val : in) val = dist(gen);
+    for (double& val : in) {
+      val = dist(gen);
+    }
 
     task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(&size), reinterpret_cast<uint8_t*>(in.data())};
     task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
@@ -74,7 +83,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, RandomData) 
   if (world.rank() == 0) {
     auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
     std::vector<double> expected = in;
-    std::sort(expected.begin(), expected.end());
+    std::ranges::sort(expected);
     for (int i = 0; i < size; ++i) {
       ASSERT_NEAR(result[i], expected[i], 1e-12);
     }
