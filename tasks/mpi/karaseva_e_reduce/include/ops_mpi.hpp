@@ -19,8 +19,12 @@ class TestTaskMPI : public ppc::core::Task {
  private:
   std::vector<T> input_, output_;
   int rc_size_{};
+  int input_size_;
+  int local_size_;
+  int remel_;
+  std::vector<T> local_input_;
+  T result_;
 
-  void ReduceBinaryTree(T* local_data, T& global_data, int root);
 };
 
 }  // namespace karaseva_e_reduce_mpi

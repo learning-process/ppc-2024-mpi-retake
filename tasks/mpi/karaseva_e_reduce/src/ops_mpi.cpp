@@ -2,7 +2,7 @@
 
 #include <mpi.h>
 
-#include <cmath>
+#include <algorithm>
 #include <cstring>
 #include <numeric>
 #include <vector>
@@ -32,50 +32,52 @@ MPI_Datatype GetMPIType<double>() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
-  unsigned int input_size = task_data->inputs_count[0];
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  input_.resize(input_size);
-  std::memcpy(input_.data(), task_data->inputs[0], input_size * sizeof(T));
+  if (rank == 0) {
+    input_size_ = task_data->inputs_count[0];
+    input_.resize(input_size_);
+    std::memcpy(input_.data(), task_data->inputs[0], input_size_ * sizeof(T));
+  }
 
-  unsigned int output_size = task_data->outputs_count[0];
-  output_.resize(output_size, static_cast<T>(0));
+  MPI_Bcast(&input_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  rc_size_ = static_cast<int>(std::sqrt(input_size));
+  local_size_ = input_size_ / size;
+  remel_ = input_size_ % size;
+
+  if (rank == 0) {
+    local_input_.assign(input_.begin(), input_.begin() + local_size_ + remel_);
+    for (int proc = 1; proc < size; proc++) {
+      MPI_Send(input_.data() + remel_ + proc * local_size_, local_size_, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD);
+    }
+  } else {
+    local_input_.resize(local_size_);
+    MPI_Recv(local_input_.data(), local_size_, GetMPIType<T>(), 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  }
+
   return true;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
-  return task_data->inputs_count[0] > 1 && task_data->outputs_count[0] == 1;
+  return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
-  T local_sum = std::accumulate(input_.begin(), input_.end(), static_cast<T>(0));
-
-  int rank = 0;
-  int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-  T global_sum = 0;
-  MPI_Reduce(&local_sum, &global_sum, 1, GetMPIType<T>(), MPI_SUM, 0, MPI_COMM_WORLD);
-
-  if (rank == 0) {
-    output_[0] = global_sum;
-  }
-
-  MPI_Barrier(MPI_COMM_WORLD);
+  T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), static_cast<T>(0));
+  MPI_Reduce(&local_sum, &result_, 1, GetMPIType<T>(), MPI_SUM, 0, MPI_COMM_WORLD);
   return true;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
-  int rank = 0;
+  int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  if (task_data->outputs_count[0] > 0 && rank == 0) {
-    std::memcpy(task_data->outputs[0], output_.data(), sizeof(T));
+  if (rank == 0) {
+    std::memcpy(task_data->outputs[0], &result_, sizeof(T));
   }
   return true;
 }
