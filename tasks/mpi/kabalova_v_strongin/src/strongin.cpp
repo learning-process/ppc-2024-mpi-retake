@@ -2,10 +2,10 @@
 #include "mpi/kabalova_v_strongin/include/strongin.h"
 
 #include <algorithm>
-#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
+#include <cmath>
 #include <functional>
-#include <ranges>
 #include <utility>
 #include <vector>
 

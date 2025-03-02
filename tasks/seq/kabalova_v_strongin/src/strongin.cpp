@@ -1,6 +1,7 @@
 #include "seq/kabalova_v_strongin/include/strongin.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 #include <vector>
 

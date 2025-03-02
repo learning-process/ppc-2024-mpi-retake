@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <numbers>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
