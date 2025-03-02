@@ -1,66 +1,113 @@
 #include <gtest/gtest.h>
-#include <mpi.h>
 
+#include <algorithm>
+#include <boost/mpi.hpp>
+#include <memory>
 #include <random>
 #include <vector>
 
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
-namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi {
+namespace mpi = boost::mpi;
+using namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi;
 
-std::vector<double> generateRandomData(int size, double minValue, double maxValue) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(minValue, maxValue);
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, SimpleData) {
+  mpi::environment env;
+  mpi::communicator world;
 
-  std::vector<double> data(size);
-  for (int i = 0; i < size; ++i) {
-    data[i] = dis(gen);
-  }
-  return data;
-}
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-void runSortingTest(const std::vector<double>& testData) {
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  int size = 8;
+  std::vector<double> in = {8.3, -4.7, 2.1, 3.5, 0.9, -1.2, 4.4, -5.6};
+  std::vector<double> out(size, 0.0);
 
-  int dataSize = testData.size();
-  std::vector<double> parallelResult(dataSize, 0.0);
-
-  auto parallelTaskData = std::make_shared<ppc::core::TaskData>();
-
-  if (rank == 0) {
-    parallelTaskData->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<double*>(testData.data())));
-    parallelTaskData->inputs_count.emplace_back(dataSize);
-    parallelTaskData->outputs.emplace_back(reinterpret_cast<uint8_t*>(parallelResult.data()));
-    parallelTaskData->outputs_count.emplace_back(dataSize);
+  if (world.rank() == 0) {
+    task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(&size), reinterpret_cast<uint8_t*>(in.data())};
+    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
+    task_data_mpi->outputs = {reinterpret_cast<uint8_t*>(out.data())};
+    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
   }
 
-  TestTaskMPI parallelSortTask(parallelTaskData);
-  ASSERT_TRUE(parallelSortTask.ValidationImpl());
-  parallelSortTask.PreProcessingImpl();
-  parallelSortTask.RunImpl();
-  parallelSortTask.PostProcessingImpl();
+  TestTaskMPI test_task_mpi(task_data_mpi);
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
 
-  if (rank == 0) {
-    std::vector<double> referenceData = testData;
-    std::sort(referenceData.begin(), referenceData.end());
-    ASSERT_EQ(referenceData, parallelResult) << "MPI sorting is incorrect!";
+  if (world.rank() == 0) {
+    auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
+    std::vector<double> expected = in;
+    std::sort(expected.begin(), expected.end());
+    for (int i = 0; i < size; ++i) {
+      ASSERT_NEAR(result[i], expected[i], 1e-12);
+    }
   }
 }
 
-}  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, RandomData) {
+  mpi::environment env;
+  mpi::communicator world;
 
-TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, VerifySorting) {
-  const int dataSize = 100;
-  const double minValue = -1000.0;
-  const double maxValue = 1000.0;
-  std::vector<double> testData =
-      komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::generateRandomData(dataSize, minValue, maxValue);
-  komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::runSortingTest(testData);
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  int size = 100;
+  std::vector<double> in(size);
+  std::vector<double> out(size, 0.0);
+  std::mt19937 gen(42);
+  std::uniform_real_distribution<double> dist(-1000.0, 1000.0);
+
+  if (world.rank() == 0) {
+    for (double& val : in) val = dist(gen);
+
+    task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(&size), reinterpret_cast<uint8_t*>(in.data())};
+    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
+    task_data_mpi->outputs = {reinterpret_cast<uint8_t*>(out.data())};
+    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
+  }
+
+  TestTaskMPI test_task_mpi(task_data_mpi);
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
+    std::vector<double> expected = in;
+    std::sort(expected.begin(), expected.end());
+    for (int i = 0; i < size; ++i) {
+      ASSERT_NEAR(result[i], expected[i], 1e-12);
+    }
+  }
 }
 
-TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, VerifySortingWithPreGeneratedData) {
-  std::vector<double> testData = {10.5, -2.3, 4.7, 8.0, -1.2, 3.5, 7.8, -6.1, 5.1};
-  komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::runSortingTest(testData);
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, AlreadySortedData) {
+  mpi::environment env;
+  mpi::communicator world;
+
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  int size = 10;
+  std::vector<double> in = {-5.0, -3.1, -1.2, 0.0, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7};
+  std::vector<double> out(size, 0.0);
+
+  if (world.rank() == 0) {
+    task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(&size), reinterpret_cast<uint8_t*>(in.data())};
+    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
+    task_data_mpi->outputs = {reinterpret_cast<uint8_t*>(out.data())};
+    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
+  }
+
+  TestTaskMPI test_task_mpi(task_data_mpi);
+  ASSERT_TRUE(test_task_mpi.ValidationImpl());
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
+    for (int i = 0; i < size; ++i) {
+      ASSERT_NEAR(result[i], in[i], 1e-12);
+    }
+  }
 }

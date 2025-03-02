@@ -1,121 +1,114 @@
 #include <gtest/gtest.h>
-#include <mpi.h>
 
-#include <algorithm>
+#include <boost/mpi.hpp>
 #include <chrono>
-#include <cmath>
-#include <random>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
+#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
-namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi {
-void generate_random_data(std::vector<double>& data, int N, double min = -1e9, double max = 1e9) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<double> dist(min, max);
+namespace mpi = boost::mpi;
+using namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi;
 
-  data.resize(N);
-  for (int i = 0; i < N; ++i) {
-    data[i] = dist(gen);
-  }
-}
-}  // namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi
+double computeValue(int i) { return std::sin(i) * 1e9 + std::cos(i * 0.5) * 1e8; }
 
-TEST(sotskov_a_radix_sort_for_numbers_type_double_with_simple_merging_mpi, test_pipeline_run) {
-  int rank;
-  int size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pipeline_run) {
+  mpi::environment env;
+  mpi::communicator world;
 
-  int N = 500000;
-  std::vector<double> inputData(N);
-  std::vector<double> xPar(N, 0.0);
+  int size = 10000000;
+  std::vector<double> in;
+  std::vector<double> out(size, 0.0);
 
-  if (rank == 0) {
-    komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::generate_random_data(inputData, N);
+  if (world.rank() == 0) {
+    in.resize(size);
+    for (int i = 0; i < size; ++i) {
+      in[i] = computeValue(i);
+    }
   }
 
-  auto taskDataPar = std::make_shared<ppc::core::TaskData>();
-  if (rank == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(inputData.data()));
-    taskDataPar->inputs_count.emplace_back(N);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
-    taskDataPar->outputs_count.emplace_back(N);
+  if (world.rank() == 0) {
+    task_data_mpi->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
+    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
+    task_data_mpi->outputs = {reinterpret_cast<uint8_t *>(out.data())};
+    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
   }
 
-  auto parallelRadixSort =
-      std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(taskDataPar);
+  auto sortTask = std::make_shared<TestTaskMPI>(task_data_mpi);
+  ASSERT_TRUE(sortTask->ValidationImpl());
+  sortTask->PreProcessingImpl();
+  sortTask->RunImpl();
+  sortTask->PostProcessingImpl();
 
-  ASSERT_TRUE(parallelRadixSort->ValidationImpl()) << "Validation failed!";
-  parallelRadixSort->PreProcessingImpl();
-  parallelRadixSort->RunImpl();
-  parallelRadixSort->PostProcessingImpl();
-
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
-
-  auto start_time = std::chrono::high_resolution_clock::now();
-  perfAttr->current_timer = [&] {
-    auto end_time = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration<double>(end_time - start_time).count();
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
   };
 
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(parallelRadixSort);
-  perfAnalyzer->PipelineRun(perfAttr, perfResults);
+  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sortTask);
+  perfAnalyzer->PipelineRun(perf_attr, perfResults);
 
-  if (rank == 0) {
+  if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perfResults);
   }
 }
 
-TEST(sotskov_a_radix_sort_for_numbers_type_double_with_simple_merging_mpi, test_task_run) {
-  int rank;
-  int size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_task_run) {
+  mpi::environment env;
+  mpi::communicator world;
 
-  int N = 500000;
-  std::vector<double> inputData;
-  std::vector<double> xPar(N, 0.0);
+  int size = 10000000;
+  std::vector<double> in;
+  std::vector<double> out(size, 0.0);
 
-  if (rank == 0) {
-    komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::generate_random_data(inputData, N);
+  if (world.rank() == 0) {
+    in.resize(size);
+    for (int i = 0; i < size; ++i) {
+      in[i] = computeValue(i);
+    }
   }
 
-  auto taskDataPar = std::make_shared<ppc::core::TaskData>();
-  if (rank == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(inputData.data()));
-    taskDataPar->inputs_count.emplace_back(N);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
-    taskDataPar->outputs_count.emplace_back(N);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+   if (world.rank() == 0) {
+    task_data_mpi->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
+    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
+    task_data_mpi->outputs = {reinterpret_cast<uint8_t *>(out.data())};
+    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
   }
 
-  auto parallelRadixSort =
-      std::make_shared<komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI>(taskDataPar);
+  auto sortTask = std::make_shared<TestTaskMPI>(task_data_mpi);
+  ASSERT_TRUE(sortTask->ValidationImpl());
+  sortTask->PreProcessingImpl();
+  sortTask->RunImpl();
+  sortTask->PostProcessingImpl();
 
-  ASSERT_TRUE(parallelRadixSort->ValidationImpl()) << "Validation failed!";
-  parallelRadixSort->PreProcessingImpl();
-  parallelRadixSort->RunImpl();
-  parallelRadixSort->PostProcessingImpl();
-
-  auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 10;
-
-  auto start_time = std::chrono::high_resolution_clock::now();
-  perfAttr->current_timer = [&] {
-    auto end_time = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration<double>(end_time - start_time).count();
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [&] {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
   };
 
   auto perfResults = std::make_shared<ppc::core::PerfResults>();
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(parallelRadixSort);
-  perfAnalyzer->TaskRun(perfAttr, perfResults);
+  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sortTask);
+  perfAnalyzer->TaskRun(perf_attr, perfResults);
 
-  if (rank == 0) {
+  if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perfResults);
   }
 }
