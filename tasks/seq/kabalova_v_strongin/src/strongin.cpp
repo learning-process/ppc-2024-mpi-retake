@@ -42,8 +42,8 @@ bool kabalova_v_strongin_seq::TestTaskSequential::RunImpl() {
     s = 0;
     // Самое первое вычисление характеристики.
     double ch = m * (v[1].first - v[0].first) +
-               (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
-               2 * (v[1].second + v[0].second);
+                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
+                2 * (v[1].second + v[0].second);
     // Последующие вычисления характеристик, поиск максимальной.
     for (int i = 1; i < (k - 1); ++i) {
       double new_ch =
