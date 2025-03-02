@@ -39,7 +39,7 @@ TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   const int expected_sum = kCount * kCount;
-  EXPECT_EQ(static_cast<size_t>(out[0]), static_cast<size_t>(expected_sum));
+  EXPECT_EQ(static_cast<size_t>(out[0]), static_cast<size_t>(expected_sum));  // Corrected comparison
 }
 
 TEST(karaseva_e_reduce_mpi, test_task_run) {
