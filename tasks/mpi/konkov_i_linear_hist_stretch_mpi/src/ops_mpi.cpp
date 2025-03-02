@@ -60,8 +60,7 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::RunImpl() {
 
 void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ApplyLinearStretch() {
   for (size_t i = 0; i < input_.size(); ++i) {
-    output_[i] = static_cast<uint8_t>((input_[i] - min_intensity_) * 255.0 /
-                                      (max_intensity_ - min_intensity_));
+    output_[i] = static_cast<uint8_t>((input_[i] - min_intensity_) * 255.0 / (max_intensity_ - min_intensity_));
   }
 }
 
