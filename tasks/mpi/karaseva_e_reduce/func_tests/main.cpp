@@ -52,7 +52,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  double expected_result = static_cast<double>(kCount);
+  auto expected_result = static_cast<double>(kCount);
   EXPECT_DOUBLE_EQ(out[0], expected_result);
 }
 
@@ -76,6 +76,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  float expected_result = static_cast<float>(kCount);
+  auto expected_result = static_cast<float>(kCount);
   EXPECT_FLOAT_EQ(out[0], expected_result);
 }
