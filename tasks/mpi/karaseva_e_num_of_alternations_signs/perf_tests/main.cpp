@@ -22,9 +22,9 @@ std::vector<int> CreateRandomAlternatingSigns(int size) {
   for (int i = 0; i < size; i++) {
     vec[i] = (dist(gen) == 0) ? -1 : 1;
   }
-  return vec;
-}
-}
+   return vec;
+ }
+}  // namespace
 
 TEST(karaseva_e_num_of_alternations_signs_mpi, test_pipeline_run) {
   constexpr int kCount = 100000000;
