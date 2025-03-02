@@ -1,11 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/konkov_i_linear_hist_stretch_mpi/include/ops_mpi.hpp"
 
 TEST(konkov_i_linear_hist_stretch_mpi, test_pipeline_run_mpi) {

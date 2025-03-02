@@ -1,8 +1,15 @@
 #include "mpi/konkov_i_linear_hist_stretch_mpi/include/ops_mpi.hpp"
 
+#include "boost/mpi/operations.hpp"
+#include "boost/mpi/collectives/all_reduce.hpp"
+#include "boost/mpi/communicator.hpp"
 #include <algorithm>
+#include <ranges>
 #include <cmath>
-#include <limits>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+
 
 bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::PreProcessingImpl() {
   size_t input_size = task_data->inputs_count[0];
@@ -15,7 +22,7 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::PreProcessingImpl()
 bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ValidationImpl() {
   boost::mpi::communicator comm;
 
-  if (task_data->inputs_count.size() < 1 || task_data->outputs_count.size() < 1) {
+  if (task_data->inputs_count.empty() || task_data->outputs_count.empty()) {
     return false;
   }
 
@@ -38,19 +45,20 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ValidationImpl() {
 
 void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(uint8_t& local_min,
                                                                                 uint8_t& local_max) {
-  local_min = *std::min_element(input_.begin(), input_.end());
-  local_max = *std::max_element(input_.begin(), input_.end());
+  local_min = *std::ranges::min_element(input_, );
+  local_max = *std::ranges::max_element(input_, );
 }
 
 bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::RunImpl() {
-  uint8_t local_min, local_max;
+  uint8_t local_min;
+  uint8_t local_max;
   ComputeLocalMinMax(local_min, local_max);
 
   boost::mpi::all_reduce(world_, local_min, min_intensity_, boost::mpi::minimum<uint8_t>());
   boost::mpi::all_reduce(world_, local_max, max_intensity_, boost::mpi::maximum<uint8_t>());
 
   if (min_intensity_ == max_intensity_) {
-    std::fill(output_.begin(), output_.end(), min_intensity_);
+    std::ranges::fill(output_, , min_intensity_);
     return true;
   }
 

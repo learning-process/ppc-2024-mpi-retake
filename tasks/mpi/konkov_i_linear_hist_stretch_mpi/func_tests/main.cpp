@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <cstdint>
 #include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/konkov_i_linear_hist_stretch_mpi/include/ops_mpi.hpp"
 
 TEST(konkov_i_linear_hist_stretch_mpi, test_contrast_stretch) {
