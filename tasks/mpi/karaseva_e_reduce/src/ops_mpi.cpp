@@ -4,7 +4,6 @@
 
 #include <cmath>
 #include <cstring>
-#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -12,7 +11,7 @@ namespace {
 
 // Utility function to get MPI datatype based on template type
 template <typename T>
-MPI_Datatype static GetMPIType();
+MPI_Datatype GetMPIType();
 
 template <>
 MPI_Datatype GetMPIType<int>() {
@@ -29,11 +28,12 @@ MPI_Datatype GetMPIType<double>() {
   return MPI_DOUBLE;
 }
 
+}  // namespace
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   unsigned int input_size = task_data->inputs_count[0];
-  auto* in_ptr = static_cast<T*>(static_cast<void*>(task_data->inputs[0]));
+  auto* in_ptr = reinterpret_cast<T*>(task_data->inputs[0]);
   input_ = std::vector<T>(in_ptr, in_ptr + input_size);
 
   unsigned int output_size = task_data->outputs_count[0];
@@ -58,28 +58,18 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  // Binary tree reduction
   for (int step = 1; step < size; step *= 2) {
     int partner_rank = rank ^ step;
-    if (partner_rank >= size) {
-      continue;
-    }
 
     if (partner_rank < size) {
-    if (rank < partner_rank) {
-      T recv_data = 0;
-      MPI_Recv(&recv_data, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-      local_sum += recv_data;
-
-      std::cout << "Rank " << rank << " received " << recv_data << " from " << partner_rank
-                << ", local_sum = " << local_sum << std::endl;
-    } else {
-      MPI_Send(&local_sum, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD);
-
-      std::cout << "Rank " << rank << " sending " << local_sum << " to " << partner_rank << std::endl;
-      break;
+      if (rank < partner_rank) {
+        MPI_Recv(&recv_data, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        local_sum += recv_data;
+      } else {
+        MPI_Send(&local_sum, 1, GetMPIType<T>(), partner_rank, 0, MPI_COMM_WORLD);
+        break;
+      }
     }
-  }
   }
 
   if (rank == 0) {
@@ -96,7 +86,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (task_data->outputs_count[0] > 0 && rank == 0) {
-    std::memcpy(static_cast<T*>(static_cast<void*>(task_data->outputs[0])), output_.data(), sizeof(T));
+    std::memcpy(task_data->outputs[0], output_.data(), sizeof(T));
   }
   return true;
 }
