@@ -64,7 +64,7 @@ bool BinarySegmentsMPI::RunImpl() {
   size_t local_size = (world_.rank() == 0) ? (rows_for_proc + (rows_ % world_.size())) : rows_for_proc;
   local_image_.resize(local_size * cols_);
   boost::mpi::scatterv(world_, input_image_.data(), send_counts, offsets, local_image_.data(),
-                       static_cast<int>(local_size) * cols_, 0);
+                       static_cast<int>(local_size * cols_), 0);
   uint32_t next_label = 1 + offsets[world_.rank()];
   std::vector<uint32_t> local_labels(local_size * cols_);
   std::unordered_map<uint32_t, uint32_t> local_label_equivalences;
