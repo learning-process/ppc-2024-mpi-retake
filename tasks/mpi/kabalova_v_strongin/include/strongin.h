@@ -4,8 +4,10 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <cmath>
 #include <functional>
 #include <memory>
+#include <numbers>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -30,6 +32,7 @@ class TestMPITaskSequential : public ppc::core::Task {
   std::pair<double, double> result{};
 };
 double algorithm(const double a, const double b, std::function<double(double*)> func, const double eps = 0.0001);
+std::pair<double, double> generateBounds(const double left = -5.0, const double right = 5.0);
 
 class TestMPITaskParallel : public ppc::core::Task {
  public:

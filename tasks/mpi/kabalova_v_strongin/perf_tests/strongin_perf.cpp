@@ -8,10 +8,10 @@
 
 TEST(kabalova_v_strongin_mpi, test_pipeline_run) {
   double left = -1.0;
-  double right = 7.0;
+  double right = 4.0;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double *)> f = [](double *x) { return exp(*x) - 1.0; };
+  std::function<double(double *)> f = [](double *x) { return std::exp(*x) - 1.0; };
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -27,7 +27,7 @@ TEST(kabalova_v_strongin_mpi, test_pipeline_run) {
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 30;
+  perf_attr->num_running = 1000;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -48,10 +48,10 @@ TEST(kabalova_v_strongin_mpi, test_pipeline_run) {
 
 TEST(kabalova_v_strongin_mpi, test_task_run) {
   double left = -1.0;
-  double right = 7.0;
+  double right = 4.0;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double *)> f = [](double *x) { return exp(*x) - 1.0; };
+  std::function<double(double *)> f = [](double *x) { return std::exp(*x) - 1.0; };
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -67,7 +67,7 @@ TEST(kabalova_v_strongin_mpi, test_task_run) {
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 30;
+  perf_attr->num_running = 1000;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();

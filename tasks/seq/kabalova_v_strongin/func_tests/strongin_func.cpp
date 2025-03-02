@@ -6,14 +6,14 @@
 
 const double PI = 3.14159265358979323846;
 
-// Все минимумы найдены +- по графику.
+// Р’СЃРµ РјРёРЅРёРјСѓРјС‹ РЅР°Р№РґРµРЅС‹ +- РїРѕ РіСЂР°С„РёРєСѓ.
 
 TEST(kabalova_v_strongin_seq, x_square) {
   double left = 0;
   double right = 10;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double)> f = [](double x) { return x * x; };
+  std::function<double(double)> f = [](double x) { return x * x; };
   double answer1 = 0;
   double answer2 = f(answer1);
   double eps = 0.0001;
@@ -41,7 +41,7 @@ TEST(kabalova_v_strongin_seq, sin) {
   double right = PI;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double)> f = [](double x) { return sin(x); };
+  std::function<double(double)> f = [](double x) { return std::sin(x); };
   double eps = 0.1;
   double answer1 = -PI / 2;
   double answer2 = f(answer1);
@@ -69,7 +69,7 @@ TEST(kabalova_v_strongin_seq, cos) {
   double right = PI / 2;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double)> f = [](double x) { return cos(x); };
+  std::function<double(double)> f = [](double x) { return std::cos(x); };
   double eps = 0.1;
   double answer1 = -PI;
   double answer2 = f(answer1);
@@ -97,7 +97,7 @@ TEST(kabalova_v_strongin_seq, x_polynome) {
   double right = 0;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double)> f = [](double x) { return x * x * x * (-0.2465) + x * x * (-0.3147) + 1.0; };
+  std::function<double(double)> f = [](double x) { return x * x * x * (-0.2465) + x * x * (-0.3147) + 1.0; };
   double eps = 0.1;
   double answer1 = -0.8;
   double answer2 = f(answer1);

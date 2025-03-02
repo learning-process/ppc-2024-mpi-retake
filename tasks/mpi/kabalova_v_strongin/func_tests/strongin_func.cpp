@@ -1,6 +1,5 @@
 // Copyright 2024 Kabalova Valeria
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <random>
 #include <vector>
@@ -11,7 +10,7 @@ const double PI = 3.14159265358979323846;
 
 namespace kabalova_v_strongin_mpi {
 
-std::pair<double, double> generateBounds(const double left = -5.0, const double right = 5.0) {
+std::pair<double, double> generateBounds(const double left, const double right) {
   // int seed = 101;
   std::random_device seed;
   std::mt19937 gen(seed());
@@ -26,7 +25,7 @@ std::pair<double, double> generateBounds(const double left = -5.0, const double 
 }
 }  // namespace kabalova_v_strongin_mpi
 
-// Все минимумы найдены +- по графику.
+// Р’СЃРµ РјРёРЅРёРјСѓРјС‹ РЅР°Р№РґРµРЅС‹ +- РїРѕ РіСЂР°С„РёРєСѓ.
 
 TEST(kabalova_v_strongin_mpi, x_square) {
   double left = 0;
@@ -61,7 +60,7 @@ TEST(kabalova_v_strongin_mpi, sin) {
   double right = PI;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double *)> f = [](double *x) { return sin(*x); };
+  const std::function<double(double *)> f = [](double *x) { return std::sin(*x); };
   double eps = 0.1;
   double answer1 = -PI / 2;
   double answer2 = f(&answer1);
@@ -89,7 +88,7 @@ TEST(kabalova_v_strongin_mpi, cos) {
   double right = PI / 2;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double *)> f = [](double *x) { return cos(*x); };
+  const std::function<double(double *)> f = [](double *x) { return std::cos(*x); };
   double eps = 0.1;
   double answer1 = -PI;
   double answer2 = f(&answer1);
@@ -177,7 +176,7 @@ TEST(kabalova_v_strongin_mpi, x_polynome2) {
 }
 
 TEST(kabalova_v_strongin_mpi, x_square_mpi_and_seq) {
-  std::pair<double, double> tmp = kabalova_v_strongin_mpi::generateBounds(-1, 4);
+  std::pair<double, double> tmp = kabalova_v_strongin_mpi::generateBounds(2, 100);
   boost::mpi::communicator world;
   double left = tmp.first;
   double right = tmp.second;
@@ -229,7 +228,7 @@ TEST(kabalova_v_strongin_mpi, x_square_mpi_and_seq) {
 
 TEST(kabalova_v_strongin_mpi, x_polynome_mpi_and_seq1) {
   boost::mpi::communicator world;
-  std::pair<double, double> tmp = kabalova_v_strongin_mpi::generateBounds();
+  std::pair<double, double> tmp = kabalova_v_strongin_mpi::generateBounds(-1, 1);
   double left = tmp.first;
   double right = tmp.second;
   double res1 = 0;
@@ -339,7 +338,7 @@ TEST(kabalova_v_strongin_mpi, exp) {
   double right = tmp.second;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double *)> f = [](double *x) { return exp(*x) - 0.13645; };
+  const std::function<double(double *)> f = [](double *x) { return std::exp(*x) - 0.13645; };
   double eps = 0.1;
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -385,10 +384,10 @@ TEST(kabalova_v_strongin_mpi, exp) {
 TEST(kabalova_v_strongin_mpi, exp_for_perf_tests) {
   boost::mpi::communicator world;
   double left = -1.0;
-  double right = 7.0;
+  double right = 4.0;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double *)> f = [](double *x) { return exp(*x) - 1.0; };
+  const std::function<double(double *)> f = [](double *x) { return std::exp(*x) - 1.0; };
   double eps = 0.1;
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();

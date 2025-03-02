@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cmath>
 #include <functional>
+#include <numbers>
 #include <numeric>
 #include <string>
 #include <utility>

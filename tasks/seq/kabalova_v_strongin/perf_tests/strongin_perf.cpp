@@ -7,12 +7,12 @@
 #include "core/task/include/task.hpp"
 #include "seq/kabalova_v_strongin/include/strongin.h"
 
-TEST(kabalova_v_strongin_seq_perf_test, test_pipeline_run) {
+TEST(kabalova_v_strongin_seq, test_pipeline_run) {
   double left = -1.0;
   double right = 7.0;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double)> f = [](double x) { return exp(x) - 1.0; };
+  std::function<double(double)> f = [](double x) { return std::exp(x) - 1.0; };
   // Create TaskData
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
@@ -45,12 +45,12 @@ TEST(kabalova_v_strongin_seq_perf_test, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 }
 
-TEST(kabalova_v_strongin_seq_perf_test, test_task_run) {
+TEST(kabalova_v_strongin_seq, test_task_run) {
   double left = -1.0;
   double right = 7.0;
   double res1 = 0;
   double res2 = 0;
-  const std::function<double(double)> f = [](double x) { return exp(x) - 1.0; };
+  std::function<double(double)> f = [](double x) { return std::exp(x) - 1.0; };
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&left));
