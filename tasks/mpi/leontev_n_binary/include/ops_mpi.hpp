@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -22,7 +21,7 @@ class BinarySegmentsMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  size_t GetIndex(size_t i, size_t j) const;
+  [[nodiscard]] size_t GetIndex(size_t i, size_t j) const;
   boost::mpi::communicator world_;
   std::vector<uint8_t> input_image_;
   std::vector<uint8_t> local_image_;
