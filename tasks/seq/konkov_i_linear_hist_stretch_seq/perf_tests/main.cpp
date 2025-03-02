@@ -27,7 +27,7 @@ TEST(konkov_i_linear_hist_stretch_seq, test_pipeline_run) {
   auto task = std::make_shared<konkov_i_linear_hist_stretch_seq::LinearHistStretchSeq>(task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 5;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     return std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - t0).count();
@@ -59,7 +59,7 @@ TEST(konkov_i_linear_hist_stretch_seq, test_task_run) {
   auto task = std::make_shared<konkov_i_linear_hist_stretch_seq::LinearHistStretchSeq>(task_data_seq);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 5;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     return std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - t0).count();
