@@ -2,8 +2,11 @@
 #include "mpi/kabalova_v_strongin/include/strongin.h"
 
 #include <algorithm>
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <functional>
+#include <ranges>
+#include <utility>
 #include <vector>
 
 bool kabalova_v_strongin_mpi::TestMPITaskSequential::PreProcessingImpl() {
@@ -23,8 +26,8 @@ bool kabalova_v_strongin_mpi::TestMPITaskSequential::ValidationImpl() {
 
 bool kabalova_v_strongin_mpi::TestMPITaskSequential::RunImpl() {
   std::vector<std::pair<double, double>> v;
-  v.emplace_back(std::pair<double, double>(left_, f_(&left_)));
-  v.emplace_back(std::pair<double, double>(right_, f_(&right_)));
+  v.emplace_back(left_, f_(&left_));
+  v.emplace_back(right_, f_(&right_));
 
   double eps = 0.0001;
   double lipsh = 0.0;
@@ -45,8 +48,8 @@ bool kabalova_v_strongin_mpi::TestMPITaskSequential::RunImpl() {
     s = 0;
     // Самое первое вычисление характеристики.
     double ch = (m * (v[1].first - v[0].first)) +
-                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
-                2 * (v[1].second + v[0].second);
+                ((v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first))) -
+                (2 * (v[1].second + v[0].second));
     // Последующие вычисления характеристик, поиск максимальной.
     for (int i = 1; i < (k - 1); i++) {
       double new_ch =
@@ -69,7 +72,7 @@ bool kabalova_v_strongin_mpi::TestMPITaskSequential::RunImpl() {
     }
     // Иначе - упорядочиваем массив по возрастания и возвращаемся на шаг 1.
     v.emplace_back(new_point);
-    std::sort(v.begin(), v.end());
+    std::ranges::sort(v);
     k++;
   }
   return true;
@@ -104,11 +107,11 @@ bool kabalova_v_strongin_mpi::TestMPITaskParallel::ValidationImpl() {
   return flag;
 }
 
-double kabalova_v_strongin_mpi::Algorithm(double left_, double right_, const std::function<double(double*)>& f_,
+double kabalova_v_strongin_mpi::Algorithm(double left, double right, const std::function<double(double*)>& f,
                                           double eps) {
   std::vector<std::pair<double, double>> v;
-  v.emplace_back(std::pair<double, double>(left_, f_(&left_)));
-  v.emplace_back(std::pair<double, double>(right_, f_(&right_)));
+  v.emplace_back(left, f(&left));
+  v.emplace_back(right, f(&right));
   double lipsh = 0.0;
   double r = 2.0;
   int k = 2;
@@ -120,13 +123,15 @@ double kabalova_v_strongin_mpi::Algorithm(double left_, double right_, const std
       lipsh = std::max(new_lipsh, lipsh);
     }
     double m = 1.0;
-    if (lipsh != 0) m = r * lipsh;
+    if (lipsh != 0) {
+      m = r * lipsh;
+    }
     // Вычисление характеристики
     s = 0;
     // Первое вычисление характеристики ch
-    double ch = m * (v[1].first - v[0].first) +
-                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
-                2 * (v[1].second + v[0].second);
+    double ch = (m * (v[1].first - v[0].first)) +
+                ((v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first))) -
+                (2 * (v[1].second + v[0].second));
     for (int i = 1; i < (k - 1); i++) {
       double new_ch =
           (m * (v[i + 1].first - v[i].first)) +
@@ -138,12 +143,12 @@ double kabalova_v_strongin_mpi::Algorithm(double left_, double right_, const std
       }
     }
     double new_x = ((v[s].first + v[s + 1].first) / 2) - ((v[s + 1].second - v[s].second) / (2 * m));
-    std::pair<double, double> new_point = std::pair<double, double>(new_x, f_(&new_x));
+    std::pair<double, double> new_point = std::pair<double, double>(new_x, f(&new_x));
     if ((v[s + 1].first - v[s].first) <= eps) {
       return v[s + 1].first;
     }
     v.emplace_back(new_point);
-    std::sort(v.begin(), v.end());
+    std::ranges::sort(v);
     k++;
   }
 }

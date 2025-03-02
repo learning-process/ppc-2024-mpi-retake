@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <cmath>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <numbers>
-#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -100,7 +101,7 @@ TEST(kabalova_v_strongin_seq, x_polynome) {
   double right = 0;
   double res1 = 0;
   double res2 = 0;
-  std::function<double(double)> f = [](double x) { return x * x * x * (-0.2465) + x * x * (-0.3147) + 1.0; };
+  std::function<double(double)> f = [](double x) { return (x * x * x * (-0.2465)) + (x * x * (-0.3147)) + 1.0; };
   double eps = 0.1;
   double answer1 = -0.8;
   double answer2 = f(answer1);

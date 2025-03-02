@@ -2,8 +2,10 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
+#include <cmath>
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <numbers>
 #include <random>
 #include <vector>

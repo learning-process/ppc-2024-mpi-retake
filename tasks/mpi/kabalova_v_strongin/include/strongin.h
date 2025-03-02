@@ -26,8 +26,8 @@ class TestMPITaskSequential : public ppc::core::Task {
   std::function<double(double *)> f_;
   std::pair<double, double> result_;
 };
-double Algorithm(double a, double b, const std::function<double(double *)> &f_, double eps = 0.0001);
-std::pair<double, double> GenerateBounds(const double left = -5.0, const double right = 5.0);
+double Algorithm(double left, double right, const std::function<double(double *)> &f, double eps = 0.0001);
+std::pair<double, double> GenerateBounds(double left = -5.0, double right = 5.0);
 
 class TestMPITaskParallel : public ppc::core::Task {
  public:

@@ -1,6 +1,7 @@
 #include "seq/kabalova_v_strongin/include/strongin.h"
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 bool kabalova_v_strongin_seq::TestTaskSequential::PreProcessingImpl() {
@@ -20,8 +21,8 @@ bool kabalova_v_strongin_seq::TestTaskSequential::ValidationImpl() {
 
 bool kabalova_v_strongin_seq::TestTaskSequential::RunImpl() {
   std::vector<std::pair<double, double>> v;
-  v.emplace_back(std::pair<double, double>(left_, f_(left_)));
-  v.emplace_back(std::pair<double, double>(right_, f_(right_)));
+  v.emplace_back(left_, f_(left_));
+  v.emplace_back(right_, f_(right_));
 
   double eps = 0.0001;
   double lipsh = 0.0;
@@ -41,9 +42,9 @@ bool kabalova_v_strongin_seq::TestTaskSequential::RunImpl() {
     // Шаг 2. Вычисление характеристики.
     s = 0;
     // Самое первое вычисление характеристики.
-    double ch = m * (v[1].first - v[0].first) +
-                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
-                2 * (v[1].second + v[0].second);
+    double ch = (m * (v[1].first - v[0].first)) +
+                ((v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first))) -
+                (2 * (v[1].second + v[0].second));
     // Последующие вычисления характеристик, поиск максимальной.
     for (int i = 1; i < (k - 1); ++i) {
       double new_ch =
@@ -66,7 +67,7 @@ bool kabalova_v_strongin_seq::TestTaskSequential::RunImpl() {
     }
     // Иначе - упорядочиваем массив по возрастания и возвращаемся на шаг 1.
     v.emplace_back(new_point);
-    std::sort(v.begin(), v.end());
+    std::ranges::sort(v);
     k++;
   }
   return true;

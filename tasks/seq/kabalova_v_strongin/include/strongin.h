@@ -11,8 +11,8 @@ namespace kabalova_v_strongin_seq {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> task_data_, std::function<double(double)> f)
-      : Task(std::move(task_data_)), f_(std::move(f)) {}
+  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> task_data, std::function<double(double)> f)
+      : Task(std::move(task_data)), f_(std::move(f)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
