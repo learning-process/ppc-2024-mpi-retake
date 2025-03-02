@@ -4,7 +4,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <ranges>
 #include <vector>
 
 #include "boost/mpi/collectives/all_reduce.hpp"
@@ -43,11 +42,13 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ValidationImpl() {
   return true;
 }
 
-void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(uint8_t& found_min,
-                                                                                uint8_t& found_max) {
-  if (input_.empty()) return;
-  found_min = *std::ranges::min_element(input_);
-  found_max = *std::ranges::max_element(input_);
+void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(uint8_t& out_min,
+                                                                                uint8_t& out_max) {
+  if (input_.empty()) {
+    return;
+  }
+  out_min = *std::min_element(input_.begin(), input_.end());
+  out_max = *std::max_element(input_.begin(), input_.end());
 }
 
 bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::RunImpl() {

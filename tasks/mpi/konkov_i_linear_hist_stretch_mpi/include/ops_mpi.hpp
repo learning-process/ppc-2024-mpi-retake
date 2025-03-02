@@ -23,7 +23,7 @@ class LinearHistStretchMPI : public ppc::core::Task {
   uint8_t min_intensity_, max_intensity_;
   boost::mpi::communicator world_;
 
-  void ComputeLocalMinMax(uint8_t& local_min, uint8_t& local_max);
+  void ComputeLocalMinMax(uint8_t& out_min, uint8_t& out_max);
   void ApplyLinearStretch();
 };
 
