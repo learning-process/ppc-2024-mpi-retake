@@ -36,20 +36,25 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  // Ensure we calculate the input_size correctly
   if (rank == 0) {
     input_size_ = task_data->inputs_count[0];
     input_.resize(input_size_);
     std::memcpy(input_.data(), task_data->inputs[0], input_size_ * sizeof(T));
   }
 
+  // Broadcast input size to all processes
   MPI_Bcast(&input_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+  // Calculate local sizes for each process
   local_size_ = input_size_ / size;
   remel_ = input_size_ % size;
 
+  // Ensure data is sent correctly to each process
   if (rank == 0) {
     local_input_.assign(input_.begin(), input_.begin() + local_size_ + remel_);
     for (int proc = 1; proc < size; proc++) {
+      // Send the correct portion of data to each process
       MPI_Send(input_.data() + remel_ + (proc * local_size_), local_size_, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD);
     }
   } else {
@@ -67,8 +72,33 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
+  int rank = 0;
+  int size = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
   T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), static_cast<T>(0));
-  MPI_Reduce(&local_sum, &result_, 1, GetMPIType<T>(), MPI_SUM, 0, MPI_COMM_WORLD);
+
+  int partner = (rank % 2 == 0) ? rank + 1 : rank - 1;
+
+  if (partner >= 0 && partner < size) {
+    MPI_Send(&local_sum, 1, GetMPIType<T>(), partner, 0, MPI_COMM_WORLD);
+  }
+
+  T total_sum = local_sum;
+
+  if (rank % 2 == 0 && rank + 1 < size) {
+    MPI_Recv(&total_sum, 1, GetMPIType<T>(), rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  } else if (rank % 2 == 1 && rank - 1 >= 0) {
+    MPI_Recv(&total_sum, 1, GetMPIType<T>(), rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  if (rank == 0) {
+    result_ = total_sum;
+  }
+
   return true;
 }
 
