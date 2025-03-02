@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
 #include <chrono>
+#include <cstdint>
+#include <cmath>
 #include <memory>
 #include <vector>
-#include <cmath>
-#include <boost/mpi.hpp> 
 
+#include <boost/mpi/environment.hpp>
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
@@ -14,8 +14,9 @@
 
 namespace mpi = boost::mpi;
 using namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi;
-
-static double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
+namespace {
+double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
+}  // namespace
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pipeline_run) {
   mpi::environment env;
@@ -81,7 +82,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_ta
   }
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  
+
   if (world.rank() == 0) {
     task_data_mpi->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
     task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};

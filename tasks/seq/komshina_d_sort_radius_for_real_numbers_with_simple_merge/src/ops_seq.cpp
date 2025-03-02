@@ -40,7 +40,7 @@ void TestTaskSequential::SortValues(std::vector<double>& values) {
   for (size_t i = 0; i < values.size(); ++i) {
     uint64_t temp = 0;
     std::memcpy(&temp, &values[i], sizeof(double));
-    temp = (temp & sign_mask) ? (temp & ~sign_mask) : ~temp;
+    temp = ((temp & sign_mask) != 0) ? ~temp : (temp | sign_mask);
     encoded[i] = temp;
   }
 
@@ -48,7 +48,7 @@ void TestTaskSequential::SortValues(std::vector<double>& values) {
 
   for (size_t i = 0; i < values.size(); ++i) {
     uint64_t temp = encoded[i];
-    temp = (temp & sign_mask) ? (temp & ~sign_mask) : ~temp;
+    temp = ((temp & sign_mask) != 0) ? (temp & ~sign_mask) : ~temp;
     std::memcpy(&values[i], &temp, sizeof(double));
   }
 }

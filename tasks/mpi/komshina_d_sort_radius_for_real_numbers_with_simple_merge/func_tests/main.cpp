@@ -2,14 +2,14 @@
 
 #include <algorithm>
 #include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/serialization/vector.hpp>
 #include <memory>
 #include <random>
+#include <ranges>
 #include <vector>
 #include <cstdint>
 #include <boost/mpi.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <ranges>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"

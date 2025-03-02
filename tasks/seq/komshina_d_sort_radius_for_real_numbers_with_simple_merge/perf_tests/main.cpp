@@ -2,17 +2,20 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <memory>
 #include <random>
-#include <vector>
-#include <cmath>
 #include <ranges>
+#include <vector>
+#include <cstdint>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_seq.hpp"
 
-static double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
+namespace {
+double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
+}  // namespace
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipeline_run) {
   int size = 10000000;
@@ -53,10 +56,10 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipelin
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  std::vector<double> refData = in;
-  std::ranges::sort(refData);
+  std::vector<double> ref_data = in;
+  std::ranges::sort(ref_data);
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(refData[i], out[i], 1e-12);
+    ASSERT_NEAR(ref_data[i], out[i], 1e-12);
   }
 }
 
@@ -99,9 +102,9 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_task_ru
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  std::vector<double> refData = in;
-  std::ranges::sort(refData);
+  std::vector<double> ref_data = in;
+  std::ranges::sort(ref_data);
   for (int i = 0; i < size; ++i) {
-    ASSERT_NEAR(refData[i], out[i], 1e-12);
+    ASSERT_NEAR(ref_data[i], out[i], 1e-12);
   }
 }

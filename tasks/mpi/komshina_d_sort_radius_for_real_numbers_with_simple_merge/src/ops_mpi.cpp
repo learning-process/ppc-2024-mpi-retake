@@ -1,16 +1,15 @@
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <array>
-#include <boost/mpi.hpp>
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <mpi.h>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <vector>
-#include <algorithm>
 #include <utility>
+#include <ranges>
+#include <vector>
 
 
 namespace mpi = boost::mpi;
@@ -30,8 +29,8 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
     is_valid = task_data->inputs_count[0] == 1 && task_data->inputs_count[1] == static_cast<size_t>(total_size_) &&
                task_data->outputs_count[0] == static_cast<size_t>(total_size_);
   }
-  mpi::broadcast(world_, is_valid, 0);
-  mpi::broadcast(world_, total_size_, 0);
+  MPI_Bcast(&is_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&total_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return is_valid;
 }
 
@@ -52,7 +51,8 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   }
 
   std::vector<double> local_data(sizes[rank]);
-  mpi::scatterv(world_, numbers_.data(), sizes, offsets, local_data.data(), sizes[rank], 0);
+  MPI_Scatterv(numbers_.data(), sizes.data(), offsets.data(), MPI_DOUBLE, local_data.data(), sizes[rank], MPI_DOUBLE, 0,
+               MPI_COMM_WORLD);
   SortDoubles(local_data);
 
   int step = 1;
@@ -66,7 +66,9 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
         world_.recv(partner, 1, partner_data.data(), partner_size);
 
         std::vector<double> merged(local_data.size() + partner_data.size());
-        std::merge(local_data.begin(), local_data.end(), partner_data.begin(), partner_data.end(), merged.begin());
+        std::ranges::merge(std::ranges::subrange(local_data), std::ranges::subrange(partner_data),
+                           std::back_inserter(merged));
+
         local_data = std::move(merged);
       }
     } else if (rank % (2 * step) == step) {
@@ -100,7 +102,7 @@ void TestTaskMPI::SortDoubles(std::vector<double>& arr) {
   for (size_t i = 0; i < arr.size(); ++i) {
     uint64_t temp = 0;
     std::memcpy(&temp, &arr[i], sizeof(double));
-    temp = (temp & sign_mask) ? ~temp : (temp | sign_mask);
+    temp = ((temp & sign_mask) != 0) ? ~temp : (temp | sign_mask);
     keys[i] = temp;
   }
 
@@ -108,7 +110,7 @@ void TestTaskMPI::SortDoubles(std::vector<double>& arr) {
 
   for (size_t i = 0; i < arr.size(); ++i) {
     uint64_t temp = keys[i];
-    temp = (temp & sign_mask) ? (temp & ~sign_mask) : ~temp;
+    temp = ((temp & sign_mask) != 0) ? (temp & ~sign_mask) : ~temp;
     std::memcpy(&arr[i], &temp, sizeof(double));
   }
 }

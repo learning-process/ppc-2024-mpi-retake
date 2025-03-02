@@ -22,7 +22,7 @@ class TestTaskMPI : public ppc::core::Task {
   std::vector<double> numbers_;
   int total_size_ = 0;
 
-  void SortDoubles(std::vector<double>& arr);
+  static void SortDoubles(std::vector<double>& arr);
   static void SortUint64(std::vector<uint64_t>& keys);
   boost::mpi::communicator world_;
 };

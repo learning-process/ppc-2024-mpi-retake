@@ -1,13 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <memory>
-#include <random>
-#include <vector>
 #include <cstdint>
+#include <memory>
 #include <ranges> 
+#include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_seq.hpp"
 
 using namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq;
@@ -28,8 +26,8 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_sort_ba
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  
-std::ranges::sort(refData);
+
+  std::ranges::sort(in);
   auto *result_seq = reinterpret_cast<double *>(task_data_seq->outputs[0]);
 
   for (int i = 0; i < size; ++i) {
@@ -53,7 +51,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_sort_ne
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  
+
   std::ranges::sort(in);
   auto *result_seq = reinterpret_cast<double *>(task_data_seq->outputs[0]);
 
