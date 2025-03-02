@@ -6,15 +6,12 @@
 #include <vector>
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::PreProcessingImpl() {
-  // Init value for input and output
-
   unsigned int output_size = task_data->outputs_count[0];
   output_ = std::vector<double>(output_size, 0);
   return true;
 }
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::ValidationImpl() {
-  // Check equality of counts elements
   if (task_data->inputs_count[1] == 0) return false;
   if (task_data->inputs_count[0] != (task_data->inputs_count[1] + 1)) {
     return false;
@@ -22,7 +19,7 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::ValidationImpl() {
   if (task_data->inputs_count[1] != task_data->outputs_count[0]) {
     return false;
   }
-  row_size_ = task_data->inputs_count[0];  // сколько элементов в строке
+  row_size_ = task_data->inputs_count[0];
   col_size_ = task_data->inputs_count[1];
   auto* in_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
   input_ = std::vector<double>(in_ptr, in_ptr + row_size_ * col_size_);
@@ -52,7 +49,6 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
-  // Multiply matrices
   for (size_t i = 0; i < col_size_; i++) {
     if (input_[i * row_size_ + i] == 0) {
       size_t k = i + 1;

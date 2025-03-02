@@ -16,7 +16,7 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::ValidationImpl() {
   row_size_ = 0;
   col_size_ = 0;
   if (world_.rank() == 0) {
-    row_size_ = task_data->inputs_count[0];  // сколько элементов в строке
+    row_size_ = task_data->inputs_count[0];
     col_size_ = task_data->inputs_count[1];
     if (task_data->inputs_count[1] == 0) {
       return false;
