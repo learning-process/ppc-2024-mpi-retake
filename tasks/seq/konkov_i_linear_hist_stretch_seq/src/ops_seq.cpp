@@ -48,6 +48,6 @@ bool konkov_i_linear_hist_stretch_seq::LinearHistStretchSeq::RunImpl() {
 }
 
 bool konkov_i_linear_hist_stretch_seq::LinearHistStretchSeq::PostProcessingImpl() {
-  std::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t*>(task_data->outputs[0])); 
+  std::copy(output_.begin(), output_.end(), reinterpret_cast<uint8_t*>(task_data->outputs[0]));
   return true;
 }
