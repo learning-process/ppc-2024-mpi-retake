@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <memory>
 #include <random>
 #include <ranges>
 #include <vector>
-#include <cstdint>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"

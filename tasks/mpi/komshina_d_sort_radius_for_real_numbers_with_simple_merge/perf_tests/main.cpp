@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi.hpp>
+#include <boost/mpi/environment.hpp>
 #include <chrono>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
-#include <boost/mpi/environment.hpp>
-#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"

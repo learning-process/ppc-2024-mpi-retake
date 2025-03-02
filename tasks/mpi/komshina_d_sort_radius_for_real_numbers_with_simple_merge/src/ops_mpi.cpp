@@ -1,21 +1,23 @@
 #include "mpi/komshina_d_sort_radius_for_real_numbers_with_simple_merge/include/ops_mpi.hpp"
 
+#include <mpi.h>
+
 #include <algorithm>
 #include <array>
-#include <mpi.h>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <utility>
+#include <iterator>
 #include <ranges>
+#include <utility>
 #include <vector>
 
-
-namespace mpi = boost::mpi;
-
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PreProcessingImpl() {
-  if (world_.rank() == 0) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  if (rank == 0) {
     numbers_.resize(total_size_);
     std::memcpy(numbers_.data(), task_data->inputs[1], total_size_ * sizeof(double));
   }
@@ -23,20 +25,27 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ValidationImpl() {
-  bool is_valid = world_.rank() == 0;
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  bool is_valid = (rank == 0);
   if (is_valid) {
     total_size_ = *reinterpret_cast<int*>(task_data->inputs[0]);
     is_valid = task_data->inputs_count[0] == 1 && task_data->inputs_count[1] == static_cast<size_t>(total_size_) &&
                task_data->outputs_count[0] == static_cast<size_t>(total_size_);
   }
+
+  // Используем MPI_Bcast вместо mpi::broadcast
   MPI_Bcast(&is_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   MPI_Bcast(&total_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return is_valid;
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::RunImpl() {
-  int rank = world_.rank();
-  int size = world_.size();
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
   int chunk_size = total_size_ / size;
   int remainder = total_size_ % size;
 
@@ -51,8 +60,10 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   }
 
   std::vector<double> local_data(sizes[rank]);
+  // Используем MPI_Scatterv вместо mpi::scatterv
   MPI_Scatterv(numbers_.data(), sizes.data(), offsets.data(), MPI_DOUBLE, local_data.data(), sizes[rank], MPI_DOUBLE, 0,
                MPI_COMM_WORLD);
+
   SortDoubles(local_data);
 
   int step = 1;
@@ -61,9 +72,9 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
       int partner = rank + step;
       if (partner < size) {
         int partner_size = 0;
-        world_.recv(partner, 0, partner_size);
+        MPI_Recv(&partner_size, 1, MPI_INT, partner, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::vector<double> partner_data(partner_size);
-        world_.recv(partner, 1, partner_data.data(), partner_size);
+        MPI_Recv(partner_data.data(), partner_size, MPI_DOUBLE, partner, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
         std::vector<double> merged(local_data.size() + partner_data.size());
         std::ranges::merge(std::ranges::subrange(local_data), std::ranges::subrange(partner_data),
@@ -72,8 +83,9 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
         local_data = std::move(merged);
       }
     } else if (rank % (2 * step) == step) {
-      world_.send(rank - step, 0, static_cast<int>(local_data.size()));
-      world_.send(rank - step, 1, local_data.data(), static_cast<int>(local_data.size()));
+      size_t local_data_size = local_data.size();
+      MPI_Send(&local_data_size, 1, MPI_UNSIGNED_LONG, rank - step, 0, MPI_COMM_WORLD);
+      MPI_Send(local_data.data(), local_data.size(), MPI_DOUBLE, rank - step, 1, MPI_COMM_WORLD);
       local_data.clear();
     }
     step *= 2;
@@ -87,7 +99,10 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (world_.rank() == 0) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  if (rank == 0) {
     std::memcpy(task_data->outputs[0], numbers_.data(), total_size_ * sizeof(double));
   }
   return true;
