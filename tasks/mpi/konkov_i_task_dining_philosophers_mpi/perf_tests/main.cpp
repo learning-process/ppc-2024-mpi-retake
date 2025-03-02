@@ -12,12 +12,12 @@ TEST(konkov_i_dining_philosophers_perf_test_mpi, test_pipeline_run_mpi) {
   boost::mpi::communicator world;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(100000);
+  task_data->inputs_count.push_back(1000000);
 
   auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 15;
   perf_attr->current_timer = [&] {
     static auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now();
@@ -39,12 +39,12 @@ TEST(konkov_i_dining_philosophers_perf_test_mpi, test_task_run_mpi) {
   boost::mpi::communicator world;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(100000);
+  task_data->inputs_count.push_back(1000000);
 
   auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 15;
   perf_attr->current_timer = [&] {
     static auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now();
