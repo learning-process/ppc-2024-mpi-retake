@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <vector>
 
-bool strakhov_a_fox_algorithm::TestTaskMPI::PreProcessingImpl() {
+bool strakhov_a_fox_algorithm_mpi::TestTaskMPI::PreProcessingImpl() {
   rc_size_ = task_data->inputs_count[0];
 
   auto* in_ptr1 = reinterpret_cast<double*>(task_data->inputs[0]);
@@ -19,13 +19,13 @@ bool strakhov_a_fox_algorithm::TestTaskMPI::PreProcessingImpl() {
   return true;
 }
 
-bool strakhov_a_fox_algorithm::TestTaskMPI::ValidationImpl() {
+bool strakhov_a_fox_algorithm_mpi::TestTaskMPI::ValidationImpl() {
   // Check equality of counts elements
   return ((task_data->inputs_count[0] * task_data->inputs_count[0]) == task_data->outputs_count[0]) &&
          (task_data->outputs_count[0] > 0);
 }
 
-bool strakhov_a_fox_algorithm::TestTaskMPI::RunImpl() {
+bool strakhov_a_fox_algorithm_mpi::TestTaskMPI::RunImpl() {
   std::vector<double> output_local(rc_size_ * rc_size_, 0);
   size_t actual_size = world_.size();
   actual_size = std::min(actual_size, rc_size_);
@@ -63,7 +63,7 @@ bool strakhov_a_fox_algorithm::TestTaskMPI::RunImpl() {
   return true;
 }
 
-bool strakhov_a_fox_algorithm::TestTaskMPI::PostProcessingImpl() {
+bool strakhov_a_fox_algorithm_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world_.rank() != 0) {
     return true;
   }

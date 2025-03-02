@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <vector>
 
-bool strakhov_a_fox_algorithm::TestTaskSequential::PreProcessingImpl() {
+bool strakhov_a_fox_algorithm_seq::TestTaskSequential::PreProcessingImpl() {
   // Init value for input and output
   rc_size_ = task_data->inputs_count[0];
   auto *in_ptr1 = reinterpret_cast<double *>(task_data->inputs[0]);
@@ -16,13 +16,13 @@ bool strakhov_a_fox_algorithm::TestTaskSequential::PreProcessingImpl() {
   return true;
 }
 
-bool strakhov_a_fox_algorithm::TestTaskSequential::ValidationImpl() {
+bool strakhov_a_fox_algorithm_seq::TestTaskSequential::ValidationImpl() {
   // Check equality of counts elements
   return ((task_data->inputs_count[0] * task_data->inputs_count[0]) == task_data->outputs_count[0]) &&
          (task_data->outputs_count[0] > 0);
 }
 
-bool strakhov_a_fox_algorithm::TestTaskSequential::RunImpl() {
+bool strakhov_a_fox_algorithm_seq::TestTaskSequential::RunImpl() {
   for (int k = 0; k < static_cast<int>(rc_size_); k++) {
     for (int i = 0; i < static_cast<int>(rc_size_); i++) {
       for (int j = 0; j < static_cast<int>(rc_size_); j++) {
@@ -36,7 +36,7 @@ bool strakhov_a_fox_algorithm::TestTaskSequential::RunImpl() {
   return true;
 }
 
-bool strakhov_a_fox_algorithm::TestTaskSequential::PostProcessingImpl() {
+bool strakhov_a_fox_algorithm_seq::TestTaskSequential::PostProcessingImpl() {
   for (size_t i = 0; i < output_.size(); i++) {
     reinterpret_cast<double *>(task_data->outputs[0])[i] = output_[i];
   }

@@ -8,7 +8,7 @@
 
 #include "core/task/include/task.hpp"
 
-namespace strakhov_a_fox_algorithm {
+namespace strakhov_a_fox_algorithm_mpi {
 
 class TestTaskMPI : public ppc::core::Task {
  public:
@@ -24,4 +24,4 @@ class TestTaskMPI : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
-}  // namespace strakhov_a_fox_algorithm
+}  // namespace strakhov_a_fox_algorithm_mpi

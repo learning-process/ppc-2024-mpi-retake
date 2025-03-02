@@ -6,7 +6,7 @@
 
 #include "core/task/include/task.hpp"
 
-namespace strakhov_a_fox_algorithm {
+namespace strakhov_a_fox_algorithm_seq {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
@@ -21,4 +21,4 @@ class TestTaskSequential : public ppc::core::Task {
   size_t rc_size_{};
 };
 
-}  // namespace strakhov_a_fox_algorithm
+}  // namespace strakhov_a_fox_algorithm_seq

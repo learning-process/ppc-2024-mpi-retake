@@ -36,7 +36,7 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
 }
 }  // namespace
 
-TEST(strakhov_a_fox_algorithm, test_matmul_different_out_sizes) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_different_out_sizes) {
   constexpr size_t kCount = 2;
 
   // Create data
@@ -53,11 +53,11 @@ TEST(strakhov_a_fox_algorithm, test_matmul_different_out_sizes) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), false);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_zero) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_zero) {
   constexpr size_t kCount = 0;
 
   // Create data
@@ -74,11 +74,11 @@ TEST(strakhov_a_fox_algorithm, test_matmul_zero) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), false);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_one) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_one) {
   constexpr size_t kCount = 1;
 
   // Create data
@@ -95,7 +95,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_one) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -103,7 +103,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_one) {
   EXPECT_EQ(ans, out);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_2x2) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_2x2) {
   constexpr size_t kCount = 2;
 
   // Create data
@@ -120,7 +120,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_2x2) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -128,7 +128,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_2x2) {
   EXPECT_EQ(ans, out);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_3x3) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_3x3) {
   constexpr size_t kCount = 3;
 
   // Create data
@@ -145,7 +145,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_3x3) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -153,7 +153,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_3x3) {
   EXPECT_EQ(ans, out);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_4x4) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_4x4) {
   constexpr size_t kCount = 4;
   // Create data
   std::vector<double> a(kCount * kCount, 0);
@@ -174,7 +174,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_4x4) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -182,7 +182,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_4x4) {
   EXPECT_EQ(ans, out);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_5x5) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_5x5) {
   constexpr size_t kCount = 5;
   // Create data
   std::vector<double> a(kCount * kCount, 0);
@@ -204,7 +204,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_5x5) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
@@ -212,7 +212,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_5x5) {
   EXPECT_EQ(ans, out);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_100x100_random) {
+TEST(strakhov_a_fox_algorithm_seq, test_matmul_100x100_random) {
   constexpr size_t kCount = 100;
   // Create data
   std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
@@ -227,7 +227,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_100x100_random) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskSequential test_task_sequential(task_data_seq);
+  strakhov_a_fox_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
   ASSERT_EQ(test_task_sequential.Validation(), true);
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();

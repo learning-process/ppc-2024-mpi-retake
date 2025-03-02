@@ -39,7 +39,7 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
 }
 }  // namespace
 
-TEST(strakhov_a_fox_algorithm, test_matmul_different_out_sizes) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_different_out_sizes) {
   constexpr size_t kCount = 2;
 
   // Create data
@@ -56,11 +56,11 @@ TEST(strakhov_a_fox_algorithm, test_matmul_different_out_sizes) {
   task_data_mpi_par->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   ASSERT_EQ(test_task_mpi.Validation(), false);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_zero) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_zero) {
   constexpr size_t kCount = 0;
 
   // Create data
@@ -77,11 +77,11 @@ TEST(strakhov_a_fox_algorithm, test_matmul_zero) {
   task_data_mpi_par->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   ASSERT_EQ(test_task_mpi.Validation(), false);
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_one) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_one) {
   constexpr size_t kCount = 1;
 
   // Create data
@@ -98,7 +98,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_one) {
   task_data_mpi_par->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   boost::mpi::communicator world;
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
@@ -109,7 +109,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_one) {
   }
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_2x2) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_2x2) {
   constexpr size_t kCount = 2;
 
   // Create data
@@ -129,7 +129,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_2x2) {
 
   // Create Task
   // std::cout << "!!!!!!!!!!!!!!!" <<std::endl;
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   boost::mpi::communicator world;
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
@@ -140,7 +140,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_2x2) {
   }
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_3x3) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_3x3) {
   constexpr size_t kCount = 3;
 
   // Create data
@@ -157,7 +157,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_3x3) {
   task_data_mpi_par->outputs_count.emplace_back(out.size());
 
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   boost::mpi::communicator world;
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
@@ -168,7 +168,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_3x3) {
   }
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_4x4) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_4x4) {
   constexpr size_t kCount = 4;
   // Create data
   std::vector<double> a(kCount * kCount, 0);
@@ -189,7 +189,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_4x4) {
   task_data_mpi_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi_par->outputs_count.emplace_back(out.size());
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   boost::mpi::communicator world;
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
@@ -200,7 +200,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_4x4) {
   }
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_5x5) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_5x5) {
   constexpr size_t kCount = 5;
   // Create data
   std::vector<double> a(kCount * kCount, 0);
@@ -222,7 +222,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_5x5) {
   task_data_mpi_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi_par->outputs_count.emplace_back(out.size());
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   boost::mpi::communicator world;
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
@@ -233,7 +233,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_5x5) {
   }
 }
 
-TEST(strakhov_a_fox_algorithm, test_matmul_100x100_random) {
+TEST(strakhov_a_fox_algorithm_mpi, test_matmul_100x100_random) {
   constexpr size_t kCount = 100;
   // Create data
   boost::mpi::communicator world;
@@ -256,7 +256,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_100x100_random) {
   task_data_mpi_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi_par->outputs_count.emplace_back(out.size());
   // Create Task
-  strakhov_a_fox_algorithm::TestTaskMPI test_task_mpi(task_data_mpi_par);
+  strakhov_a_fox_algorithm_mpi::TestTaskMPI test_task_mpi(task_data_mpi_par);
   ASSERT_EQ(test_task_mpi.Validation(), true);
   test_task_mpi.PreProcessing();
   test_task_mpi.Run();

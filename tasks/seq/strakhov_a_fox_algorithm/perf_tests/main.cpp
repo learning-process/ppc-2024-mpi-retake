@@ -36,7 +36,7 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
   return ans;
 }
 }  // namespace
-TEST(strakhov_a_fox_algorithm, test_pipeline_run) {
+TEST(strakhov_a_fox_algorithm_seq, test_pipeline_run) {
   constexpr size_t kCount = 100;
   // Create data
   std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
@@ -52,7 +52,7 @@ TEST(strakhov_a_fox_algorithm, test_pipeline_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = std::make_shared<strakhov_a_fox_algorithm::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<strakhov_a_fox_algorithm_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -76,7 +76,7 @@ TEST(strakhov_a_fox_algorithm, test_pipeline_run) {
   }
 }
 
-TEST(strakhov_a_fox_algorithm, test_task_run) {
+TEST(strakhov_a_fox_algorithm_seq, test_task_run) {
   constexpr size_t kCount = 100;
   // Create data
   std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
@@ -92,7 +92,7 @@ TEST(strakhov_a_fox_algorithm, test_task_run) {
   task_data_seq->outputs_count.emplace_back(out.size());
 
   // Create Task
-  auto test_task_sequential = std::make_shared<strakhov_a_fox_algorithm::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<strakhov_a_fox_algorithm_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
