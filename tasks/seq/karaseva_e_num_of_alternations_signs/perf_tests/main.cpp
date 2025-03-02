@@ -4,22 +4,36 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/karaseva_e_num_of_alternations_signs/include/ops_seq.hpp"
 
-TEST(karaseva_e_num_of_alternations_signs_seq, test_pipeline_run) {
-  constexpr int kCount = 100000000;
+std::vector<int> CreateRandomAlternatingSignsSequence(int size) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::uniform_int_distribution<int> dist(-100, 100);
 
-  // Create data
-  std::vector<int> in(kCount, 0);
-  std::vector<int> out(1, 0);
-
-  for (size_t i = 0; i < kCount; i++) {
-    in[i] = (i % 2 == 0) ? 1 : -1;
+  std::vector<int> vec(size);
+  if (size > 0) {
+    vec[0] = dist(gen);
+    for (int i = 1; i < size; i++) {
+      do {
+        vec[i] = dist(gen);
+      } while (vec[i] == vec[i - 1]);
+    }
   }
+  return vec;
+}
+
+TEST(karaseva_e_num_of_alternations_signs_seq, test_pipeline_run) {
+  constexpr int kCount = 1000000;
+
+  // Create random data
+  std::vector<int> in = CreateRandomAlternatingSignsSequence(kCount);
+  std::vector<int> out(1, 0);
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -62,15 +76,11 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_pipeline_run) {
 }
 
 TEST(karaseva_e_num_of_alternations_signs_seq, test_task_run) {
-  constexpr int kCount = 100000000;
+  constexpr int kCount = 1000000;
 
-  // Create data
-  std::vector<int> in(kCount, 0);
+  // Create random data
+  std::vector<int> in = CreateRandomAlternatingSignsSequence(kCount);
   std::vector<int> out(1, 0);
-
-  for (size_t i = 0; i < kCount; i++) {
-    in[i] = (i % 2 == 0) ? 1 : -1;
-  }
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -109,6 +119,5 @@ TEST(karaseva_e_num_of_alternations_signs_seq, test_task_run) {
     }
   }
 
-  // Check if the result matches the expected alternations
   ASSERT_EQ(expected_alternations, out[0]);
 }

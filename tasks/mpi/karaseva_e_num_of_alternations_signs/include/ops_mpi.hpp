@@ -23,4 +23,6 @@ class AlternatingSignsMPI : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
+std::vector<int> CreateRandomAlternatingSigns(int size);
+
 }  // namespace karaseva_e_num_of_alternations_signs_mpi
