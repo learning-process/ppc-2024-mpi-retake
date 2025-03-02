@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/serialization/vector.hpp>  // NOLINT
+// #include <boost/serialization/vector.hpp>  // NOLINT
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <vector>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
@@ -28,7 +29,7 @@ std::vector<double> MultiplyMatrices(std::vector<double>& a, std::vector<double>
 
 std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
   std::random_device dev;
-  std::mt19937 random(static_cast < dev());
+  std::mt19937 random(dev());
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<double> dis(min_v, max_v);
