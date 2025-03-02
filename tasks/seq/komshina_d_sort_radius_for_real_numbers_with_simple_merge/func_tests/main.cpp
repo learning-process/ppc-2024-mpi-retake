@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <memory>
 #include <random>
-#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -28,7 +27,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_sort_ba
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-  
+
   std::ranges::sort(in);
   auto *result_seq = reinterpret_cast<double *>(task_data_seq->outputs[0]);
 

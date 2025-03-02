@@ -39,7 +39,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, EmptyData) {
 
   if (world.rank() == 0) {
     auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
-    ASSERT_EQ(result, out.data());  // Проверка, что результат пустой
+    ASSERT_EQ(result, out.data());
   }
 }
 
@@ -68,7 +68,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, SingleElemen
 
   if (world.rank() == 0) {
     auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
-    ASSERT_EQ(result[0], in[0]);  // Результат должен быть равен единственному элементу
+    ASSERT_EQ(result[0], in[0]);
   }
 }
 
@@ -80,7 +80,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, IncorrectDat
 
   int size = 10;
   std::vector<double> in = {1.0, 2.0, 3.0};
-  std::vector<double> out(size, 0.0);  // Размер вывода отличается от размера ввода
+  std::vector<double> out(size, 0.0);
 
   if (world.rank() == 0) {
     task_data_mpi->inputs = {reinterpret_cast<uint8_t*>(&size), reinterpret_cast<uint8_t*>(in.data())};
@@ -90,7 +90,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, IncorrectDat
   }
 
   TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_FALSE(test_task_mpi.ValidationImpl());  // Проверка на ошибку из-за несоответствия размера данных
+  ASSERT_FALSE(test_task_mpi.ValidationImpl());
 }
 
 TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, LargeData) {
@@ -158,7 +158,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, AlreadySorte
   if (world.rank() == 0) {
     auto* result = reinterpret_cast<double*>(task_data_mpi->outputs[0]);
     for (int i = 0; i < size; ++i) {
-      ASSERT_NEAR(result[i], in[i], 1e-12);  // Проверка, что данные не изменены
+      ASSERT_NEAR(result[i], in[i], 1e-12);
     }
   }
 }
