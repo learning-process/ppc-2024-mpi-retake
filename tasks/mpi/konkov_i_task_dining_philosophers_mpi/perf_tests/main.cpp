@@ -12,7 +12,7 @@ TEST(konkov_i_dining_philosophers_perf_test_mpi, test_pipeline_run_mpi) {
   boost::mpi::communicator world;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(1000);
+  task_data->inputs_count.push_back(100000);
 
   auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
 
@@ -39,7 +39,7 @@ TEST(konkov_i_dining_philosophers_perf_test_mpi, test_task_run_mpi) {
   boost::mpi::communicator world;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(1000);
+  task_data->inputs_count.push_back(100000);
 
   auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
 
