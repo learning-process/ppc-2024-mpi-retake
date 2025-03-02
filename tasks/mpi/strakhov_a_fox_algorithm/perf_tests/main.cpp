@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <vector>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
