@@ -44,7 +44,7 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ValidationImpl() {
 }
 
 void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(
-    uint8_t& found_min, uint8_t& found_max) {  // Переименованы параметры
+    uint8_t& found_min, uint8_t& found_max) {
   if (input_.empty()) return;
   found_min = *std::ranges::min_element(input_);
   found_max = *std::ranges::max_element(input_);
