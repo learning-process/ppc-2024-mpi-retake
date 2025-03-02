@@ -1,40 +1,19 @@
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
-#include <mpi.h>
-
+#include <boost/mpi.hpp>
+#include <boost/serialization/vector.hpp>
+#include <cstdint>
 #include <cstring>
 #include <numeric>
 #include <vector>
 
-namespace {
-
-// Utility function to get MPI datatype based on template type
-template <typename T>
-static MPI_Datatype GetMPIType();
-
-template <>
-MPI_Datatype GetMPIType<int>() {
-  return MPI_INT;
-}
-
-template <>
-MPI_Datatype GetMPIType<float>() {
-  return MPI_FLOAT;
-}
-
-template <>
-MPI_Datatype GetMPIType<double>() {
-  return MPI_DOUBLE;
-}
-
-}  // namespace
+namespace mpi = boost::mpi;
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
-  int rank = 0;
-  int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  mpi::communicator world;
+  int rank = world.rank();
+  int size = world.size();
 
   // Ensure we calculate the input_size correctly
   if (rank == 0) {
@@ -45,7 +24,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   }
 
   // Broadcast input size to all processes
-  MPI_Bcast(&input_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpi::broadcast(world, input_size_, 0);
 
   // Calculate local sizes for each process
   local_size_ = input_size_ / size;
@@ -56,11 +35,11 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
     local_input_.assign(input_.begin(), input_.begin() + local_size_ + remel_);
     for (int proc = 1; proc < size; proc++) {
       // Send the correct portion of data to each process
-      MPI_Send(input_.data() + remel_ + (proc * local_size_), local_size_, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD);
+      world.send(proc, 0, input_.data() + remel_ + (proc * local_size_), local_size_);
     }
   } else {
     local_input_.resize(local_size_);
-    MPI_Recv(local_input_.data(), local_size_, GetMPIType<T>(), 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    world.recv(0, 0, local_input_.data(), local_size_);
   }
 
   return true;
@@ -73,10 +52,9 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
-  int rank = 0;
-  int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  mpi::communicator world;
+  int rank = world.rank();
+  int size = world.size();
 
   T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), static_cast<T>(0));
 
@@ -85,22 +63,22 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     result_ = local_sum;
     for (int proc = 1; proc < size; proc++) {
       T recv_sum;
-      MPI_Recv(&recv_sum, 1, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      world.recv(proc, 0, recv_sum);
       result_ += recv_sum;
     }
   } else {
-    MPI_Send(&local_sum, 1, GetMPIType<T>(), 0, 0, MPI_COMM_WORLD);
+    world.send(0, 0, local_sum);
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  world.barrier();
 
   return true;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
-  int rank = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  mpi::communicator world;
+  int rank = world.rank();
   if (rank == 0) {
     if (task_data->outputs[0] == nullptr) {
       task_data->outputs[0] = new uint8_t[sizeof(T)];
