@@ -8,7 +8,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
 
-TEST(konkov_i_DiningPhilosophersMPIPerfTest, test_pipeline_run_mpi) {
+TEST(konkov_i_dining_philosophers_perf_test_mpi, test_pipeline_run_mpi) {
   boost::mpi::communicator world;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -35,7 +35,7 @@ TEST(konkov_i_DiningPhilosophersMPIPerfTest, test_pipeline_run_mpi) {
   }
 }
 
-TEST(konkov_i_DiningPhilosophersMPIPerfTest, test_task_run_mpi) {
+TEST(konkov_i_dining_philosophers_perf_test_mpi, test_task_run_mpi) {
   boost::mpi::communicator world;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
