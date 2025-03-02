@@ -35,7 +35,6 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
                task_data->outputs_count[0] == static_cast<size_t>(total_size_);
   }
 
-  // Используем MPI_Bcast вместо mpi::broadcast
   MPI_Bcast(&is_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   MPI_Bcast(&total_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return is_valid;
@@ -60,7 +59,6 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   }
 
   std::vector<double> local_data(sizes[rank]);
-  // Используем MPI_Scatterv вместо mpi::scatterv
   MPI_Scatterv(numbers_.data(), sizes.data(), offsets.data(), MPI_DOUBLE, local_data.data(), sizes[rank], MPI_DOUBLE, 0,
                MPI_COMM_WORLD);
 
