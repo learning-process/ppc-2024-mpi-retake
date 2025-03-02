@@ -79,24 +79,16 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
   T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), static_cast<T>(0));
 
-  int partner = (rank % 2 == 0) ? rank + 1 : rank - 1;
-
-  if (partner >= 0 && partner < size) {
-    MPI_Send(&local_sum, 1, GetMPIType<T>(), partner, 0, MPI_COMM_WORLD);
-  }
-
-  T total_sum = local_sum;
-
-  if (rank % 2 == 0 && rank + 1 < size) {
-    MPI_Recv(&total_sum, 1, GetMPIType<T>(), rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  } else if (rank % 2 == 1 && rank - 1 >= 0) {
-    MPI_Recv(&total_sum, 1, GetMPIType<T>(), rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-  }
-
-  MPI_Barrier(MPI_COMM_WORLD);
-
+  // Reduce
   if (rank == 0) {
-    result_ = total_sum;
+    result_ = local_sum;
+    for (int proc = 1; proc < size; proc++) {
+      T recv_sum;
+      MPI_Recv(&recv_sum, 1, GetMPIType<T>(), proc, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      result_ += recv_sum;
+    }
+  } else {
+    MPI_Send(&local_sum, 1, GetMPIType<T>(), 0, 0, MPI_COMM_WORLD);
   }
 
   return true;
@@ -107,7 +99,8 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank == 0) {
-    std::memcpy(task_data->outputs[0], &result_, sizeof(T));
+    T* output_ptr = reinterpret_cast<T*>(task_data->outputs[0]);
+    *output_ptr = result_;
   }
   return true;
 }
