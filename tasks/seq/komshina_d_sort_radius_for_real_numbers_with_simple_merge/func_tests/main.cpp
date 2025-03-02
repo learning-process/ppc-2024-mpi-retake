@@ -28,8 +28,8 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_sort_ba
   test_task_sequential.PreProcessing();
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
-
-  std::sort(in.begin(), in.end());
+  
+  std::ranges::sort(in);
   auto *result_seq = reinterpret_cast<double *>(task_data_seq->outputs[0]);
 
   for (int i = 0; i < size; ++i) {
@@ -79,7 +79,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_sort_la
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
 
-  std::sort(in.begin(), in.end());
+  std::ranges::sort(in);
   auto *result_seq = reinterpret_cast<double *>(task_data_seq->outputs[0]);
 
   for (int i = 0; i < size; ++i) {

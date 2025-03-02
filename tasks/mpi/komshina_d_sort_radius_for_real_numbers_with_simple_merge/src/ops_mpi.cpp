@@ -14,7 +14,7 @@
 #include <vector>
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PreProcessingImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
@@ -25,7 +25,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ValidationImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   bool is_valid = (rank == 0);
@@ -41,7 +41,8 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::RunImpl() {
-  int rank, size;
+  int rank = 0,
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -83,7 +84,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
     } else if (rank % (2 * step) == step) {
       size_t local_data_size = local_data.size();
       MPI_Send(&local_data_size, 1, MPI_UNSIGNED_LONG, rank - step, 0, MPI_COMM_WORLD);
-      MPI_Send(local_data.data(), local_data.size(), MPI_DOUBLE, rank - step, 1, MPI_COMM_WORLD);
+      MPI_Send(local_data.data(), static_cast<int>(local_data.size()), MPI_DOUBLE, rank - step, 1, MPI_COMM_WORLD);
       local_data.clear();
     }
     step *= 2;
@@ -97,7 +98,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PostProcessingImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
