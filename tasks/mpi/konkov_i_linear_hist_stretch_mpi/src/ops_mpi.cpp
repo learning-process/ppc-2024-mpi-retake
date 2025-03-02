@@ -42,18 +42,17 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ValidationImpl() {
   return true;
 }
 
-void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(uint8_t& out_min, uint8_t& out_max) {
+std::pair<uint8_t, uint8_t> konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax() {
   if (input_.empty()) {
-    return;
+    return {0, 0};
   }
-  out_min = *std::ranges::min_element(input_);
-  out_max = *std::ranges::max_element(input_);
+  uint8_t min_value = *std::ranges::min_element(input_);
+  uint8_t max_value = *std::ranges::max_element(input_);
+  return {min_value, max_value};
 }
 
 bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::RunImpl() {
-  uint8_t local_min = 0;
-  uint8_t local_max = 0;
-  ComputeLocalMinMax(local_min, local_max);
+  auto [local_min, local_max] = ComputeLocalMinMax();
 
   boost::mpi::all_reduce(world_, local_min, min_intensity_, boost::mpi::minimum<uint8_t>());
   boost::mpi::all_reduce(world_, local_max, max_intensity_, boost::mpi::maximum<uint8_t>());
