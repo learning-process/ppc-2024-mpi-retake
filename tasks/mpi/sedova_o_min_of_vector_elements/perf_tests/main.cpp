@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
-#include <random>
+
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"
@@ -18,7 +19,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
   std::vector<std::vector<int>> global_matrix;
   std::vector<int32_t> global_min(1, INT_MAX);
   int ref = INT_MIN;
-  
+
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world_.rank() == 0) {
@@ -54,7 +55,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
   perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
   perf_attr->current_timer = [&] { return current_timer.elapsed(); };
-  
+
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
@@ -62,8 +63,8 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world_.rank() == 0) {
-  ppc::core::Perf::PrintPerfStatistic(perf_results);
-  ASSERT_EQ(ref, global_min[0]);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
+    ASSERT_EQ(ref, global_min[0]);
   }
 }
 
