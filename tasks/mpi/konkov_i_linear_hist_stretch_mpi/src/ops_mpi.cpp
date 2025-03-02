@@ -1,15 +1,15 @@
 #include "mpi/konkov_i_linear_hist_stretch_mpi/include/ops_mpi.hpp"
 
-#include "boost/mpi/operations.hpp"
-#include "boost/mpi/collectives/all_reduce.hpp"
-#include "boost/mpi/communicator.hpp"
 #include <algorithm>
-#include <ranges>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <ranges>
 #include <vector>
 
+#include "boost/mpi/collectives/all_reduce.hpp"
+#include "boost/mpi/communicator.hpp"
+#include "boost/mpi/operations.hpp"
 
 bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::PreProcessingImpl() {
   size_t input_size = task_data->inputs_count[0];

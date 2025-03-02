@@ -1,9 +1,9 @@
 #include "seq/konkov_i_linear_hist_stretch_seq/include/ops_seq.hpp"
 
 #include <algorithm>
-#include <ranges>
 #include <cstddef>
 #include <cstdint>
+#include <ranges>
 #include <vector>
 
 bool konkov_i_linear_hist_stretch_seq::LinearHistStretchSeq::PreProcessingImpl() {
