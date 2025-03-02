@@ -12,7 +12,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_num_of_alternations_signs/include/ops_mpi.hpp"
 
-std::vector<int> karaseva_e_num_of_alternations_signs_mpi::CreateRandomAlternatingSigns(int size) {
+static std::vector<int> CreateRandomAlternatingSigns(int size) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(0, 1);
@@ -28,7 +28,7 @@ TEST(karaseva_e_num_of_alternations_signs_mpi, test_pipeline_run) {
   constexpr int kCount = 100000000;
 
   // Create random data
-  std::vector<int> in = karaseva_e_num_of_alternations_signs_mpi::CreateRandomAlternatingSigns(kCount);
+  std::vector<int> in = CreateRandomAlternatingSigns(kCount);
   std::vector<int> out(1, 0);
 
   // Create task_data
@@ -79,7 +79,7 @@ TEST(karaseva_e_num_of_alternations_signs_mpi, test_task_run) {
   constexpr int kCount = 100000000;
 
   // Create random data
-  std::vector<int> in = karaseva_e_num_of_alternations_signs_mpi::CreateRandomAlternatingSigns(kCount);
+  std::vector<int> in = CreateRandomAlternatingSigns(kCount);
   std::vector<int> out(1, 0);
 
   // Create task_data
