@@ -38,8 +38,11 @@ bool BinarySegmentsSeq::PreProcessingImpl() {
   return true;
 }
 
-void BinarySegmentsSeq::LoopProcess(size_t col, size_t row, uint32_t cur_label,
+void BinarySegmentsSeq::LoopProcess(size_t col, size_t row, uint32_t& cur_label,
                                     std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+  if (input_image_[GetIndex(row, col)] == 0) {
+    return;
+  }
   uint32_t label_b = (col > 0) ? labels_[GetIndex(row, col - 1)] : 0;
   uint32_t label_c = (row > 0) ? labels_[GetIndex(row - 1, col)] : 0;
   uint32_t label_d = (row > 0 && col > 0) ? labels_[GetIndex(row - 1, col - 1)] : 0;
@@ -63,10 +66,6 @@ bool BinarySegmentsSeq::RunImpl() {
   labels_.resize(rows_ * cols_, 0);
   for (size_t row = 0; row < rows_; ++row) {
     for (size_t col = 0; col < cols_; ++col) {
-      if (input_image_[GetIndex(row, col)] == 0) {
-        continue;
-      }
-
       LoopProcess(col, row, cur_label, label_equivalences);
     }
   }

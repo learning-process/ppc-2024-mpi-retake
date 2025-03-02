@@ -96,7 +96,7 @@ void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
   }
 }
 
-void BinarySegmentsMPI::LocalLoopProcess(size_t row, size_t col, uint32_t next_label,
+void BinarySegmentsMPI::LocalLoopProcess(size_t row, size_t col, uint32_t& next_label,
                                          std::vector<uint32_t>& local_labels,
                                          std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
   size_t cur_ind = GetIndex(row, col);
@@ -119,7 +119,7 @@ void BinarySegmentsMPI::LocalLoopProcess(size_t row, size_t col, uint32_t next_l
   }
 }
 
-void BinarySegmentsMPI::LocalLoop(size_t local_size, uint32_t next_label, std::vector<uint32_t>& local_labels,
+void BinarySegmentsMPI::LocalLoop(size_t local_size, uint32_t& next_label, std::vector<uint32_t>& local_labels,
                                   std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
   for (size_t row = 0; row < local_size; ++row) {
     for (size_t col = 0; col < cols_; ++col) {

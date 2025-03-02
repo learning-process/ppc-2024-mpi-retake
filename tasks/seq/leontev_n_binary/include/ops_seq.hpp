@@ -20,8 +20,8 @@ class BinarySegmentsSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  size_t GetIndex(size_t i, size_t j) const;
-  void LoopProcess(size_t col, size_t row, uint32_t cur_label,
+  [[nodiscard]] size_t GetIndex(size_t i, size_t j) const;
+  void LoopProcess(size_t col, size_t row, uint32_t& cur_label,
                    std::unordered_map<uint32_t, uint32_t>& label_equivalences);
   std::vector<uint8_t> input_image_;
   std::vector<uint32_t> labels_;
