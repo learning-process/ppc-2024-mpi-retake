@@ -28,7 +28,8 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  EXPECT_EQ(out[0], static_cast<int>(kCount));
+  int expected_result = static_cast<int>(kCount);
+  EXPECT_EQ(out[0], expected_result);
 }
 
 // MPI_DOUBLE
@@ -51,7 +52,8 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  EXPECT_DOUBLE_EQ(out[0], static_cast<double>(kCount));
+  double expected_result = static_cast<double>(kCount);
+  EXPECT_DOUBLE_EQ(out[0], expected_result);
 }
 
 // MPI_FLOAT
@@ -74,5 +76,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  EXPECT_FLOAT_EQ(out[0], static_cast<float>(kCount));
+  float expected_result = static_cast<float>(kCount);
+  EXPECT_FLOAT_EQ(out[0], expected_result);
 }
