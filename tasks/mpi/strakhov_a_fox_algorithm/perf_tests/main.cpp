@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/serialization/vector.hpp>  // NOLINT
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
-#include <vector>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
@@ -27,7 +28,7 @@ std::vector<double> MultiplyMatrices(std::vector<double>& a, std::vector<double>
 
 std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
   std::random_device dev;
-  std::mt19937 random(dev());
+  std::mt19937 random(static_cast < dev());
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<double> dis(min_v, max_v);
@@ -82,7 +83,6 @@ TEST(strakhov_a_fox_algorithm, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   // Create Perf analyzer
-  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
@@ -136,7 +136,6 @@ TEST(strakhov_a_fox_algorithm, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   // Create Perf analyzer
-  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }

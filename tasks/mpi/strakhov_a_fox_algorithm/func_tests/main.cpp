@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/broadcast.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstddef>
 #include <cstdint>

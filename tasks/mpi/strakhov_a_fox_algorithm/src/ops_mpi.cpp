@@ -42,8 +42,8 @@ bool strakhov_a_fox_algorithm::TestTaskMPI::RunImpl() {
     for (int i = 0; i < static_cast<int>(rc_size_); i++) {
       for (int j = 0; j < static_cast<int>(rc_size_); j++) {
         size_t x_a = (i + k + j) % rc_size_;
-        size_t y_B = (i + j + k) % rc_size_;
-        double ans = matrA_[x_a + (i * static_cast<int>(rc_size_))] * matrB_[((y_B * static_cast<int>(rc_size_)) + j)];
+        size_t y_b = (i + j + k) % rc_size_;
+        double ans = matrA_[x_a + (i * static_cast<int>(rc_size_))] * matrB_[((y_b * static_cast<int>(rc_size_)) + j)];
         output_local[(static_cast<int>(rc_size_) * i) + j] += ans;
       }
     }
