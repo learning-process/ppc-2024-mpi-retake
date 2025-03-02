@@ -27,7 +27,6 @@ std::vector<T> GetRandom(int size) {
 
 }  // namespace
 
-// MPI_INT
 TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   constexpr size_t kCount = 50;
 
@@ -58,7 +57,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   EXPECT_EQ(out[0], expected_result);
 }
 
-// MPI_DOUBLE
 TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   constexpr size_t kCount = 50;
 
@@ -89,7 +87,6 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   EXPECT_DOUBLE_EQ(out[0], expected_result);
 }
 
-// MPI_FLOAT
 TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   constexpr size_t kCount = 50;
 

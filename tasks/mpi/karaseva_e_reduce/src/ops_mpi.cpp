@@ -102,6 +102,9 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank == 0) {
+    if (task_data->outputs[0] == nullptr) {
+      task_data->outputs[0] = new uint8_t[sizeof(T)];
+    }
     auto* output_ptr = reinterpret_cast<T*>(task_data->outputs[0]);
     *output_ptr = result_;
   }
