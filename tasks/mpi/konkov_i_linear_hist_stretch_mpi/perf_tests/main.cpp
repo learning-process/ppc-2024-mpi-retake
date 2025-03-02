@@ -12,7 +12,7 @@
 #include "mpi/konkov_i_linear_hist_stretch_mpi/include/ops_mpi.hpp"
 
 TEST(konkov_i_linear_hist_stretch_mpi, test_pipeline_run_mpi) {
-  constexpr size_t kSize = 100000000;
+  constexpr size_t kSize = 500000000;
   std::vector<uint8_t> in(kSize, 128);
   std::vector<uint8_t> out(kSize, 0);
 
@@ -25,7 +25,7 @@ TEST(konkov_i_linear_hist_stretch_mpi, test_pipeline_run_mpi) {
   auto task = std::make_shared<konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI>(task_data);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 15;
+  perf_attr->num_running = 10;
   const auto start = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     return std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
@@ -42,7 +42,7 @@ TEST(konkov_i_linear_hist_stretch_mpi, test_pipeline_run_mpi) {
 }
 
 TEST(konkov_i_linear_hist_stretch_mpi, test_task_run_mpi) {
-  constexpr size_t kSize = 100000000;
+  constexpr size_t kSize = 1000000000;
   std::vector<uint8_t> in(kSize, 128);
   std::vector<uint8_t> out(kSize, 0);
 
@@ -55,7 +55,7 @@ TEST(konkov_i_linear_hist_stretch_mpi, test_task_run_mpi) {
   auto task = std::make_shared<konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI>(task_data);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 15;
+  perf_attr->num_running = 10;
   const auto start = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     return std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
