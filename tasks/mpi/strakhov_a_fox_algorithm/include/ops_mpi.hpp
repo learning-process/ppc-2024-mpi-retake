@@ -2,9 +2,8 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <stddef>
+#include <cstddef>
 #include <utility>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 

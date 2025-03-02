@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/serialization/vector.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -18,7 +17,7 @@ std::vector<double> MultiplyMatrices(std::vector<double>& a, std::vector<double>
   for (unsigned int i = 0; i < n; ++i) {
     for (unsigned int j = 0; j < n; ++j) {
       for (unsigned int k = 0; k < n; ++k) {
-        c[i * n + j] += (a[i * n + k] * b[k * n + j]);
+        c[(i * n) + j] += (a[(i * n) + k] * b[(k * n) + j]);
       }
     }
   }

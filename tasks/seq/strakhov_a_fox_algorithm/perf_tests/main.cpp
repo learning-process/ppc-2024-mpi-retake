@@ -11,16 +11,16 @@
 #include "core/task/include/task.hpp"
 #include "seq/strakhov_a_fox_algorithm/include/ops_seq.hpp"
 namespace {
-std::vector<double> multiplyMatrices(std::vector<double>& A, std::vector<double>& B, size_t n) {
-  std::vector<double> C(A.size(), 0);
+std::vector<double> MultiplyMatrices(std::vector<double>& a, std::vector<double>& b, size_t n) {
+  std::vector<double> c(a.size(), 0);
   for (unsigned int i = 0; i < n; ++i) {
     for (unsigned int j = 0; j < n; ++j) {
       for (unsigned int k = 0; k < n; ++k) {
-        C[i * n + j] += (A[i * n + k] * B[k * n + j]);
+        c[(i * n) + j] += (a[(i * n) + k] * b[(k * n) + j]);
       }
     }
   }
-  return C;
+  return c;
 }
 
 std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
@@ -39,14 +39,14 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
 TEST(strakhov_a_fox_algorithm, test_pipeline_run) {
   constexpr size_t kCount = 100;
   // Create data
-  std::vector<double> A = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> B = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> ans = multiplyMatrices(A, B, kCount);
+  std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> b = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> ans = MultiplyMatrices(a, b, kCount);
   std::vector<double> out(kCount * kCount, 0);
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(B.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(a.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
   task_data_seq->inputs_count.emplace_back(kCount);
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
@@ -79,14 +79,14 @@ TEST(strakhov_a_fox_algorithm, test_pipeline_run) {
 TEST(strakhov_a_fox_algorithm, test_task_run) {
   constexpr size_t kCount = 100;
   // Create data
-  std::vector<double> A = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> B = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> ans = multiplyMatrices(A, B, kCount);
+  std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> b = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> ans = MultiplyMatrices(a, b, kCount);
   std::vector<double> out(kCount * kCount, 0);
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(B.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(a.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
   task_data_seq->inputs_count.emplace_back(kCount);
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());

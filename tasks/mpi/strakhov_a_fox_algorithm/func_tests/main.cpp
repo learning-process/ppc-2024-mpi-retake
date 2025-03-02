@@ -1,23 +1,21 @@
 #include <gtest/gtest.h>
 
-#include <boost/serialization/vector.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
-#include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/strakhov_a_fox_algorithm/include/ops_mpi.hpp"
 
 namespace {
-std::vector<double> multiplyMatrices(std::vector<double>& a, std::vector<double>& b, size_t n) {
+std::vector<double> MultiplyMatrices(std::vector<double>& a, std::vector<double>& b, size_t n) {
   std::vector<double> c(a.size(), 0);
   for (unsigned int i = 0; i < n; ++i) {
     for (unsigned int j = 0; j < n; ++j) {
       for (unsigned int k = 0; k < n; ++k) {
-        c[i * n + j] += (a[i * n + k] * b[k * n + j]);
+        c[(i * n) + j] += (a[(i * n) + k] * b[(k * n) + j]);
       }
     }
   }
@@ -45,7 +43,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_different_out_sizes) {
   std::vector<double> a = {1, 2, 3, 4};
   std::vector<double> b = {10, 11, 12, 15};
   std::vector<double> ans = {84, 90, 96, 201, 216, 231, 318, 342, 366};
-  std::vector<double> out(kCount * kCount + 7, 0);
+  std::vector<double> out((kCount * kCount) + 7, 0);
   // Create task_data
   auto task_data_mpi_par = std::make_shared<ppc::core::TaskData>();
   task_data_mpi_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(a.data()));
@@ -242,7 +240,7 @@ TEST(strakhov_a_fox_algorithm, test_matmul_100x100_random) {
   if (world.rank() == 0) {
     a = CreateRandomVal(0, 100, kCount * kCount);
     b = CreateRandomVal(0, 100, kCount * kCount);
-    ans = multiplyMatrices(a, b, kCount);
+    ans = MultiplyMatrices(a, b, kCount);
   }
   std::vector<double> out(kCount * kCount, 0);
   broadcast(world, a, 0);
