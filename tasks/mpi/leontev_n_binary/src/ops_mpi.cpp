@@ -47,6 +47,26 @@ bool BinarySegmentsMPI::PreProcessingImpl() {
   return true;
 }
 
+void BinarySegmentsMPI::RootLoopProcess(size_t border, size_t col,
+                                        std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+  size_t cur_ind = border + col;
+  if (labels_[cur_ind] == 0) {
+    return;
+  }
+  uint32_t label_b = (col > 0) ? labels_[cur_ind - 1] : 0;
+  uint32_t label_c = labels_[cur_ind - cols_];
+  uint32_t label_d = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
+  if (label_b != 0 || label_c != 0 || label_d != 0) {
+    uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+    label_equivalences[labels_[cur_ind]] = min_label;
+    for (uint32_t label2 : {label_b, label_c, label_d}) {
+      if (label2 != 0 && label2 != min_label) {
+        label_equivalences[std::max(label2, min_label)] = std::min(label2, min_label);
+      }
+    }
+  }
+}
+
 void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
   std::unordered_map<uint32_t, uint32_t> label_equivalences;
   for (int section = 1; section < world_.size(); ++section) {
@@ -55,22 +75,7 @@ void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
       break;
     }
     for (size_t col = 0; col < cols_; ++col) {
-      size_t cur_ind = border + col;
-      if (labels_[cur_ind] == 0) {
-        continue;
-      }
-      uint32_t label_b = (col > 0) ? labels_[cur_ind - 1] : 0;
-      uint32_t label_c = labels_[cur_ind - cols_];
-      uint32_t label_d = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
-      if (label_b != 0 || label_c != 0 || label_d != 0) {
-        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-        label_equivalences[labels_[cur_ind]] = min_label;
-        for (uint32_t label2 : {label_b, label_c, label_d}) {
-          if (label2 != 0 && label2 != min_label) {
-            label_equivalences[std::max(label2, min_label)] = std::min(label2, min_label);
-          }
-        }
-      }
+      RootLoopProcess(border, col, label_equivalences);
     }
   }
   for (auto& label : labels_) {
@@ -91,28 +96,34 @@ void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
   }
 }
 
+void BinarySegmentsMPI::LocalLoopProcess(size_t row, size_t col, uint32_t next_label,
+                                         std::vector<uint32_t>& local_labels,
+                                         std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
+  size_t cur_ind = GetIndex(row, col);
+  if (local_image_[cur_ind] == 0) {
+    return;
+  }
+  uint32_t label_b = (col > 0) ? local_labels[cur_ind - 1] : 0;
+  uint32_t label_c = (row > 0) ? local_labels[cur_ind - cols_] : 0;
+  uint32_t label_d = (row > 0 && col > 0) ? local_labels[cur_ind - cols_ - 1] : 0;
+  if (label_b == 0 && label_c == 0 && label_d == 0) {
+    local_labels[cur_ind] = next_label++;
+  } else {
+    uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+    local_labels[cur_ind] = min_label;
+    for (uint32_t label : {label_b, label_c, label_d}) {
+      if (label != 0 && label != min_label) {
+        local_label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+      }
+    }
+  }
+}
+
 void BinarySegmentsMPI::LocalLoop(size_t local_size, uint32_t next_label, std::vector<uint32_t>& local_labels,
                                   std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
   for (size_t row = 0; row < local_size; ++row) {
     for (size_t col = 0; col < cols_; ++col) {
-      size_t cur_ind = GetIndex(row, col);
-      if (local_image_[cur_ind] == 0) {
-        continue;
-      }
-      uint32_t label_b = (col > 0) ? local_labels[cur_ind - 1] : 0;
-      uint32_t label_c = (row > 0) ? local_labels[cur_ind - cols_] : 0;
-      uint32_t label_d = (row > 0 && col > 0) ? local_labels[cur_ind - cols_ - 1] : 0;
-      if (label_b == 0 && label_c == 0 && label_d == 0) {
-        local_labels[cur_ind] = next_label++;
-      } else {
-        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-        local_labels[cur_ind] = min_label;
-        for (uint32_t label : {label_b, label_c, label_d}) {
-          if (label != 0 && label != min_label) {
-            local_label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
-          }
-        }
-      }
+      LocalLoopProcess(row, col, next_label, local_labels, local_label_equivalences);
     }
   }
   for (auto& label : local_labels) {
