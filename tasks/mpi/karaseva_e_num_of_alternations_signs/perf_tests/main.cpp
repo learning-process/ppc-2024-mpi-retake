@@ -12,7 +12,8 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_num_of_alternations_signs/include/ops_mpi.hpp"
 
-static std::vector<int> CreateRandomAlternatingSigns(int size) {
+namespace {
+std::vector<int> CreateRandomAlternatingSigns(int size) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(0, 1);
@@ -22,6 +23,7 @@ static std::vector<int> CreateRandomAlternatingSigns(int size) {
     vec[i] = (dist(gen) == 0) ? -1 : 1;
   }
   return vec;
+}
 }
 
 TEST(karaseva_e_num_of_alternations_signs_mpi, test_pipeline_run) {
