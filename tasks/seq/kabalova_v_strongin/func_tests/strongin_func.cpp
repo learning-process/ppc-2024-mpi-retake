@@ -1,10 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <functional>
+#include <numbers>
+#include <random>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "seq/kabalova_v_strongin/include/strongin.h"
-
-const double PI = 3.14159265358979323846;
 
 // Все минимумы найдены +- по графику.
 
@@ -27,23 +30,23 @@ TEST(kabalova_v_strongin_seq, x_square) {
   task_data_seq->outputs_count.emplace_back(2);
 
   // Create Task
-  kabalova_v_strongin_seq::TestTaskSequential testTaskSequential(task_data_seq, f);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  kabalova_v_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq, f);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   EXPECT_NEAR(answer1, res1, eps);
   EXPECT_NEAR(answer2, res2, eps);
 }
 
 TEST(kabalova_v_strongin_seq, sin) {
-  double left = -PI;
-  double right = PI;
+  double left = -std::numbers::pi;
+  double right = std::numbers::pi;
   double res1 = 0;
   double res2 = 0;
   std::function<double(double)> f = [](double x) { return std::sin(x); };
   double eps = 0.1;
-  double answer1 = -PI / 2;
+  double answer1 = -std::numbers::pi / 2;
   double answer2 = f(answer1);
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -55,23 +58,23 @@ TEST(kabalova_v_strongin_seq, sin) {
   task_data_seq->outputs_count.emplace_back(2);
 
   // Create Task
-  kabalova_v_strongin_seq::TestTaskSequential testTaskSequential(task_data_seq, f);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  kabalova_v_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq, f);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   EXPECT_NEAR(answer1, res1, eps);
   EXPECT_NEAR(answer2, res2, eps);
 }
 
 TEST(kabalova_v_strongin_seq, cos) {
-  double left = -PI;
-  double right = PI / 2;
+  double left = -std::numbers::pi;
+  double right = std::numbers::pi / 2;
   double res1 = 0;
   double res2 = 0;
   std::function<double(double)> f = [](double x) { return std::cos(x); };
   double eps = 0.1;
-  double answer1 = -PI;
+  double answer1 = -std::numbers::pi;
   double answer2 = f(answer1);
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -83,11 +86,11 @@ TEST(kabalova_v_strongin_seq, cos) {
   task_data_seq->outputs_count.emplace_back(2);
 
   // Create Task
-  kabalova_v_strongin_seq::TestTaskSequential testTaskSequential(task_data_seq, f);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  kabalova_v_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq, f);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   EXPECT_NEAR(answer1, res1, eps);
   EXPECT_NEAR(answer2, res2, eps);
 }
@@ -111,11 +114,11 @@ TEST(kabalova_v_strongin_seq, x_polynome) {
   task_data_seq->outputs_count.emplace_back(2);
 
   // Create Task
-  kabalova_v_strongin_seq::TestTaskSequential testTaskSequential(task_data_seq, f);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  kabalova_v_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq, f);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   EXPECT_NEAR(answer1, res1, eps);
   EXPECT_NEAR(answer2, res2, eps);
 }

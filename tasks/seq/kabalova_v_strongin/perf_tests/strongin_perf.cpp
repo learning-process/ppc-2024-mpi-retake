@@ -1,6 +1,11 @@
 // Copyright 2024 Kabalova Valeria
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <numbers>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"

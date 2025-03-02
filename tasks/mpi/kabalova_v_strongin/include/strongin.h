@@ -1,16 +1,11 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <functional>
 #include <memory>
-#include <numbers>
-#include <numeric>
 #include <utility>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 
@@ -18,37 +13,37 @@ namespace kabalova_v_strongin_mpi {
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
-  explicit TestMPITaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_, std::function<double(double*)> f_)
-      : Task(std::move(taskData_)), f(f_) {}
+  explicit TestMPITaskSequential(std::shared_ptr<ppc::core::TaskData> task_data, std::function<double(double *)> f)
+      : Task(std::move(task_data)), f_(std::move(f)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
  private:
-  double left{};
-  double right{};
-  std::function<double(double*)> f;
-  std::pair<double, double> result{};
+  double left_{};
+  double right_{};
+  std::function<double(double *)> f_;
+  std::pair<double, double> result_;
 };
-double algorithm(const double a, const double b, std::function<double(double*)> func, const double eps = 0.0001);
-std::pair<double, double> generateBounds(const double left = -5.0, const double right = 5.0);
+double Algorithm(double a, double b, const std::function<double(double *)> &f_, double eps = 0.0001);
+std::pair<double, double> GenerateBounds(const double left = -5.0, const double right = 5.0);
 
 class TestMPITaskParallel : public ppc::core::Task {
  public:
-  explicit TestMPITaskParallel(std::shared_ptr<ppc::core::TaskData> taskData_, std::function<double(double*)> f_)
-      : Task(std::move(taskData_)), f(f_) {}
+  explicit TestMPITaskParallel(std::shared_ptr<ppc::core::TaskData> task_data, std::function<double(double *)> f)
+      : Task(std::move(task_data)), f_(std::move(f)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
  private:
-  double left{};
-  double right{};
-  std::function<double(double*)> f;
-  std::pair<double, double> result{};
-  boost::mpi::communicator world;
+  double left_{};
+  double right_{};
+  std::function<double(double *)> f_;
+  std::pair<double, double> result_;
+  boost::mpi::communicator world_;
 };
 
 }  // namespace kabalova_v_strongin_mpi

@@ -1,15 +1,15 @@
 #include "seq/kabalova_v_strongin/include/strongin.h"
 
-#include <random>
-#include <thread>
+#include <algorithm>
+#include <vector>
 
 bool kabalova_v_strongin_seq::TestTaskSequential::PreProcessingImpl() {
-  result.first = 0;
-  result.second = 0;
-  auto* inputData1 = reinterpret_cast<double*>(task_data->inputs[0]);
-  std::copy(inputData1, inputData1 + 1, &left);
-  auto* inputData2 = reinterpret_cast<double*>(task_data->inputs[1]);
-  std::copy(inputData2, inputData2 + 1, &right);
+  result_.first = 0;
+  result_.second = 0;
+  auto* input_data1 = reinterpret_cast<double*>(task_data->inputs[0]);
+  std::copy(input_data1, input_data1 + 1, &left_);
+  auto* input_data2 = reinterpret_cast<double*>(task_data->inputs[1]);
+  std::copy(input_data2, input_data2 + 1, &right_);
   return true;
 }
 
@@ -20,50 +20,52 @@ bool kabalova_v_strongin_seq::TestTaskSequential::ValidationImpl() {
 
 bool kabalova_v_strongin_seq::TestTaskSequential::RunImpl() {
   std::vector<std::pair<double, double>> v;
-  v.push_back(std::pair<double, double>(left, f(left)));
-  v.push_back(std::pair<double, double>(right, f(right)));
+  v.emplace_back(std::pair<double, double>(left_, f_(left_)));
+  v.emplace_back(std::pair<double, double>(right_, f_(right_)));
 
   double eps = 0.0001;
-  double M = 0.0;
+  double lipsh = 0.0;
   double r = 2.0;
   int k = 2;
   int s = 0;
   while (true) {
     // Шаг 1. Вычисление константы Липшица.
     for (int i = 0; i < (k - 1); ++i) {
-      double newM = std::abs((v[i + 1].second - v[i].second) / (v[i + 1].first - v[i].first));
-      M = std::max(newM, M);
+      double new_lipsh = std::abs((v[i + 1].second - v[i].second) / (v[i + 1].first - v[i].first));
+      lipsh = std::max(new_lipsh, lipsh);
     }
     double m = 1.0;
-    if (M != 0) m = r * M;
+    if (lipsh != 0) {
+      m = r * lipsh;
+    }
     // Шаг 2. Вычисление характеристики.
     s = 0;
     // Самое первое вычисление характеристики.
-    double R = m * (v[1].first - v[0].first) +
+    double ch = m * (v[1].first - v[0].first) +
                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
                2 * (v[1].second + v[0].second);
     // Последующие вычисления характеристик, поиск максимальной.
     for (int i = 1; i < (k - 1); ++i) {
-      double newR =
-          m * (v[i + 1].first - v[i].first) +
-          (v[i + 1].second - v[i].second) * (v[i + 1].second - v[i].second) / (m * (v[i + 1].first - v[i].first)) -
-          2 * (v[i + 1].second + v[i].second);
-      if (newR > R) {
+      double new_ch =
+          (m * (v[i + 1].first - v[i].first)) +
+          ((v[i + 1].second - v[i].second) * (v[i + 1].second - v[i].second) / (m * (v[i + 1].first - v[i].first))) -
+          (2 * (v[i + 1].second + v[i].second));
+      if (new_ch > ch) {
         // Как только нашли - обновили интервал, чтобы найти точку на интервале максимальной характеристики
         s = i;
-        R = newR;
+        ch = new_ch;
       }
     }
     // Шаг 3. Новая точка разбиения на интервале максимальной характеристики.
-    double newX = (v[s].first + v[s + 1].first) / 2 - (v[s + 1].second - v[s].second) / (2 * m);
-    std::pair<double, double> newPoint = std::pair<double, double>(newX, f(newX));
+    double new_x = ((v[s].first + v[s + 1].first) / 2) - ((v[s + 1].second - v[s].second) / (2 * m));
+    std::pair<double, double> new_point = std::pair<double, double>(new_x, f_(new_x));
     // Шаг 4. Проверка критерия останова по точности.
     if ((v[s + 1].first - v[s].first) <= eps) {
-      result = v[s + 1];
+      result_ = v[s + 1];
       break;
     }
     // Иначе - упорядочиваем массив по возрастания и возвращаемся на шаг 1.
-    v.push_back(newPoint);
+    v.emplace_back(new_point);
     std::sort(v.begin(), v.end());
     k++;
   }
@@ -71,7 +73,7 @@ bool kabalova_v_strongin_seq::TestTaskSequential::RunImpl() {
 }
 
 bool kabalova_v_strongin_seq::TestTaskSequential::PostProcessingImpl() {
-  reinterpret_cast<double*>(task_data->outputs[0])[0] = result.first;
-  reinterpret_cast<double*>(task_data->outputs[1])[0] = result.second;
+  reinterpret_cast<double*>(task_data->outputs[0])[0] = result_.first;
+  reinterpret_cast<double*>(task_data->outputs[1])[0] = result_.second;
   return true;
 }

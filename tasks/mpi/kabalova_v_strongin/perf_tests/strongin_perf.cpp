@@ -1,9 +1,16 @@
 // Copyright 2024 Kabalova Valeria
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
+#include <chrono>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <numbers>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/kabalova_v_strongin/include/strongin.h"
 
 TEST(kabalova_v_strongin_mpi, test_pipeline_run) {
@@ -11,7 +18,7 @@ TEST(kabalova_v_strongin_mpi, test_pipeline_run) {
   double right = 4.0;
   double res1 = 0;
   double res2 = 0;
-  std::function<double(double *)> f = [](double *x) { return std::exp(*x) - 1.0; };
+  std::function<double(double *)> f = [](const double *x) { return std::exp(*x) - 1.0; };
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -51,7 +58,7 @@ TEST(kabalova_v_strongin_mpi, test_task_run) {
   double right = 4.0;
   double res1 = 0;
   double res2 = 0;
-  std::function<double(double *)> f = [](double *x) { return std::exp(*x) - 1.0; };
+  std::function<double(double *)> f = [](const double *x) { return std::exp(*x) - 1.0; };
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();

@@ -1,16 +1,18 @@
-// Copyright 2024 Kabalova Valeria
+// Copyright_ 2024 Kabalova Valeria
 #include "mpi/kabalova_v_strongin/include/strongin.h"
 
-#include <random>
-#include <thread>
+#include <algorithm>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <functional>
+#include <vector>
 
 bool kabalova_v_strongin_mpi::TestMPITaskSequential::PreProcessingImpl() {
-  result.first = 0;
-  result.second = 0;
-  auto* inputData1 = reinterpret_cast<double*>(task_data->inputs[0]);
-  std::copy(inputData1, inputData1 + 1, &left);
-  auto* inputData2 = reinterpret_cast<double*>(task_data->inputs[1]);
-  std::copy(inputData2, inputData2 + 1, &right);
+  result_.first = 0;
+  result_.second = 0;
+  auto* input_data1 = reinterpret_cast<double*>(task_data->inputs[0]);
+  std::copy(input_data1, input_data1 + 1, &left_);
+  auto* input_data2 = reinterpret_cast<double*>(task_data->inputs[1]);
+  std::copy(input_data2, input_data2 + 1, &right_);
   return true;
 }
 
@@ -21,50 +23,52 @@ bool kabalova_v_strongin_mpi::TestMPITaskSequential::ValidationImpl() {
 
 bool kabalova_v_strongin_mpi::TestMPITaskSequential::RunImpl() {
   std::vector<std::pair<double, double>> v;
-  v.push_back(std::pair<double, double>(left, f(&left)));
-  v.push_back(std::pair<double, double>(right, f(&right)));
+  v.emplace_back(std::pair<double, double>(left_, f_(&left_)));
+  v.emplace_back(std::pair<double, double>(right_, f_(&right_)));
 
   double eps = 0.0001;
-  double M = 0.0;
+  double lipsh = 0.0;
   double r = 2.0;
   int k = 2;
   int s = 0;
   while (true) {
     // Шаг 1. Вычисление константы Липшица.
     for (int i = 0; i < (k - 1); i++) {
-      double newM = std::abs((v[i + 1].second - v[i].second) / (v[i + 1].first - v[i].first));
-      M = std::max(newM, M);
+      double new_lipsh = std::abs((v[i + 1].second - v[i].second) / (v[i + 1].first - v[i].first));
+      lipsh = std::max(new_lipsh, lipsh);
     }
     double m = 1.0;
-    if (M != 0) m = r * M;
+    if (lipsh != 0) {
+      m = r * lipsh;
+    }
     // Шаг 2. Вычисление характеристики.
     s = 0;
     // Самое первое вычисление характеристики.
-    double R = m * (v[1].first - v[0].first) +
-               (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
-               2 * (v[1].second + v[0].second);
+    double ch = (m * (v[1].first - v[0].first)) +
+                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
+                2 * (v[1].second + v[0].second);
     // Последующие вычисления характеристик, поиск максимальной.
     for (int i = 1; i < (k - 1); i++) {
-      double newR =
-          m * (v[i + 1].first - v[i].first) +
-          (v[i + 1].second - v[i].second) * (v[i + 1].second - v[i].second) / (m * (v[i + 1].first - v[i].first)) -
-          2 * (v[i + 1].second + v[i].second);
-      if (newR > R) {
+      double new_ch =
+          (m * (v[i + 1].first - v[i].first)) +
+          ((v[i + 1].second - v[i].second) * (v[i + 1].second - v[i].second) / (m * (v[i + 1].first - v[i].first))) -
+          (2 * (v[i + 1].second + v[i].second));
+      if (new_ch > ch) {
         // Как только нашли - обновили интервал, чтобы найти точку на интервале максимальной характеристики
         s = i;
-        R = newR;
+        ch = new_ch;
       }
     }
     // Шаг 3. Новая точка разбиения на интервале максимальной характеристики.
-    double newX = (v[s].first + v[s + 1].first) / 2 - (v[s + 1].second - v[s].second) / (2 * m);
-    std::pair<double, double> newPoint = std::pair<double, double>(newX, f(&newX));
+    double new_x = ((v[s].first + v[s + 1].first) / 2) - ((v[s + 1].second - v[s].second) / (2 * m));
+    std::pair<double, double> new_point = std::pair<double, double>(new_x, f_(&new_x));
     // Шаг 4. Проверка критерия останова по точности.
     if ((v[s + 1].first - v[s].first) <= eps) {
-      result = v[s + 1];
+      result_ = v[s + 1];
       break;
     }
     // Иначе - упорядочиваем массив по возрастания и возвращаемся на шаг 1.
-    v.push_back(newPoint);
+    v.emplace_back(new_point);
     std::sort(v.begin(), v.end());
     k++;
   }
@@ -72,19 +76,19 @@ bool kabalova_v_strongin_mpi::TestMPITaskSequential::RunImpl() {
 }
 
 bool kabalova_v_strongin_mpi::TestMPITaskSequential::PostProcessingImpl() {
-  reinterpret_cast<double*>(task_data->outputs[0])[0] = result.first;
-  reinterpret_cast<double*>(task_data->outputs[1])[0] = result.second;
+  reinterpret_cast<double*>(task_data->outputs[0])[0] = result_.first;
+  reinterpret_cast<double*>(task_data->outputs[1])[0] = result_.second;
   return true;
 }
 
 bool kabalova_v_strongin_mpi::TestMPITaskParallel::PreProcessingImpl() {
-  if (world.rank() == 0) {
-    result.first = 0;
-    result.second = 0;
-    auto* inputData1 = reinterpret_cast<double*>(task_data->inputs[0]);
-    std::copy(inputData1, inputData1 + 1, &left);
-    auto* inputData2 = reinterpret_cast<double*>(task_data->inputs[1]);
-    std::copy(inputData2, inputData2 + 1, &right);
+  if (world_.rank() == 0) {
+    result_.first = 0;
+    result_.second = 0;
+    auto* input_data1 = reinterpret_cast<double*>(task_data->inputs[0]);
+    std::copy(input_data1, input_data1 + 1, &left_);
+    auto* input_data2 = reinterpret_cast<double*>(task_data->inputs[1]);
+    std::copy(input_data2, input_data2 + 1, &right_);
     return true;
   }
   return true;
@@ -92,102 +96,100 @@ bool kabalova_v_strongin_mpi::TestMPITaskParallel::PreProcessingImpl() {
 
 bool kabalova_v_strongin_mpi::TestMPITaskParallel::ValidationImpl() {
   bool flag = true;
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     flag = task_data->inputs_count[0] == 2 && task_data->outputs_count[0] == 2 && task_data->inputs.size() == 2 &&
            task_data->outputs.size() == 2;
   }
-  broadcast(world, flag, 0);
+  broadcast(world_, flag, 0);
   return flag;
 }
 
-double kabalova_v_strongin_mpi::algorithm(double left, double right, std::function<double(double*)> f,
-                                          const double eps) {
+double kabalova_v_strongin_mpi::Algorithm(double left_, double right_, const std::function<double(double*)>& f_,
+                                          double eps) {
   std::vector<std::pair<double, double>> v;
-  v.push_back(std::pair<double, double>(left, f(&left)));
-  v.push_back(std::pair<double, double>(right, f(&right)));
-  double M = 0.0;
+  v.emplace_back(std::pair<double, double>(left_, f_(&left_)));
+  v.emplace_back(std::pair<double, double>(right_, f_(&right_)));
+  double lipsh = 0.0;
   double r = 2.0;
   int k = 2;
   int s = 0;
   // Основной цикл
   while (true) {
     for (int i = 0; i < (k - 1); ++i) {
-      double newM = std::abs((v[i + 1].second - v[i].second) / (v[i + 1].first - v[i].first));
-      M = std::max(newM, M);
+      double new_lipsh = std::abs((v[i + 1].second - v[i].second) / (v[i + 1].first - v[i].first));
+      lipsh = std::max(new_lipsh, lipsh);
     }
     double m = 1.0;
-    if (M != 0) m = r * M;
+    if (lipsh != 0) m = r * lipsh;
     // Вычисление характеристики
     s = 0;
-    // Первое вычисление характеристики R
-    double R = m * (v[1].first - v[0].first) +
-               (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
-               2 * (v[1].second + v[0].second);
+    // Первое вычисление характеристики ch
+    double ch = m * (v[1].first - v[0].first) +
+                (v[1].second - v[0].second) * (v[1].second - v[0].second) / (m * (v[1].first - v[0].first)) -
+                2 * (v[1].second + v[0].second);
     for (int i = 1; i < (k - 1); i++) {
-      double newR =
-          m * (v[i + 1].first - v[i].first) +
-          (v[i + 1].second - v[i].second) * (v[i + 1].second - v[i].second) / (m * (v[i + 1].first - v[i].first)) -
-          2 * (v[i + 1].second + v[i].second);
-      if (newR > R) {
+      double new_ch =
+          (m * (v[i + 1].first - v[i].first)) +
+          ((v[i + 1].second - v[i].second) * (v[i + 1].second - v[i].second) / (m * (v[i + 1].first - v[i].first))) -
+          (2 * (v[i + 1].second + v[i].second));
+      if (new_ch > ch) {
         s = i;
-        R = newR;
+        ch = new_ch;
       }
     }
-    double newX = (v[s].first + v[s + 1].first) / 2 - (v[s + 1].second - v[s].second) / (2 * m);
-    std::pair<double, double> newPoint = std::pair<double, double>(newX, f(&newX));
+    double new_x = ((v[s].first + v[s + 1].first) / 2) - ((v[s + 1].second - v[s].second) / (2 * m));
+    std::pair<double, double> new_point = std::pair<double, double>(new_x, f_(&new_x));
     if ((v[s + 1].first - v[s].first) <= eps) {
       return v[s + 1].first;
     }
-    v.push_back(newPoint);
+    v.emplace_back(new_point);
     std::sort(v.begin(), v.end());
     k++;
   }
 }
 
 bool kabalova_v_strongin_mpi::TestMPITaskParallel::RunImpl() {
-  unsigned int size = world.size();
-  unsigned int rank = world.rank();
+  unsigned int size = world_.size();
+  unsigned int rank = world_.rank();
   double segment = 0;
 
   if (size == 1) {
-    result.first = kabalova_v_strongin_mpi::algorithm(left, right, f, 0.0001);
-    result.second = f(&result.first);
+    result_.first = kabalova_v_strongin_mpi::Algorithm(left_, right_, f_, 0.0001);
+    result_.second = f_(&result_.first);
     return true;
   }
-  std::vector<double> localAnswer(size);
+  std::vector<double> local_answer(size);
   if (rank == 0) {
-    segment = std::abs(right - left) / world.size();
+    segment = std::abs(right_ - left_) / world_.size();
   }
-  broadcast(world, segment, 0);
-  broadcast(world, left, 0);
-  broadcast(world, right, 0);
-  double localLeft = left + segment * rank;
-  double localRight = localLeft + segment;
-  // std::cout << "ProcNum: " << rank << " Left:" << localLeft << " Right: " << localRight << std::endl;
+  broadcast(world_, segment, 0);
+  broadcast(world_, left_, 0);
+  broadcast(world_, right_, 0);
+  double local_left = left_ + (segment * rank);
+  double local_right = local_left + segment;
 
-  double localResult = kabalova_v_strongin_mpi::algorithm(localLeft, localRight, f, 0.0001);
-  // std::cout << "ProcNum: " << rank << "Local result: " << localResult << "\n";
+  double local_result = kabalova_v_strongin_mpi::Algorithm(local_left, local_right, f_, 0.0001);
 
-  boost::mpi::gather(world, localResult, localAnswer, 0);
+  boost::mpi::gather(world_, local_result, local_answer, 0);
 
   if (rank == 0) {
-    double answer = f(&localAnswer[0]);
+    double answer = f_(local_answer.data());
     for (unsigned int i = 1; i < size; i++) {
-      if (f(&localAnswer[i]) < answer) {
-        std::swap(localAnswer[0], localAnswer[i]);
-        answer = f(&localAnswer[i]);
+      if (f_(&local_answer[i]) < answer) {
+        std::swap(local_answer[0], local_answer[i]);
+        answer = f_(&local_answer[i]);
       }
     }
   }
-  result.first = localAnswer[0];
-  result.second = f(&localAnswer[0]);
+  result_.first = local_answer[0];
+  result_.second = f_(local_answer.data());
   return true;
 }
 
 bool kabalova_v_strongin_mpi::TestMPITaskParallel::PostProcessingImpl() {
-  if (world.rank() == 0) {
-    reinterpret_cast<double*>(task_data->outputs[0])[0] = result.first;
-    reinterpret_cast<double*>(task_data->outputs[1])[0] = result.second;
+  if (world_.rank() == 0) {
+    reinterpret_cast<double*>(task_data->outputs[0])[0] = result_.first;
+    reinterpret_cast<double*>(task_data->outputs[1])[0] = result_.second;
   }
   return true;
 }
