@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -16,7 +14,7 @@ namespace {
 
 // Utility function to generate random data
 template <typename T>
-static std::vector<T> getRandom(int size) {
+std::vector<T> GetRandom(int size) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<> distrib(-100, 100);
@@ -33,7 +31,7 @@ static std::vector<T> getRandom(int size) {
 TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   constexpr size_t kCount = 50;
 
-  std::vector<int> in = getRandom<int>(kCount);
+  std::vector<int> in = GetRandom<int>(kCount);
   std::vector<int> out(1, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -64,7 +62,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
 TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   constexpr size_t kCount = 50;
 
-  std::vector<double> in = getRandom<double>(kCount);
+  std::vector<double> in = GetRandom<double>(kCount);
   std::vector<double> out(1, 0.0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -95,7 +93,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
 TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   constexpr size_t kCount = 50;
 
-  std::vector<float> in = getRandom<float>(kCount);
+  std::vector<float> in = GetRandom<float>(kCount);
   std::vector<float> out(1, 0.0F);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
