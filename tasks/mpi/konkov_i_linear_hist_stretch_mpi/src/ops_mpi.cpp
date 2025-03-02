@@ -43,8 +43,7 @@ bool konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ValidationImpl() {
   return true;
 }
 
-void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(uint8_t& out_min,
-                                                                                uint8_t& out_max) {
+void konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI::ComputeLocalMinMax(uint8_t& out_min, uint8_t& out_max) {
   if (input_.empty()) {
     return;
   }
