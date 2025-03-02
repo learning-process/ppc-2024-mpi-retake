@@ -40,7 +40,8 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   if (rank == 0) {
     input_size_ = task_data->inputs_count[0];
     input_.resize(input_size_);
-    std::memcpy(input_.data(), task_data->inputs[0], input_size_ * sizeof(T));
+    auto* input_data = reinterpret_cast<T*>(task_data->inputs[0]);
+    std::memcpy(input_.data(), input_data, input_size_ * sizeof(T));
   }
 
   // Broadcast input size to all processes
@@ -91,6 +92,8 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     MPI_Send(&local_sum, 1, GetMPIType<T>(), 0, 0, MPI_COMM_WORLD);
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
+
   return true;
 }
 
@@ -99,7 +102,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank == 0) {
-    T* output_ptr = reinterpret_cast<T*>(task_data->outputs[0]);
+    auto* output_ptr = reinterpret_cast<T*>(task_data->outputs[0]);
     *output_ptr = result_;
   }
   return true;
