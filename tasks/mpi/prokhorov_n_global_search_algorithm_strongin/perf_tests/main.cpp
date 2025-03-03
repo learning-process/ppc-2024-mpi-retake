@@ -58,9 +58,9 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
 
 TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
   boost::mpi::communicator world;
-  std::vector<double> global_a = {-100000.0};
-  std::vector<double> global_b = {100000.0};
-  std::vector<double> global_epsilon = {0.0000001};
+  std::vector<double> global_a = {-100000000.0};
+  std::vector<double> global_b = {100000000.0};
+  std::vector<double> global_epsilon = {0.00000001};
   std::vector<double> global_result(1, 0.0);
 
   auto task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -82,7 +82,7 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
   test_mpi_task_parallel->PostProcessing();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10000;
+  perf_attr->num_running = 10000000;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
