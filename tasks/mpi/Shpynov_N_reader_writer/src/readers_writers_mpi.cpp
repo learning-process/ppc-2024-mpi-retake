@@ -9,9 +9,7 @@
 
 using namespace std::chrono_literals;
 
-// *** PARALLEL ALGORITHM *** //
-
-class C_sem {
+class C_sem { //semaphore class
 private:
   int signal;
 
@@ -74,7 +72,7 @@ bool Shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
 
   if (world.rank() == 0) { // world represents monitor
 
-    while (!proc.IsFree()) {
+    while (!proc.IsFree()) { // processing requests untill all threads been used at least once
       std::string procedure;
       boost::mpi::status stat;
 
