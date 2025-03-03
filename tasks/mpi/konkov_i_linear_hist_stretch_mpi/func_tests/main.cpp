@@ -66,3 +66,17 @@ TEST(konkov_i_linear_hist_stretch_mpi, test_full_range) {
 
   EXPECT_EQ(out, expected_out);
 }
+
+TEST(konkov_i_linear_hist_stretch_mpi, test_empty_image) {
+  std::vector<uint8_t> in;
+  std::vector<uint8_t> out;
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
+  task_data->inputs_count.emplace_back(in.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
+  task_data->outputs_count.emplace_back(out.size());
+
+  konkov_i_linear_hist_stretch_mpi::LinearHistStretchMPI task(task_data);
+  ASSERT_FALSE(task.Validation());
+}

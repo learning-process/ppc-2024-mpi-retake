@@ -83,3 +83,17 @@ TEST(konkov_i_linear_hist_stretch_seq, test_custom_range) {
   EXPECT_EQ(output.back(), 255);
   EXPECT_EQ(output[1], 85);
 }
+
+TEST(konkov_i_linear_hist_stretch_seq, test_empty_image) {
+  std::vector<uint8_t> in;
+  std::vector<uint8_t> out;
+
+  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs_count.emplace_back(in.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs_count.emplace_back(out.size());
+
+  konkov_i_linear_hist_stretch_seq::LinearHistStretchSeq task(task_data_seq);
+  ASSERT_FALSE(task.Validation());
+}
