@@ -2,27 +2,24 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
 #include <random>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/strakhov_a_m_gauss_jordan/include/ops_seq.hpp"
 
 namespace {
-std::vector<double> genRandomVector(size_t size, int min, int max) {
+std::vector<double> GenRandomVector(size_t size, int min, int max) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int> dis(min, max);
-  std::vector<double> randomVector(size);
+  std::vector<double> random_vector(size);
   for (size_t i = 0; i < size; i++) {
-    randomVector[i] = (double)(dis(gen));
+    random_vector[i] = (double)(dis(gen));
   }
 
-  return randomVector;
+  return random_vector;
 }
 }  // namespace
 
@@ -248,14 +245,14 @@ TEST(strakhov_a_m_gauss_jordan_seq, test_mat_7_random) {
   constexpr size_t kCount = 7;
 
   // Create data
-  std::vector<double> in = genRandomVector(kCount * (kCount + 1), -5, 55);
+  std::vector<double> in = GenRandomVector(kCount * (kCount + 1), -5, 55);
   std::vector<double> ans = {1, 2, 3, 4, 5, 6, 7};
   for (size_t i = 0; i < kCount; i++) {
     double sum = 0;
     for (size_t j = 0; j < kCount; j++) {
-      sum += ans[j] * in[(kCount + 1) * i + j];
+      sum += ans[j] * in[((kCount + 1) * i) + j];
     }
-    in[(kCount + 1) * (i + 1) - 1] = sum;
+    in[((kCount + 1) * (i + 1)) - 1] = sum;
   }
   std::vector<double> out(kCount, 0);
 
