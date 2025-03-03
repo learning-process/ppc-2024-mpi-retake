@@ -1,5 +1,6 @@
 #include "seq/sharamygina_i_horizontal_line_filtration/include/ops_seq.h"
 
+#include <ranges>
 #include <vector>
 
 bool sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrationSeq::PreProcessingImpl() {
@@ -31,7 +32,7 @@ bool sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrationSeq::
 
 bool sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrationSeq::PostProcessingImpl() {
   auto* output_ptr = reinterpret_cast<unsigned int*>(task_data->outputs[0]);
-  std::copy(result_data_.begin(), result_data_.end(), output_ptr);
+  std::ranges::copy(result_data_, output_ptr);
   return true;
 }
 
@@ -43,19 +44,19 @@ unsigned int sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrat
   unsigned int sum = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      int tX = x + i - 1;
-      int tY = y + j - 1;
-      if (tX < 0 || tX > rows_ - 1) {
-        tX = x;
+      int t_x = x + i - 1;
+      int t_y = y + j - 1;
+      if (t_x < 0 || t_x > rows_ - 1) {
+        t_x = x;
       }
-      if (tY < 0 || tY > cols_ - 1) {
-        tY = y;
+      if (t_y < 0 || t_y > cols_ - 1) {
+        t_y = y;
       }
-      if ((tX * cols) + tY >= cols * rows) {
-        tX = x;
-        tY = y;
+      if ((t_x * cols) + t_y >= cols * rows) {
+        t_x = x;
+        t_y = y;
       }
-      sum += static_cast<unsigned int>(image[(tX * cols) + tY] * (gauss_[i][j]));
+      sum += static_cast<unsigned int>(image[(t_x * cols) + t_y] * (gauss_[i][j]));
     }
   }
   return sum / 16;

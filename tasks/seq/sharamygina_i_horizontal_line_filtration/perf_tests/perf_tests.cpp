@@ -5,6 +5,7 @@
 #include <limits>
 #include <memory>
 #include <random>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
@@ -12,15 +13,15 @@
 
 namespace sharamygina_i_horizontal_line_filtration_seq {
 namespace {
-std::vector<unsigned int> GetImage(int rows, int cols) {
-  std::vector<unsigned int> temporary_im(rows * cols);
+std::vector<unsigned int> GetImage(int kRows, int kCols) {
+  std::vector<unsigned int> temporary_im(kRows * kCols);
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
 
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      temporary_im[(i * cols) + j] = dist(gen);
+  for (int i = 0; i < kRows; i++) {
+    for (int j = 0; j < kCols; j++) {
+      temporary_im[(i * kCols) + j] = dist(gen);
     }
   }
   return temporary_im;
@@ -29,16 +30,16 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
 }  // namespace sharamygina_i_horizontal_line_filtration_seq
 
 TEST(sharamygina_i_horizontal_line_filtration_seq, test_pipeline_run) {
-  constexpr int rows = 6000;
-  constexpr int cols = 6000;
+  constexpr int kRows = 6000;
+  constexpr int kCols = 6000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
-  std::vector<unsigned int> input = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  std::vector<unsigned int> output(rows * cols);
+  std::vector<unsigned int> input = sharamygina_i_horizontal_line_filtration_seq::GetImage(kRows, kCols);
+  std::vector<unsigned int> output(kRows * kCols);
 
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(input.data()));
-  task_data->inputs_count.push_back(rows);
-  task_data->inputs_count.push_back(cols);
+  task_data->inputs_count.push_back(kRows);
+  task_data->inputs_count.push_back(kCols);
   task_data->outputs.push_back(reinterpret_cast<uint8_t*>(output.data()));
   task_data->outputs_count.push_back(output.size());
 
@@ -63,16 +64,16 @@ TEST(sharamygina_i_horizontal_line_filtration_seq, test_pipeline_run) {
 }
 
 TEST(sharamygina_i_horizontal_line_filtration_seq, test_task_run) {
-  constexpr int rows = 6000;
-  constexpr int cols = 6000;
+  constexpr int kRows = 6000;
+  constexpr int kCols = 6000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
-  std::vector<unsigned int> input = sharamygina_i_horizontal_line_filtration_seq::GetImage(rows, cols);
-  std::vector<unsigned int> output(rows * cols);
+  std::vector<unsigned int> input = sharamygina_i_horizontal_line_filtration_seq::GetImage(kRows, kCols);
+  std::vector<unsigned int> output(kRows * kCols);
 
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(input.data()));
-  task_data->inputs_count.push_back(rows);
-  task_data->inputs_count.push_back(cols);
+  task_data->inputs_count.push_back(kRows);
+  task_data->inputs_count.push_back(kCols);
   task_data->outputs.push_back(reinterpret_cast<uint8_t*>(output.data()));
   task_data->outputs_count.push_back(output.size());
 

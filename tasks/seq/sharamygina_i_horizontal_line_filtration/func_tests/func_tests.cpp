@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cstdint>
+#include <limits>
 #include <random>
 #include <vector>
 
@@ -30,7 +31,7 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
   std::vector<unsigned int> temporary_im(rows * cols);
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
+  std::uniform_int_distribution<unsigned int> dist(0, std::numeric_limits<unsigned int>::max());
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       temporary_im[(i * cols) + j] = dist(gen);
@@ -53,6 +54,7 @@ TEST(sharamygina_i_horizontal_line_filtration, SampleImageTest) {
   std::vector<unsigned int> image = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
   std::vector<unsigned int> expected_image = {0, 0, 0, 0, 0, 6, 7, 0, 0, 10, 11, 0, 0, 0, 0, 0};
   std::vector<unsigned int> expected_image_new(rows * cols);
+
   sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image_new);
 
   test_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
