@@ -3,9 +3,11 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
+#include <limits>
 #include <random>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/sharamygina_i_horizontal_line_filtraiton/include/ops_mpi.h"
 
 namespace sharamygina_i_horizontal_line_filtration_mpi {
@@ -14,7 +16,7 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
   std::vector<unsigned int> temporary_im(rows * cols);
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
+  std::uniform_int_distribution<unsigned int> dist(0, std::numeric_limits<unsigned int>::max());
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       temporary_im[(i * cols) + j] = dist(gen);
@@ -23,34 +25,39 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
   return temporary_im;
 }
 
-std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int>& image, int rows, int cols) {  // seq
-  std::vector<unsigned int> final_image(rows * cols);
+unsigned int ApplyGaussianFilter(const std::vector<unsigned int>& image, int x, int y, int rows, int cols) {
   unsigned int gauss[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
+  unsigned int sum = 0;
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      int t_x = x + i - 1;
+      int t_y = y + j - 1;
+
+      if (t_x < 0 || t_x >= rows) {
+        t_x = x;
+      }
+      if (t_y < 0 || t_y >= cols) {
+        t_y = y;
+      }
+
+      sum += static_cast<unsigned int>(image[(t_x * cols) + t_y] * gauss[i][j]);
+    }
+  }
+
+  return sum / 16;
+}
+
+std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int>& image, int rows, int cols) {
+  std::vector<unsigned int> final_image(rows * cols, 0);
+
   for (int x = 0; x < rows; x++) {
     for (int y = 0; y < cols; y++) {
       if (x < 1 || x >= rows - 1 || y < 1 || y >= cols - 1) {
         final_image[(x * cols) + y] = 0;
-        continue;
+      } else {
+        final_image[(x * cols) + y] = ApplyGaussianFilter(image, x, y, rows, cols);
       }
-      unsigned int sum = 0;
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          int tX = x + i - 1;
-          int tY = y + j - 1;
-          if (tX < 0 || tX > rows - 1) {
-            tX = x;
-          }
-          if (tY < 0 || tY > cols - 1) {
-            tY = y;
-          }
-          if (tX * cols + tY >= cols * rows) {
-            tX = x;
-            tY = y;
-          }
-          sum += static_cast<unsigned int>(image[(tX * cols) + tY] * (gauss[i][j]));
-        }
-      }
-      final_image[(x * cols) + y] = sum / 16;
     }
   }
   return final_image;
@@ -60,6 +67,7 @@ std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int>& image, int 
 
 TEST(sharamygina_i_horizontal_line_filtration_mpi, SampleImageTest) {
   boost::mpi::communicator world;
+
   int rows = 4;
   int cols = 4;
 
@@ -70,16 +78,18 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SampleImageTest) {
   std::vector<unsigned int> expected_image = {0, 0, 0, 0, 0, 6, 7, 0, 0, 10, 11, 0, 0, 0, 0, 0};
 
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    received_image.resize(rows * cols);
+
     task_data->inputs_count.emplace_back(rows);
     task_data->inputs_count.emplace_back(cols);
-
-    received_image.resize(rows * cols);
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
     task_data->outputs_count.emplace_back(received_image.size());
+
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
   ASSERT_TRUE(test_task.ValidationImpl());
   ASSERT_TRUE(test_task.PreProcessingImpl());
   ASSERT_TRUE(test_task.RunImpl());
@@ -107,15 +117,14 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, BigImageTest) {
   if (world.rank() == 0) {
     image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
     expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    received_image.resize(rows * cols);
 
     task_data->inputs_count.emplace_back(rows);
     task_data->inputs_count.emplace_back(cols);
+    task_data->outputs_count.emplace_back(received_image.size());
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-    received_image.resize(rows * cols);
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-    task_data->outputs_count.emplace_back(received_image.size());
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
@@ -146,18 +155,18 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SmallImageTest) {
   if (world.rank() == 0) {
     image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
     expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    received_image.resize(rows * cols);
 
     task_data->inputs_count.emplace_back(rows);
     task_data->inputs_count.emplace_back(cols);
+    task_data->outputs_count.emplace_back(received_image.size());
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-    received_image.resize(rows * cols);
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-    task_data->outputs_count.emplace_back(received_image.size());
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
   ASSERT_TRUE(test_task.ValidationImpl());
   ASSERT_TRUE(test_task.PreProcessingImpl());
   ASSERT_TRUE(test_task.RunImpl());
@@ -185,17 +194,18 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SquareImageTest) {
   if (world.rank() == 0) {
     image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
     expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    received_image.resize(rows * cols);
 
     task_data->inputs_count.emplace_back(rows);
     task_data->inputs_count.emplace_back(cols);
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-    received_image.resize(rows * cols);
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
     task_data->outputs_count.emplace_back(received_image.size());
+
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
   ASSERT_TRUE(test_task.ValidationImpl());
   ASSERT_TRUE(test_task.PreProcessingImpl());
   ASSERT_TRUE(test_task.RunImpl());
@@ -223,18 +233,18 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, HorizontalImageTest) {
   if (world.rank() == 0) {
     image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
     expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    received_image.resize(rows * cols);
 
     task_data->inputs_count.emplace_back(rows);
     task_data->inputs_count.emplace_back(cols);
+    task_data->outputs_count.emplace_back(received_image.size());
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-    received_image.resize(rows * cols);
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-    task_data->outputs_count.emplace_back(received_image.size());
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
   ASSERT_TRUE(test_task.ValidationImpl());
   ASSERT_TRUE(test_task.PreProcessingImpl());
   ASSERT_TRUE(test_task.RunImpl());
@@ -262,18 +272,18 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, VerticalImageTest) {
   if (world.rank() == 0) {
     image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
     expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    received_image.resize(rows * cols);
 
     task_data->inputs_count.emplace_back(rows);
     task_data->inputs_count.emplace_back(cols);
+    task_data->outputs_count.emplace_back(received_image.size());
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-    received_image.resize(rows * cols);
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-    task_data->outputs_count.emplace_back(received_image.size());
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
   ASSERT_TRUE(test_task.ValidationImpl());
   ASSERT_TRUE(test_task.PreProcessingImpl());
   ASSERT_TRUE(test_task.RunImpl());

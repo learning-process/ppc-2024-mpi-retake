@@ -23,7 +23,8 @@ class HorizontalLineFiltrationMpi : public ppc::core::Task {
   std::vector<unsigned int> result_data_;
   unsigned int rows_;
   unsigned int cols_;
-  unsigned int InputAnotherPixel(const std::vector<unsigned int>& image, int x, int y, int rows, int cols);
+  unsigned int InputAnotherPixel(const std::vector<unsigned int>& image, unsigned int x, unsigned int y,
+                                 unsigned int rows, unsigned int cols);
   boost::mpi::communicator world_;
 };
 }  // namespace sharamygina_i_horizontal_line_filtration_mpi

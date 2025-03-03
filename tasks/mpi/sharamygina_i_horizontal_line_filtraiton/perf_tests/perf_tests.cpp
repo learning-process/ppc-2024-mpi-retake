@@ -15,47 +15,47 @@
 
 namespace sharamygina_i_horizontal_line_filtration_mpi {
 namespace {
-std::vector<unsigned int> GetImage(int kRows, int kCols) {
-  std::vector<unsigned int> temporary_im(kRows * kCols);
+std::vector<unsigned int> GetImage(int k_rows, int k_cols) {
+  std::vector<unsigned int> temporary_im(k_rows * k_cols);
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
-  for (int i = 0; i < kRows; i++) {
-    for (int j = 0; j < kCols; j++) {
-      temporary_im[(i * kCols) + j] = dist(gen);
+  std::uniform_int_distribution<unsigned int> dist(0, std::numeric_limits<unsigned int>::max());
+  for (int i = 0; i < k_rows; i++) {
+    for (int j = 0; j < k_cols; j++) {
+      temporary_im[(i * k_cols) + j] = dist(gen);
     }
   }
   return temporary_im;
 }
 
-std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int kRows, int kCols) {
-  std::vector<unsigned int> final_image(kRows * kCols);
+std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int k_rows, int k_cols) {
+  std::vector<unsigned int> final_image(k_rows * k_cols);
   unsigned int gauss[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
-  for (int x = 0; x < kRows; x++) {
-    for (int y = 0; y < kCols; y++) {
-      if (x < 1 || x >= kRows - 1 || y < 1 || y >= kCols - 1) {
-        final_image[(x * kCols) + y] = 0;
+  for (int x = 0; x < k_rows; x++) {
+    for (int y = 0; y < k_cols; y++) {
+      if (x < 1 || x >= k_rows - 1 || y < 1 || y >= k_cols - 1) {
+        final_image[(x * k_cols) + y] = 0;
         continue;
       }
       unsigned int sum = 0;
       for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-          int tX = x + i - 1;
-          int tY = y + j - 1;
-          if (tX < 0 || tX > kRows - 1) {
-            tX = x;
+          int t_x = x + i - 1;
+          int t_y = y + j - 1;
+          if (t_x < 0 || t_x > k_rows - 1) {
+            t_x = x;
           }
-          if (tY < 0 || tY > kCols - 1) {
-            tY = y;
+          if (t_y < 0 || t_y > k_cols - 1) {
+            t_y = y;
           }
-          if (tX * kCols + tY >= kCols * kRows) {
-            tX = x;
-            tY = y;
+          if (t_x * k_cols + t_y >= k_cols * k_rows) {
+            t_x = x;
+            t_y = y;
           }
-          sum += static_cast<unsigned int>(image[(tX * kCols) + tY] * (gauss[i][j]));
+          sum += static_cast<unsigned int>(image[(t_x * k_cols) + t_y] * (gauss[i][j]));
         }
       }
-      final_image[(x * kCols) + y] = sum / 16;
+      final_image[(x * k_cols) + y] = sum / 16;
     }
   }
   return final_image;
@@ -66,28 +66,28 @@ std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int 
 TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
-  int kRows = 6000;
-  int kCols = 6000;
+  int k_rows = 6000;
+  int k_cols = 6000;
 
   // Create data
   std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(kRows * kCols);
-  std::vector<unsigned int> expected_image(kRows * kCols);
-  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
-  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
+  std::vector<unsigned int> image(k_rows * k_cols);
+  std::vector<unsigned int> expected_image(k_rows * k_cols);
+  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(k_rows, k_cols);
+  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, k_rows, k_cols);
 
   // Create task_data
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
+    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(k_rows, k_cols);
+    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, k_rows, k_cols);
 
-    task_data->inputs_count.emplace_back(kRows);
-    task_data->inputs_count.emplace_back(kCols);
+    task_data->inputs_count.emplace_back(k_rows);
+    task_data->inputs_count.emplace_back(k_cols);
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
 
-    received_image.resize(kRows * kCols);
+    received_image.resize(k_rows * k_cols);
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_image.data()));
     task_data->outputs_count.emplace_back(received_image.size());
   }
@@ -119,28 +119,28 @@ TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_pipeline_run) {
 TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_task_run) {
   boost::mpi::communicator world;
 
-  int kRows = 6000;
-  int kCols = 6000;
+  int k_rows = 6000;
+  int k_cols = 6000;
 
   // Create data
   std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(kRows * kCols);
-  std::vector<unsigned int> expected_image(kRows * kCols);
-  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
-  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
+  std::vector<unsigned int> image(k_rows * k_cols);
+  std::vector<unsigned int> expected_image(k_rows * k_cols);
+  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(k_rows, k_cols);
+  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, k_rows, k_cols);
 
   // Create task_data
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
+    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(k_rows, k_cols);
+    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, k_rows, k_cols);
 
-    task_data->inputs_count.emplace_back(kRows);
-    task_data->inputs_count.emplace_back(kCols);
+    task_data->inputs_count.emplace_back(k_rows);
+    task_data->inputs_count.emplace_back(k_cols);
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
 
-    received_image.resize(kRows * kCols);
+    received_image.resize(k_rows * k_cols);
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_image.data()));
     task_data->outputs_count.emplace_back(received_image.size());
   }
