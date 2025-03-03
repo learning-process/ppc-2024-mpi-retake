@@ -1,19 +1,16 @@
 #pragma once
-#include <gtest/gtest.h>
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
-#include <numeric>
-#include <string>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace sedova_o_min_of_vector_elements_mpi {
-std::vector<int> getRandomVector(int size, int min = 0, int max = 100);
-std::vector<std::vector<int>> getRandomMatrix(int rows, int columns, int min = 0, int max = 100);
+std::vector<int> GetRandomVector(int size, int min = 0, int max = 100);
+std::vector<std::vector<int>> GetRandomMatrix(int rows, int columns, int min = 0, int max = 100);
 
 class TestTaskMPI : public ppc::core::Task {
  public:

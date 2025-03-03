@@ -31,7 +31,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
     int min = -500;
     int max = 500;
 
-    global_matrix = sedova_o_min_of_vector_elements_mpi::getRandomMatrix(rows, columns, min, max);
+    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
     int index = gen() % (rows * columns);
     global_matrix[index / columns][index / rows] = ref;
 
@@ -86,7 +86,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_task_run) {
     int min = -500;
     int max = 500;
 
-    global_matrix = sedova_o_min_of_vector_elements_mpi::getRandomMatrix(rows, columns, min, max);
+    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
     int index = gen() % (rows * columns);
     global_matrix[index / columns][index / rows] = ref;
 

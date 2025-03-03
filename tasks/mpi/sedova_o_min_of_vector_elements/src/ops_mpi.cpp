@@ -1,17 +1,16 @@
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
-
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi.hpp>
 #include <algorithm>
 #include <climits>
 #include <cmath>
-#include <cstddef>
-#include <functional>
 #include <random>
-#include <string>
 #include <vector>
 
 using namespace std::chrono_literals;
 
-std::vector<int> sedova_o_min_of_vector_elements_mpi::getRandomVector(int size, int min, int max) {
+std::vector<int> sedova_o_min_of_vector_elements_mpi::GetRandomVector(int size, int min, int max) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(size);
@@ -21,11 +20,11 @@ std::vector<int> sedova_o_min_of_vector_elements_mpi::getRandomVector(int size, 
   return vec;
 }
 
-std::vector<std::vector<int>> sedova_o_min_of_vector_elements_mpi::getRandomMatrix(int rows, int columns, int min,
+std::vector<std::vector<int>> sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(int rows, int columns, int min,
                                                                                    int max) {
   std::vector<std::vector<int>> vec(rows);
   for (int i = 0; i < rows; i++) {
-    vec[i] = sedova_o_min_of_vector_elements_mpi::getRandomVector(columns, min, max);
+    vec[i] = sedova_o_min_of_vector_elements_mpi::GetRandomVector(columns, min, max);
   }
   return vec;
 }
@@ -45,7 +44,9 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::ValidationImpl() {
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::RunImpl() {
-  if (input_.empty()) return true;
+  if (input_.empty()) {
+    return true;
+  }
   res_ = input_[0][0];
   for (const auto &row : input_) {
     for (int val : row) {
@@ -73,11 +74,11 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
     for (unsigned int i = 0; i < rows; i++) {
       auto *tmp_ptr = reinterpret_cast<int *>(task_data->inputs[i]);
       for (unsigned int j = 0; j < columns; j++) {
-        input_[i * columns + j] = tmp_ptr[j];
+        input_[(i * columns) + j] = tmp_ptr[j];
       }
     }
     for (int proc = 1; proc < world_.size(); proc++) {
-      world_.send(proc, 0, input_.data() + delta * proc, delta);
+      world_.send(proc, 0, input_.data() + (delta * proc), delta);
     }
   }
   output_ = std::vector<int>(delta);
@@ -98,7 +99,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
-  int local_res = *std::min_element(output_.begin(), output_.end());
+  int local_res = *std::ranges::min_element(output_.begin(), output_.end());
   reduce(world_, local_res, res_, boost::mpi::minimum<int>(), 0);
   return true;
 }
