@@ -1,8 +1,13 @@
+#ifndef MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP_
+#define MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP_
+
 #define OMPI_SKIP_MPICXX
 
-#pragma once
-
-#include <utility>
+#include <mpi.h>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/environment.hpp>
+#include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -26,6 +31,8 @@ class TestTaskMPI : public ppc::core::Task {
   int remel_;
   std::vector<T> local_input_;
   T result_;
+  MPI_Op op_;
 };
 
 }  // namespace karaseva_e_reduce_mpi
+#endif  // MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP_

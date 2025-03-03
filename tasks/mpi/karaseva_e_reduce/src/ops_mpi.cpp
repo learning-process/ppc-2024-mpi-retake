@@ -45,6 +45,7 @@ int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_O
 
   int typesize{};
   MPI_Type_size(datatype, &typesize);
+
   memcpy(recvbuf, sendbuf, count * typesize);
 
   int step = 1;
@@ -54,6 +55,7 @@ int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_O
       if (src < size) {
         std::vector<T> temp_buf(count);
         MPI_Recv(temp_buf.data(), count, datatype, src, 0, comm, MPI_STATUS_IGNORE);
+
         ApplyOperation<T>(temp_buf.data(), recvbuf, count, op);
       }
     } else {
@@ -63,6 +65,12 @@ int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_O
     }
     step *= 2;
   }
+
+  if (rank != root) {
+    return MPI_SUCCESS;
+  }
+
+  memcpy(recvbuf, sendbuf, count * typesize);
 
   return MPI_SUCCESS;
 }
@@ -157,7 +165,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     throw std::runtime_error("Unsupported type for MPI operation");
   }
 
-  MPI_Reduce(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, world);
+  Reduce<T>(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, world);
 
   boost::mpi::broadcast(world, global_sum, 0);
 
