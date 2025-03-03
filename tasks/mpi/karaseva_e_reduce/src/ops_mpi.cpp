@@ -3,6 +3,7 @@
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 #include <mpi.h>
+#include <stdexcept>
 
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
@@ -14,8 +15,9 @@
 
 namespace mpi = boost::mpi;
 
+namespace {
 template <typename T>
-void apply_operation(void *inbuf, void *inoutbuf, int count, MPI_Op op) {
+void ApplyOperation(void *inbuf, void *inoutbuf, int count, MPI_Op op) {
   auto *in = reinterpret_cast<T *>(inbuf);
   auto *inout = reinterpret_cast<T *>(inoutbuf);
   for (int i = 0; i < count; i++) {
@@ -30,6 +32,7 @@ void apply_operation(void *inbuf, void *inoutbuf, int count, MPI_Op op) {
     }
   }
 }
+}  // namespace
 
 namespace {
 template <typename T>
@@ -141,7 +144,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   T global_sum = local_sum;
 
   // Defining the MPI type depending on the type T
-  MPI_Datatype mpi_type;
+  MPI_Datatype mpi_type = nullptr;
   if constexpr (std::is_same_v<T, int>) {
     mpi_type = MPI_INT;
   } else if constexpr (std::is_same_v<T, float>) {
