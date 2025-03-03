@@ -1,5 +1,6 @@
 #include "mpi/strakhov_a_m_gauss_jordan/include/ops_mpi.hpp"
 
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <cmath>
 #include <cstddef>
 #include <iostream>
@@ -28,18 +29,18 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::ValidationImpl() {
       return false;
     }
     auto* in_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-    input_ = std::vector<double>(in_ptr, in_ptr + row_size_ * col_size_);
+    input_ = std::vector<double>(in_ptr, in_ptr + (row_size_ * col_size_));
     for (size_t i = 0; i < col_size_; i++) {
       bool flag1 = true;
       bool flag2 = true;
       for (size_t j = 0; j < col_size_; j++) {
-        if (flag1 && (input_[j * row_size_ + i] != 0)) {
+        if (flag1 && (input_[(j * row_size_) + i] != 0)) {
           flag1 = false;
           if (!flag2) {
             break;
           }
         }
-        if (flag2 && (input_[i * row_size_ + j] != 0)) {
+        if (flag2 && (input_[(i * row_size_) + j] != 0)) {
           flag2 = false;
           if (!flag1) {
             break;
@@ -62,16 +63,16 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
   int r = world_.rank();
   size_t sz = world_.size();
   size_t ost = col_size_ % sz;
-  size_t dv = col_size_ / sz + (int)(r < ost);
+  size_t dv = (col_size_ / sz) + (int)(r < static_cast<int>(ost));
   size_t osn_dv = col_size_ / sz;
   int head = 0;
   size_t tkt = 0;
   std::vector<double> head_vec(row_size_, 0);
   std::vector<double> local_input;
   if (r == 0) {
-    int j = dv;
+    int j = static_cast<int>(dv);
     for (int k = 1; k < world_.size(); k++) {
-      size_t pr_size = (k < ost) ? dv : osn_dv;
+      size_t pr_size = (k < static_cast<int>(ost)) ? dv : osn_dv;
       world_.send(k, 0, &input_[j * row_size_], pr_size * row_size_);
       j += pr_size;
     }
