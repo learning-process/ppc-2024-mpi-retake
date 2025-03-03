@@ -2,8 +2,8 @@
 
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
-#include <boost/mpi/communicator.hpp>
 #include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <cstring>
 #include <numeric>
