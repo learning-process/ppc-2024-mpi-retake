@@ -1,3 +1,5 @@
+#define OMPI_SKIP_MPICXX
+
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 #include <boost/mpi.hpp>

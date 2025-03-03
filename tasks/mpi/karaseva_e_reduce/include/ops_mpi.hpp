@@ -1,7 +1,10 @@
+#define OMPI_SKIP_MPICXX
+
 #pragma once
 
 #include <utility>
 #include <vector>
+#include <mpi.h>
 
 #include "core/task/include/task.hpp"
 
