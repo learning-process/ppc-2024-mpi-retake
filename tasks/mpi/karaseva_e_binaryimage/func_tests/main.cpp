@@ -9,7 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-std::vector<int> karaseva_e_binaryimage_mpi::CreateRandomBinaryImage(int r, int c) {
+std::vector<int> CreateRandomBinaryImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(r * c);
@@ -29,7 +29,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_25x25) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::CreateRandomBinaryImage(rows, cols);
+    image = CreateRandomBinaryImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);
@@ -77,7 +77,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_50x50) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::CreateRandomBinaryImage(rows, cols);
+    image = CreateRandomBinaryImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);
@@ -125,7 +125,7 @@ TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_75x75) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    image = karaseva_e_binaryimage_mpi::CreateRandomBinaryImage(rows, cols);
+    image = CreateRandomBinaryImage(rows, cols);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
     task_data_par->inputs_count.emplace_back(rows);
     task_data_par->inputs_count.emplace_back(cols);

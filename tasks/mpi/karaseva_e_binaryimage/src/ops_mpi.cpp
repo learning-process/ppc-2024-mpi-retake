@@ -7,7 +7,6 @@
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstddef>
-#include <iostream>
 #include <map>
 #include <numeric>
 #include <set>
@@ -192,8 +191,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::PreProcessingImpl() {
     labeled_image_ = std::vector<int>(rows_ * columns_, 1);
   }
 
-  std::cout << "Rank " << world_.rank() << " - PreProcessingImpl completed\n";
-
   return true;
 }
 
@@ -263,7 +260,6 @@ void karaseva_e_binaryimage_mpi::LoadLabelMapFromStream(std::istringstream& iss,
 }
 
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
-  std::cout << "Rank " << world_.rank() << " - RunImpl started\n";
 
   boost::mpi::broadcast(world_, rows_, 0);
   boost::mpi::broadcast(world_, columns_, 0);
@@ -275,8 +271,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
 
   local_image_ = std::vector<int>(partition_sizes[world_.rank()]);
   boost::mpi::scatterv(world_, image_, partition_sizes, local_image_.data(), 0);
-
-  std::cout << "Rank " << world_.rank() << " - Image data scattered\n";
 
   std::vector<int> local_labeled_image(partition_sizes[world_.rank()], 1);
   int min_label = (100000 * world_.rank()) + 2;
@@ -304,8 +298,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
   std::vector<char> send_data(serialized_data.begin(), serialized_data.end());
   boost::mpi::gatherv(world_, send_data, buffer.data(), data_sizes, 0);
 
-  std::cout << "Rank " << world_.rank() << " - Data gathered\n";
-
   if (world_.rank() == 0) {
     std::map<int, std::set<int>> global_map;
     int displacement = 0;
@@ -321,8 +313,6 @@ bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
     Labeling(image_, labeled_image_, rows_, columns_, 2, global_map);
     UpdateLabels(labeled_image_, rows_, columns_);
   }
-
-  std::cout << "Rank " << world_.rank() << " - RunImpl completed\n";
 
   return true;
 }

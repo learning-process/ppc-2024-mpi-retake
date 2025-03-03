@@ -13,7 +13,6 @@
 namespace karaseva_e_binaryimage_mpi {
 
 // Function declarations
-std::vector<int> CreateRandomBinaryImage(int r, int c);
 int GetRootLabel(std::map<int, std::set<int>>& label_parent_map, int label);
 void PropagateLabelEquivalences(std::map<int, std::set<int>>& label_parent_map);
 void UpdateLabels(std::vector<int>& labeled_image, int rows, int cols);
