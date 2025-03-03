@@ -44,8 +44,8 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::PreProcessingImpl() {
 
     double *it1 = bufferA.data();
     double *it2 = bufferB.data();
-//    double *it1 = (double *)(task_data->inputs[0]);
-//   double *it2 = (double *)(task_data->inputs[1]);
+    //    double *it1 = (double *)(task_data->inputs[0]);
+    //   double *it2 = (double *)(task_data->inputs[1]);
     for (int i = 0; i < matrix_size; ++i) {
       std::copy(it1 + i * matrix_size, it1 + (i + 1) * matrix_size, inputA.begin() + i * sz);
       std::copy(it2 + i * matrix_size, it2 + (i + 1) * matrix_size, inputB.begin() + i * sz);
