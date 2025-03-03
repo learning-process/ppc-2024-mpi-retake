@@ -47,7 +47,6 @@ void konstantinov_i_gauss_jordan_method_seq::UpdateMatrix(int n, int k, std::vec
     matrix[(k * (n + 1)) + i] /= matrix[(k * (n + 1)) + k];
   }
 
-
   for (int i = 0; i < n; i++) {
     matrix[(i * (n + 1)) + k] = 0;
   }
