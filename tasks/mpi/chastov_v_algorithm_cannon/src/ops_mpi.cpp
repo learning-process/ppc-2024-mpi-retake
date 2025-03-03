@@ -5,10 +5,44 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
+#include <boost/mpi/collectives/scatter.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/request.hpp>
 #include <cmath>
+#include <cstddef>
 #include <vector>
+
+bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::PrepareComputation(boost::mpi::communicator& sub_world,
+                                                                     int& submatrix_size, int& block_size) {
+  int rank = world_.rank();
+  int size = world_.size();
+
+  boost::mpi::broadcast(world_, matrix_size_, 0);
+  boost::mpi::broadcast(world_, total_elements_, 0);
+
+  block_size = std::floor(std::sqrt(size));
+  while (block_size > 0) {
+    if (matrix_size_ % block_size == 0) {
+      break;
+    };
+    --block_size;
+  }
+  block_size = std::max(block_size, 1);
+  submatrix_size = static_cast<int>(matrix_size_ / block_size);
+
+  int group_color = (rank < block_size * block_size) ? 1 : MPI_UNDEFINED;
+  MPI_Comm sub_comm = MPI_COMM_NULL;
+  MPI_Comm_split(world_, group_color, rank, &sub_comm);
+
+  if (group_color == MPI_UNDEFINED) {
+    return false;
+  };
+
+  sub_world = boost::mpi::communicator(sub_comm, boost::mpi::comm_take_ownership);
+  return true;
+}
 
 bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
@@ -49,40 +83,17 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::ValidationImpl() {
   return true;
 }
 
+// NOLINTBEGIN
 bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
-  int rank = world_.rank();
-  int size = world_.size();
+  boost::mpi::communicator sub_world;
+  int block_size, submatrix_size;
 
-  boost::mpi::broadcast(world_, matrix_size_, 0);
-  boost::mpi::broadcast(world_, total_elements_, 0);
-
-  int block_size = std::floor(std::sqrt(size));
-  while (block_size > 0) {
-    if (matrix_size_ % block_size == 0) {
-      break;
-    }
-    --block_size;
-  }
-  block_size = std::max(block_size, 1);
-  int submatrix_size = static_cast<int>(matrix_size_ / block_size);
-
-  int group_color = 0;
-  if (rank < block_size * block_size) {
-    group_color = 1;
-  } else {
-    group_color = MPI_UNDEFINED;
-  }
-
-  MPI_Comm sub_comm = MPI_COMM_NULL;
-  MPI_Comm_split(world_, group_color, rank, &sub_comm);
-
-  if (group_color == MPI_UNDEFINED) {
+  if (!PrepareComputation(sub_world, submatrix_size, block_size)) {
     return true;
   }
 
-  boost::mpi::communicator sub_world(sub_comm, boost::mpi::comm_take_ownership);
-  rank = sub_world.rank();
-  size = sub_world.size();
+  int rank = sub_world.rank();
+  int size = sub_world.size();
 
   std::vector<double> temp_vec_1(total_elements_);
   std::vector<double> temp_vec_2(total_elements_);
@@ -114,8 +125,10 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
   std::vector<double> local_c(submatrix_size * submatrix_size, 0.0);
   std::vector<double> collected_vec(total_elements_);
 
-  boost::mpi::scatter(sub_world, temp_vec_1, block_1.data(), submatrix_size * submatrix_size, 0);
-  boost::mpi::scatter(sub_world, temp_vec_2, block_2.data(), submatrix_size * submatrix_size, 0);
+  auto block_data_size = static_cast<std::size_t>(submatrix_size) * static_cast<std::size_t>(submatrix_size);
+
+  boost::mpi::scatter(sub_world, temp_vec_1, block_1.data(), static_cast<int>(block_data_size), 0);
+  boost::mpi::scatter(sub_world, temp_vec_2, block_2.data(), static_cast<int>(block_data_size), 0);
 
   int row = rank / block_size;
   int col = rank % block_size;
@@ -139,12 +152,15 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
     boost::mpi::request recv_req;
 
     std::vector<double> buffer_1(block_1.size());
-    send_req = sub_world.isend(send_vec_1_rank, 0, block_1.data(), block_1.size());
-    recv_req = sub_world.irecv(recv_vec_1_rank, 0, buffer_1.data(), buffer_1.size());
+    send_req = sub_world.isend(send_vec_1_rank, 0, block_1.data(), static_cast<int>(block_data_size));
+    recv_req = sub_world.irecv(recv_vec_1_rank, 0, buffer_1.data(), static_cast<int>(block_data_size));
 
-    // Ожидание завершения операций
-    send_req.wait();
-    recv_req.wait();
+    if (send_req.active() && recv_req.active()) {
+      send_req.wait();
+      recv_req.wait();
+    } else {
+      return false;
+    }
 
     block_1 = buffer_1;
   }
@@ -154,12 +170,15 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
     boost::mpi::request recv_req_2;
 
     std::vector<double> buffer_2(block_2.size());
-    send_req_2 = sub_world.isend(send_vec_2_rank, 1, block_2.data(), block_2.size());
-    recv_req_2 = sub_world.irecv(recv_vec_2_rank, 1, buffer_2.data(), buffer_2.size());
+    send_req_2 = sub_world.isend(send_vec_2_rank, 1, block_2.data(), static_cast<int>(block_data_size));
+    recv_req_2 = sub_world.irecv(recv_vec_2_rank, 1, buffer_2.data(), static_cast<int>(block_data_size));
 
-    // Ожидание завершения операций
-    send_req_2.wait();
-    recv_req_2.wait();
+    if (send_req_2.active() && recv_req_2.active()) {
+      send_req_2.wait();
+      recv_req_2.wait();
+    } else {
+      return false;
+    }
 
     block_2 = buffer_2;
   }
@@ -180,18 +199,21 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
     boost::mpi::request recv_req_2;
 
     std::vector<double> buffer_1(block_1.size());
-    send_req_1 = sub_world.isend(send_vec_1_rank, 0, block_1.data(), block_1.size());
-    recv_req_1 = sub_world.irecv(recv_vec_1_rank, 0, buffer_1.data(), buffer_1.size());
+    send_req_1 = sub_world.isend(send_vec_1_rank, 0, block_1.data(), static_cast<int>(block_data_size));
+    recv_req_1 = sub_world.irecv(recv_vec_1_rank, 0, buffer_1.data(), static_cast<int>(block_data_size));
 
     std::vector<double> buffer_2(block_2.size());
-    send_req_2 = sub_world.isend(send_vec_2_rank, 1, block_2.data(), block_2.size());
-    recv_req_2 = sub_world.irecv(recv_vec_2_rank, 1, buffer_2.data(), buffer_2.size());
+    send_req_2 = sub_world.isend(send_vec_2_rank, 1, block_2.data(), static_cast<int>(block_data_size));
+    recv_req_2 = sub_world.irecv(recv_vec_2_rank, 1, buffer_2.data(), static_cast<int>(block_data_size));
 
-    // Ожидание завершения операций
-    send_req_1.wait();
-    recv_req_1.wait();
-    send_req_2.wait();
-    recv_req_2.wait();
+    if (send_req_1.active() && recv_req_1.active() && send_req_2.active() && recv_req_2.active()) {
+      send_req_1.wait();
+      recv_req_1.wait();
+      send_req_2.wait();
+      recv_req_2.wait();
+    } else {
+      return false;
+    }
 
     block_1 = buffer_1;
     block_2 = buffer_2;
@@ -205,7 +227,9 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
     }
   }
 
-  boost::mpi::gather(sub_world, local_c.data(), local_c.size(), collected_vec, 0);
+  auto local_c_size = local_c.size();
+  boost::mpi::gather(sub_world, local_c.data(), static_cast<int>(local_c_size), collected_vec, 0);
+
   if (rank == 0) {
     for (int block_row = 0; block_row < block_size; ++block_row) {
       for (int block_col = 0; block_col < block_size; ++block_col) {
@@ -225,6 +249,7 @@ bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::RunImpl() {
   }
   return true;
 }
+// NOLINTEND
 
 bool chastov_v_algorithm_cannon_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
