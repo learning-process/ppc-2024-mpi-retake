@@ -52,11 +52,11 @@ int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_O
       if (rank + step < size) {
         MPI_Recv(recvbuf, count, datatype, rank + step, 0, comm, MPI_STATUS_IGNORE);
         if (datatype == MPI_INT) {
-          apply_operation<int>(recvbuf, sendbuf, count, op);
+          ApplyOperation<int>(recvbuf, sendbuf, count, op);
         } else if (datatype == MPI_FLOAT) {
-          apply_operation<float>(recvbuf, sendbuf, count, op);
+          ApplyOperation<float>(recvbuf, sendbuf, count, op);
         } else if (datatype == MPI_DOUBLE) {
-          apply_operation<double>(recvbuf, sendbuf, count, op);
+          ApplyOperation<double>(recvbuf, sendbuf, count, op);
         } else {
           fprintf(stderr, "Unsupported datatype\n");
           MPI_Abort(MPI_COMM_WORLD, MPI_ERR_TYPE);
@@ -144,7 +144,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   T global_sum = local_sum;
 
   // Defining the MPI type depending on the type T
-  MPI_Datatype mpi_type = nullptr;
+  MPI_Datatype mpi_type;
   if constexpr (std::is_same_v<T, int>) {
     mpi_type = MPI_INT;
   } else if constexpr (std::is_same_v<T, float>) {
