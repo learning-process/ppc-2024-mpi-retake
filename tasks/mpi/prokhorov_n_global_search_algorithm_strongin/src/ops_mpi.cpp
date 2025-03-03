@@ -3,7 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <chrono>
 #include <cmath>
 #include <functional>
 #include <vector>
