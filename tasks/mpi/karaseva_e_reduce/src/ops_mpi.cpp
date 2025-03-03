@@ -3,7 +3,6 @@
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 #include <mpi.h>
-#include <stdexcept>
 
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
@@ -11,6 +10,7 @@
 #include <cstring>
 #include <iostream>
 #include <numeric>
+#include <stdexcept>
 #include <vector>
 
 namespace mpi = boost::mpi;
