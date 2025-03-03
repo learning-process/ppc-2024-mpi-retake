@@ -30,7 +30,6 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
                task_data->outputs_count[0] == static_cast<size_t>(total_size_);
   }
 
-  int is_valid = 0;
   MPI_Bcast(&is_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   MPI_Bcast(&total_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return is_valid;
