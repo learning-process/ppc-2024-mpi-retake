@@ -128,7 +128,7 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
   } else {
     int j = static_cast<int>(dv);
     for (int k = 1; k < world_.size(); k++) {
-      int recv_size = static_cast<int>((static_cast<int>(k) < ost) ? dv : osn_dv);
+      int recv_size = static_cast<int>(k < static_cast<int>(ost) ? dv : osn_dv);
       world_.recv(k, 0, &output_[j], recv_size);
       j += recv_size;
     }
