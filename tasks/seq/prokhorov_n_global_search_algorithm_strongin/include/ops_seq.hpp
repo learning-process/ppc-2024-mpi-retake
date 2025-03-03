@@ -9,7 +9,8 @@ namespace prokhorov_n_global_search_algorithm_strongin_seq {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data, std::function<double(double)> func)
+      : Task(std::move(task_data)), f_(std::move(func)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

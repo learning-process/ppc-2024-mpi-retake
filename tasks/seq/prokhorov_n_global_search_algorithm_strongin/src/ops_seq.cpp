@@ -14,8 +14,6 @@ bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PrePr
   b_ = reinterpret_cast<double*>(task_data->inputs[1])[0];
   epsilon_ = reinterpret_cast<double*>(task_data->inputs[2])[0];
 
-  f_ = [](double x) { return x * x; };
-
   result_ = 0.0;
   return true;
 }

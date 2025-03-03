@@ -28,8 +28,9 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
   task_data_par->outputs_count.emplace_back(global_result.size());
 
-  auto test_mpi_task_parallel =
-      std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(task_data_par);
+  auto quadratic_function = [](double x) { return x * x; };
+  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(
+      task_data_par, quadratic_function);
   ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
   test_mpi_task_parallel->PreProcessing();
   test_mpi_task_parallel->Run();
@@ -72,8 +73,9 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
   task_data_par->outputs_count.emplace_back(global_result.size());
 
-  auto test_mpi_task_parallel =
-      std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(task_data_par);
+  auto quadratic_function = [](double x) { return x * x; };
+  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(
+      task_data_par, quadratic_function);
   ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
   test_mpi_task_parallel->PreProcessing();
   test_mpi_task_parallel->Run();

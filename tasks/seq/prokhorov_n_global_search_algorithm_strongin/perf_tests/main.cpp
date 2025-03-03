@@ -26,8 +26,10 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, test_pipeline_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  auto test_task_sequential =
-      std::make_shared<prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential>(task_data_seq);
+  auto quadratic_function = [](double x) { return x * x; };
+
+  auto test_task_sequential = std::make_shared<prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential>(
+      task_data_seq, quadratic_function);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -72,8 +74,10 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, test_task_run) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
   task_data_seq->outputs_count.emplace_back(out.size());
 
-  auto test_task_sequential =
-      std::make_shared<prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential>(task_data_seq);
+  auto quadratic_function = [](double x) { return x * x; };
+
+  auto test_task_sequential = std::make_shared<prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential>(
+      task_data_seq, quadratic_function);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;

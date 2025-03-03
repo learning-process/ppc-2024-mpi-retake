@@ -11,7 +11,8 @@ namespace prokhorov_n_global_search_algorithm_strongin_mpi {
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  explicit TestTaskSequential(ppc::core::TaskDataPtr task_data, std::function<double(double)> func)
+      : Task(std::move(task_data)), f_(std::move(func)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -29,7 +30,8 @@ class TestTaskSequential : public ppc::core::Task {
 
 class TestTaskMPI : public ppc::core::Task {
  public:
-  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data, std::function<double(double)> func)
+      : Task(std::move(task_data)), f_(std::move(func)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;

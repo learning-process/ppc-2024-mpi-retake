@@ -6,7 +6,6 @@
 #include <chrono>
 #include <cmath>
 #include <functional>
-#include <thread>
 #include <vector>
 
 namespace prokhorov_n_global_search_algorithm_strongin_mpi {
@@ -15,8 +14,6 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::PrePr
   a_ = reinterpret_cast<double*>(task_data->inputs[0])[0];
   b_ = reinterpret_cast<double*>(task_data->inputs[1])[0];
   epsilon_ = reinterpret_cast<double*>(task_data->inputs[2])[0];
-
-  f_ = [](double x) { return x * x; };
 
   result_ = 0.0;
   return true;
@@ -29,7 +26,6 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::Valid
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::RunImpl() {
   result_ = StronginAlgorithm();
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
   return true;
 }
 
@@ -75,8 +71,6 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PreProcessin
     epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
   }
 
-  f_ = [](double x) { return x * x; };
-
   return true;
 }
 
@@ -93,7 +87,6 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::RunImpl() {
   } else {
     result_ = StronginAlgorithmParallel();
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
   return true;
 }
 
