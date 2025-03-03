@@ -144,7 +144,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), static_cast<T>(0));
   std::cout << "Rank " << rank << " - Local sum: " << local_sum << "\n";
 
-  T global_sum = local_sum;
+  T global_sum = 0;
 
   MPI_Datatype mpi_type;
   if constexpr (std::is_same_v<T, int>) {
@@ -157,7 +157,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     throw std::runtime_error("Unsupported type for MPI operation");
   }
 
-  Reduce<T>(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, world);
+  MPI_Reduce(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, world);
 
   boost::mpi::broadcast(world, global_sum, 0);
 
