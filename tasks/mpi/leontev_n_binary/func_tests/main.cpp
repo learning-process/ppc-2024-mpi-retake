@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstddef>
@@ -41,30 +42,36 @@ bool CompNotZero(uint32_t a, uint32_t b) {
   return a < b;
 }
 
+void LoopProcess(size_t row, size_t col, const std::vector<uint8_t>& image, size_t rows, size_t cols,
+                 std::vector<uint32_t>& labels, uint32_t& cur_label,
+                 std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+  if (image[(row * cols) + col] == 0) {
+    return;
+  }
+  uint32_t label_b = (col > 0) ? labels[(row * cols) + col - 1] : 0;
+  uint32_t label_c = (row > 0) ? labels[((row - 1) * cols) + col] : 0;
+  uint32_t label_d = (row > 0 && col > 0) ? labels[((row - 1) * cols) + col - 1] : 0;
+
+  if (label_b == 0 && label_c == 0 && label_d == 0) {
+    labels[(row * cols) + col] = cur_label++;
+  } else {
+    uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
+    labels[(row * cols) + col] = min_label;
+    for (uint32_t label : {label_b, label_c, label_d}) {
+      if (label != 0 && label != min_label) {
+        label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+      }
+    }
+  }
+}
+
 std::vector<uint32_t> RunSeq(const std::vector<uint8_t>& image, size_t rows, size_t cols) {
   std::vector<uint32_t> labels(rows * cols, 0);
   std::unordered_map<uint32_t, uint32_t> label_equivalences;
   uint32_t cur_label = 1;
   for (size_t row = 0; row < rows; ++row) {
     for (size_t col = 0; col < cols; ++col) {
-      if (image[(row * cols) + col] == 0) {
-        continue;
-      }
-      uint32_t label_b = (col > 0) ? labels[(row * cols) + col - 1] : 0;
-      uint32_t label_c = (row > 0) ? labels[((row - 1) * cols) + col] : 0;
-      uint32_t label_d = (row > 0 && col > 0) ? labels[((row - 1) * cols) + col - 1] : 0;
-
-      if (label_b == 0 && label_c == 0 && label_d == 0) {
-        labels[(row * cols) + col] = cur_label++;
-      } else {
-        uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-        labels[(row * cols) + col] = min_label;
-        for (uint32_t label : {label_b, label_c, label_d}) {
-          if (label != 0 && label != min_label) {
-            label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
-          }
-        }
-      }
+      LoopProcess(row, col, image, rows, cols, labels, cur_label, label_equivalences);
     }
   }
   for (auto& label : labels) {
