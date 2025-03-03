@@ -12,7 +12,7 @@
 
 namespace {
 
-// Utility function to generate random data
+// Utility function to generate random dat
 template <typename T>
 std::vector<T> GetRandom(int size) {
   std::random_device dev;
