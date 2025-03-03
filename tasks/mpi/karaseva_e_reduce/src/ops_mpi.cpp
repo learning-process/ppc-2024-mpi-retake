@@ -157,10 +157,9 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     throw std::runtime_error("Unsupported type for MPI operation");
   }
 
-  Reduce<T>(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, MPI_COMM_WORLD);
+  Reduce<T>(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, world);
 
-  // Broadcast
-  MPI_Bcast(&global_sum, 1, mpi_type, 0, MPI_COMM_WORLD);
+  boost::mpi::broadcast(world, global_sum, 0);
 
   result_ = global_sum;
 
@@ -176,8 +175,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
 
   std::cout << "Rank " << rank << " - PostProcessingImpl started\n";
 
-  // Broadcast the result to all processes
-  MPI_Bcast(&result_, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  boost::mpi::broadcast(world, result_, 0);
 
   // Ensure the output buffer is allocated
   if (task_data->outputs[0] == nullptr) {
