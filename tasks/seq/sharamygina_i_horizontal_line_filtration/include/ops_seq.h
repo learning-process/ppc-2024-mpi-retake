@@ -1,25 +1,22 @@
 #pragma once
-#include <gtest/gtest.h>
 
-#include <limits>
 #include <memory>
-#include <random>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace sharamygina_i_horizontal_line_filtration_seq {
-class horizontal_line_filtration_seq : public ppc::core::Task {
+class HorizontalLineFiltrationSeq : public ppc::core::Task {
  public:
-  explicit horizontal_line_filtration_seq(std::shared_ptr<ppc::core::TaskData> taskData_)
-      : Task(std::move(taskData_)) {}
+  explicit HorizontalLineFiltrationSeq(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
  private:
-  unsigned int gauss[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
+  unsigned int gauss_[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
   std::vector<unsigned int> original_data_;
   std::vector<unsigned int> result_data_;
   int rows_;
