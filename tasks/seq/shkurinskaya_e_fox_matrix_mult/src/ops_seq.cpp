@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <random>
 #include <vector>
-#include <cstring>
 
 #include "seq/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
