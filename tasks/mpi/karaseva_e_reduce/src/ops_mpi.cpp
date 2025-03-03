@@ -149,13 +149,10 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
   Reduce<T>(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, MPI_COMM_WORLD);
 
-  if (rank == 0) {
-    result_ = global_sum;
-    std::cout << "Rank " << rank << " - Global sum after reduction: " << result_ << "\n";
-  }
+  // Broadcast
+  MPI_Bcast(&global_sum, 1, mpi_type, 0, MPI_COMM_WORLD);
 
-  world.barrier();
-  boost::mpi::broadcast(world, result_, 0);
+  result_ = global_sum;
 
   std::cout << "Rank " << rank << " - Final result: " << result_ << "\n";
 
