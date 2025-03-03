@@ -39,6 +39,15 @@ std::vector<unsigned int> GetImage(int rows, int cols) {
   }
   return temporary_im;
 }
+void InitializeTaskData(std::shared_ptr<ppc::core::TaskData>& test_data, int rows, int cols,
+                        std::vector<unsigned int>& received_image) {
+  test_data->inputs_count.emplace_back(rows);
+  test_data->inputs_count.emplace_back(cols);
+
+  received_image.resize(rows * cols);
+  test_data->outputs_count.emplace_back(received_image.size());
+  test_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+}
 }  // namespace
 }  // namespace sharamygina_i_horizontal_line_filtration_seq
 
@@ -47,8 +56,6 @@ TEST(sharamygina_i_horizontal_line_filtration, SampleImageTest) {
   int cols = 4;
 
   std::shared_ptr<ppc::core::TaskData> test_data = std::make_shared<ppc::core::TaskData>();
-  test_data->inputs_count.emplace_back(rows);
-  test_data->inputs_count.emplace_back(cols);
 
   std::vector<unsigned int> received_image;
   std::vector<unsigned int> image = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
@@ -58,10 +65,7 @@ TEST(sharamygina_i_horizontal_line_filtration, SampleImageTest) {
   sharamygina_i_horizontal_line_filtration_seq::ToFiltSeq(image, rows, cols, expected_image_new);
 
   test_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-
-  received_image.resize(rows * cols);
-  test_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
-  test_data->outputs_count.emplace_back(received_image.size());
+  sharamygina_i_horizontal_line_filtration_seq::InitializeTaskData(test_data, rows, cols, received_image);
 
   sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrationSeq test_task(test_data);
   ASSERT_TRUE(test_task.ValidationImpl());

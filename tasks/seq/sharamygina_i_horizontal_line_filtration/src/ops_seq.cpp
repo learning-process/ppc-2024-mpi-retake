@@ -46,10 +46,10 @@ unsigned int sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrat
     for (int j = 0; j < 3; j++) {
       int t_x = x + i - 1;
       int t_y = y + j - 1;
-      if (t_x < 0 || t_x > rows_ - 1) {
+      if (t_x < 0 || t_x > rows - 1) {
         t_x = x;
       }
-      if (t_y < 0 || t_y > cols_ - 1) {
+      if (t_y < 0 || t_y > cols - 1) {
         t_y = y;
       }
       if ((t_x * cols) + t_y >= cols * rows) {

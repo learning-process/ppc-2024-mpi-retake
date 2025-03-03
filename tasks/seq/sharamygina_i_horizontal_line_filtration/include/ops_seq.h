@@ -19,8 +19,8 @@ class HorizontalLineFiltrationSeq : public ppc::core::Task {
   unsigned int gauss_[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
   std::vector<unsigned int> original_data_;
   std::vector<unsigned int> result_data_;
-  unsigned int rows_;
-  unsigned int cols_;
+  int rows_;
+  int cols_;
   unsigned int InputAnotherPixel(const std::vector<unsigned int>& image, int x, int y, int rows, int cols);
 };
 }  // namespace sharamygina_i_horizontal_line_filtration_seq
