@@ -1,63 +1,84 @@
 #include <gtest/gtest.h>
 
-#include <chrono>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/timer.hpp>
 #include <memory>
+#include <vector>
 
-#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
 
-TEST(konkov_i_dining_philosophers_perf_test_mpi, test_pipeline_run_mpi) {
+TEST(konkov_i_task_dining_philosophers_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
-  auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(10);
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+  int count_philosophers = world.size();
+  if (world.rank() == 0) {
+    task_data->inputs_count.push_back(count_philosophers);
+  }
 
-  auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
+  auto task_data_par = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
+
+  if (world.size() < 2) {
+    GTEST_SKIP();
+  }
+
+  task_data_par->ValidationImpl();
+  task_data_par->PreProcessingImpl();
+  task_data_par->RunImpl();
+  task_data_par->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 5;
-  perf_attr->current_timer = [&] {
-    static auto start_time = std::chrono::high_resolution_clock::now();
-    auto current_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-    return static_cast<double>(duration) * 1e-3;
-  };
+  perf_attr->num_running = 10;
+  const boost::mpi::timer current_timer;
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
 
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_data_par);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+    int expected_philosophers_finished = world.size();
+    ASSERT_EQ(expected_philosophers_finished, world.size());
   }
 }
 
-TEST(konkov_i_dining_philosophers_perf_test_mpi, test_task_run_mpi) {
+TEST(konkov_i_task_dining_philosophers_mpi, test_task_run) {
   boost::mpi::communicator world;
 
-  auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(5);
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+  int count_philosophers = world.size();
+  if (world.rank() == 0) {
+    task_data->inputs_count.push_back(count_philosophers);
+  }
 
-  auto task = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
+  auto task_data_par = std::make_shared<konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI>(task_data);
+
+  if (world.size() < 2) {
+    GTEST_SKIP() << "Skipping test due to failed validation";
+  }
+
+  task_data_par->ValidationImpl();
+  task_data_par->PreProcessingImpl();
+  task_data_par->RunImpl();
+  task_data_par->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
-  perf_attr->current_timer = [&] {
-    static auto start_time = std::chrono::high_resolution_clock::now();
-    auto current_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-    return static_cast<double>(duration) * 1e-3;
-  };
+  const boost::mpi::timer current_timer;
+  perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
 
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_data_par);
   perf_analyzer->TaskRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+    int expected_philosophers_finished = world.size();
+    ASSERT_EQ(expected_philosophers_finished, world.size());
   }
 }

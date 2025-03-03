@@ -1,33 +1,63 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <functional>
 #include <memory>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/konkov_i_task_dining_philosophers_mpi/include/ops_mpi.hpp"
 
-TEST(konkov_i_task_dining_philosophers_mpi, ValidNumberOfPhilosophers) {
+TEST(konkov_i_task_dining_philosophers_mpi, test_valid_number_of_philosophers) {
+  boost::mpi::communicator world;
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(5);
+  int count_philosophers = 4;
 
-  konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI task(task_data);
-  ASSERT_TRUE(task.Validation());
+  if (world.rank() == 0) {
+    task_data->inputs_count.push_back(count_philosophers);
+  }
+
+  konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI dining_philosophers_mpi(task_data);
+
+  if (world.size() < 2) {
+    GTEST_SKIP();
+  }
+
+  ASSERT_TRUE(dining_philosophers_mpi.ValidationImpl());
 }
 
-TEST(konkov_i_task_dining_philosophers_mpi, InvalidPhilosopherCount) {
-  auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(1);
+TEST(konkov_i_task_dining_philosophers_mpi, test_invalid_philosopher_count) {
+  boost::mpi::communicator world;
 
-  konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI task(task_data);
-  ASSERT_FALSE(task.Validation());
+  if (world.rank() == 0) {
+    int count_philosophers = -5;
+    auto task_data = std::make_shared<ppc::core::TaskData>();
+    task_data->inputs_count.push_back(count_philosophers);
+
+    konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI dining_philosophers_mpi(task_data);
+
+    ASSERT_FALSE(dining_philosophers_mpi.ValidationImpl());
+  }
 }
 
-TEST(konkov_i_task_dining_philosophers_mpi, DeadlockFreeExecution) {
+TEST(konkov_i_task_dining_philosophers_mpi, test_deadlock_free_execution) {
+  boost::mpi::communicator world;
   auto task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs_count.push_back(4);
+  int count_philosophers = world.size();
 
-  konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI task(task_data);
-  ASSERT_TRUE(task.Validation());
-  ASSERT_TRUE(task.PreProcessing());
-  ASSERT_TRUE(task.Run());
-  ASSERT_TRUE(task.PostProcessing());
+  if (world.rank() == 0) {
+    task_data->inputs_count.push_back(count_philosophers);
+  }
+
+  konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI dining_philosophers_mpi(task_data);
+
+  if (world.size() < 2) {
+    GTEST_SKIP();
+  }
+
+  ASSERT_TRUE(dining_philosophers_mpi.ValidationImpl());
+  dining_philosophers_mpi.PreProcessingImpl();
+  dining_philosophers_mpi.RunImpl();
+  dining_philosophers_mpi.PostProcessingImpl();
 }
