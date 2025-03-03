@@ -39,21 +39,15 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  // Create the task with MPI-specific operations
   karaseva_e_reduce_mpi::TestTaskMPI<int> test_task_mpi(task_data_mpi);
 
-  // Validate inputs
   ASSERT_TRUE(test_task_mpi.ValidationImpl());
-
-  // Run the full pipeline
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  // Calculate the expected result (sum of input vector)
   int expected_result = std::accumulate(in.begin(), in.end(), 0);
 
-  // Check if the result matches the expected value
   EXPECT_EQ(out[0], expected_result);
 }
 
@@ -69,21 +63,15 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  // Create the task with MPI-specific operations
   karaseva_e_reduce_mpi::TestTaskMPI<double> test_task_mpi(task_data_mpi);
 
-  // Validate inputs
   ASSERT_TRUE(test_task_mpi.ValidationImpl());
-
-  // Run the full pipeline
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  // Calculate the expected result (sum of input vector)
   double expected_result = std::accumulate(in.begin(), in.end(), 0.0);
 
-  // Check if the result matches the expected value
   EXPECT_DOUBLE_EQ(out[0], expected_result);
 }
 
@@ -99,20 +87,14 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
-  // Create the task with MPI-specific operations
   karaseva_e_reduce_mpi::TestTaskMPI<float> test_task_mpi(task_data_mpi);
 
-  // Validate inputs
   ASSERT_TRUE(test_task_mpi.ValidationImpl());
-
-  // Run the full pipeline
   test_task_mpi.PreProcessingImpl();
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  // Calculate the expected result (sum of input vector)
   float expected_result = std::accumulate(in.begin(), in.end(), 0.0F);
 
-  // Check if the result matches the expected value
   EXPECT_FLOAT_EQ(out[0], expected_result);
 }

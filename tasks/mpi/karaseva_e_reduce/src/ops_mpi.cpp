@@ -5,10 +5,67 @@
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <numeric>
 #include <vector>
 
 namespace mpi = boost::mpi;
+
+template <typename T>
+void apply_operation(void *inbuf, void *inoutbuf, int count, MPI_Op op) {
+  auto *in = reinterpret_cast<T *>(inbuf);
+  auto *inout = reinterpret_cast<T *>(inoutbuf);
+  for (int i = 0; i < count; i++) {
+    if (op == MPI_SUM) {
+      inout[i] += in[i];
+    } else if (op == MPI_MAX) {
+      inout[i] = (inout[i] > in[i]) ? inout[i] : in[i];
+    } else if (op == MPI_MIN) {
+      inout[i] = (inout[i] < in[i]) ? inout[i] : in[i];
+    } else {
+      throw "Unsupported operation\n";
+    }
+  }
+}
+
+template <typename T>
+int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) {
+  int rank = 0;
+  int size = 0;
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &size);
+
+  int typesize{};
+  MPI_Type_size(datatype, &typesize);
+  memcpy(recvbuf, sendbuf, count * typesize);
+
+  int step = 1;
+  while (step < size) {
+    if (rank % (2 * step) == 0) {
+      if (rank + step < size) {
+        MPI_Recv(recvbuf, count, datatype, rank + step, 0, comm, MPI_STATUS_IGNORE);
+        if (datatype == MPI_INT) {
+          apply_operation<int>(recvbuf, sendbuf, count, op);
+        } else if (datatype == MPI_FLOAT) {
+          apply_operation<float>(recvbuf, sendbuf, count, op);
+        } else if (datatype == MPI_DOUBLE) {
+          apply_operation<double>(recvbuf, sendbuf, count, op);
+        } else {
+          fprintf(stderr, "Unsupported datatype\n");
+          MPI_Abort(MPI_COMM_WORLD, MPI_ERR_TYPE);
+        }
+        memcpy(recvbuf, sendbuf, count * typesize);
+      }
+    } else {
+      int dest = rank - step;
+      MPI_Send(recvbuf, count, datatype, dest, 0, comm);
+      break;
+    }
+    step *= 2;
+  }
+
+  return MPI_SUCCESS;
+}
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
@@ -16,11 +73,19 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   int rank = world.rank();
   int size = world.size();
 
+  std::cout << "Rank " << rank << " - PreProcessingImpl started\n";
+
   if (rank == 0) {
     input_size_ = task_data->inputs_count[0];
     input_.resize(input_size_);
-    auto* input_data = reinterpret_cast<T*>(task_data->inputs[0]);
+    auto *input_data = reinterpret_cast<T *>(task_data->inputs[0]);
     std::memcpy(input_.data(), input_data, input_size_ * sizeof(T));
+
+    std::cout << "Rank " << rank << " - Input data: \n";
+    for (int i = 0; i < input_size_; ++i) {
+      std::cout << input_[i] << " ";
+    }
+    std::cout << "\n";
 
     for (int proc = 1; proc < size; proc++) {
       world.send(proc, 0, input_size_);
@@ -42,11 +107,19 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
     world.recv(0, 0, local_input_.data(), local_size_);
   }
 
+  std::cout << "Rank " << rank << " - Local input: \n";
+  for (const auto &val : local_input_) {
+    std::cout << val << " ";
+  }
+  std::cout << "\n";
+
   return true;
 }
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::ValidationImpl() {
+  mpi::communicator world;
+  std::cout << "Rank " << world.rank() << " - ValidationImpl started\n";
   return task_data->inputs_count[0] > 0 && task_data->outputs_count[0] == 1;
 }
 
@@ -54,38 +127,24 @@ template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
   mpi::communicator world;
   int rank = world.rank();
-  int size = world.size();
+
+  std::cout << "Rank " << rank << " - RunImpl started\n";
 
   T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), static_cast<T>(0));
-  T global_sum = local_sum;
-  int step = 1;
+  std::cout << "Rank " << rank << " - Local sum: " << local_sum << "\n";
 
-  while (step < size) {
-    if (rank % (2 * step) == 0) {
-      if (rank + step < size) {
-        T recv_value;
-        world.recv(rank + step, 0, recv_value);
-        global_sum += recv_value;
-      }
-    } else {
-      int target = rank - step;
-      world.send(target, 0, global_sum);
-      return true;
-    }
-    step *= 2;
-  }
+  T global_sum = local_sum;
+
+  Reduce<T>(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {
     result_ = global_sum;
+    std::cout << "Rank " << rank << " - Global sum after reduction: " << result_ << "\n";
   }
 
-  for (int proc = 1; proc < size; proc++) {
-    world.send(proc, 0, result_);
-  }
+  MPI_Bcast(&result_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  if (rank != 0) {
-    world.recv(0, 0, result_);
-  }
+  std::cout << "Rank " << rank << " - Final result: " << result_ << "\n";
 
   return true;
 }
@@ -95,13 +154,18 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
   mpi::communicator world;
   int rank = world.rank();
 
+  std::cout << "Rank " << rank << " - PostProcessingImpl started\n";
+
   if (rank == 0) {
     if (task_data->outputs[0] == nullptr) {
       task_data->outputs[0] = new uint8_t[sizeof(T)];
     }
-    auto* output_ptr = reinterpret_cast<T*>(task_data->outputs[0]);
+    auto *output_ptr = reinterpret_cast<T *>(task_data->outputs[0]);
     *output_ptr = result_;
+
+    std::cout << "Rank " << rank << " - Output value: " << *output_ptr << "\n";
   }
+
   return true;
 }
 
