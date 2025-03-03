@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <random>
 #include <vector>
+#include <cstring>
 
 #include "seq/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
@@ -28,10 +29,9 @@ bool shkurinskaya_e_fox_mat_mul_seq::FoxMatMulSequential::PreProcessingImpl() {
   inputB.resize(matrix_size * matrix_size);
   output.resize(matrix_size * matrix_size);
 
-  double *it1 = (double *)(task_data->inputs[0]);
-  double *it2 = (double *)(task_data->inputs[1]);
-  std::copy(it1, it1 + matrix_size * matrix_size, inputA.data());
-  std::copy(it2, it2 + matrix_size * matrix_size, inputB.data());
+  std::memcpy(inputA.data(), task_data->inputs[0], matrix_size * matrix_size * sizeof(double));
+  std::memcpy(inputB.data(), task_data->inputs[1], matrix_size * matrix_size * sizeof(double));
+
   return true;
 }
 
@@ -52,7 +52,6 @@ bool shkurinskaya_e_fox_mat_mul_seq::FoxMatMulSequential::RunImpl() {
 }
 
 bool shkurinskaya_e_fox_mat_mul_seq::FoxMatMulSequential::PostProcessingImpl() {
-  double *it1 = (double *)(task_data->outputs[0]);
-  std::copy(output.begin(), output.end(), it1);
+  std::memcpy(task_data->outputs[0], output.data(), matrix_size * matrix_size * sizeof(double));
   return true;
 }
