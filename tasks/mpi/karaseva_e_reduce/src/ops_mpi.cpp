@@ -48,28 +48,18 @@ bool TestTaskMPI<T>::PreProcessingImpl() {
 
     int offset = 0;
     for (int proc = 0; proc < size; ++proc) {
-      if (proc == root) {
-        if (offset + counts[proc] > input_size_) {
-          throw std::runtime_error("Invalid chunk size for root");
-        }
+      if (proc == rank) {
         local_input_.assign(input_.begin() + offset, input_.begin() + offset + counts[proc]);
       } else {
         MPI_Send(&counts[proc], 1, MPI_INT, proc, 0, MPI_COMM_WORLD);
-        if (counts[proc] > 0) {
-          MPI_Send(input_.data() + offset, counts[proc], mpi_type, proc, 0, MPI_COMM_WORLD);
-        }
+        MPI_Send(input_.data() + offset, counts[proc], mpi_type, proc, 0, MPI_COMM_WORLD);
       }
       offset += counts[proc];
     }
   } else {
     MPI_Recv(&local_size, 1, MPI_INT, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    if (local_size < 0) {
-      throw std::runtime_error("Received invalid local size");
-    }
     local_input_.resize(local_size);
-    if (local_size > 0) {
-      MPI_Recv(local_input_.data(), local_size, mpi_type, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    }
+    MPI_Recv(local_input_.data(), local_size, mpi_type, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   return true;
@@ -86,33 +76,28 @@ bool TestTaskMPI<T>::RunImpl() {
   T local_sum = std::accumulate(local_input_.begin(), local_input_.end(), T{0});
   T result = local_sum;
 
-  int virtual_rank = (rank - root + size) % size;
-  int mask = 1;
-
-  while (mask < size) {
-    int partner_virtual = virtual_rank ^ mask;
-    if (partner_virtual < size) {
-      int partner_real = (partner_virtual + root) % size;
-
-      if (virtual_rank < partner_virtual) {
+  int step = 1;
+  while (step < size) {
+    int distance = (rank - root + size) % size;
+    if (distance % (2 * step) == 0) {
+      int partner_rank = rank + step;
+      if (partner_rank >= size) {
+        partner_rank -= size;
+      }
+      if ((distance / step) % 2 == 0) {
         T recv_data;
-        MPI_Recv(&recv_data, 1, mpi_type, partner_real, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&recv_data, 1, mpi_type, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         result += recv_data;
       } else {
-        MPI_Send(&result, 1, mpi_type, partner_real, 0, MPI_COMM_WORLD);
+        MPI_Send(&result, 1, mpi_type, partner_rank, 0, MPI_COMM_WORLD);
         break;
       }
     }
-    mask <<= 1;
+    step *= 2;
   }
 
   if (rank == root) {
-    if (virtual_rank != 0) {
-      MPI_Recv(&result, 1, mpi_type, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    }
     result_ = result;
-  } else if (virtual_rank == 0) {
-    MPI_Send(&result, 1, mpi_type, root, 0, MPI_COMM_WORLD);
   }
 
   return true;
