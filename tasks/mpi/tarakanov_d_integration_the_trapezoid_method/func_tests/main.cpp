@@ -3,6 +3,8 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
+#include <cstdlib>
+#include <ctime>
 #include <memory>
 
 #include "core/task/include/task.hpp"
@@ -83,4 +85,20 @@ TEST(tarakanov_d_trapezoid_method_mpi, PostProcessingCheck) {
     bool flag = output == 0.0;
     EXPECT_FALSE(flag);
   }
+}
+
+TEST(tarakanov_d_trapezoid_method_mpi, RandomDataCheck) {
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));
+  auto a = static_cast<double>((std::rand() % 10000) + 1);
+  auto b = a + static_cast<double>((std::rand() % 100) + 1);
+  auto h = static_cast<double>(std::rand() % 10) / 10;
+  double res = 0.0;
+  auto data = CreateTaskData(&a, &b, &h, &res);
+
+  IntegrationTheTrapezoidMethodMPI task(data);
+
+  EXPECT_TRUE(task.ValidationImpl());
+  EXPECT_TRUE(task.PreProcessingImpl());
+  EXPECT_TRUE(task.RunImpl());
+  EXPECT_TRUE(task.PostProcessingImpl());
 }
