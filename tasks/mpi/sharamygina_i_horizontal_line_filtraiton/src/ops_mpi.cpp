@@ -2,17 +2,17 @@
 
 #include <mpi.h>
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstdlib>
-#include <ranges>
 #include <vector>
 
 bool sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    rows_ = task_data->inputs_count[0];
-    cols_ = task_data->inputs_count[1];
+    rows_ = static_cast<int>(task_data->inputs_count[0]);
+    cols_ = static_cast<int>(task_data->inputs_count[1]);
 
     auto* input_buffer = reinterpret_cast<unsigned int*>(task_data->inputs[0]);
     original_data_.assign(input_buffer, input_buffer + (rows_ * cols_));
@@ -44,15 +44,15 @@ bool sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
   std::vector<unsigned int> temporary_image;
   std::vector<unsigned int> local_data;
 
-  prepareTemporaryImage(myrank, count_of_proc, temporary_image);
-  receiveData(myrank, count_of_proc, temporary_image);
-  processLocalData(myrank, count_of_proc, temporary_image, local_data);
-  sendData(myrank, count_of_proc, local_data);
+  PrepareTemporaryImage(myrank, count_of_proc, temporary_image);
+  ReceiveData(myrank, count_of_proc, temporary_image);
+  ProcessLocalData(myrank, count_of_proc, temporary_image, local_data);
+  SendData(myrank, count_of_proc, local_data);
 
   return true;
 }
 
-void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::prepareTemporaryImage(
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::PrepareTemporaryImage(
     int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image) {
   int block_on_proc = rows_ / count_of_proc;
   int remainder = rows_ % count_of_proc;
@@ -63,11 +63,11 @@ void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
       temporary_image[i] = original_data_[i];
     }
   } else {
-    temporary_image.resize((block_on_proc + 2) * cols_);  // Prepare size for non-root processes
+    temporary_image.resize((block_on_proc + 2) * cols_);
   }
 }
 
-void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::receiveData(
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::ReceiveData(
     int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image) {
   MPI_Status status;
   int block_on_proc = rows_ / count_of_proc;
@@ -88,7 +88,7 @@ void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
   }
 }
 
-void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::processLocalData(
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::ProcessLocalData(
     int myrank, int count_of_proc, const std::vector<unsigned int>& temporary_image,
     std::vector<unsigned int>& local_data) {
   int block_on_proc = rows_ / count_of_proc;
@@ -98,14 +98,14 @@ void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
 
   if (myrank == count_of_proc - 1 && count_of_proc != 1) {
     for (int i = 1; i < block_on_proc; i++) {
-      for (int j = 0; j < static_cast<int>(cols_); j++) {
+      for (int j = 0; j < cols_; j++) {
         local_data[((i - 1) * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
       }
     }
   } else {
     if (myrank != 0) {
       for (int i = 1; i < block_on_proc + 1; i++) {
-        for (int j = 0; j < static_cast<int>(cols_); j++) {
+        for (int j = 0; j < cols_; j++) {
           local_data[((i - 1) * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
         }
       }
@@ -127,17 +127,15 @@ void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
   }
 }
 
-void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::sendData(
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::SendData(
     int myrank, int count_of_proc, const std::vector<unsigned int>& local_data) {
   MPI_Status status;
   int block_on_proc = rows_ / count_of_proc;
   int remainder = rows_ % count_of_proc;
 
   if (myrank != 0) {
-    // Отправляем локальные данные обратно на главный процесс
     MPI_Send(local_data.data(), block_on_proc * cols_, MPI_UNSIGNED, 0, 0, MPI_COMM_WORLD);
   } else {
-    // Получаем данные от всех процессов
     for (int i = 1; i < count_of_proc; i++) {
       MPI_Recv(result_data_.data() + ((block_on_proc + remainder) * cols_) + ((i - 1) * block_on_proc * cols_),
                block_on_proc * cols_, MPI_UNSIGNED, i, 0, MPI_COMM_WORLD, &status);

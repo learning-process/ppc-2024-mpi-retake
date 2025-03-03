@@ -24,11 +24,11 @@ class HorizontalLineFiltrationMpi : public ppc::core::Task {
   int rows_;
   int cols_;
   unsigned int InputAnotherPixel(const std::vector<unsigned int>& image, int x, int y, int rows, int cols);
-  void sendData(int myrank, int count_of_proc, const std::vector<unsigned int>& local_data);
-  void processLocalData(int myrank, int count_of_proc, const std::vector<unsigned int>& temporary_image,
+  void SendData(int myrank, int count_of_proc, const std::vector<unsigned int>& local_data);
+  void ProcessLocalData(int myrank, int count_of_proc, const std::vector<unsigned int>& temporary_image,
                         std::vector<unsigned int>& local_data);
-  void receiveData(int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image);
-  void prepareTemporaryImage(int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image);
+  void ReceiveData(int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image);
+  void PrepareTemporaryImage(int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image);
   boost::mpi::communicator world_;
 };
 }  // namespace sharamygina_i_horizontal_line_filtration_mpi
