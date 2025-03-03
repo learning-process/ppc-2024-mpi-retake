@@ -4,8 +4,8 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <vector>
+#include <cstring>
 
 using namespace komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq;
 

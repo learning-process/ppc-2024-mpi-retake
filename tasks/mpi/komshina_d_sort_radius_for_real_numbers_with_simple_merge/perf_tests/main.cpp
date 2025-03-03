@@ -5,8 +5,8 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
-#include <memory>
 #include <vector>
+#include <memory>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
