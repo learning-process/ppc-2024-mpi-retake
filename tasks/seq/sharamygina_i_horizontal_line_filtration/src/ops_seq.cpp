@@ -1,11 +1,11 @@
 #include "seq/sharamygina_i_horizontal_line_filtration/include/ops_seq.h"
 
-#include <ranges>
+#include <algorithm>
 #include <vector>
 
 bool sharamygina_i_horizontal_line_filtration_seq::HorizontalLineFiltrationSeq::PreProcessingImpl() {
-  rows_ = task_data->inputs_count[0];
-  cols_ = task_data->inputs_count[1];
+  rows_ = static_cast<int>(task_data->inputs_count[0]);
+  cols_ = static_cast<int>(task_data->inputs_count[1]);
 
   auto* input_buffer = reinterpret_cast<unsigned int*>(task_data->inputs[0]);
   original_data_.assign(input_buffer, input_buffer + (rows_ * cols_));

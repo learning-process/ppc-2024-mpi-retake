@@ -13,15 +13,15 @@
 
 namespace sharamygina_i_horizontal_line_filtration_seq {
 namespace {
-std::vector<unsigned int> GetImage(int kRows, int kCols) {
-  std::vector<unsigned int> temporary_im(kRows * kCols);
+std::vector<unsigned int> GetImage(int k_rows, int k_cols) {
+  std::vector<unsigned int> temporary_im(k_rows * k_cols);
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
 
-  for (int i = 0; i < kRows; i++) {
-    for (int j = 0; j < kCols; j++) {
-      temporary_im[(i * kCols) + j] = dist(gen);
+  for (int i = 0; i < k_rows; i++) {
+    for (int j = 0; j < k_cols; j++) {
+      temporary_im[(i * k_cols) + j] = dist(gen);
     }
   }
   return temporary_im;
