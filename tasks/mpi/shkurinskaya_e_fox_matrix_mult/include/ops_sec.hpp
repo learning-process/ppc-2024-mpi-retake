@@ -9,6 +9,7 @@
 
 namespace shkurinskaya_e_fox_mat_mul_mpi {
 std::vector<double> GetRandomMatrix(int rows, int cols);
+void SimpleMult(std::vector<double> &in1, std::vector<double> &in2, std::vector<double> &ans, int matrix_size);
 class FoxMatMulMPI : public ppc::core::Task {
  public:
   explicit FoxMatMulMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
