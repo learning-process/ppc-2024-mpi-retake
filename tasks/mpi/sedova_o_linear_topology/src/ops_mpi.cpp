@@ -3,10 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <functional>
 #include <random>
-#include <string>
-#include <thread>
 #include <vector>
 
 std::vector<int> sedova_o_linear_topology_mpi::GetRandomVector(int size) {

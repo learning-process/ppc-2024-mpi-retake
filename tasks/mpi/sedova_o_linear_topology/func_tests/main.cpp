@@ -1,14 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
 TEST(sedova_o_linear_topology_mpi, test_1000) {
