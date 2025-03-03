@@ -2,6 +2,7 @@
 
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
+#include <boost/mpi/communicator.hpp>
 #include <boost/mpi.hpp>
 #include <cstdint>
 #include <cstring>
@@ -35,7 +36,7 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   if (rank == 0) {
     local_input_.assign(input_.begin(), input_.begin() + local_size_ + remel_);
     for (int proc = 1; proc < size; proc++) {
-      world.send(proc, 0, input_.data() + remel_ + proc * local_size_, local_size_);
+      world.send(proc, 0, input_.data() + remel_ + (proc * local_size_), local_size_);
     }
   } else {
     local_input_.resize(local_size_);

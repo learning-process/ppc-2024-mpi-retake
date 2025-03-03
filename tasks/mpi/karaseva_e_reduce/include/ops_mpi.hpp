@@ -4,7 +4,6 @@
 
 #include <utility>
 #include <vector>
-#include <mpi.h>
 
 #include "core/task/include/task.hpp"
 
