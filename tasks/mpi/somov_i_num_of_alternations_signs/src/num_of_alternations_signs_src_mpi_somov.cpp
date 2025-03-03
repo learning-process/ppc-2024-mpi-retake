@@ -4,7 +4,6 @@
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstring>
 #include <functional>
-#include <random>
 #include <vector>
 
 #include "mpi/somov_i_num_of_alternations_signs/include/num_of_alternations_signs_header_mpi_somov.hpp"
@@ -16,12 +15,6 @@ void CheckForAlternationSigns(const std::vector<int>& vec, int& out) {
       ++out;
     }
   }
-}
-void GetRndVector(std::vector<int>& vec) {
-  std::random_device rd;
-  std::default_random_engine reng(rd());
-  std::uniform_int_distribution<int> dist(-static_cast<int>(vec.size()) - 1, static_cast<int>(vec.size()) - 1);
-  std::ranges::generate(vec, [&dist, &reng] { return dist(reng); });
 }
 bool NumOfAlternationsSigns::PreProcessingImpl() {
   // Init vectors

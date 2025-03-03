@@ -4,11 +4,21 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/somov_i_num_of_alternations_signs/include/num_of_alternations_signs_header_mpi_somov.hpp"
+
+namespace {
+void GetRndVector(std::vector<int> &vec) {
+  std::random_device rd;
+  std::default_random_engine reng(rd());
+  std::uniform_int_distribution<int> dist(-static_cast<int>(vec.size()) - 1, static_cast<int>(vec.size()) - 1);
+  std::ranges::generate(vec, [&dist, &reng] { return dist(reng); });
+}
+}  // namespace
 
 TEST(somov_i_num_of_alternations_signs_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
@@ -19,6 +29,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, test_pipeline_run) {
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     arr.resize(n);
+    GetRndVector(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(arr.size());
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(&out));
@@ -58,6 +69,7 @@ TEST(somov_i_num_of_alternations_signs_mpi, test_task_run) {
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     arr.resize(n);
+    GetRndVector(arr);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(arr.data()));
     task_data->inputs_count.emplace_back(arr.size());
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(&out));

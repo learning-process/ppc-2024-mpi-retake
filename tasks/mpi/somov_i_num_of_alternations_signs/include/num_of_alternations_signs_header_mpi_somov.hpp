@@ -21,7 +21,6 @@ class NumOfAlternationsSigns : public ppc::core::Task {
   int sz_ = 0;
   int output_ = 0;
 };
-void GetRndVector(std::vector<int>& vec);
 
 void CheckForAlternationSigns(const std::vector<int>& vec, int& out);
 }  // namespace somov_i_num_of_alternations_signs_mpi
