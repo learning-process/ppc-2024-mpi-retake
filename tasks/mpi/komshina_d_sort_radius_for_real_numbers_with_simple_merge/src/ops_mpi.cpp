@@ -31,14 +31,14 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
   }
 
   int is_valid = 0;
-  MPI_Bcast(&is_valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&is_valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   MPI_Bcast(&total_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return is_valid;
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::RunImpl() {
-  int rank;
-  int size;
+  int rank = 0;
+  int size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -78,7 +78,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
     } else if (rank % (2 * step) == step) {
       int local_size = static_cast<int>(local_data.size());
       MPI_Send(&local_size, 1, MPI_INT, rank - step, 0, MPI_COMM_WORLD);
-      MPI_Send(local_data.data(), local_data.size(), MPI_DOUBLE, rank - step, 1, MPI_COMM_WORLD);
+      MPI_Send(local_data.data(), static_cast<int>(local_data.size()), MPI_DOUBLE, rank - step, 1, MPI_COMM_WORLD);
       local_data.clear();
     }
     step *= 2;
