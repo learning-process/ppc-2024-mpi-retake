@@ -26,7 +26,7 @@ std::vector<int> GetVector(unsigned int size) {
   std::mt19937 gen(dev());
   std::vector<int> v(size);
   for (unsigned int i = 0; i < size; i++) {
-    v[i] = static_cast<int>((gen() % 320) + (gen() % 11));
+    v[i] = static_cast<int>((gen() % 320) - (gen() % 97));
   }
   return v;
 }
@@ -86,7 +86,7 @@ TEST(sharamygina_i_vector_dot_product_mpi, test_task_run) {
   boost::mpi::communicator world;
 
   // Create data
-  constexpr unsigned int kLenght = 10000000;
+  constexpr unsigned int kLenght = 12000000;
 
   std::vector<int> received_res(1);
   std::vector<int> v1(kLenght);
