@@ -86,4 +86,3 @@ TEST(sedova_o_linear_topology_mpi, test_task_run) {
     ASSERT_TRUE(result);
   }
 }
-  

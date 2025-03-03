@@ -1,13 +1,13 @@
 #include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <functional>
-#include <string>
-#include <thread>
 #include <cmath>
 #include <cstddef>
-#include <vector>
+#include <functional>
 #include <random>
+#include <string>
+#include <thread>
+#include <vector>
 
 std::vector<int> sedova_o_linear_topology_mpi::GetRandomVector(int size) {
   std::random_device dev;
