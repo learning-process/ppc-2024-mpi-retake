@@ -9,7 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-std::vector<int> CreateRandomBinaryImage(int r, int c) {
+std::vector<int> static CreateRandomBinaryImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(r * c);

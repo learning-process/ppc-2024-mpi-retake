@@ -260,7 +260,6 @@ void karaseva_e_binaryimage_mpi::LoadLabelMapFromStream(std::istringstream& iss,
 }
 
 bool karaseva_e_binaryimage_mpi::TestMPITaskParallel::RunImpl() {
-
   boost::mpi::broadcast(world_, rows_, 0);
   boost::mpi::broadcast(world_, columns_, 0);
 
