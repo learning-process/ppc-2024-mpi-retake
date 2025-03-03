@@ -2,8 +2,11 @@
 
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
+#include <mpi.h>
+
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <numeric>
@@ -28,6 +31,7 @@ void apply_operation(void *inbuf, void *inoutbuf, int count, MPI_Op op) {
   }
 }
 
+namespace {
 template <typename T>
 int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) {
   int rank = 0;
@@ -66,6 +70,7 @@ int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_O
 
   return MPI_SUCCESS;
 }
+}  // namespace
 
 template <typename T>
 bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
@@ -135,14 +140,26 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
   T global_sum = local_sum;
 
-  Reduce<T>(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+  // Defining the MPI type depending on the type T
+  MPI_Datatype mpi_type;
+  if constexpr (std::is_same_v<T, int>) {
+    mpi_type = MPI_INT;
+  } else if constexpr (std::is_same_v<T, float>) {
+    mpi_type = MPI_FLOAT;
+  } else if constexpr (std::is_same_v<T, double>) {
+    mpi_type = MPI_DOUBLE;
+  } else {
+    throw std::runtime_error("Unsupported type for MPI operation");
+  }
+
+  Reduce<T>(&local_sum, &global_sum, 1, mpi_type, MPI_SUM, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {
     result_ = global_sum;
     std::cout << "Rank " << rank << " - Global sum after reduction: " << result_ << "\n";
   }
 
-  MPI_Bcast(&result_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&result_, 1, mpi_type, 0, MPI_COMM_WORLD);
 
   std::cout << "Rank " << rank << " - Final result: " << result_ << "\n";
 
