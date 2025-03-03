@@ -25,7 +25,7 @@ class TestTaskMPI : public ppc::core::Task {
 
  private:
   std::vector<int> input_, output_;
-  int res_{}, size_;
+  int res_{};
   boost::mpi::communicator world_;
 };
 
