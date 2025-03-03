@@ -36,8 +36,16 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::PreProcessingImpl() {
     inputB.resize(sz * sz);
     output = std::vector<double>(matrix_size * matrix_size, 0.0);
 
-    double *it1 = (double *)(task_data->inputs[0]);
-    double *it2 = (double *)(task_data->inputs[1]);
+    std::vector<double> bufferA(matrix_size * matrix_size);
+    std::vector<double> bufferB(matrix_size * matrix_size);
+
+    std::memcpy(bufferA.data(), task_data->inputs[0], matrix_size * matrix_size * sizeof(double));
+    std::memcpy(bufferB.data(), task_data->inputs[1], matrix_size * matrix_size * sizeof(double));
+
+    double *it1 = bufferA.data();
+    double *it2 = bufferB.data();
+//    double *it1 = (double *)(task_data->inputs[0]);
+//   double *it2 = (double *)(task_data->inputs[1]);
     for (int i = 0; i < matrix_size; ++i) {
       std::copy(it1 + i * matrix_size, it1 + (i + 1) * matrix_size, inputA.begin() + i * sz);
       std::copy(it2 + i * matrix_size, it2 + (i + 1) * matrix_size, inputB.begin() + i * sz);
@@ -186,8 +194,7 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
 
 bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::PostProcessingImpl() {
   if (world.rank() == 0) {
-    double *it1 = (double *)(task_data->outputs[0]);
-    std::copy(output.begin(), output.end(), it1);
+    std::memcpy(task_data->outputs[0], output.data(), matrix_size * matrix_size * sizeof(double));
   }
   return true;
 }
