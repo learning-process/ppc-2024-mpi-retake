@@ -30,7 +30,6 @@ void PrepareIteration(int n, int k, const std::vector<double>& matrix, std::vect
 void SwapRows(int n, int k, int change, std::vector<double>& matrix);
 bool SwapRowsIfZero(int n, int k, std::vector<double>& matrix, bool& solve);
 
-
 class GaussJordanMethodMPI : public ppc::core::Task {
  public:
   explicit GaussJordanMethodMPI(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}

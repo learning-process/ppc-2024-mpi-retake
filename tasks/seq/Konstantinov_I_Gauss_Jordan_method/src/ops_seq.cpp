@@ -1,9 +1,9 @@
 #include "seq/Konstantinov_I_Gauss_Jordan_method/include/ops_seq.hpp"
 
-#include <ranges>
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <ranges>
 #include <thread>
 
 std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n, int k,
@@ -44,7 +44,7 @@ void konstantinov_i_gauss_jordan_method_seq::UpdateMatrix(int n, int k, std::vec
   }
 
   for (int i = k + 1; i < n + 1; i++) {
-    matrix[(k * (n + 1)) + i] /= matrix[(k * (n + 1)) + k];  
+    matrix[(k * (n + 1)) + i] /= matrix[(k * (n + 1)) + k];
   }
   
   for (int i = 0; i < n; i++) {

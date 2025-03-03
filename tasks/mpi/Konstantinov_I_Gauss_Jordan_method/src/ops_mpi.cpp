@@ -1,14 +1,14 @@
 #include "mpi/Konstantinov_I_Gauss_Jordan_method/include/ops_mpi.hpp"
 
-#include <ranges>
 #include <algorithm>
-#include <boost/serialization/vector.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/serialization/vector.hpp>
 #include <cmath>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -265,7 +265,7 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::RunImpl() {
 
     if (!BroadcastSolve(world, solve)) {
       return false;
-    } 
+    }
     BroadcastData(world, sizes, iter_matrix);
 
     int local_size = sizes[world.rank()];
