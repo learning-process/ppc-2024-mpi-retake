@@ -166,7 +166,7 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
     // (color + key + it) % root_  equals A~i~(i + k)
     if ((((color + key + it) % root_) == 0) && (!valid)) {
       valid = true;
-      left_block = move(temp);
+      left_block = std::move(temp);
     }
 
     // Broadcast the local block to all ranks in the row
