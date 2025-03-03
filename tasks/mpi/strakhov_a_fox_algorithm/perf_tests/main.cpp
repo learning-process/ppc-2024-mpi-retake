@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/vector.hpp>  // NOLINT
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
