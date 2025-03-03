@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 #include <random>
 #include <vector>
 
@@ -28,8 +29,8 @@ bool shkurinskaya_e_fox_mat_mul_seq::FoxMatMulSequential::PreProcessingImpl() {
   inputB.resize(matrix_size * matrix_size);
   output.resize(matrix_size * matrix_size);
 
-  std::memcpy(inputA.data(), task_data->inputs[0], matrix_size * matrix_size * sizeof(double));
-  std::memcpy(inputB.data(), task_data->inputs[1], matrix_size * matrix_size * sizeof(double));
+  memcpy(inputA.data(), task_data->inputs[0], matrix_size * matrix_size * sizeof(double));
+  memcpy(inputB.data(), task_data->inputs[1], matrix_size * matrix_size * sizeof(double));
 
   return true;
 }
@@ -51,6 +52,6 @@ bool shkurinskaya_e_fox_mat_mul_seq::FoxMatMulSequential::RunImpl() {
 }
 
 bool shkurinskaya_e_fox_mat_mul_seq::FoxMatMulSequential::PostProcessingImpl() {
-  std::memcpy(task_data->outputs[0], output.data(), matrix_size * matrix_size * sizeof(double));
+  memcpy(task_data->outputs[0], output.data(), matrix_size * matrix_size * sizeof(double));
   return true;
 }
