@@ -17,7 +17,7 @@ std::vector<int> GetVector(unsigned int size) {
   std::mt19937 gen(dev());
   std::vector<int> v(size);
   for (unsigned int i = 0; i < size; i++) {
-    v[i] = static_cast<int>((gen() % 320) + (gen() % 11));
+    v[i] = static_cast<int>((gen() % 320) - (gen() % 97));
   }
   return v;
 }
@@ -25,7 +25,7 @@ std::vector<int> GetVector(unsigned int size) {
 }  // namespace sharamygina_i_vector_dot_product_seq
 
 TEST(sharamygina_i_vector_dot_product_seq, LargeImage) {
-  constexpr unsigned int kLenght = 10000000;
+  constexpr unsigned int kLenght = 12000000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
   task_data->inputs_count.emplace_back(kLenght);
@@ -62,7 +62,7 @@ TEST(sharamygina_i_vector_dot_product_seq, LargeImage) {
 }
 
 TEST(sharamygina_i_vector_dot_product_seq, LargeImageRun) {
-  constexpr unsigned int kLenght = 10000000;
+  constexpr unsigned int kLenght = 12000000;
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
   task_data->inputs_count.emplace_back(kLenght);
