@@ -18,7 +18,7 @@ namespace {
 double ComputeValue(int i) { return (std::sin(i) * 1e9) + (std::cos(i * 0.5) * 1e8); }
 }  // namespace
 
-TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pipeline_run) {
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_pipeline_run) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -36,10 +36,12 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pi
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    task_data_mpi->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
-    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
-    task_data_mpi->outputs = {reinterpret_cast<uint8_t *>(out.data())};
-    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
+    task_data_mpi->inputs_count.emplace_back(1);
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_mpi->inputs_count.emplace_back(size);
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_mpi->outputs_count.emplace_back(size);
   }
 
   auto sort_task = std::make_shared<TestTaskMPI>(task_data_mpi);
@@ -66,7 +68,7 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_pi
   }
 }
 
-TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_task_run) {
+TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi, test_task_run) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -84,10 +86,12 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi_perf, test_ta
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    task_data_mpi->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
-    task_data_mpi->inputs_count = {1, static_cast<unsigned int>(size)};
-    task_data_mpi->outputs = {reinterpret_cast<uint8_t *>(out.data())};
-    task_data_mpi->outputs_count = {static_cast<unsigned int>(size)};
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
+    task_data_mpi->inputs_count.emplace_back(1);
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+    task_data_mpi->inputs_count.emplace_back(size);
+    task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data_mpi->outputs_count.emplace_back(size);
   }
 
   auto sort_task = std::make_shared<TestTaskMPI>(task_data_mpi);

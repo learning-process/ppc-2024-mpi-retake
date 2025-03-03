@@ -27,10 +27,12 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_pipelin
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
-  task_data_seq->inputs_count = {1, static_cast<unsigned int>(size)};
-  task_data_seq->outputs = {reinterpret_cast<uint8_t *>(out.data())};
-  task_data_seq->outputs_count = {static_cast<unsigned int>(size)};
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
+  task_data_seq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs_count.emplace_back(size);
 
   // Create Task
   auto test_task_sequential =
@@ -73,10 +75,12 @@ TEST(komshina_d_sort_radius_for_real_numbers_with_simple_merge_seq, test_task_ru
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs = {reinterpret_cast<uint8_t *>(&size), reinterpret_cast<uint8_t *>(in.data())};
-  task_data_seq->inputs_count = {1, static_cast<unsigned int>(size)};
-  task_data_seq->outputs = {reinterpret_cast<uint8_t *>(out.data())};
-  task_data_seq->outputs_count = {static_cast<unsigned int>(size)};
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
+  task_data_seq->inputs_count.emplace_back(1);
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_seq->outputs_count.emplace_back(size);
 
   // Create Task
   auto test_task_sequential =
