@@ -5,6 +5,8 @@
 #include <mpi.h>
 
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -37,8 +39,7 @@ void ApplyOperation(void *inbuf, void *inoutbuf, int count, MPI_Op op) {
 namespace {
 template <typename T>
 int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) {
-  int rank = 0;
-  int size = 0;
+  int rank, size;
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &size);
 
@@ -48,20 +49,12 @@ int Reduce(void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_O
 
   int step = 1;
   while (step < size) {
-    if (rank % (2 * step) == 0) {
-      if (rank + step < size) {
-        MPI_Recv(recvbuf, count, datatype, rank + step, 0, comm, MPI_STATUS_IGNORE);
-        if (datatype == MPI_INT) {
-          ApplyOperation<int>(recvbuf, sendbuf, count, op);
-        } else if (datatype == MPI_FLOAT) {
-          ApplyOperation<float>(recvbuf, sendbuf, count, op);
-        } else if (datatype == MPI_DOUBLE) {
-          ApplyOperation<double>(recvbuf, sendbuf, count, op);
-        } else {
-          fprintf(stderr, "Unsupported datatype\n");
-          MPI_Abort(MPI_COMM_WORLD, MPI_ERR_TYPE);
-        }
-        memcpy(recvbuf, sendbuf, count * typesize);
+    if ((rank % (2 * step)) == 0) {
+      int src = rank + step;
+      if (src < size) {
+        std::vector<T> temp_buf(count);
+        MPI_Recv(temp_buf.data(), count, datatype, src, 0, comm, MPI_STATUS_IGNORE);
+        ApplyOperation<T>(temp_buf.data(), recvbuf, count, op);
       }
     } else {
       int dest = rank - step;
@@ -143,7 +136,6 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
 
   T global_sum = local_sum;
 
-  // Defining the MPI type depending on the type T
   MPI_Datatype mpi_type;
   if constexpr (std::is_same_v<T, int>) {
     mpi_type = MPI_INT;
@@ -162,7 +154,8 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::RunImpl() {
     std::cout << "Rank " << rank << " - Global sum after reduction: " << result_ << "\n";
   }
 
-  MPI_Bcast(&result_, 1, mpi_type, 0, MPI_COMM_WORLD);
+  world.barrier();
+  boost::mpi::broadcast(world, result_, 0);
 
   std::cout << "Rank " << rank << " - Final result: " << result_ << "\n";
 
