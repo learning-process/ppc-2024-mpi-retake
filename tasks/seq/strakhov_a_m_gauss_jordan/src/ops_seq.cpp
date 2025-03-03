@@ -6,7 +6,7 @@
 
 namespace {
 
-bool checkZero(size_t col_size, size_t row_size, std::vector<double>& input) {
+bool CheckZero(size_t col_size, size_t row_size, std::vector<double>& input) {
   for (size_t i = 0; i < col_size; i++) {
     bool flag1 = true;
     bool flag2 = true;
@@ -33,7 +33,9 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::PreProcessingImpl() {
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::ValidationImpl() {
   // Check equality of counts elements
-  if (task_data->inputs_count[1] == 0) return false;
+  if (task_data->inputs_count[1] == 0) {
+    return false;
+  }
   if (task_data->inputs_count[0] != (task_data->inputs_count[1] + 1)) {
     return false;
   }
@@ -43,8 +45,8 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::ValidationImpl() {
   row_size_ = task_data->inputs_count[0];
   col_size_ = task_data->inputs_count[1];
   auto* in_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-  input_ = std::vector<double>(in_ptr, in_ptr + row_size_ * col_size_);
-  return checkZero(col_size_, row_size_, input_);
+  input_ = std::vector<double>(in_ptr, in_ptr + (row_size_ * col_size_));
+  return CheckZero(col_size_, row_size_, input_);
 }
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
@@ -64,7 +66,7 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
       size_t k_row = k * row_size_;
       double kf = input_[k_row + i] / input_[i_row + i];
       for (size_t j = i + 1; j < row_size_; j++) {
-        input_[k_row + j] -= (input_[row_size_ * i + j] * kf);
+        input_[k_row + j] -= (input_[(row_size_ * i) + j] * kf);
       }
       input_[k_row + i] = 0;
     }
@@ -74,7 +76,7 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::PostProcessingImpl() {
   for (size_t i = 0; i < output_.size(); i++) {
-    reinterpret_cast<double*>(task_data->outputs[0])[i] = input_[(i + 1) * row_size_ - 1];
+    reinterpret_cast<double*>(task_data->outputs[0])[i] = input_[((i + 1) * row_size_) - 1];
   }
   return true;
 }
