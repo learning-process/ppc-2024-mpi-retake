@@ -29,7 +29,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, simple_three_not_solve_at_1_iter) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -63,7 +63,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, simple_five_not_solve_at_2_iter) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -97,7 +97,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_three) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -119,10 +119,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_three) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -142,14 +142,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_three) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {
@@ -161,7 +161,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_four) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -183,10 +183,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_four) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -206,14 +206,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_four) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {
@@ -225,7 +225,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_five) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -247,10 +247,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_five) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -270,14 +270,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_five) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {
@@ -289,7 +289,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_six) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -311,10 +311,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_six) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -334,14 +334,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_six) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {
@@ -353,7 +353,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_seven) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -375,10 +375,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_seven) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -398,14 +398,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_seven) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {
@@ -417,7 +417,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_ten) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -439,10 +439,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_ten) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -462,14 +462,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_ten) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {
@@ -481,7 +481,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -503,10 +503,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
   }
 
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  bool isNonSingular = task_parallel->ValidationImpl();
-  if (isNonSingular) {
+  bool is_non_singular = task_parallel->ValidationImpl();
+  if (is_non_singular) {
     task_parallel->PreProcessingImpl();
-    bool parRunRes = task_parallel->RunImpl();
+    bool par_run_res = task_parallel->RunImpl();
     task_parallel->PostProcessingImpl();
 
     if (world.rank() == 0) {
@@ -526,14 +526,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, random_eleven) {
           std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
       ASSERT_TRUE(task_sequential->ValidationImpl());
       task_sequential->PreProcessingImpl();
-      bool seqRunRes = task_sequential->RunImpl();
+      bool seq_run_res = task_sequential->RunImpl();
       task_sequential->PostProcessingImpl();
 
-      if (seqRunRes && parRunRes) {
+      if (seq_run_res && par_run_res) {
         ASSERT_EQ(global_result.size(), seq_result.size());
         EXPECT_EQ(global_result, seq_result);
       } else {
-        EXPECT_EQ(seqRunRes, parRunRes);
+        EXPECT_EQ(seq_run_res, par_run_res);
       }
     }
   } else {

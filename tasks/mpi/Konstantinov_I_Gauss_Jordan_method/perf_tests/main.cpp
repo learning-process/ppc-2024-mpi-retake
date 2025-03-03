@@ -35,10 +35,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  int n;
+  int n = 0;
 
   if (world.rank() == 0) {
-    n = 200;
+    n = 250;
     global_matrix = konstantinov_i_gauss_jordan_method_mpi::GetRandomMatrix(n, n + 1);
 
     global_result.resize(n * (n + 1));
@@ -56,7 +56,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
   ASSERT_TRUE(task_parallel->ValidationImpl());
   task_parallel->PreProcessingImpl();
-  bool parRunRes = task_parallel->RunImpl();
+  bool par_run_res = task_parallel->RunImpl();
   task_parallel->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -66,8 +66,8 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perfAnalyzer = std::make_shared<ppc::core::Perf>(task_parallel);
-  perfAnalyzer->PipelineRun(perf_attr, perf_results);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_parallel);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
@@ -88,14 +88,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
         std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
     ASSERT_TRUE(task_sequential->ValidationImpl());
     task_sequential->PreProcessingImpl();
-    bool seqRunRes = task_sequential->RunImpl();
+    bool seq_run_res = task_sequential->RunImpl();
     task_sequential->PostProcessingImpl();
 
-    if (seqRunRes && parRunRes) {
+    if (seq_run_res && par_run_res) {
       ASSERT_EQ(global_result.size(), seq_result.size());
       EXPECT_EQ(global_result, seq_result);
     } else {
-      EXPECT_EQ(seqRunRes, parRunRes);
+      EXPECT_EQ(seq_run_res, par_run_res);
     }
   }
 }
@@ -108,10 +108,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, task_run) {
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  int n;
+  int n = 0;
 
   if (world.rank() == 0) {
-    n = 200;
+    n = 250;
     global_matrix = konstantinov_i_gauss_jordan_method_mpi::GetRandomMatrix(n, n + 1);
 
     global_result.resize(n * (n + 1));
@@ -129,7 +129,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, task_run) {
   auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
   ASSERT_TRUE(task_parallel->ValidationImpl());
   task_parallel->PreProcessingImpl();
-  bool parRunRes = task_parallel->RunImpl();
+  bool par_run_res = task_parallel->RunImpl();
   task_parallel->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -161,14 +161,14 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, task_run) {
         std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
     ASSERT_TRUE(task_sequential->ValidationImpl());
     task_sequential->PreProcessingImpl();
-    bool seqRunRes = task_sequential->RunImpl();
+    bool seq_run_res = task_sequential->RunImpl();
     task_sequential->PostProcessingImpl();
 
-    if (seqRunRes && parRunRes) {
+    if (seq_run_res && par_run_res) {
       ASSERT_EQ(global_result.size(), seq_result.size());
       EXPECT_EQ(global_result, seq_result);
     } else {
-      EXPECT_EQ(seqRunRes, parRunRes);
+      EXPECT_EQ(seq_run_res, par_run_res);
     }
   }
 }

@@ -3,7 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -15,7 +14,22 @@ std::vector<double> ProcessMatrix(int n, int k, const std::vector<double>& matri
 void CalcSizesDispls(int n, int k, int world_size, std::vector<int>& sizes, std::vector<int>& displs);
 std::vector<std::pair<int, int>> GetIndicies(int rows, int cols);
 void UpdateMatrix(int n, int k, std::vector<double>& matrix, const std::vector<double>& iter_result);
-bool IsNonSingularSystem(const std::vector<double>& A, int n);
+bool IsNonSingularSystem(const std::vector<double>& a, int n);
+void GatherResults(boost::mpi::communicator& world, std::vector<double>& local_result, std::vector<double>& iter_result,
+                   std::vector<int>& sizes, std::vector<int>& displs);
+std::vector<double> CalculateLocalResult(int local_size, std::vector<std::pair<int, int>>& local_indicies,
+                                         const std::vector<double>& iter_matrix, int n, int k);
+std::vector<std::pair<int, int>> ScatterIndices(boost::mpi::communicator& world,
+                                                std::vector<std::pair<int, int>>& indicies, std::vector<int>& sizes,
+                                                std::vector<int>& displs, int local_size);
+void BroadcastData(boost::mpi::communicator& world, std::vector<int>& sizes, std::vector<double>& iter_matrix);
+bool BroadcastSolve(boost::mpi::communicator& world, bool solve);
+void PrepareIteration(int n, int k, const std::vector<double>& matrix, std::vector<double>& iter_matrix,
+                      std::vector<int>& sizes, std::vector<int>& displs, std::vector<std::pair<int, int>>& indicies,
+                      std::vector<double>& iter_result, boost::mpi::communicator& world);
+void SwapRows(int n, int k, int change, std::vector<double>& matrix);
+bool SwapRowsIfZero(int n, int k, std::vector<double>& matrix, bool& solve);
+
 
 class GaussJordanMethodMPI : public ppc::core::Task {
  public:
