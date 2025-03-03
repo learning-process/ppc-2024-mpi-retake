@@ -215,8 +215,8 @@ TEST(strakhov_a_fox_algorithm_seq, test_matmul_5x5) {
 TEST(strakhov_a_fox_algorithm_seq, test_matmul_100x100_random) {
   constexpr size_t kCount = 100;
   // Create data
-  std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> b = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> a = CreateRandomVal(-100, 100, kCount * kCount);
+  std::vector<double> b = CreateRandomVal(-100, 100, kCount * kCount);
   std::vector<double> ans = MultiplyMatrices(a, b, kCount);
   std::vector<double> out(kCount * kCount, 0);
   // Create task_data

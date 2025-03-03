@@ -2,7 +2,7 @@
 
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp>  // NOLINT
+#include <boost/serialization/vector.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -241,8 +241,8 @@ TEST(strakhov_a_fox_algorithm_mpi, test_matmul_100x100_random) {
   std::vector<double> b(kCount * kCount, 0);
   std::vector<double> ans(kCount * kCount, 0);
   if (world.rank() == 0) {
-    a = CreateRandomVal(0, 100, kCount * kCount);
-    b = CreateRandomVal(0, 100, kCount * kCount);
+    a = CreateRandomVal(-100, 100, kCount * kCount);
+    b = CreateRandomVal(-100, 100, kCount * kCount);
     ans = MultiplyMatrices(a, b, kCount);
   }
   std::vector<double> out(kCount * kCount, 0);

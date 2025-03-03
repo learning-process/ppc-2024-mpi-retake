@@ -37,10 +37,10 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
 }
 }  // namespace
 TEST(strakhov_a_fox_algorithm_seq, test_pipeline_run) {
-  constexpr size_t kCount = 100;
+  constexpr size_t kCount = 200;
   // Create data
-  std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> b = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> a = CreateRandomVal(-100, 100, kCount * kCount);
+  std::vector<double> b = CreateRandomVal(-100, 100, kCount * kCount);
   std::vector<double> ans = MultiplyMatrices(a, b, kCount);
   std::vector<double> out(kCount * kCount, 0);
   // Create task_data
@@ -77,10 +77,10 @@ TEST(strakhov_a_fox_algorithm_seq, test_pipeline_run) {
 }
 
 TEST(strakhov_a_fox_algorithm_seq, test_task_run) {
-  constexpr size_t kCount = 100;
+  constexpr size_t kCount = 200;
   // Create data
-  std::vector<double> a = CreateRandomVal(0, 100, kCount * kCount);
-  std::vector<double> b = CreateRandomVal(0, 100, kCount * kCount);
+  std::vector<double> a = CreateRandomVal(-100, 100, kCount * kCount);
+  std::vector<double> b = CreateRandomVal(-100, 100, kCount * kCount);
   std::vector<double> ans = MultiplyMatrices(a, b, kCount);
   std::vector<double> out(kCount * kCount, 0);
   // Create task_data

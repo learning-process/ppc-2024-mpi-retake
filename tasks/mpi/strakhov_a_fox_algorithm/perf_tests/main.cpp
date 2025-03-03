@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/serialization/vector.hpp>  // NOLINT
+#include <boost/serialization/vector.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -42,15 +42,15 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
 }  // namespace
 
 TEST(strakhov_a_fox_algorithm_mpi, test_pipeline_run) {
-  constexpr size_t kCount = 400;
+  constexpr size_t kCount = 200;
   // Create data
   boost::mpi::communicator world;
   std::vector<double> a(kCount * kCount, 0);
   std::vector<double> b(kCount * kCount, 0);
   std::vector<double> ans(kCount * kCount, 0);
   if (world.rank() == 0) {
-    a = CreateRandomVal(0, 100, kCount * kCount);
-    b = CreateRandomVal(0, 100, kCount * kCount);
+    a = CreateRandomVal(-100, 100, kCount * kCount);
+    b = CreateRandomVal(-100, 100, kCount * kCount);
     ans = MultiplyMatrices(a, b, kCount);
   }
   std::vector<double> out(kCount * kCount, 0);
@@ -95,15 +95,15 @@ TEST(strakhov_a_fox_algorithm_mpi, test_pipeline_run) {
 }
 
 TEST(strakhov_a_fox_algorithm_mpi, test_task_run) {
-  constexpr size_t kCount = 400;
+  constexpr size_t kCount = 200;
   // Create data
   boost::mpi::communicator world;
   std::vector<double> a(kCount * kCount, 0);
   std::vector<double> b(kCount * kCount, 0);
   std::vector<double> ans(kCount * kCount, 0);
   if (world.rank() == 0) {
-    a = CreateRandomVal(0, 100, kCount * kCount);
-    b = CreateRandomVal(0, 100, kCount * kCount);
+    a = CreateRandomVal(-100, 100, kCount * kCount);
+    b = CreateRandomVal(-100, 100, kCount * kCount);
     ans = MultiplyMatrices(a, b, kCount);
   }
   std::vector<double> out(kCount * kCount, 0);
