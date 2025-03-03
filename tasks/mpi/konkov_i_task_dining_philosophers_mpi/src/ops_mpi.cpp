@@ -5,9 +5,10 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include "boost/mpi/collectives/all_gather.hpp"
 #include <random>
 #include <vector>
+
+#include "boost/mpi/collectives/all_gather.hpp"
 
 bool konkov_i_task_dining_philosophers_mpi::DiningPhilosophersMPI::PreProcessingImpl() {
   l_philosopher_ = (world_.rank() + world_.size() - 1) % world_.size();
