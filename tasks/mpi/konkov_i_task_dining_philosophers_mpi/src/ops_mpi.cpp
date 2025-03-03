@@ -2,9 +2,9 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <chrono>
+#include <thread>
 #include <vector>
-
-#include "boost/mpi/collectives/broadcast.hpp"
 
 namespace konkov_i_task_dining_philosophers_mpi {
 
@@ -27,12 +27,22 @@ bool DiningPhilosophersMPI::RunImpl() {
     return true;
   }
 
-  for (int i = 0; i < num_philosophers_; ++i) {
+  int philosophers_per_process = num_philosophers_ / size;
+  int remaining = num_philosophers_ % size;
+  int start = rank * philosophers_per_process + std::min(rank, remaining);
+  int end = start + philosophers_per_process + (rank < remaining ? 1 : 0);
+
+  for (int i = start; i < end; ++i) {
     int left_fork = i;
     int right_fork = (i + 1) % num_philosophers_;
 
-    boost::mpi::broadcast(world_, left_fork, i % size);
-    boost::mpi::broadcast(world_, right_fork, i % size);
+    if (i % 2 == 0) {
+      boost::mpi::broadcast(world_, left_fork, rank);
+      boost::mpi::broadcast(world_, right_fork, rank);
+    } else {
+      boost::mpi::broadcast(world_, right_fork, rank);
+      boost::mpi::broadcast(world_, left_fork, rank);
+    }
   }
 
   return true;
