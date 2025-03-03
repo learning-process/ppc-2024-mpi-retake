@@ -98,14 +98,24 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PreProcessingImpl() {
   local_size_ = input_size_ / size;
   remel_ = input_size_ % size;
 
+  // Calculate the start and end indices for each process
+  int start = rank * local_size_ + std::min(rank, remel_);
+  int end = start + local_size_ + (rank < remel_ ? 1 : 0);
+
   if (rank == 0) {
-    local_input_.assign(input_.begin(), input_.begin() + local_size_ + remel_);
+    // Process 0 takes its portion
+    local_input_.assign(input_.begin() + start, input_.begin() + end);
+
+    // Send data to other processes
     for (int proc = 1; proc < size; proc++) {
-      world.send(proc, 0, input_.data() + remel_ + (proc * local_size_), local_size_);
+      int proc_start = proc * local_size_ + std::min(proc, remel_);
+      int proc_end = proc_start + local_size_ + (proc < remel_ ? 1 : 0);
+      world.send(proc, 0, input_.data() + proc_start, proc_end - proc_start);
     }
   } else {
-    local_input_.resize(local_size_);
-    world.recv(0, 0, local_input_.data(), local_size_);
+    // Receive data from process 0
+    local_input_.resize(end - start);
+    world.recv(0, 0, local_input_.data(), end - start);
   }
 
   std::cout << "Rank " << rank << " - Local input: \n";
@@ -166,15 +176,19 @@ bool karaseva_e_reduce_mpi::TestTaskMPI<T>::PostProcessingImpl() {
 
   std::cout << "Rank " << rank << " - PostProcessingImpl started\n";
 
-  if (rank == 0) {
-    if (task_data->outputs[0] == nullptr) {
-      task_data->outputs[0] = new uint8_t[sizeof(T)];
-    }
-    auto *output_ptr = reinterpret_cast<T *>(task_data->outputs[0]);
-    *output_ptr = result_;
+  // Broadcast the result to all processes
+  MPI_Bcast(&result_, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    std::cout << "Rank " << rank << " - Output value: " << *output_ptr << "\n";
+  // Ensure the output buffer is allocated
+  if (task_data->outputs[0] == nullptr) {
+    task_data->outputs[0] = new uint8_t[sizeof(T)];
   }
+
+  // Write the result to the output buffer
+  auto *output_ptr = reinterpret_cast<T *>(task_data->outputs[0]);
+  *output_ptr = result_;
+
+  std::cout << "Rank " << rank << " - Output value: " << *output_ptr << "\n";
 
   return true;
 }
