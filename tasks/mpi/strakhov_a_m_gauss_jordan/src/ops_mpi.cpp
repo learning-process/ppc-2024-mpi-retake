@@ -5,9 +5,53 @@
 #include <cstddef>
 #include <vector>
 
+namespace {
+
+bool checkZero(size_t col_size, size_t row_size, std::vector<double>& input) {
+  for (size_t i = 0; i < col_size; i++) {
+    bool flag1 = true;
+    bool flag2 = true;
+    for (size_t j = 0; (j < col_size) && (flag1 || flag2); j++) {
+      flag1 = flag1 && (input[(j * row_size) + i] == 0);
+      flag2 = flag2 && (input[(i * row_size) + j] == 0);
+    }
+    if (flag1 || flag2) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void step(int tkt, size_t i, bool rang_is_head, int dv, std::vector<double>& head_vec,
+          std::vector<double>& local_input) {
+  size_t row_size_ = head_vec.size();
+  for (size_t k = 0; k < dv; k++) {
+    size_t k_row = k * row_size_;
+    size_t tkt_row = tkt * row_size_;
+    if (rang_is_head && (tkt == k)) {
+      if (local_input[tkt_row + i] != 1.0) {
+        for (size_t j = i + 1; j < row_size_; j++) {
+          local_input[tkt_row + j] /= local_input[tkt_row + i];
+        }
+        local_input[tkt_row + i] = 1.0;
+      }
+      continue;
+    };
+    double kf = local_input[k_row + i] / head_vec[i];
+    for (size_t j = i + 1; j < row_size_; j++) {
+      local_input[k_row + j] -= (head_vec[j] * kf);
+    }
+    local_input[k_row + i] = 0;
+  }
+}
+
+}  // namespace
+
 bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::PreProcessingImpl() {
   // Init value for input and output
   output_ = std::vector<double>(row_size_, 0);
+  broadcast(world_, row_size_, 0);
+  broadcast(world_, col_size_, 0);
   return true;
 }
 
@@ -28,33 +72,12 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::ValidationImpl() {
       return false;
     }
     auto* in_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
-    input_ = std::vector<double>(in_ptr, in_ptr + (row_size_ * col_size_));
-    for (size_t i = 0; i < col_size_; i++) {
-      bool flag1 = true;
-      bool flag2 = true;
-      for (size_t j = 0; j < col_size_; j++) {
-        if (flag1 && (input_[(j * row_size_) + i] != 0)) {
-          flag1 = false;
-          if (!flag2) {
-            break;
-          }
-        }
-        if (flag2 && (input_[(i * row_size_) + j] != 0)) {
-          flag2 = false;
-          if (!flag1) {
-            break;
-          }
-        }
-      }
-      if (flag1 || flag2) {
-        return false;
-      }
-    }
+    input_ = std::vector<double>(in_ptr, in_ptr + row_size_ * col_size_);
+    return checkZero(col_size_, row_size_, input_);
+
   } else {
     input_ = std::vector<double>(0);
   }
-  broadcast(world_, row_size_, 0);
-  broadcast(world_, col_size_, 0);
   return true;
 }
 
@@ -62,121 +85,64 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
   int r = world_.rank();
   size_t sz = world_.size();
   size_t ost = col_size_ % sz;
-  size_t dv = (col_size_ / sz) + (int)(r < static_cast<int>(ost));
+  size_t dv = col_size_ / sz + (int)(r < ost);
   size_t osn_dv = col_size_ / sz;
   int head = 0;
+  int new_head = 0;
   size_t tkt = 0;
   std::vector<double> head_vec(row_size_, 0);
   std::vector<double> local_input;
   if (r == 0) {
-    int j = static_cast<int>(dv);
+    int j = dv;
     for (int k = 1; k < world_.size(); k++) {
-      size_t pr_size = (k < static_cast<int>(ost)) ? dv : osn_dv;
-      world_.send(k, 0, &input_[j * row_size_], static_cast<int>(pr_size * row_size_));
-      j += static_cast<int>(pr_size);
+      size_t pr_size = (k < ost) ? dv : osn_dv;
+      world_.send(k, 0, &input_[j * row_size_], pr_size * row_size_);
+      j += pr_size;
     }
     local_input = std::vector<double>(input_.data(), input_.data() + (dv * row_size_));
   } else {
     local_input = std::vector<double>(dv * row_size_, 0);
-    world_.recv(0, 0, local_input.data(), static_cast<int>(local_input.size()));
+    world_.recv(0, 0, local_input.data(), local_input.size());
   }
-
-  if (r == 0) {
-    for (size_t i = 0; i < col_size_; i++) {
-      broadcast(world_, head, 0);
-      broadcast(world_, tkt, 0);
-      if (head == 0) {
-        if (local_input[(tkt * row_size_) + i] != 1.0) {
-          for (size_t j = i + 1; j < row_size_; j++) {
-            local_input[(tkt * row_size_) + j] /= local_input[(tkt * row_size_) + i];
-          }
-          local_input[(tkt * row_size_) + i] = 1.0;
-        }
-        head_vec = std::vector(local_input.data() + (tkt * row_size_), local_input.data() + ((tkt + 1) * row_size_));
-      }
-      broadcast(world_, head_vec.data(), static_cast<int>(row_size_), head);
-
-      for (size_t k = 0; k < dv; k++) {
-        if ((head == 0) && (tkt == k)) {
-          continue;
-        }
-        double kf = local_input[(k * row_size_) + i] / head_vec[i];
-        for (size_t j = i + 1; j < row_size_; j++) {
-          local_input[(k * row_size_) + j] -= (head_vec[j] * kf);
-        }
-        local_input[(k * row_size_) + i] = 0;
-      }
-      tkt++;
-
-      if ((head >= static_cast<int>(ost)) && (tkt >= osn_dv)) {
-        head++;
-        tkt = 0;
-        continue;
-      }
-      if ((head < static_cast<int>(ost)) && (tkt >= dv)) {
-        head++;
-        tkt = 0;
-      }
+  for (size_t i = 0; i < col_size_; i++) {
+    broadcast(world_, tkt, head);
+    broadcast(world_, new_head, head);
+    head = new_head;
+    if (head == r) {
+      head_vec = std::vector(local_input.data() + (tkt * row_size_), local_input.data() + ((tkt + 1) * row_size_));
     }
-  } else {
-    for (size_t i = 0; i < col_size_; i++) {
-      broadcast(world_, head, 0);
-      broadcast(world_, tkt, 0);
-
-      if (head == r) {
-        head_vec = std::vector(local_input.data() + (tkt * row_size_), local_input.data() + ((tkt + 1) * row_size_));
-      }
-
-      broadcast(world_, head_vec.data(), static_cast<int>(row_size_), head);
-
-      for (size_t k = 0; k < dv; k++) {
-        if ((head == r) && (tkt == k)) {
-          if (local_input[(tkt * row_size_) + i] != 1.0) {
-            for (size_t j = i + 1; j < row_size_; j++) {
-              local_input[(tkt * row_size_) + j] /= local_input[(tkt * row_size_) + i];
-            }
-            local_input[(tkt * row_size_) + i] = 1.0;
-          }
-          continue;
-        };
-        double kf = local_input[(k * row_size_) + i] / head_vec[i];
-        for (size_t j = i + 1; j < row_size_; j++) {
-          local_input[(k * row_size_) + j] -= (head_vec[j] * kf);
-        }
-        local_input[(k * row_size_) + i] = 0;
-      }
+    broadcast(world_, head_vec.data(), row_size_, head);
+    step(tkt, i, (r == head), dv, head_vec, local_input);
+    tkt++;
+    if (tkt >= dv) {
+      new_head++;
+      tkt = 0;
     }
   }
-
   std::vector<double> output_local = std::vector<double>(dv, 0);
   for (size_t i = 0; i < dv; i++) {
     output_local[i] = (float)local_input[(row_size_ * (i + 1)) - 1];
   }
-
-  world_.barrier();
-
   output_ = std::vector<double>(col_size_, 0);
-
   if (r != 0) {
-    MPI_Send(output_local.data(), static_cast<int>(output_local.size()), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+    world_.send(0, 0, output_local.data(), output_local.size());
   } else {
-    int j = static_cast<int>(dv);
+    int j = dv;
     for (int k = 1; k < world_.size(); k++) {
-      int recv_size = static_cast<int>((k < static_cast<int>(ost)) ? dv : osn_dv);
-      MPI_Recv(&output_[j], recv_size, MPI_DOUBLE, k, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      int recv_size = (k < ost) ? dv : osn_dv;
+      world_.recv(k, 0, &output_[j], recv_size);
       j += recv_size;
     }
 
-    for (int i = 0; i < static_cast<int>(output_local.size()); i++) {
+    for (int i = 0; i < output_local.size(); i++) {
       output_[i] = output_local[i];
     }
   }
-  world_.barrier();
   return true;
 }
 
 bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::PostProcessingImpl() {
-  broadcast(world_, output_.data(), static_cast<int>(col_size_), 0);
+  broadcast(world_, output_.data(), col_size_, 0);
 
   if (world_.rank() == 0) {
     for (size_t i = 0; i < output_.size(); i++) {
