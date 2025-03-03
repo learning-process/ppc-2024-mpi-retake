@@ -4,9 +4,9 @@
 
 #include <mpi.h>
 
-#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
