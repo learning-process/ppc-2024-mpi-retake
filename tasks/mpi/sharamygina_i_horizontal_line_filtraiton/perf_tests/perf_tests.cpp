@@ -28,34 +28,39 @@ std::vector<unsigned int> GetImage(int k_rows, int k_cols) {
   return temporary_im;
 }
 
-std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int k_rows, int k_cols) {
-  std::vector<unsigned int> final_image(k_rows * k_cols);
+unsigned int ApplyGaussianFilter(const std::vector<unsigned int> &image, int x, int y, int rows, int cols) {
   unsigned int gauss[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
-  for (int x = 0; x < k_rows; x++) {
-    for (int y = 0; y < k_cols; y++) {
-      if (x < 1 || x >= k_rows - 1 || y < 1 || y >= k_cols - 1) {
-        final_image[(x * k_cols) + y] = 0;
-        continue;
+  unsigned int sum = 0;
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      int t_x = x + i - 1;
+      int t_y = y + j - 1;
+
+      if (t_x < 0 || t_x >= rows) {
+        t_x = x;
       }
-      unsigned int sum = 0;
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          int t_x = x + i - 1;
-          int t_y = y + j - 1;
-          if (t_x < 0 || t_x > k_rows - 1) {
-            t_x = x;
-          }
-          if (t_y < 0 || t_y > k_cols - 1) {
-            t_y = y;
-          }
-          if (t_x * k_cols + t_y >= k_cols * k_rows) {
-            t_x = x;
-            t_y = y;
-          }
-          sum += static_cast<unsigned int>(image[(t_x * k_cols) + t_y] * (gauss[i][j]));
-        }
+      if (t_y < 0 || t_y >= cols) {
+        t_y = y;
       }
-      final_image[(x * k_cols) + y] = sum / 16;
+
+      sum += static_cast<unsigned int>(image[(t_x * cols) + t_y] * gauss[i][j]);
+    }
+  }
+
+  return sum / 16;
+}
+
+std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int rows, int cols) {
+  std::vector<unsigned int> final_image(rows * cols, 0);
+
+  for (int x = 0; x < rows; x++) {
+    for (int y = 0; y < cols; y++) {
+      if (x < 1 || x >= rows - 1 || y < 1 || y >= cols - 1) {
+        final_image[(x * cols) + y] = 0;
+      } else {
+        final_image[(x * cols) + y] = ApplyGaussianFilter(image, x, y, rows, cols);
+      }
     }
   }
   return final_image;

@@ -62,6 +62,16 @@ std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int>& image, int 
   }
   return final_image;
 }
+
+void InitializeTaskData(std::shared_ptr<ppc::core::TaskData>& task_data, int rows, int cols,
+                        std::vector<unsigned int>& received_image) {
+  task_data->inputs_count.emplace_back(rows);
+  task_data->inputs_count.emplace_back(cols);
+
+  received_image.resize(rows * cols);
+  task_data->outputs_count.emplace_back(received_image.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+}
 }  // namespace
 }  // namespace sharamygina_i_horizontal_line_filtration_mpi
 
@@ -78,14 +88,8 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SampleImageTest) {
   std::vector<unsigned int> expected_image = {0, 0, 0, 0, 0, 6, 7, 0, 0, 10, 11, 0, 0, 0, 0, 0};
 
   if (world.rank() == 0) {
-    received_image.resize(rows * cols);
-
-    task_data->inputs_count.emplace_back(rows);
-    task_data->inputs_count.emplace_back(cols);
-    task_data->outputs_count.emplace_back(received_image.size());
-
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, rows, cols, received_image);
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
@@ -115,16 +119,8 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, BigImageTest) {
   std::vector<unsigned int> expected_image(rows * cols);
 
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
-    received_image.resize(rows * cols);
-
-    task_data->inputs_count.emplace_back(rows);
-    task_data->inputs_count.emplace_back(cols);
-    task_data->outputs_count.emplace_back(received_image.size());
-
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, rows, cols, received_image);
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
@@ -153,16 +149,8 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SmallImageTest) {
   std::vector<unsigned int> expected_image(rows * cols);
 
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
-    received_image.resize(rows * cols);
-
-    task_data->inputs_count.emplace_back(rows);
-    task_data->inputs_count.emplace_back(cols);
-    task_data->outputs_count.emplace_back(received_image.size());
-
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, rows, cols, received_image);
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
@@ -192,16 +180,8 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SquareImageTest) {
   std::vector<unsigned int> expected_image(rows * cols);
 
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
-    received_image.resize(rows * cols);
-
-    task_data->inputs_count.emplace_back(rows);
-    task_data->inputs_count.emplace_back(cols);
-    task_data->outputs_count.emplace_back(received_image.size());
-
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, rows, cols, received_image);
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
@@ -231,16 +211,8 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, HorizontalImageTest) {
   std::vector<unsigned int> expected_image(rows * cols);
 
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
-    received_image.resize(rows * cols);
-
-    task_data->inputs_count.emplace_back(rows);
-    task_data->inputs_count.emplace_back(cols);
-    task_data->outputs_count.emplace_back(received_image.size());
-
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, rows, cols, received_image);
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
@@ -270,16 +242,8 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, VerticalImageTest) {
   std::vector<unsigned int> expected_image(rows * cols);
 
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
-    received_image.resize(rows * cols);
-
-    task_data->inputs_count.emplace_back(rows);
-    task_data->inputs_count.emplace_back(cols);
-    task_data->outputs_count.emplace_back(received_image.size());
-
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, rows, cols, received_image);
   }
 
   sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
