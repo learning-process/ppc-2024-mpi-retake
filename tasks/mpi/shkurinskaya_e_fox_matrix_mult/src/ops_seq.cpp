@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 #include <random>
 #include <vector>
 
@@ -39,8 +40,8 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::PreProcessingImpl() {
     std::vector<double> bufferA(matrix_size * matrix_size);
     std::vector<double> bufferB(matrix_size * matrix_size);
 
-    std::memcpy(bufferA.data(), task_data->inputs[0], matrix_size * matrix_size * sizeof(double));
-    std::memcpy(bufferB.data(), task_data->inputs[1], matrix_size * matrix_size * sizeof(double));
+    memcpy(bufferA.data(), task_data->inputs[0], matrix_size * matrix_size * sizeof(double));
+    memcpy(bufferB.data(), task_data->inputs[1], matrix_size * matrix_size * sizeof(double));
 
     double *it1 = bufferA.data();
     double *it2 = bufferB.data();
@@ -194,7 +195,7 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
 
 bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::PostProcessingImpl() {
   if (world.rank() == 0) {
-    std::memcpy(task_data->outputs[0], output.data(), matrix_size * matrix_size * sizeof(double));
+    memcpy(task_data->outputs[0], output.data(), matrix_size * matrix_size * sizeof(double));
   }
   return true;
 }
