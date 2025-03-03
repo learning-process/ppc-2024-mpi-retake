@@ -4,7 +4,6 @@
 #include <boost/mpi/collectives/scatter.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <cstring>
-#include <random>
 #include <utility>
 #include <vector>
 
@@ -19,12 +18,6 @@ void LiterallyMult(const std::vector<int>& a, const std::vector<int>& b, std::ve
       }
     }
   }
-}
-void GetRndVector(std::vector<int>& vec) {
-  std::random_device rd;
-  std::default_random_engine reng(rd());
-  std::uniform_int_distribution<int> dist(-static_cast<int>(vec.size()) - 1, static_cast<int>(vec.size()) - 1);
-  std::ranges::generate(vec, [&dist, &reng] { return dist(reng); });
 }
 bool RibbonHorSchemeOnlyMatA::PreProcessingImpl() {
   if (world_.rank() == 0) {

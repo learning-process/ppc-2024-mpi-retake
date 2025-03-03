@@ -2,15 +2,24 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-
+namespace {
+void GetRndVector(std::vector<int> &vec) {
+  std::random_device rd;
+  std::default_random_engine reng(rd());
+  std::uniform_int_distribution<int> dist(-static_cast<int>(vec.size()) - 1, static_cast<int>(vec.size()) - 1);
+  std::ranges::generate(vec, [&dist, &reng] { return dist(reng); });
+}
+}  // namespace
 TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   const int a_c = 500;
@@ -25,8 +34,8 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, test_pipeline_run) {
     a.resize(a_c * a_r);
     b.resize(b_r * b_c);
     c.resize(a_r * b_c);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::GetRndVector(a);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::GetRndVector(b);
+    GetRndVector(a);
+    GetRndVector(b);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     task_data->inputs_count.emplace_back(a_c);
@@ -75,8 +84,8 @@ TEST(somov_i_ribbon_hor_scheme_only_mat_a_mpi, test_task_run) {
     a.resize(a_c * a_r);
     b.resize(b_r * b_c);
     c.resize(a_r * b_c);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::GetRndVector(a);
-    somov_i_ribbon_hor_scheme_only_mat_a_mpi::GetRndVector(b);
+    GetRndVector(a);
+    GetRndVector(b);
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a.data()));
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b.data()));
     task_data->inputs_count.emplace_back(a_c);
