@@ -35,7 +35,7 @@ bool DiningPhilosophersMPI::RunImpl() {
   for (int i = start; i < end; ++i) {
     int left_fork = i;
     int right_fork = (i + 1) % num_philosophers_;
-
+    // try
     if (i % 2 == 0) {
       boost::mpi::broadcast(world_, left_fork, rank);
       boost::mpi::broadcast(world_, right_fork, rank);
