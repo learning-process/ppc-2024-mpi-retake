@@ -20,7 +20,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::ValidationImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   bool is_valid = (rank == 0);
 
@@ -30,13 +30,15 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
                task_data->outputs_count[0] == static_cast<size_t>(total_size_);
   }
 
+  int is_valid = 0;
   MPI_Bcast(&is_valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&total_size_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return is_valid;
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::RunImpl() {
-  int rank, size;
+  int rank;
+  int size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -89,7 +91,7 @@ bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI:
 }
 
 bool komshina_d_sort_radius_for_real_numbers_with_simple_merge_mpi::TestTaskMPI::PostProcessingImpl() {
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (rank == 0) {
     std::memcpy(task_data->outputs[0], numbers_.data(), total_size_ * sizeof(double));
