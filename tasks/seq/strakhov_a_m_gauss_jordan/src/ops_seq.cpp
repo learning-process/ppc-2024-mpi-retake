@@ -60,7 +60,7 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
         return false;
       }
       for (size_t j = 0; j < row_size_; j++) {
-        input_[(i * row_size_) + j] = input_[k * row_size_ + j];
+        input_[(i * row_size_) + j] = input_[(k * row_size_) + j];
       }
     }
     if (input_[(i * row_size_) + i] != 1.0) {
@@ -81,7 +81,7 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
       };
       double kf = input_[(k * row_size_) + i] / input_[(i * row_size_) + i];
       for (size_t j = i + 1; j < row_size_; j++) {
-        input_[k * row_size_ + j] -= (input_[row_size_ * i + j] * kf);
+        input_[(k * row_size_) + j] -= (input_[(row_size_ * i) + j] * kf);
       }
       input_[(k * row_size_) + i] = 0;
     }
@@ -91,7 +91,7 @@ bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::RunImpl() {
 
 bool strakhov_a_m_gauss_jordan_seq::TestTaskSequential::PostProcessingImpl() {
   for (size_t i = 0; i < output_.size(); i++) {
-    reinterpret_cast<double*>(task_data->outputs[0])[i] = input_[(i + 1) * row_size_ - 1];
+    reinterpret_cast<double*>(task_data->outputs[0])[i] = input_[((i + 1) * row_size_) - 1];
   }
   return true;
 }

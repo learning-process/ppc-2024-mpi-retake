@@ -72,7 +72,7 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
     int j = static_cast<int>(dv);
     for (int k = 1; k < world_.size(); k++) {
       size_t pr_size = (k < static_cast<int>(ost)) ? dv : osn_dv;
-      world_.send(k, 0, &input_[j * row_size_], static_cast<int>(pr_size) * row_size_);
+      world_.send(k, 0, &input_[j * row_size_], static_cast<int>(pr_size * row_size_));
       j += static_cast<int>(pr_size);
     }
     local_input = std::vector<double>(input_.data(), input_.data() + (dv * row_size_));
