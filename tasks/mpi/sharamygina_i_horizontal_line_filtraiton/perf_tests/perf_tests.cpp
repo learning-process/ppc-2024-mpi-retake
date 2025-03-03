@@ -3,8 +3,8 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
-#include <chrono>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <random>
 #include <vector>
@@ -15,39 +15,49 @@
 
 namespace sharamygina_i_horizontal_line_filtration_mpi {
 namespace {
-std::vector<unsigned int> GetImage(int rows, int cols) {
-  std::vector<unsigned int> temporaryIm(rows * cols);
+std::vector<unsigned int> GetImage(int kRows, int kCols) {
+  std::vector<unsigned int> temporary_im(kRows * kCols);
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
-  for (int i = 0; i < rows; i++)
-    for (int j = 0; j < cols; j++) temporaryIm[i * cols + j] = dist(gen);
-  return temporaryIm;
+  for (int i = 0; i < kRows; i++) {
+    for (int j = 0; j < kCols; j++) {
+      temporary_im[(i * kCols) + j] = dist(gen);
+    }
+  }
+  return temporary_im;
 }
 
-std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int rows, int cols) {  // seq
-  std::vector<unsigned int> final_image(rows * cols);
+std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int kRows, int kCols) {
+  std::vector<unsigned int> final_image(kRows * kCols);
   unsigned int gauss[3][3]{{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
-  for (int x = 0; x < rows; x++)
-    for (int y = 0; y < cols; y++) {
-      if (x < 1 || x >= rows - 1 || y < 1 || y >= cols - 1) {
-        final_image[x * cols + y] = 0;
+  for (int x = 0; x < kRows; x++) {
+    for (int y = 0; y < kCols; y++) {
+      if (x < 1 || x >= kRows - 1 || y < 1 || y >= kCols - 1) {
+        final_image[(x * kCols) + y] = 0;
         continue;
       }
       unsigned int sum = 0;
-      for (int i = 0; i < 3; i++)
+      for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-          int tX = x + i - 1, tY = y + j - 1;
-          if (tX < 0 || tX > rows - 1) tX = x;
-          if (tY < 0 || tY > cols - 1) tY = y;
-          if (tX * cols + tY >= cols * rows) {
+          int tX = x + i - 1;
+          int tY = y + j - 1;
+          if (tX < 0 || tX > kRows - 1) {
+            tX = x;
+          }
+          if (tY < 0 || tY > kCols - 1) {
+            tY = y;
+          }
+          if (tX * kCols + tY >= kCols * kRows) {
             tX = x;
             tY = y;
           }
-          sum += static_cast<unsigned int>(image[tX * cols + tY] * (gauss[i][j]));
+          sum += static_cast<unsigned int>(image[(tX * kCols) + tY] * (gauss[i][j]));
         }
-      final_image[x * cols + y] = sum / 16;
+      }
+      final_image[(x * kCols) + y] = sum / 16;
     }
+  }
   return final_image;
 }
 }  // namespace
@@ -56,39 +66,39 @@ std::vector<unsigned int> ToFiltSeq(const std::vector<unsigned int> &image, int 
 TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
-  int rows = 5000;
-  int cols = 5000;
+  int kRows = 6000;
+  int kCols = 6000;
 
   // Create data
   std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
-  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+  std::vector<unsigned int> image(kRows * kCols);
+  std::vector<unsigned int> expected_image(kRows * kCols);
+  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
+  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
 
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
+  // Create task_data
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
+    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
 
-    taskData->inputs_count.emplace_back(rows);
-    taskData->inputs_count.emplace_back(cols);
+    task_data->inputs_count.emplace_back(kRows);
+    task_data->inputs_count.emplace_back(kCols);
 
-    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
 
-    received_image.resize(rows * cols);
-    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_image.data()));
-    taskData->outputs_count.emplace_back(received_image.size());
+    received_image.resize(kRows * kCols);
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_image.data()));
+    task_data->outputs_count.emplace_back(received_image.size());
   }
 
-  auto testTask =
-      std::make_shared<sharamygina_i_horizontal_line_filtration_mpi::horizontal_line_filtration_mpi>(taskData);
+  auto test_task =
+      std::make_shared<sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi>(task_data);
 
-  ASSERT_EQ(testTask->ValidationImpl(), true);
-  testTask->PreProcessingImpl();
-  testTask->RunImpl();
-  testTask->PostProcessingImpl();
+  ASSERT_EQ(test_task->ValidationImpl(), true);
+  test_task->PreProcessingImpl();
+  test_task->RunImpl();
+  test_task->PostProcessingImpl();
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -98,7 +108,7 @@ TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_pipeline_run) {
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTask);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
@@ -109,38 +119,38 @@ TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_pipeline_run) {
 TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_task_run) {
   boost::mpi::communicator world;
 
-  int rows = 5000;
-  int cols = 5000;
+  int kRows = 6000;
+  int kCols = 6000;
 
   // Create data
   std::vector<unsigned int> received_image;
-  std::vector<unsigned int> image(rows * cols);
-  std::vector<unsigned int> expected_image(rows * cols);
-  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+  std::vector<unsigned int> image(kRows * kCols);
+  std::vector<unsigned int> expected_image(kRows * kCols);
+  image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
+  expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
 
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskData = std::make_shared<ppc::core::TaskData>();
+  // Create task_data
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(rows, cols);
-    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, rows, cols);
+    image = sharamygina_i_horizontal_line_filtration_mpi::GetImage(kRows, kCols);
+    expected_image = sharamygina_i_horizontal_line_filtration_mpi::ToFiltSeq(image, kRows, kCols);
 
-    taskData->inputs_count.emplace_back(rows);
-    taskData->inputs_count.emplace_back(cols);
+    task_data->inputs_count.emplace_back(kRows);
+    task_data->inputs_count.emplace_back(kCols);
 
-    taskData->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(image.data()));
 
-    received_image.resize(rows * cols);
-    taskData->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_image.data()));
-    taskData->outputs_count.emplace_back(received_image.size());
+    received_image.resize(kRows * kCols);
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(received_image.data()));
+    task_data->outputs_count.emplace_back(received_image.size());
   }
-  auto testTask =
-      std::make_shared<sharamygina_i_horizontal_line_filtration_mpi::horizontal_line_filtration_mpi>(taskData);
+  auto test_task =
+      std::make_shared<sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi>(task_data);
 
-  ASSERT_EQ(testTask->ValidationImpl(), true);
-  testTask->PreProcessingImpl();
-  testTask->RunImpl();
-  testTask->PostProcessingImpl();
+  ASSERT_EQ(test_task->ValidationImpl(), true);
+  test_task->PreProcessingImpl();
+  test_task->RunImpl();
+  test_task->PostProcessingImpl();
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -150,7 +160,7 @@ TEST(sharamygina_i_horizontal_line_filtraiton_mpi, test_task_run) {
   // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTask);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
