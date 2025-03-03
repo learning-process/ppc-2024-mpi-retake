@@ -9,7 +9,8 @@
 #include "core/task/include/task.hpp"
 #include "mpi/karaseva_e_binaryimage/include/ops_mpi.hpp"
 
-std::vector<int> static CreateRandomBinaryImage(int r, int c) {
+namespace {
+std::vector<int> CreateRandomBinaryImage(int r, int c) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(r * c);
@@ -18,6 +19,7 @@ std::vector<int> static CreateRandomBinaryImage(int r, int c) {
   }
   return vec;
 }
+}  // namespace
 
 TEST(karaseva_e_binaryimage_mpi, test_on_random_ing_25x25) {
   boost::mpi::communicator world;
