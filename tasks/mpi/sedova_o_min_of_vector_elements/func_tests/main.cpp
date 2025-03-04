@@ -41,7 +41,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_10x10) {
 
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_matrix;
-  std::vector<int> output(1, INT_MAX);
+  std::vector<uint8_t> output(1, INT_MAX);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);

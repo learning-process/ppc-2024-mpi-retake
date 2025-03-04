@@ -94,7 +94,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
 TEST(sedova_o_min_of_vector_elements_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_matrix;
-  std::vector<int> global_min(1, INT_MAX);
+  std::vector<size_t> global_min(1, INT_MAX);
   int ref = INT_MIN;
 
   // Create TaskData
