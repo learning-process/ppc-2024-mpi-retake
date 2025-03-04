@@ -157,14 +157,13 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
   std::vector<double> temp = left_block;
   std::vector<double> temp_output(sz_ * sz_, 0.0);
 
-  bool valid = temp.empty();
-
   // Fox's algorithm (root_ steps)
   for (int it = 0; it < root_; ++it) {
     // (color + key + it) % root_  equals A~i~(i + k)
-    if ((((color + key + it) % root_) == 0) && (!valid)) {
-      valid = true;
-      left_block = temp;
+    if (((color + key + it) % root_) == 0) {
+      for (int k = 0; k < temp.size(); ++k) {
+        left_block[k] = temp[k];
+      }
     }
 
     // Broadcast the local block to all ranks in the row
