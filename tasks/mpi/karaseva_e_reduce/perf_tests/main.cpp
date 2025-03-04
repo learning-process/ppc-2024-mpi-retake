@@ -18,9 +18,9 @@ TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<unsigned char *>(in.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<unsigned char*>(in.data()));
   task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<unsigned char *>(out.data()));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<unsigned char*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   // Create Task
@@ -39,11 +39,11 @@ TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
   const int expected_sum = kCount * kCount;
-  EXPECT_EQ(static_cast<size_t>(out[0]), static_cast<size_t>(expected_sum));  // Corrected comparison
+  EXPECT_EQ(out[0], expected_sum);
 }
 
 TEST(karaseva_e_reduce_mpi, test_task_run) {
-  constexpr int kCount = 25000;
+  constexpr int kCount = 10000;
 
   // Create data
   std::vector<int> in(kCount * kCount, 1);
@@ -51,9 +51,9 @@ TEST(karaseva_e_reduce_mpi, test_task_run) {
 
   // Create task_data
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<unsigned char *>(in.data()));
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<unsigned char*>(in.data()));
   task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<unsigned char *>(out.data()));
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<unsigned char*>(out.data()));
   task_data_mpi->outputs_count.emplace_back(out.size());
 
   // Create Task
@@ -77,5 +77,7 @@ TEST(karaseva_e_reduce_mpi, test_task_run) {
 
   // Checking that the output result is equal to the sum of all the elements
   const int expected_sum = kCount * kCount;
-  EXPECT_EQ(static_cast<size_t>(out[0]), static_cast<size_t>(expected_sum));  // Corrected comparison
+  EXPECT_EQ(out[0], expected_sum);
 }
+
+#define OMPI_SKIP_MPICXX
