@@ -4,6 +4,7 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
+#include <boost/mpi/operations.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
 #include <cmath>
@@ -44,7 +45,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PostProcessingImpl
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
-  unsigned int delta = 0;
+  int delta = 0;
   if (world_.rank() == 0) {
     delta = task_data->inputs_count[0] * task_data->inputs_count[1] / world_.size();
   }
@@ -82,7 +83,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   int local_res = *std::ranges::min_element(output_.begin(), output_.end());
-  boost::mpi::reduce(world_, local_res, res_, boost::mpi::minimum<int>(), 0);
+  boost::mpi::reduce(world_, local_res, res_, boost::mpi::operations::minimum<int>(), 0);
   return true;
 }
 
