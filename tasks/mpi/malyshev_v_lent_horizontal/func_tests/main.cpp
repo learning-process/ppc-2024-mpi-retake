@@ -108,7 +108,7 @@ TEST(malyshev_v_lent_horizontal_mpi, test_2x2_matrix) {
   std::vector<int> vector = {5, 6};
   std::vector<int> out_par(rows, 0);
 
-  std::vector<int> expect = {1 * 5 + 2 * 6, 3 * 5 + 4 * 6};  // {17, 39}
+  std::vector<int> expect = {(1 * 5) + (2 * 6), (3 * 5) + (4 * 6)};  // {17, 39}
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
@@ -144,7 +144,7 @@ TEST(malyshev_v_lent_horizontal_mpi, test_3x2_matrix) {
   std::vector<int> vector = {2, 3};
   std::vector<int> out_par(rows, 0);
 
-  std::vector<int> expect = {1 * 2 + 2 * 3, 3 * 2 + 4 * 3, 5 * 2 + 6 * 3};  // {8, 18, 28}
+  std::vector<int> expect = {(1 * 2) + (2 * 3), (3 * 2) + (4 * 3), (5 * 2) + (6 * 3)};  // {8, 18, 28}
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
@@ -182,7 +182,7 @@ TEST(malyshev_v_lent_horizontal_mpi, test_random_matrix) {
   std::vector<int> expect(rows, 0);
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      expect[i] += matrix[i * cols + j] * vector[j];
+      expect[i] += matrix[(i * cols) + j] * vector[j];
     }
   }
 

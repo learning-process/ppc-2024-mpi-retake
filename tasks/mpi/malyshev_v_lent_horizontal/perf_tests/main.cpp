@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -39,8 +40,8 @@ TEST(malyshev_v_lent_horizontal_mpi, test_pipeline_Run) {
   int cols = 12000;
   int rows = 12000;
 
-  std::vector<int> matrix = malyshev_v_lent_horizontal_mpi::GetRandomMatrix(rows, cols);
-  std::vector<int> vector = malyshev_v_lent_horizontal_mpi::GetRandomVector(cols);
+  std::vector<int> matrix = GetRandomMatrix(rows, cols);
+  std::vector<int> vector = GetRandomVector(cols);
   std::vector<int> out(rows, 0);
 
   std::vector<int> expect(rows, 0);
@@ -93,8 +94,8 @@ TEST(malyshev_v_lent_horizontal_mpi, test_task_Run) {
   int cols = 12000;
   int rows = 12000;
 
-  std::vector<int> matrix = malyshev_v_lent_horizontal_mpi::GetRandomMatrix(rows, cols);
-  std::vector<int> vector = malyshev_v_lent_horizontal_mpi::GetRandomVector(cols);
+  std::vector<int> matrix = GetRandomMatrix(rows, cols);
+  std::vector<int> vector = GetRandomVector(cols);
   std::vector<int> out(rows, 0);
 
   std::vector<int> expect(rows, 0);

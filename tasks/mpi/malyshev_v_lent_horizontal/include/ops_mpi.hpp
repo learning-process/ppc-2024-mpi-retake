@@ -19,7 +19,7 @@ class MatVecMultMpi : public ppc::core::Task {
 
  private:
   std::vector<int> matrix_, vector_, local_matrix_, local_result_;
-  unsigned int rows_, cols_;
+  unsigned int rows_{}, cols_{};
   boost::mpi::communicator world_;
 };
 
