@@ -1,20 +1,15 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <memory>
-#include <numeric>
-#include <string>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
-namespace Shpynov_N_readers_writers_mpi {
+namespace shpynov_N_readers_writers_mpi {
 class TestTaskMPI : public ppc::core::Task {
-public:
+ public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data)
       : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
@@ -22,9 +17,9 @@ public:
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-private:
-  std::vector<int> critical_resource;
-  std::vector<int> result;
-  boost::mpi::communicator world;
+ private:
+  std::vector<int> critical_resource_;
+  std::vector<int> result_;
+  boost::mpi::communicator world_;
 };
-} // namespace Shpynov_N_readers_writers_mpi
+}  // namespace shpynov_N_readers_writers_mpi

@@ -1,163 +1,191 @@
-#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
-
 #include <algorithm>
-#include <functional>
-#include <random>
+#include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
 
+#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
+
 using namespace std::chrono_literals;
 
-class C_sem { //semaphore class
-private:
-  int signal;
+class CSem {  // semaphore class
+ private:
+  int signal_;
 
-public:
-  C_sem(int sig) { signal = sig; }
+ public:
+  CSem(int sig) { signal_ = sig; }
 
   bool TryLock() {
-    if (signal != 0) {
-      signal--;
+    if (signal_ != 0) {
+      signal_--;
       return true;
     }
     return false;
   }
-  void Lock() { signal--; }
-  void Unlock() { signal++; }
-  bool IsOnlyUser() { return signal == 1; }
-  bool IsFree() { return signal == 0; }
+  void Lock() { signal_--; }
+  void Unlock() { signal_++; }
+  bool IsOnlyUser() const { return signal_ == 1; }
+
+  bool IsFree() const { return signal_ == 0; }
+
+  int CheckAnotherSem(CSem &writer, CSem &read_count) {
+    if (this->TryLock()) {
+      read_count.Unlock();
+      if (read_count.IsOnlyUser()) {
+        if (writer.TryLock()) {
+        } else {
+          this->Unlock();
+          return 1;
+        }
+      }
+      return 2;
+    }
+    return 0;
+  }
+
+  void UnlockIfFree(CSem &writer) {
+    if (this->IsFree()) {
+      writer.Unlock();
+    }
+  }
 };
 
-bool Shpynov_N_readers_writers_mpi::TestTaskMPI::ValidationImpl() {
-  if (world.rank() == 0) {
-    if (task_data->inputs_count[0] != task_data->outputs_count[0])
+void Adder(std::vector<int> &A) {
+  for (size_t i = 0; i < A.size(); i++) {
+    A[i]++;
+  }
+}
+
+bool shpynov_N_readers_writers_mpi::TestTaskMPI::ValidationImpl() {
+  if (world_.rank() == 0) {
+    if (task_data->inputs_count[0] != task_data->outputs_count[0]) {
       return false;
-    if (task_data->inputs_count[0] <= 0)
+    }
+    if (task_data->inputs_count[0] <= 0) {
       return false;
+    }
   }
   return true;
 }
 
-bool Shpynov_N_readers_writers_mpi::TestTaskMPI::PreProcessingImpl() {
-  if (world.rank() == 0) {
+bool shpynov_N_readers_writers_mpi::TestTaskMPI::PreProcessingImpl() {
+  if (world_.rank() == 0) {
     unsigned int input_size = task_data->inputs_count[0];
     auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-    critical_resource = std::vector<int>(in_ptr, in_ptr + input_size);
+    critical_resource_ = std::vector<int>(in_ptr, in_ptr + input_size);
 
     unsigned int output_size = task_data->outputs_count[0];
-    result = std::vector<int>(output_size, 0);
+    result_ = std::vector<int>(output_size, 0);
   }
   return true;
 }
 
-enum procedures { WriteBegin, WriteEnd, ReadBegin, ReadEnd };
+enum Procedures : std::uint8_t { kWriteBegin, kWriteEnd, kReadBegin, kReadEnd };
 
-procedures hasher(std::string const &inString) {
-  if (inString == "WriteBegin")
-    return WriteBegin;
-  if (inString == "WriteEnd")
-    return WriteEnd;
-  if (inString == "ReadBegin")
-    return ReadBegin;
-  if (inString == "ReadEnd")
-    return ReadEnd;
-  return WriteBegin;
+static Procedures Hasher(std::string const &in_string) {
+  if (in_string == "kWriteBegin") {
+    return kWriteBegin;
+  }
+  if (in_string == "kWriteEnd") {
+    return kWriteEnd;
+  }
+  if (in_string == "kReadBegin") {
+    return kReadBegin;
+  }
+  if (in_string == "kReadEnd") {
+    return kReadEnd;
+  }
+  return kWriteBegin;
 };
-bool Shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
-  C_sem mutex(1);
-  C_sem writer(1);
-  C_sem read_count(0);
-  C_sem proc(world.size() - 1);
+bool shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
+  CSem mutex(1);
+  CSem writer(1);
+  CSem read_count(0);
+  CSem proc(world_.size() - 1);
 
-  if (world.rank() == 0) { // world represents monitor
+  if (world_.rank() == 0) {  // world_ represents monitor
 
-    while (!proc.IsFree()) { // processing requests untill all threads been used at least once
+    while (!proc.IsFree()) {  // processing requests untill all threads been
+                              // used at least once
       std::string procedure;
       boost::mpi::status stat;
 
-      stat = world.recv(boost::mpi::any_source, 0, procedure);
+      stat = world_.recv(boost::mpi::any_source, 0, procedure);
       int sender_name = stat.source();
-      std::vector<int> NewRes(critical_resource.size());
-      switch (hasher(procedure)) {
-      case WriteBegin:
-        if (writer.TryLock()) {
-          world.send(sender_name, 2, std::string("clear"));
-          world.send(sender_name, 1, critical_resource);
-        } else {
-          world.send(sender_name, 2, std::string("wait"));
-        }
-        break;
-
-      case WriteEnd:
-        world.recv(sender_name, 3, NewRes);
-        critical_resource = NewRes;
-        writer.Unlock();
-        proc.Lock();
-        break;
-
-      case ReadBegin:
-        if (mutex.TryLock()) {
-          read_count.Unlock();
-          if (read_count.IsOnlyUser()) {
-            if (writer.TryLock()) {
-            } else {
-              world.send(sender_name, 2, std::string("wait"));
-              mutex.Unlock();
-              continue;
-            }
+      std::vector<int> new_res(critical_resource_.size());
+      int tmp;
+      switch (Hasher(procedure)) {
+        case kWriteBegin:
+          if (writer.TryLock()) {
+            world_.send(sender_name, 2, std::string("clear"));
+            world_.send(sender_name, 1, critical_resource_);
+          } else {
+            world_.send(sender_name, 2, std::string("wait"));
           }
-          mutex.Unlock();
-          world.send(sender_name, 2, std::string("clear"));
-          world.send(sender_name, 1, critical_resource);
-        } else
-          world.send(sender_name, 2, std::string("wait"));
-        break;
+          break;
 
-      case ReadEnd:
-        mutex.Lock();
-        read_count.Lock();
-        if (read_count.IsFree()) {
+        case kWriteEnd:
+          world_.recv(sender_name, 3, new_res);
+          critical_resource_ = new_res;
           writer.Unlock();
-        }
-        mutex.Unlock();
-        proc.Lock();
-        break;
+          proc.Lock();
+          break;
 
-      default:
-        break;
+        case kReadBegin:
+          tmp = mutex.CheckAnotherSem(writer, read_count);
+          if (tmp == 1) {
+            world_.send(sender_name, 2, std::string("wait"));
+            mutex.Unlock();
+            continue;
+          } else if (tmp == 2) {
+            mutex.Unlock();
+            world_.send(sender_name, 2, std::string("clear"));
+            world_.send(sender_name, 1, critical_resource_);
+          } else {
+            world_.send(sender_name, 2, std::string("wait"));
+          }
+          break;
+
+        case kReadEnd:
+          mutex.Lock();
+          read_count.Lock();
+          read_count.UnlockIfFree(writer);
+          mutex.Unlock();
+          proc.Lock();
+          break;
+
+        default:
+          break;
       }
     }
-    result = critical_resource;
-  } else if (world.rank() % 2 == 0) { // reader
+    result_ = critical_resource_;
+  } else if (world_.rank() % 2 == 0) {  // reader
     std::string resp = "wait";
     while (resp != "clear") {
-      world.send(0, 0, std::string("ReadBegin"));
-      world.recv(0, 2, resp);
+      world_.send(0, 0, std::string("kReadBegin"));
+      world_.recv(0, 2, resp);
     }
-    world.recv(0, 1, critical_resource);
+    world_.recv(0, 1, critical_resource_);
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    world.send(0, 0, std::string("ReadEnd"));
-  } else { // writer
+    world_.send(0, 0, std::string("kReadEnd"));
+  } else {  // writer
     std::string resp = "wait";
     while (resp != "clear") {
-      world.send(0, 0, std::string("WriteBegin"));
-      world.recv(0, 2, resp);
+      world_.send(0, 0, std::string("kWriteBegin"));
+      world_.recv(0, 2, resp);
     }
-    world.recv(0, 1, critical_resource);
-    for (int i = 0; i < critical_resource.size(); i++) {
-      critical_resource[i] += 1;
-    }
-    world.send(0, 3, critical_resource);
-    world.send(0, 0, std::string("WriteEnd"));
+    world_.recv(0, 1, critical_resource_);
+    Adder(critical_resource_);
+    world_.send(0, 3, critical_resource_);
+    world_.send(0, 0, std::string("kWriteEnd"));
   }
-  world.barrier();
+  world_.barrier();
   return true;
 }
-bool Shpynov_N_readers_writers_mpi::TestTaskMPI::PostProcessingImpl() {
-  if (world.rank() == 0) {
+bool shpynov_N_readers_writers_mpi::TestTaskMPI::PostProcessingImpl() {
+  if (world_.rank() == 0) {
     auto *output = reinterpret_cast<int *>(task_data->outputs[0]);
-    std::copy(result.begin(), result.end(), output);
+    std::ranges::copy(result_.begin(), result_.end(), output);
     return true;
   }
   return true;
