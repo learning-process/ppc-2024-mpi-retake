@@ -201,6 +201,8 @@ void OddEvenBatcherSort(std::vector<int>& v) {
   }
 }
 
+// --- Implementation of OddEvenBatcherSortTask ---
+
 bool OddEvenBatcherSortTask::ValidationImpl() {
   return !task_data->inputs.empty() && !task_data->outputs.empty() &&
          task_data->inputs_count[0] == task_data->outputs_count[0];
@@ -219,7 +221,6 @@ bool OddEvenBatcherSortTask::RunImpl() {
 }
 
 bool OddEvenBatcherSortTask::PostProcessingImpl() {
-  unsigned int count = task_data->outputs_count[0];
   int* out_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
   std::copy(data_.begin(), data_.end(), out_ptr);
   return true;
