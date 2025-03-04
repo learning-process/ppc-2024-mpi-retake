@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/timer.hpp>
 #include <cstdint>
 #include <memory>
