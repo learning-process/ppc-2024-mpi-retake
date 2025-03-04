@@ -47,7 +47,8 @@ bool ersoz_b_test_task_seq::TestTaskSequential::PreProcessingImpl() {
 
 bool ersoz_b_test_task_seq::TestTaskSequential::ValidationImpl() {
   unsigned int input_size = task_data->inputs_count[0];
-  if (img_size_ * img_size_ != input_size) return false;
+  if (static_cast<unsigned int>(img_size_ * img_size_) != input_size) return false;
+
   if (task_data->outputs_count[0] != static_cast<unsigned int>((img_size_ - 2) * (img_size_ - 2))) return false;
   return true;
 }
