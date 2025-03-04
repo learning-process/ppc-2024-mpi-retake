@@ -21,17 +21,18 @@ TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
   int min = -500;
   int max = 500;
 
-  global_matrix = sedova_o_min_of_vector_elements_seq::getRandomMatrix(rows, columns, min, max);
+  global_matrix = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
   int index = gen() % (rows * columns);
   global_matrix[index / columns][index / rows] = ref;
 
-  for (unsigned int i = 0; i < global_matrix.size(); i++)
+  for (unsigned int i = 0; i < global_matrix.size(); i++) {
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
-  task_data_seq->inputs_count.emplace_back(rows);
-  task_data_seq->inputs_count.emplace_back(columns);
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->inputs_count.emplace_back(columns);
 
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_min.data()));
-  task_data_seq->outputs_count.emplace_back(global_min.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_min.data()));
+    task_data_seq->outputs_count.emplace_back(global_min.size());
+  }
 
   // Create Task
   auto testTaskSequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);
@@ -71,17 +72,18 @@ TEST(sedova_o_min_of_vector_elements_seq, test_task_run) {
   int min = -500;
   int max = 500;
 
-  global_matrix = sedova_o_min_of_vector_elements_seq::getRandomMatrix(rows, columns, min, max);
+  global_matrix = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
   int index = gen() % (rows * columns);
   global_matrix[index / columns][index / rows] = ref;
 
-  for (unsigned int i = 0; i < global_matrix.size(); i++)
+  for (unsigned int i = 0; i < global_matrix.size(); i++) {
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
-  task_data_seq->inputs_count.emplace_back(rows);
-  task_data_seq->inputs_count.emplace_back(columns);
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->inputs_count.emplace_back(columns);
 
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_min.data()));
-  task_data_seq->outputs_count.emplace_back(global_min.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_min.data()));
+    task_data_seq->outputs_count.emplace_back(global_min.size());
+  }
 
   // Create Task
   auto testTaskSequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);

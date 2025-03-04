@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
-#include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -35,13 +33,14 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
     int index = gen() % (rows * columns);
     global_matrix[index / columns][index / rows] = ref;
 
-    for (unsigned int i = 0; i < global_matrix.size(); i++)
+    for (unsigned int i = 0; i < global_matrix.size(); i++) {
       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix[i].data()));
-    task_data_par->inputs_count.emplace_back(rows);
-    task_data_par->inputs_count.emplace_back(columns);
+      task_data_par->inputs_count.emplace_back(rows);
+      task_data_par->inputs_count.emplace_back(columns);
 
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_min.data()));
-    task_data_par->outputs_count.emplace_back(global_min.size());
+      task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_min.data()));
+      task_data_par->outputs_count.emplace_back(global_min.size());
+    }
   }
 
   auto task_data_parallel = std::make_shared<sedova_o_min_of_vector_elements_mpi::TestTaskMPI>(task_data_par);
@@ -90,13 +89,14 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_task_run) {
     int index = gen() % (rows * columns);
     global_matrix[index / columns][index / rows] = ref;
 
-    for (unsigned int i = 0; i < global_matrix.size(); i++)
+    for (unsigned int i = 0; i < global_matrix.size(); i++) {
       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix[i].data()));
-    task_data_par->inputs_count.emplace_back(rows);
-    task_data_par->inputs_count.emplace_back(columns);
+      task_data_par->inputs_count.emplace_back(rows);
+      task_data_par->inputs_count.emplace_back(columns);
 
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_min.data()));
-    task_data_par->outputs_count.emplace_back(global_min.size());
+      task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_min.data()));
+      task_data_par->outputs_count.emplace_back(global_min.size());
+    }
   }
 
   auto task_data_parallel = std::make_shared<sedova_o_min_of_vector_elements_mpi::TestTaskMPI>(task_data_par);

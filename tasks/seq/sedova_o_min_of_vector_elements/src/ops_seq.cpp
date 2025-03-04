@@ -7,7 +7,7 @@
 
 using namespace std::chrono_literals;
 
-std::vector<int> sedova_o_min_of_vector_elements_seq::getRandomVector(int size, int min, int max) {
+std::vector<int> sedova_o_min_of_vector_elements_seq::GetRandomVector(int size, int min, int max) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<> distrib(min, max);
@@ -16,10 +16,10 @@ std::vector<int> sedova_o_min_of_vector_elements_seq::getRandomVector(int size, 
   return vec;
 }
 
-std::vector<std::vector<int>> sedova_o_min_of_vector_elements_seq::getRandomMatrix(int rows, int columns, int min,
+std::vector<std::vector<int>> sedova_o_min_of_vector_elements_seq::GetRandomMatrix(int rows, int columns, int min,
                                                                                    int max) {
   std::vector<std::vector<int>> vec(rows);
-  std::generate(vec.begin(), vec.end(), [&]() { return getRandomVector(columns, min, max); });
+  std::generate(vec.begin(), vec.end(), [&]() { return GetRandomVector(columns, min, max); });
   return vec;
 }
 

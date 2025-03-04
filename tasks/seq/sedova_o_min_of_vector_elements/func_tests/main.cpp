@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <climits>
+#include <memory>
 #include <random>
 #include <vector>
 
@@ -18,20 +19,21 @@ TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {
 
   // Create data
   std::vector<int> output(1, INT_MAX);
-  std::vector<std::vector<int>> input = sedova_o_min_of_vector_elements_seq::getRandomMatrix(rows, columns, min, max);
+  std::vector<std::vector<int>> input = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
 
   int index = gen() % (rows * columns);
   input[index / columns][index / rows] = ref;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  for (unsigned int i = 0; i < input.size(); i++)
+  for (unsigned int i = 0; i < input.size(); i++) {
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input[i].data()));
-  task_data_seq->inputs_count.emplace_back(rows);
-  task_data_seq->inputs_count.emplace_back(columns);
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->inputs_count.emplace_back(columns);
 
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
-  task_data_seq->outputs_count.emplace_back(output.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
+    task_data_seq->outputs_count.emplace_back(output.size());
+  }
 
   // Create Task
   sedova_o_min_of_vector_elements_seq::TestTaskSequential test_task_sequential(task_data_seq);
@@ -55,20 +57,21 @@ TEST(sedova_o_min_of_vector_elements_seq, test_100x100) {
 
   // Create data
   std::vector<int> output(1, INT_MAX);
-  std::vector<std::vector<int>> input = sedova_o_min_of_vector_elements_seq::getRandomMatrix(rows, columns, min, max);
+  std::vector<std::vector<int>> input = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
 
   int index = gen() % (rows * columns);
   input[index / columns][index / rows] = ref;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  for (unsigned int i = 0; i < input.size(); i++)
+  for (unsigned int i = 0; i < input.size(); i++) {
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input[i].data()));
-  task_data_seq->inputs_count.emplace_back(rows);
-  task_data_seq->inputs_count.emplace_back(columns);
+    task_data_seq->inputs_count.emplace_back(rows);
+    task_data_seq->inputs_count.emplace_back(columns);
 
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
-  task_data_seq->outputs_count.emplace_back(output.size());
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
+    task_data_seq->outputs_count.emplace_back(output.size());
+  }
 
   // Create Task
   sedova_o_min_of_vector_elements_seq::TestTaskSequential test_task_sequential(task_data_seq);
