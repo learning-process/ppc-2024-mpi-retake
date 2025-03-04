@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/reducer.hpp>
+#include <boost/mpi.hpp>
 #include <climits>
 #include <cmath>
 #include <random>
