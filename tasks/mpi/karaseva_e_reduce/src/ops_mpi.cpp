@@ -77,21 +77,26 @@ bool TestTaskMPI<T>::RunImpl() {
   T result = local_sum;
 
   int step = 1;
+  int vr = (rank - root + size) % size;
+
   while (step < size) {
-    int distance = (rank - root + size) % size;
-    if (distance % (2 * step) == 0) {
-      int partner_rank = rank + step;
-      if (partner_rank >= size) {
-        partner_rank -= size;
+    if (vr % (2 * step) == 0) {
+      int partner_vr = vr + step;
+      if (partner_vr >= size) {
+        step *= 2;
+        continue;
       }
-      if ((distance / step) % 2 == 0) {
-        T recv_data;
-        MPI_Recv(&recv_data, 1, mpi_type, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        result += recv_data;
-      } else {
-        MPI_Send(&result, 1, mpi_type, partner_rank, 0, MPI_COMM_WORLD);
-        break;
-      }
+      int partner_rank = (partner_vr + root) % size;
+
+      T recv_data;
+      MPI_Recv(&recv_data, 1, mpi_type, partner_rank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      result += recv_data;
+    } else {
+      int partner_vr = vr - step;
+      int partner_rank = (partner_vr + root) % size;
+
+      MPI_Send(&result, 1, mpi_type, partner_rank, 0, MPI_COMM_WORLD);
+      break;
     }
     step *= 2;
   }

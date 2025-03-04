@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <mpi.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -12,7 +13,7 @@
 
 namespace {
 
-// Utility function to generate random dat
+// Utility function to generate random data
 template <typename T>
 std::vector<T> GetRandom(int size) {
   std::random_device dev;
@@ -28,10 +29,21 @@ std::vector<T> GetRandom(int size) {
 }  // namespace
 
 TEST(karaseva_e_reduce_mpi, test_reduce_int) {
-  constexpr size_t kCount = 50;
+  MPI_Comm comm = MPI_COMM_WORLD;
+  int rank;
+  MPI_Comm_rank(comm, &rank);
 
-  std::vector<int> in = GetRandom<int>(kCount);
+  constexpr size_t kCount = 50;
+  std::vector<int> in;
   std::vector<int> out(1, 0);
+
+  if (rank == 0) {
+    in = GetRandom<int>(kCount);
+  } else {
+    in.resize(kCount);
+  }
+
+  MPI_Bcast(in.data(), kCount, MPI_INT, 0, comm);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
@@ -46,16 +58,28 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  int expected_result = std::accumulate(in.begin(), in.end(), 0);
-
-  EXPECT_EQ(out[0], expected_result);
+  if (rank == 0) {
+    int expected_result = std::accumulate(in.begin(), in.end(), 0);
+    EXPECT_EQ(out[0], expected_result);
+  }
 }
 
 TEST(karaseva_e_reduce_mpi, test_reduce_double) {
-  constexpr size_t kCount = 50;
+  MPI_Comm comm = MPI_COMM_WORLD;
+  int rank;
+  MPI_Comm_rank(comm, &rank);
 
-  std::vector<double> in = GetRandom<double>(kCount);
+  constexpr size_t kCount = 50;
+  std::vector<double> in;
   std::vector<double> out(1, 0.0);
+
+  if (rank == 0) {
+    in = GetRandom<double>(kCount);
+  } else {
+    in.resize(kCount);
+  }
+
+  MPI_Bcast(in.data(), kCount, MPI_DOUBLE, 0, comm);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
@@ -70,16 +94,28 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  double expected_result = std::accumulate(in.begin(), in.end(), 0.0);
-
-  EXPECT_DOUBLE_EQ(out[0], expected_result);
+  if (rank == 0) {
+    double expected_result = std::accumulate(in.begin(), in.end(), 0.0);
+    EXPECT_DOUBLE_EQ(out[0], expected_result);
+  }
 }
 
 TEST(karaseva_e_reduce_mpi, test_reduce_float) {
-  constexpr size_t kCount = 50;
+  MPI_Comm comm = MPI_COMM_WORLD;
+  int rank;
+  MPI_Comm_rank(comm, &rank);
 
-  std::vector<float> in = GetRandom<float>(kCount);
+  constexpr size_t kCount = 50;
+  std::vector<float> in;
   std::vector<float> out(1, 0.0F);
+
+  if (rank == 0) {
+    in = GetRandom<float>(kCount);
+  } else {
+    in.resize(kCount);
+  }
+
+  MPI_Bcast(in.data(), kCount, MPI_FLOAT, 0, comm);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(in.data()));
@@ -94,7 +130,8 @@ TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   test_task_mpi.RunImpl();
   test_task_mpi.PostProcessingImpl();
 
-  float expected_result = std::accumulate(in.begin(), in.end(), 0.0F);
-
-  EXPECT_FLOAT_EQ(out[0], expected_result);
+  if (rank == 0) {
+    float expected_result = std::accumulate(in.begin(), in.end(), 0.0F);
+    EXPECT_FLOAT_EQ(out[0], expected_result);
+  }
 }
