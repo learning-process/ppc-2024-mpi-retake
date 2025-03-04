@@ -37,7 +37,7 @@ std::vector<double> CreateRandomVal(double min_v, double max_v, size_t s) {
   }
   return ans;
 }
-}  // namespace
+}  // namespace 
 
 TEST(strakhov_a_fox_algorithm_mpi, test_matmul_different_out_sizes) {
   constexpr size_t kCount = 2;
