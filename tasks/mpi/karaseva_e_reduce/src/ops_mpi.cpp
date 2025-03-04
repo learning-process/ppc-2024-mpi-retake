@@ -5,9 +5,9 @@
 #include <mpi.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <numeric>
 #include <stdexcept>
-#include <cstdint>
 #include <type_traits>
 #include <vector>
 
