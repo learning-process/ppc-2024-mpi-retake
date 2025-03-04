@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <numeric>
 #include <stdexcept>
+#include <cstdint>
+#include <type_traits>
 #include <vector>
 
 namespace karaseva_e_reduce_mpi {
@@ -57,9 +59,9 @@ bool TestTaskMPI<T>::PreProcessingImpl() {
       offset += counts[proc];
     }
   } else {
-    MPI_Recv(&local_size, 1, MPI_INT, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    local_input_.resize(local_size);
-    MPI_Recv(local_input_.data(), local_size, mpi_type, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&local_size_, 1, MPI_INT, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    local_input_.resize(local_size_);
+    MPI_Recv(local_input_.data(), local_size_, mpi_type, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
 
   return true;

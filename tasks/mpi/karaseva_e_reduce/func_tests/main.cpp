@@ -30,7 +30,7 @@ std::vector<T> GetRandom(int size) {
 
 TEST(karaseva_e_reduce_mpi, test_reduce_int) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(comm, &rank);
 
   constexpr size_t kCount = 50;
@@ -66,7 +66,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_int) {
 
 TEST(karaseva_e_reduce_mpi, test_reduce_double) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(comm, &rank);
 
   constexpr size_t kCount = 50;
@@ -102,7 +102,7 @@ TEST(karaseva_e_reduce_mpi, test_reduce_double) {
 
 TEST(karaseva_e_reduce_mpi, test_reduce_float) {
   MPI_Comm comm = MPI_COMM_WORLD;
-  int rank;
+  int rank = 0;
   MPI_Comm_rank(comm, &rank);
 
   constexpr size_t kCount = 50;

@@ -1,14 +1,12 @@
-#ifndef MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP_
-#define MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP_
+#ifndef MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP
+#define MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP
 
 #define OMPI_SKIP_MPICXX
 
 #include <mpi.h>
+#include <utility>
 
 #include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -36,9 +34,9 @@ class TestTaskMPI : public ppc::core::Task {
   int size;
   int rank;
   int root;
-  int mpi_type;
-  int local_size;
+  MPI_Datatype mpi_type;
 };
 
 }  // namespace karaseva_e_reduce_mpi
-#endif  // MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP_
+
+#endif  // MODULES_TASK_3_KARASEVA_E_REDUCE_OPS_MPI_HPP
