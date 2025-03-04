@@ -41,7 +41,7 @@ TEST(sedova_o_linear_topology_mpi, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_data_par);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
@@ -78,7 +78,7 @@ TEST(sedova_o_linear_topology_mpi, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_data_par);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_parallel);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
