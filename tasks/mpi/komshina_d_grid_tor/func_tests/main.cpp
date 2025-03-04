@@ -7,8 +7,8 @@
 #include <cstring>
 #include <memory>
 #include <numeric>
-#include <utility>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
