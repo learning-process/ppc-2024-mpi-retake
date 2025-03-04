@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <ranges>
 #include <vector>
 
 using namespace std::chrono_literals;
@@ -54,7 +55,7 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
       world_.recv(neighbor, 0, recv_data);
 
       if (task_data->outputs_count[0] >= recv_data.size()) {
-        std::copy(recv_data.begin(), recv_data.end(), task_data->outputs[0]);
+        std::ranges::copy(recv_data, task_data->outputs[0]);
       }
     }
     world_.barrier();

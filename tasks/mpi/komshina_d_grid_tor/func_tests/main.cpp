@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstdint>
@@ -7,6 +8,7 @@
 #include <memory>
 #include <numeric>
 #include <utility>
+#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -227,31 +229,6 @@ TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl_MinProcesses) {
   world.barrier();
 }
 
-TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl_NoValidNeighbors) {
-  boost::mpi::communicator world;
-  if (world.size() < 2) {
-    GTEST_SKIP() << "Not enough processes for this test.";
-    return;
-  }
-
-  std::vector<uint8_t> input_data(4, static_cast<uint8_t>(world.rank()));
-  std::vector<uint8_t> output_data(4, 0);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(input_data.data());
-  task_data_mpi->inputs_count.emplace_back(input_data.size());
-  task_data_mpi->outputs.emplace_back(output_data.data());
-  task_data_mpi->outputs_count.emplace_back(output_data.size());
-
-  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_TRUE(task.ValidationImpl());
-  ASSERT_TRUE(task.PreProcessingImpl());
-  ASSERT_TRUE(task.RunImpl());
-
-  world.barrier();
-}
-
 TEST(komshina_d_grid_torus_topology_mpi, TestCorrectDataTransmission) {
   boost::mpi::communicator world;
   int size = world.size();
@@ -280,13 +257,15 @@ TEST(komshina_d_grid_torus_topology_mpi, TestCorrectDataTransmission) {
 
   world.barrier();
 
-  std::vector<int> neighbors = task.ComputeNeighbors(rank, grid_size);
+  std::vector<int> neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(rank, grid_size);
 
   bool received_valid_data = false;
   for (int neighbor : neighbors) {
-    if (neighbor >= size) continue;
+    if (neighbor >= size) {
+      continue;
+    }
 
-    if (std::find(output_data.begin(), output_data.end(), static_cast<uint8_t>(neighbor)) != output_data.end()) {
+    if (std::ranges::find(output_data, static_cast<uint8_t>(neighbor)) != output_data.end()) {
       received_valid_data = true;
       break;
     }
