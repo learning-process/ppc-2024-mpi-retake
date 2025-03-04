@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/utility.hpp>
 #include <cmath>
 #include <cstddef>
 #include <random>
