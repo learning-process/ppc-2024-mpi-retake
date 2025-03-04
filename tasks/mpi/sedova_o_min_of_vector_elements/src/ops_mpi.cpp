@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
@@ -11,10 +12,10 @@
 using namespace std::chrono_literals;
 
 template <typename T>
-struct minimum {
-  typedef T first_argument_type;
-  typedef T second_argument_type;
-  typedef T result_type;
+struct Minimum {
+  using first_argument_type = T;
+  using second_argument_type = T;
+  using result_type = T;
   const T &operator()(const T &x, const T &y) const { return x < y ? x : y; }
 };
 
@@ -89,7 +90,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   int local_res = *std::ranges::min_element(output_.begin(), output_.end());
-  boost::mpi::reduce(world_, local_res, res_, minimum<int>(), 0);
+  boost::mpi::reduce(world_, local_res, res_, Minimum<int>(), 0);
   return true;
 }
 
