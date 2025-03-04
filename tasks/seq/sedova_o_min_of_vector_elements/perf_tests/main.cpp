@@ -21,8 +21,8 @@ TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  int rows = 4000;
-  int columns = 4000;
+  int rows = 40000;
+  int columns = 40000;
   int min = -500;
   int max = 500;
 
@@ -72,8 +72,8 @@ TEST(sedova_o_min_of_vector_elements_seq, test_task_run) {
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
-  int rows = 4000;
-  int columns = 4000;
+  int rows = 40000;
+  int columns = 40000;
   int min = -500;
   int max = 500;
 

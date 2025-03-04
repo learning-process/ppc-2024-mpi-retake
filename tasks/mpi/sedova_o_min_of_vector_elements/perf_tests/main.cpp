@@ -49,8 +49,8 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
     std::random_device dev;
     std::mt19937 gen(dev());
 
-    size_t rows = 4000;
-    size_t columns = 4000;
+    size_t rows = 40000;
+    size_t columns = 40000;
     int min = -500;
     size_t max = 500;
 
@@ -105,8 +105,8 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_task_run) {
     std::random_device dev;
     std::mt19937 gen(dev());
 
-    size_t rows = 4000;
-    size_t columns = 4000;
+    size_t rows = 40000;
+    size_t columns = 40000;
     int min = -500;
     size_t max = 500;
 
