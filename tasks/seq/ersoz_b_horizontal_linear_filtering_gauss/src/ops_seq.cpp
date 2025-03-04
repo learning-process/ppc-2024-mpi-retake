@@ -53,7 +53,7 @@ bool ersoz_b_test_task_seq::TestTaskSequential::ValidationImpl() {
   int computed_size = static_cast<int>(std::sqrt(input_size));
   if (computed_size * computed_size != input_size) return false;
   if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) return false;
-  imgsize = computed_size;  // store for later use
+  img_size_ = computed_size;  // store for later use
   return true;
 }
 
