@@ -23,7 +23,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {
   std::vector<int> output(1, INT_MAX);
   std::vector<std::vector<int>> input = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
 
- int index = (static_cast<int>(gen() % (rows * columns)));
+  int index = (static_cast<int>(gen() % (rows * columns)));
   input[index / columns][index / rows] = ref;
 
   // Create TaskData
