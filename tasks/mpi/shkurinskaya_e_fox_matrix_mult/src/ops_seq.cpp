@@ -161,7 +161,7 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
   for (int it = 0; it < root_; ++it) {
     // (color + key + it) % root_  equals A~i~(i + k)
     if (((color + key + it) % root_) == 0) {
-      for (size_t k = 0; k < temp.size(); ++k) {
+      for (int k = 0; k < (int)temp.size(); ++k) {
         left_block[k] = temp[k];
       }
     }
