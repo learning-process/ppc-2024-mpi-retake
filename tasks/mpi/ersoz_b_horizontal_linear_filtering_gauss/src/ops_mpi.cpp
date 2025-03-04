@@ -102,7 +102,7 @@ bool ersoz_b_test_task_mpi::TestTaskMPI::PreProcessingImpl() {
 bool ersoz_b_test_task_mpi::TestTaskMPI::ValidationImpl() {
   unsigned int input_size = task_data->inputs_count[0];
   int computed_size = static_cast<int>(std::sqrt(input_size));
-  if (computed_size * computed_size != input_size) return false;
+  if (static_cast<unsigned int>(computed_size * computed_size) != input_size) return false;
   if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) return false;
   img_size_ = computed_size;  // store for later use
   return true;
