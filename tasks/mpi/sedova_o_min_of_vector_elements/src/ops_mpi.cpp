@@ -3,14 +3,20 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/reduce.hpp>
-#include <boost/mpi/operations.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
 #include <cmath>
 #include <vector>
 
 using namespace std::chrono_literals;
+
+template <typename T>
+struct minimum {
+  typedef T first_argument_type;
+  typedef T second_argument_type;
+  typedef T result_type;
+  const T &operator()(const T &x, const T &y) const { return x < y ? x : y; }
+};
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PreProcessingImpl() {
   input_ = std::vector<std::vector<int>>(task_data->inputs_count[0], std::vector<int>(task_data->inputs_count[1]));
@@ -47,7 +53,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PostProcessingImpl
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
   int delta = 0;
   if (world_.rank() == 0) {
-    delta = task_data->inputs_count[0] * task_data->inputs_count[1] / world_.size();
+    delta = static_cast<int>(task_data->inputs_count[0] * task_data->inputs_count[1] / world_.size());
   }
   boost::mpi::broadcast(world_, delta, 0);
   if (world_.rank() == 0) {
@@ -83,7 +89,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   int local_res = *std::ranges::min_element(output_.begin(), output_.end());
-  boost::mpi::reduce(world_, local_res, res_, boost::mpi::operations::minimum<int>(), 0);
+  boost::mpi::reduce(world_, local_res, res_, minimum<int>(), 0);
   return true;
 }
 
