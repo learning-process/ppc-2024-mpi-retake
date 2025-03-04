@@ -12,7 +12,6 @@
 #include "core/task/include/task.hpp"
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
 
-
 namespace sedova_o_min_of_vector_elements_mpi {
 namespace {
 std::vector<int> GetRandomVector(size_t size, size_t min, size_t max) {
