@@ -24,7 +24,6 @@ std::vector<int> RandomVector(int size) {
 
 namespace {
 
-// Partition function for quicksort.
 int Partition(std::vector<int>& v, int l, int r) {
   int pivot = v[r];
   int i = l - 1;
