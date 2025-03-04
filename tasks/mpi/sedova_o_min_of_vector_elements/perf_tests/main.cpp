@@ -12,6 +12,25 @@
 #include "core/task/include/task.hpp"
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
 
+std::vector<int> GetRandomVector(int size, int min, int max) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::uniform_int_distribution<> distrib(min, max);
+  std::vector<int> vec(size);
+  for (int i = 0; i < size; i++) {
+    vec[i] = distrib(gen);
+  }
+  return vec;
+}
+
+std::vector<std::vector<int>> GetRandomMatrix(int rows, int columns, int min, int max) {
+  std::vector<std::vector<int>> vec(rows);
+  for (int i = 0; i < rows; i++) {
+    vec[i] = GetRandomVector(columns, min, max);
+  }
+  return vec;
+}
+
 TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_matrix;
@@ -30,7 +49,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
     int min = -500;
     int max = 500;
 
-    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
+    global_matrix = GetRandomMatrix(rows, columns, min, max);
     int index = gen() % (rows * columns);
     global_matrix[index / columns][index / rows] = ref;
 
@@ -86,7 +105,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_task_run) {
     int min = -500;
     int max = 500;
 
-    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
+    global_matrix = GetRandomMatrix(rows, columns, min, max);
     int index = gen() % (rows * columns);
     global_matrix[index / columns][index / rows] = ref;
 

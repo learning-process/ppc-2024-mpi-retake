@@ -3,11 +3,7 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/non_blocking.hpp>
-#include <boost/mpi/operations.hpp>
 #include <boost/mpi/reducer.hpp>
-#include <boost/serialization/string.hpp>
 #include <climits>
 #include <cmath>
 #include <random>
@@ -15,7 +11,7 @@
 
 using namespace std::chrono_literals;
 
-std::vector<int> sedova_o_min_of_vector_elements_mpi::GetRandomVector(int size, int min, int max) {
+std::vector<int> GetRandomVector(int size, int min, int max) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<> distrib(min, max);
@@ -26,11 +22,11 @@ std::vector<int> sedova_o_min_of_vector_elements_mpi::GetRandomVector(int size, 
   return vec;
 }
 
-std::vector<std::vector<int>> sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(int rows, int columns, int min,
+std::vector<std::vector<int>> GetRandomMatrix(int rows, int columns, int min,
                                                                                    int max) {
   std::vector<std::vector<int>> vec(rows);
   for (int i = 0; i < rows; i++) {
-    vec[i] = sedova_o_min_of_vector_elements_mpi::GetRandomVector(columns, min, max);
+    vec[i] = GetRandomVector(columns, min, max);
   }
   return vec;
 }
