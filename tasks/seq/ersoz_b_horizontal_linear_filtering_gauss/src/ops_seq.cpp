@@ -1,4 +1,4 @@
-#include "ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
+#include "seq/ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
 
 #include <cmath>
 #include <vector>

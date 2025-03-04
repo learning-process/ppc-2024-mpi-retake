@@ -5,7 +5,7 @@
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
-#include "ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
+#include "seq/ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
 
 TEST(ersoz_b_test_task_seq, test_gaussian_filter_small) {
   constexpr int N = 16;
