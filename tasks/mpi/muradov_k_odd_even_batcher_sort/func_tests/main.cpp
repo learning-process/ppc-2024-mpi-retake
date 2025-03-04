@@ -9,7 +9,6 @@
 #include <cstring>
 #include <ctime>
 #include <memory>
-#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"

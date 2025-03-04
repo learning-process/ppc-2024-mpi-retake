@@ -1,3 +1,4 @@
+#include <algorithm>
 #define OMPI_SKIP_MPICXX
 
 #include <gtest/gtest.h>
@@ -7,7 +8,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <memory>
-#include <ranges>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"

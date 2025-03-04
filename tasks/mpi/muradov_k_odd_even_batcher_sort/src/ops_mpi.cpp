@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
-#include <random>
-#include <ranges>
 #include <utility>
 #include <vector>
 
