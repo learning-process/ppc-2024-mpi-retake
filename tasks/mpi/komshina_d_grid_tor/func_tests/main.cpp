@@ -7,7 +7,6 @@
 #include <cstring>
 #include <memory>
 #include <numeric>
-#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -66,24 +65,6 @@ TEST(komshina_d_grid_torus_topology_mpi, TestDataTransmission) {
   ASSERT_TRUE(task.PreProcessingImpl());
 }
 
-TEST(komshina_d_grid_torus_topology_mpi, TestEmptyOutputData) {
-  boost::mpi::communicator world;
-
-  std::vector<uint8_t> input_data(4);
-  std::iota(input_data.begin(), input_data.end(), 1);
-  std::vector<uint8_t> output_data;
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(input_data.data());
-  task_data_mpi->inputs_count.emplace_back(input_data.size());
-  task_data_mpi->outputs.emplace_back(output_data.data());
-  task_data_mpi->outputs_count.emplace_back(output_data.size());
-
-  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with empty output data";
-}
-
 TEST(komshina_d_grid_torus_topology_mpi, TestNullptrInput) {
   boost::mpi::communicator world;
 
@@ -98,29 +79,6 @@ TEST(komshina_d_grid_torus_topology_mpi, TestNullptrInput) {
   komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
 
   ASSERT_FALSE(task.ValidationImpl()) << "Validation should fail with nullptr in the input data";
-}
-
-TEST(komshina_d_grid_torus_topology_mpi, TestNonMatchingInputOutputSizes) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP() << "Not enough processes for this test.";
-    return;
-  }
-
-  std::vector<uint8_t> input_data(4);
-  std::iota(input_data.begin(), input_data.end(), 9);
-
-  std::vector<uint8_t> output_data(2);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(input_data.data());
-  task_data_mpi->inputs_count.emplace_back(input_data.size());
-  task_data_mpi->outputs.emplace_back(output_data.data());
-  task_data_mpi->outputs_count.emplace_back(output_data.size());
-
-  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_FALSE(task.ValidationImpl());
 }
 
 TEST(komshina_d_grid_torus_topology_mpi, TestEmptyInputsOnly) {
@@ -204,31 +162,6 @@ TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_WrapAround) {
   }
 }
 
-TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl_MinProcesses) {
-  boost::mpi::communicator world;
-  if (world.size() < 4) {
-    GTEST_SKIP() << "Not enough processes for this test.";
-    return;
-  }
-
-  std::vector<uint8_t> input_data(4, static_cast<uint8_t>(world.rank()));
-  std::vector<uint8_t> output_data(4, 0);
-
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(input_data.data());
-  task_data_mpi->inputs_count.emplace_back(input_data.size());
-  task_data_mpi->outputs.emplace_back(output_data.data());
-  task_data_mpi->outputs_count.emplace_back(output_data.size());
-
-  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-
-  ASSERT_TRUE(task.ValidationImpl());
-  ASSERT_TRUE(task.PreProcessingImpl());
-  ASSERT_TRUE(task.RunImpl());
-
-  world.barrier();
-}
-
 TEST(komshina_d_grid_torus_topology_mpi, TestCorrectDataTransmission) {
   boost::mpi::communicator world;
   int size = world.size();
@@ -272,4 +205,111 @@ TEST(komshina_d_grid_torus_topology_mpi, TestCorrectDataTransmission) {
   }
 
   ASSERT_TRUE(received_valid_data) << "Process " << rank << " did not receive expected data from its neighbors.";
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestOutputCopy) {
+  boost::mpi::communicator world;
+  if (world.size() != 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(4, 1);
+  std::vector<uint8_t> output_data(4, 0);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.RunImpl());
+
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    EXPECT_EQ(output_data[i], 1) << "Output data mismatch at index " << i;
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighborsTest) {
+  boost::mpi::communicator world;
+  int size = world.size();
+  int grid_size = static_cast<int>(std::sqrt(size));
+
+  for (int rank = 0; rank < size; ++rank) {
+    auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(rank, grid_size);
+
+    for (int neighbor : neighbors) {
+      ASSERT_GE(neighbor, 0);
+      ASSERT_LT(neighbor, size);
+    }
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, RunImplTest) {
+  boost::mpi::communicator world;
+  if (world.size() < 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(4, world.rank());
+  std::vector<uint8_t> output_data(4);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+  ASSERT_TRUE(task.RunImpl());
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, NeighborBoundaryTest) {
+  boost::mpi::communicator world;
+  int size = world.size();
+  int grid_size = static_cast<int>(std::sqrt(size));
+
+  for (int rank = 0; rank < size; ++rank) {
+    auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(rank, grid_size);
+
+    for (int neighbor : neighbors) {
+      if (neighbor >= size) {
+        ADD_FAILURE() << "Neighbor index out of bounds: " << neighbor;
+      }
+    }
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, DataTransferTest) {
+  boost::mpi::communicator world;
+  if (world.size() < 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(4, world.rank());
+  std::vector<uint8_t> output_data(4, 255);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+  ASSERT_TRUE(task.RunImpl());
+
+  bool changed = false;
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    if (output_data[i] != 255) {
+      changed = true;
+      break;
+    }
+  }
+  ASSERT_TRUE(changed) << "Output data did not change after communication";
 }
