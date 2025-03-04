@@ -39,15 +39,15 @@ class GaussJordanMethodMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> matrix;
-  bool solve = true;
-  int n;
-  std::vector<int> sizes;
-  std::vector<int> displs;
-  std::vector<double> iter_matrix;
-  std::vector<double> iter_result;
-  std::vector<std::pair<int, int>> indicies;
-  boost::mpi::communicator world;
+  std::vector<double> matrix_;
+  bool solve_ = true;
+  int n_;
+  std::vector<int> sizes_;
+  std::vector<int> displs_;
+  std::vector<double> iter_matrix_;
+  std::vector<double> iter_result_;
+  std::vector<std::pair<int, int>> indicies_;
+  boost::mpi::communicator world_;
 };
 
 class GaussJordanMethodSeq : public ppc::core::Task {
@@ -59,9 +59,9 @@ class GaussJordanMethodSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> matrix;
-  bool solve = true;
-  int n;
+  std::vector<double> matrix_;
+  bool solve_ = true;
+  int n_;
 };
 
 }  // namespace konstantinov_i_gauss_jordan_method_mpi

@@ -2,9 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
-#include <ranges>
-#include <thread>
+#include <vector>
 
 std::vector<double> konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(int n, int k,
                                                                           const std::vector<double>& matrix) {
@@ -63,44 +61,46 @@ bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::ValidationImp
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::PreProcessingImpl() {
   auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
   int matrix_size = static_cast<int>(task_data->inputs_count[0]);
-  n = *reinterpret_cast<int*>(task_data->inputs[1]);
-  matrix.assign(matrix_data, matrix_data + matrix_size);
+  n_ = *reinterpret_cast<int*>(task_data->inputs[1]);
+  matrix_.assign(matrix_data, matrix_data + matrix_size);
 
   return true;
 }
 
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::RunImpl() {
-  for (int k = 0; k < n; k++) {
-    if (matrix[(k * (n + 1)) + k] == 0) {
+  for (int k = 0; k < n_; k++) {
+    if (matrix_[(k * (n_ + 1)) + k] == 0) {
       int change = 0;
-      for (change = k + 1; change < n; change++) {
-        if (matrix[(change * (n + 1)) + k] != 0) {
-          for (int col = 0; col < (n + 1); col++) {
-            std::swap(matrix[(k * (n + 1)) + col], matrix[(change * (n + 1)) + col]);
+      for (change = k + 1; change < n_; change++) {
+        if (matrix_[(change * (n_ + 1)) + k] != 0) {
+          for (int col = 0; col < (n_ + 1); col++) {
+            std::swap(matrix_[(k * (n_ + 1)) + col], matrix_[(change * (n_ + 1)) + col]);
           }
           break;
         }
       }
-      if (change == n) return false;
+      if (change == n_) {
+        return false;
+      }
     }
 
-    std::vector<double> iter_matrix = konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(n, k, matrix);
+    std::vector<double> iter_matrix = konstantinov_i_gauss_jordan_method_seq::ProcessMatrix(n_, k, matrix_);
 
-    std::vector<double> iter_result((n - 1) * (n - k));
+    std::vector<double> iter_result((n_ - 1) * (n_ - k));
 
     int ind = 0;
-    for (int i = 1; i < n; ++i) {
-      for (int j = 1; j < n - k + 1; ++j) {
+    for (int i = 1; i < n_; ++i) {
+      for (int j = 1; j < n_ - k + 1; ++j) {
         double rel = iter_matrix[0];
-        double nel = iter_matrix[(i * (n - k + 1)) + j];
+        double nel = iter_matrix[(i * (n_ - k + 1)) + j];
         double a = iter_matrix[j];
-        double b = iter_matrix[(i * (n - k + 1))];
+        double b = iter_matrix[(i * (n_ - k + 1))];
         double res = nel - ((a * b) / rel);
         iter_result[ind++] = res;
       }
     }
 
-    konstantinov_i_gauss_jordan_method_seq::UpdateMatrix(n, k, matrix, iter_result);
+    konstantinov_i_gauss_jordan_method_seq::UpdateMatrix(n_, k, matrix_, iter_result);
   }
 
   return true;
@@ -108,7 +108,7 @@ bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::RunImpl() {
 
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::PostProcessingImpl() {
   auto* output_data = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::ranges::copy(matrix, output_data);
+  std::ranges::copy(matrix_, output_data);
 
   return true;
 }

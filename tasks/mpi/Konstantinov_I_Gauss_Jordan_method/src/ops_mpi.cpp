@@ -3,12 +3,11 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -143,7 +142,9 @@ void konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(int n, int k, std::vec
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::SwapRowsIfZero(int n, int k, std::vector<double>& matrix, bool& solve) {
-  if (matrix[(k * (n + 1)) + k] != 0) return true;
+  if (matrix[(k * (n + 1)) + k] != 0) {
+    return true;
+  }
   for (int change = k + 1; change < n; change++) {
     if (matrix[(change * (n + 1)) + k] != 0) {
       SwapRows(n, k, change, matrix);
@@ -215,14 +216,15 @@ void konstantinov_i_gauss_jordan_method_mpi::GatherResults(boost::mpi::communica
                                                            std::vector<double>& iter_result, std::vector<int>& sizes,
                                                            std::vector<int>& displs) {
   if (world.rank() == 0) {
-    boost::mpi::gatherv(world, local_result.data(), local_result.size(), iter_result.data(), sizes, displs, 0);
+    boost::mpi::gatherv(world, local_result.data(), static_cast<int>(local_result.size()), iter_result.data(), sizes,
+                        displs, 0);
   } else {
-    boost::mpi::gatherv(world, local_result.data(), local_result.size(), 0);
+    boost::mpi::gatherv(world, local_result.data(), static_cast<int>(local_result.size()), 0);
   }
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::ValidationImpl() {
-  if (world.rank() != 0) {
+  if (world_.rank() != 0) {
     return true;
   }
   int n_val = *reinterpret_cast<int*>(task_data->inputs[1]);
@@ -238,44 +240,44 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::ValidationImp
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::PreProcessingImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
     int matrix_size = static_cast<int>(task_data->inputs_count[0]);
 
-    n = *reinterpret_cast<int*>(task_data->inputs[1]);
+    n_ = *reinterpret_cast<int*>(task_data->inputs[1]);
 
-    matrix.assign(matrix_data, matrix_data + matrix_size);
+    matrix_.assign(matrix_data, matrix_data + matrix_size);
   }
 
   return true;
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::RunImpl() {
-  boost::mpi::broadcast(world, n, 0);
+  boost::mpi::broadcast(world_, n_, 0);
 
-  for (int k = 0; k < n; k++) {
-    if (world.rank() == 0) {
-      if (!SwapRowsIfZero(n, k, matrix, solve)) {
+  for (int k = 0; k < n_; k++) {
+    if (world_.rank() == 0) {
+      if (!SwapRowsIfZero(n_, k, matrix_, solve_)) {
         return false;
       }
-      if (solve) {
-        PrepareIteration(n, k, matrix, iter_matrix, sizes, displs, indicies, iter_result, world);
+      if (solve_) {
+        PrepareIteration(n_, k, matrix_, iter_matrix_, sizes_, displs_, indicies_, iter_result_, world_);
       }
     }
 
-    if (!BroadcastSolve(world, solve)) {
+    if (!BroadcastSolve(world_, solve_)) {
       return false;
     }
-    BroadcastData(world, sizes, iter_matrix);
+    BroadcastData(world_, sizes_, iter_matrix_);
 
-    int local_size = sizes[world.rank()];
-    auto local_indicies = ScatterIndices(world, indicies, sizes, displs, local_size);
+    int local_size = sizes_[world_.rank()];
+    auto local_indicies = ScatterIndices(world_, indicies_, sizes_, displs_, local_size);
 
-    auto local_result = CalculateLocalResult(local_size, local_indicies, iter_matrix, n, k);
-    GatherResults(world, local_result, iter_result, sizes, displs);
+    auto local_result = CalculateLocalResult(local_size, local_indicies, iter_matrix_, n_, k);
+    GatherResults(world_, local_result, iter_result_, sizes_, displs_);
 
-    if (world.rank() == 0) {
-      konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(n, k, matrix, iter_result);
+    if (world_.rank() == 0) {
+      konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(n_, k, matrix_, iter_result_);
     }
   }
 
@@ -283,12 +285,12 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::RunImpl() {
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::PostProcessingImpl() {
-  if (!solve) {
+  if (!solve_) {
     return false;
   }
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     auto* output_data = reinterpret_cast<double*>(task_data->outputs[0]);
-    std::ranges::copy(matrix, output_data);
+    std::ranges::copy(matrix_, output_data);
   }
 
   return true;
@@ -303,58 +305,58 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::ValidationImp
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::PreProcessingImpl() {
   auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
   int matrix_size = static_cast<int>(task_data->inputs_count[0]);
-  n = *reinterpret_cast<int*>(task_data->inputs[1]);
-  matrix.assign(matrix_data, matrix_data + matrix_size);
+  n_ = *reinterpret_cast<int*>(task_data->inputs[1]);
+  matrix_.assign(matrix_data, matrix_data + matrix_size);
 
   return true;
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::RunImpl() {
-  for (int k = 0; k < n; k++) {
-    if (matrix[(k * (n + 1)) + k] == 0) {
+  for (int k = 0; k < n_; k++) {
+    if (matrix_[(k * (n_ + 1)) + k] == 0) {
       int change = 0;
-      for (change = k + 1; change < n; change++) {
-        if (matrix[(change * (n + 1)) + k] != 0) {
-          for (int col = 0; col < (n + 1); col++) {
-            std::swap(matrix[(k * (n + 1)) + col], matrix[(change * (n + 1)) + col]);
+      for (change = k + 1; change < n_; change++) {
+        if (matrix_[(change * (n_ + 1)) + k] != 0) {
+          for (int col = 0; col < (n_ + 1); col++) {
+            std::swap(matrix_[(k * (n_ + 1)) + col], matrix_[(change * (n_ + 1)) + col]);
           }
           break;
         }
       }
-      if (change == n) {
-        solve = false;
+      if (change == n_) {
+        solve_ = false;
         return false;
       }
     }
 
-    std::vector<double> iter_matrix = konstantinov_i_gauss_jordan_method_mpi::ProcessMatrix(n, k, matrix);
+    std::vector<double> iter_matrix = konstantinov_i_gauss_jordan_method_mpi::ProcessMatrix(n_, k, matrix_);
 
-    std::vector<double> iter_result((n - 1) * (n - k));
+    std::vector<double> iter_result((n_ - 1) * (n_ - k));
 
     int ind = 0;
-    for (int i = 1; i < n; ++i) {
-      for (int j = 1; j < n - k + 1; ++j) {
+    for (int i = 1; i < n_; ++i) {
+      for (int j = 1; j < n_ - k + 1; ++j) {
         double rel = iter_matrix[0];
-        double nel = iter_matrix[(i * (n - k + 1)) + j];
+        double nel = iter_matrix[(i * (n_ - k + 1)) + j];
         double a = iter_matrix[j];
-        double b = iter_matrix[i * (n - k + 1)];
+        double b = iter_matrix[i * (n_ - k + 1)];
         double res = nel - ((a * b) / rel);
         iter_result[ind++] = res;
       }
     }
 
-    konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(n, k, matrix, iter_result);
+    konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(n_, k, matrix_, iter_result);
   }
 
   return true;
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::PostProcessingImpl() {
-  if (!solve) {
+  if (!solve_) {
     return false;
   }
   auto* output_data = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::ranges::copy(matrix, output_data);
+  std::ranges::copy(matrix_, output_data);
 
   return true;
 }

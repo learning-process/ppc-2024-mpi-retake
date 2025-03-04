@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/Konstantinov_I_Gauss_Jordan_method/include/ops_seq.hpp"
 
 namespace konstantinov_i_gauss_jordan_method_seq {
