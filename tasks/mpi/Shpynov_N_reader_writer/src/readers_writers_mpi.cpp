@@ -1,10 +1,12 @@
+#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
+
+#include <cstdint>
+#include <memory>
 #include <algorithm>
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
-
-#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
 
 using namespace std::chrono_literals;
 
@@ -24,9 +26,9 @@ class CSem {  // semaphore class
   }
   void Lock() { signal_--; }
   void Unlock() { signal_++; }
-  bool IsOnlyUser() const { return signal_ == 1; }
+  bool [[nodiscard]] IsOnlyUser() const { return signal_ == 1; }
 
-  bool IsFree() const { return signal_ == 0; }
+  bool [[nodiscard]] IsFree() const { return signal_ == 0; }
 
   int CheckAnotherSem(CSem &writer, CSem &read_count) {
     if (this->TryLock()) {
@@ -43,20 +45,14 @@ class CSem {  // semaphore class
     return 0;
   }
 
-  void UnlockIfFree(CSem &writer) {
+  void UnlockIfFree(CSem &writer) const{
     if (this->IsFree()) {
       writer.Unlock();
     }
   }
 };
 
-void Adder(std::vector<int> &A) {
-  for (size_t i = 0; i < A.size(); i++) {
-    A[i]++;
-  }
-}
-
-bool shpynov_N_readers_writers_mpi::TestTaskMPI::ValidationImpl() {
+bool shpynov_n_readers_writers_mpi::TestTaskMPI::ValidationImpl() {
   if (world_.rank() == 0) {
     if (task_data->inputs_count[0] != task_data->outputs_count[0]) {
       return false;
@@ -68,7 +64,7 @@ bool shpynov_N_readers_writers_mpi::TestTaskMPI::ValidationImpl() {
   return true;
 }
 
-bool shpynov_N_readers_writers_mpi::TestTaskMPI::PreProcessingImpl() {
+bool shpynov_n_readers_writers_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
     unsigned int input_size = task_data->inputs_count[0];
     auto *in_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
@@ -80,24 +76,7 @@ bool shpynov_N_readers_writers_mpi::TestTaskMPI::PreProcessingImpl() {
   return true;
 }
 
-enum Procedures : std::uint8_t { kWriteBegin, kWriteEnd, kReadBegin, kReadEnd };
-
-static Procedures Hasher(std::string const &in_string) {
-  if (in_string == "kWriteBegin") {
-    return kWriteBegin;
-  }
-  if (in_string == "kWriteEnd") {
-    return kWriteEnd;
-  }
-  if (in_string == "kReadBegin") {
-    return kReadBegin;
-  }
-  if (in_string == "kReadEnd") {
-    return kReadEnd;
-  }
-  return kWriteBegin;
-};
-bool shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
+bool shpynov_n_readers_writers_mpi::TestTaskMPI::RunImpl() {
   CSem mutex(1);
   CSem writer(1);
   CSem read_count(0);
@@ -114,7 +93,7 @@ bool shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
       int sender_name = stat.source();
       std::vector<int> new_res(critical_resource_.size());
       int tmp;
-      switch (Hasher(procedure)) {
+      switch (shpynov_n_readers_writers_mpi::Hasher(procedure)) {
         case kWriteBegin:
           if (writer.TryLock()) {
             world_.send(sender_name, 2, std::string("clear"));
@@ -133,16 +112,17 @@ bool shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
 
         case kReadBegin:
           tmp = mutex.CheckAnotherSem(writer, read_count);
-          if (tmp == 1) {
+          if (tmp == 0) {
             world_.send(sender_name, 2, std::string("wait"));
-            mutex.Unlock();
-            continue;
+
           } else if (tmp == 2) {
             mutex.Unlock();
             world_.send(sender_name, 2, std::string("clear"));
             world_.send(sender_name, 1, critical_resource_);
           } else {
             world_.send(sender_name, 2, std::string("wait"));
+            mutex.Unlock();
+            continue;
           }
           break;
 
@@ -175,14 +155,14 @@ bool shpynov_N_readers_writers_mpi::TestTaskMPI::RunImpl() {
       world_.recv(0, 2, resp);
     }
     world_.recv(0, 1, critical_resource_);
-    Adder(critical_resource_);
+    shpynov_n_readers_writers_mpi::Adder(critical_resource_);
     world_.send(0, 3, critical_resource_);
     world_.send(0, 0, std::string("kWriteEnd"));
   }
   world_.barrier();
   return true;
 }
-bool shpynov_N_readers_writers_mpi::TestTaskMPI::PostProcessingImpl() {
+bool shpynov_n_readers_writers_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto *output = reinterpret_cast<int *>(task_data->outputs[0]);
     std::ranges::copy(result_.begin(), result_.end(), output);
