@@ -38,6 +38,7 @@ TEST(strakhov_a_m_gauss_jordan_mpi, test_pipeline_run) {
     }
     for (size_t i = 0; i < kCount; i++) {
       double sum = 0;
+      in[((kCount + 1) * i) + i] += (int)(in[((kCount + 1) * i) + i] == 0);
       for (size_t j = 0; j < kCount; j++) {
         sum += ans[j] * in[((kCount + 1) * i) + j];
       }
@@ -96,6 +97,7 @@ TEST(strakhov_a_m_gauss_jordan_mpi, test_task_run) {
     }
     for (size_t i = 0; i < kCount; i++) {
       double sum = 0;
+      in[((kCount + 1) * i) + i] += (int)(in[((kCount + 1) * i) + i] == 0);
       for (size_t j = 0; j < kCount; j++) {
         sum += ans[j] * in[((kCount + 1) * i) + j];
       }
