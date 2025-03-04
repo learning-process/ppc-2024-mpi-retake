@@ -51,7 +51,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_pipeline_run) {
 
     size_t rows = 4000;
     size_t columns = 4000;
-    size_t min = -500;
+    int min = -500;
     size_t max = 500;
 
     global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
@@ -107,7 +107,7 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_task_run) {
 
     size_t rows = 4000;
     size_t columns = 4000;
-    size_t min = -500;
+    int min = -500;
     size_t max = 500;
 
     global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
