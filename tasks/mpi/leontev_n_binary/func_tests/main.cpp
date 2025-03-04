@@ -96,8 +96,8 @@ std::vector<uint32_t> RunSeq(const std::vector<uint8_t>& image, size_t rows, siz
 
 TEST(leontev_n_binary_mpi, random_test) {
   boost::mpi::communicator world;
-  size_t rows = 10;
-  size_t cols = 10;
+  size_t rows = 9;
+  size_t cols = 9;
   std::vector<uint8_t> img = GetRandomVector(rows, cols);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   std::vector<uint32_t> actual(rows * cols);
