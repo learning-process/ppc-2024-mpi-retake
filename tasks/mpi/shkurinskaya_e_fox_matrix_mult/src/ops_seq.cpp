@@ -57,85 +57,83 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::ValidationImpl() {
   }
   return true;
 }
-
-static void ShareData(boost::mpi::communicator &world_, int block_sz_, int sz_, int root_,
-                      std::vector<double> &left_block, std::vector<double> &right_block, std::vector<double> &inputA_,
-                      std::vector<double> &inputB_) {
-  if (world_.rank() == 0) {
-    int block_matix_size = block_sz_ * block_sz_;
+namespace shkurinskaya_e_fox_mat_mul_mpi {
+void ShareData(boost::mpi::communicator &world, int block_sz, int sz, int root, std::vector<double> &left_block,
+               std::vector<double> &right_block, std::vector<double> &input_a, std::vector<double> &input_b) {
+  if (world.rank() == 0) {
+    int block_matix_size = block_sz * block_sz;
     std::vector<double> left_to_send(block_matix_size, 0.0);
     std::vector<double> right_to_send(block_matix_size, 0.0);
 
-    for (int i = 0; i < block_sz_; ++i) {
-      for (int j = 0; j < block_sz_; ++j) {
-        left_block[(i * block_sz_) + j] = inputA_[(i * sz_) + j];
-        right_block[(i * block_sz_) + j] = inputB_[(i * sz_) + j];
+    for (int i = 0; i < block_sz; ++i) {
+      for (int j = 0; j < block_sz; ++j) {
+        left_block[(i * block_sz) + j] = input_a[(i * sz) + j];
+        right_block[(i * block_sz) + j] = input_b[(i * sz) + j];
       }
     }
 
-    for (int proc = 1; proc < world_.size(); ++proc) {
-      int local_color = proc / root_;
-      int local_key = proc % root_;
+    for (int proc = 1; proc < world.size(); ++proc) {
+      int local_color = proc / root;
+      int local_key = proc % root;
 
-      for (int i = 0; i < block_sz_; i++) {
-        for (int j = 0; j < block_sz_; j++) {
-          left_to_send[(i * block_sz_) + j] =
-              inputA_[((local_color * block_sz_ + i) * sz_) + (local_key * block_sz_) + j];
-          right_to_send[(i * block_sz_) + j] =
-              inputB_[((local_color * block_sz_ + i) * sz_) + (local_key * block_sz_) + j];
+      for (int i = 0; i < block_sz; i++) {
+        for (int j = 0; j < block_sz; j++) {
+          left_to_send[(i * block_sz) + j] = input_a[((local_color * block_sz + i) * sz) + (local_key * block_sz) + j];
+          right_to_send[(i * block_sz) + j] = input_b[((local_color * block_sz + i) * sz) + (local_key * block_sz) + j];
         }
       }
 
-      world_.send(proc, 0, left_to_send);
-      world_.send(proc, 0, right_to_send);
+      world.send(proc, 0, left_to_send);
+      world.send(proc, 0, right_to_send);
     }
   } else {
-    world_.recv(0, 0, left_block);
-    world_.recv(0, 0, right_block);
+    world.recv(0, 0, left_block);
+    world.recv(0, 0, right_block);
   }
 }
 
-static void SaveMatrix(std::vector<double> &left_block, std::vector<double> &right_block, std::vector<double> &out,
-                       int block_sz_, int sz_) {
-  for (int i = 0; i < block_sz_; ++i) {
-    for (int j = 0; j < block_sz_; ++j) {
-      for (int k = 0; k < block_sz_; ++k) {
-        out[(i * sz_) + j] += left_block[(i * block_sz_) + k] * right_block[(k * block_sz_) + j];
+void SaveMatrix(std::vector<double> &left_block, std::vector<double> &right_block, std::vector<double> &out,
+                int block_sz, int sz) {
+  for (int i = 0; i < block_sz; ++i) {
+    for (int j = 0; j < block_sz; ++j) {
+      for (int k = 0; k < block_sz; ++k) {
+        out[(i * sz) + j] += left_block[(i * block_sz) + k] * right_block[(k * block_sz) + j];
       }
     }
   }
 }
 
-static void GatherResult(boost::mpi::communicator world_, int root_, int block_sz_, int sz_, int matrix_size_,
-                         std::vector<double> &local_res, std::vector<double> &temp_output,
-                         std::vector<double> &output_) {
+void GatherResult(boost::mpi::communicator &world, int root, int block_sz, int sz, int matrix_size,
+                  std::vector<double> &local_res, std::vector<double> &temp_output, std::vector<double> &output) {
   // Gather results on rank 0
-  if (world_.rank() == 0) {
-    for (int proc = 1; proc < world_.size(); proc++) {
-      world_.recv(proc, 0, local_res);
-      int local_color = proc / root_;
-      int local_key = proc % root_;
-      int mergin_x = block_sz_ * local_color;
-      int mergin_y = block_sz_ * local_key;
+  if (world.rank() == 0) {
+    for (int proc = 1; proc < world.size(); proc++) {
+      world.recv(proc, 0, local_res);
+      int local_color = proc / root;
+      int local_key = proc % root;
+      int mergin_x = block_sz * local_color;
+      int mergin_y = block_sz * local_key;
 
-      for (int i = 0; i < block_sz_; i++) {
-        for (int j = 0; j < block_sz_; j++) {
-          temp_output[((mergin_x + i) * sz_) + j + mergin_y] = local_res[(i * block_sz_) + j];
+      for (int i = 0; i < block_sz; i++) {
+        for (int j = 0; j < block_sz; j++) {
+          temp_output[((mergin_x + i) * sz) + j + mergin_y] = local_res[(i * block_sz) + j];
         }
       }
     }
   } else {
-    world_.send(0, 0, local_res);
+    world.send(0, 0, local_res);
   }
 
-  if (world_.rank() == 0) {
-    for (int i = 0; i < matrix_size_; ++i) {
-      for (int j = 0; j < matrix_size_; ++j) {
-        output_[(i * matrix_size_) + j] = temp_output[(i * sz_) + j];
+  if (world.rank() == 0) {
+    for (int i = 0; i < matrix_size; ++i) {
+      for (int j = 0; j < matrix_size; ++j) {
+        output[(i * matrix_size) + j] = temp_output[(i * sz) + j];
       }
     }
   }
 }
+
+}  // namespace shkurinskaya_e_fox_mat_mul_mpi
 
 bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
   // share size and block size
@@ -148,7 +146,7 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
   std::vector<double> right_block(block_matix_size, 0.0);
 
   // share blocks
-  ShareData(world_, block_sz_, sz_, root_, left_block, right_block, inputA_, inputB_);
+  shkurinskaya_e_fox_mat_mul_mpi::ShareData(world_, block_sz_, sz_, root_, left_block, right_block, inputA_, inputB_);
   std::vector<double> recv_block_result(block_sz_ * block_sz_, 0.0);
 
   int color = world_.rank() / root_;
@@ -166,7 +164,7 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
     // (color + key + it) % root_  equals A~i~(i + k)
     if ((((color + key + it) % root_) == 0) && (!valid)) {
       valid = true;
-      left_block = std::move(temp);
+      left_block = temp;
     }
 
     // Broadcast the local block to all ranks in the row
@@ -174,9 +172,9 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
 
     // Matrix multiplication
     if (world_.rank() == 0) {
-      SaveMatrix(left_block, right_block, temp_output, block_sz_, sz_);
+      shkurinskaya_e_fox_mat_mul_mpi::SaveMatrix(left_block, right_block, temp_output, block_sz_, sz_);
     } else {
-      SaveMatrix(left_block, right_block, local_res, block_sz_, block_sz_);
+      shkurinskaya_e_fox_mat_mul_mpi::SaveMatrix(left_block, right_block, local_res, block_sz_, block_sz_);
     }
     // do not need to send/recv right block
     if (it == root_ - 1) {
@@ -196,7 +194,8 @@ bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::RunImpl() {
       world_.recv(prev, 0, right_block);
     }
   }
-  GatherResult(world_, root_, block_sz_, sz_, matrix_size_, local_res, temp_output, output_);
+  shkurinskaya_e_fox_mat_mul_mpi::GatherResult(world_, root_, block_sz_, sz_, matrix_size_, local_res, temp_output,
+                                               output_);
   return true;
 }
 
