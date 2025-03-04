@@ -9,9 +9,6 @@
 
 namespace malyshev_v_lent_horizontal_mpi {
 
-std::vector<int> GetRandomMatrix(int rows, int cols);
-std::vector<int> GetRandomVector(int size);
-
 class MatVecMultMpi : public ppc::core::Task {
  public:
   explicit MatVecMultMpi(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
