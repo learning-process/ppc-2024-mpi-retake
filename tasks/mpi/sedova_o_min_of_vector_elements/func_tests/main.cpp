@@ -9,37 +9,41 @@
 #include "core/task/include/task.hpp"
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
 
-std::vector<int> GetRandomVector(int size, int min, int max) {
+namespace sedova_o_min_of_vector_elements_mpi {
+namespace {
+std::vector<int> GetRandomVector(size_t size, size_t min, size_t max) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<> distrib(min, max);
   std::vector<int> vec(size);
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     vec[i] = distrib(gen);
   }
   return vec;
 }
 
-std::vector<std::vector<int>> GetRandomMatrix(int rows, int columns, int min, int max) {
+std::vector<std::vector<int>> GetRandomMatrix(size_t rows, size_t columns, size_t min, size_t max) {
   std::vector<std::vector<int>> vec(rows);
-  for (int i = 0; i < rows; i++) {
+  for (size_t i = 0; i < rows; i++) {
     vec[i] = GetRandomVector(columns, min, max);
   }
   return vec;
 }
+}  // namespace
+}  // namespace sedova_o_min_of_vector_elements_mpi
 
 TEST(sedova_o_min_of_vector_elements_mpi, test_10x10) {
-  const int rows = 10;
-  const int columns = 10;
-  const int min = -500;
-  const int max = 500;
+  size_t rows = 10;
+  size_t columns = 10;
+  size_t min = -500;
+  size_t max = 500;
 
   boost::mpi::communicator world;
   std::vector<std::vector<int>> global_matrix;
   std::vector<int> output(1, INT_MAX);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    global_matrix = GetRandomMatrix(rows, columns, min, max);
+    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
     for (unsigned int i = 0; i < global_matrix.size(); i++) {
       task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
       task_data_par->inputs_count.emplace_back(rows);

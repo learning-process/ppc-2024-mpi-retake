@@ -11,26 +11,6 @@
 
 using namespace std::chrono_literals;
 
-std::vector<int> GetRandomVector(int size, int min, int max) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::uniform_int_distribution<> distrib(min, max);
-  std::vector<int> vec(size);
-  for (int i = 0; i < size; i++) {
-    vec[i] = distrib(gen);
-  }
-  return vec;
-}
-
-std::vector<std::vector<int>> GetRandomMatrix(int rows, int columns, int min,
-                                                                                   int max) {
-  std::vector<std::vector<int>> vec(rows);
-  for (int i = 0; i < rows; i++) {
-    vec[i] = GetRandomVector(columns, min, max);
-  }
-  return vec;
-}
-
 bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PreProcessingImpl() {
   input_ = std::vector<std::vector<int>>(task_data->inputs_count[0], std::vector<int>(task_data->inputs_count[1]));
   for (unsigned int i = 0; i < task_data->inputs_count[0]; i++) {
