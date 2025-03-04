@@ -1,7 +1,7 @@
 #include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
-#include <boost/serialization/vector.hpp>
 #include <algorithm>
+#include <boost/serialization/vector.hpp>
 #include <cmath>
 #include <cstddef>
 #include <random>
