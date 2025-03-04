@@ -8,7 +8,6 @@
 #define M_PI 3.14159265358979323846
 #endif
 #include <limits>
-#include <stdexcept>
 
 #include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 

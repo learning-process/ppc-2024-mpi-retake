@@ -3,7 +3,6 @@
 #include <cmath>
 #include <functional>
 #include <limits>
-#include <stdexcept>
 
 #include "seq/ersoz_b_rectangular_method_integration/include/ops_seq.hpp"
 
