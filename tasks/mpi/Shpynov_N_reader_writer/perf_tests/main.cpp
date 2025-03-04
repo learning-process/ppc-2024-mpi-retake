@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
 
-TEST(Shpynov_N_readers_writers_perf, test_pipeline_run) {
+TEST(shpynov_n_readers_writers_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {
@@ -64,7 +64,7 @@ TEST(Shpynov_N_readers_writers_perf, test_pipeline_run) {
   }
 }
 
-TEST(Shpynov_N_readers_writers_perf, test_task_run) {
+TEST(shpynov_n_readers_writers_mpi, test_task_run) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {

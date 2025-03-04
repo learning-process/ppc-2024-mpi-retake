@@ -8,7 +8,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
 
-TEST(Shpynov_N_readers_writers, test_single) {
+TEST(shpynov_n_readers_writers_mpi, test_single) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {
@@ -46,7 +46,7 @@ TEST(Shpynov_N_readers_writers, test_single) {
   }
 }
 
-TEST(Shpynov_N_readers_writers, test_alot) {
+TEST(shpynov_n_readers_writers_mpi, test_alot) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {
@@ -86,7 +86,7 @@ TEST(Shpynov_N_readers_writers, test_alot) {
   }
 }
 
-TEST(Shpynov_N_readers_writers, test_multiple) {
+TEST(shpynov_n_readers_writers_mpi, test_multiple) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {
@@ -126,7 +126,7 @@ TEST(Shpynov_N_readers_writers, test_multiple) {
   }
 }
 
-TEST(Shpynov_N_readers_writers, test_invalid_size) {
+TEST(shpynov_n_readers_writers_mpi, test_invalid_size) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {
@@ -163,7 +163,7 @@ TEST(Shpynov_N_readers_writers, test_invalid_size) {
   }
 }
 
-TEST(Shpynov_N_readers_writers, test_different_sizes) {
+TEST(shpynov_n_readers_writers_mpi, test_different_sizes) {
   boost::mpi::communicator world;
 
   if (world.size() < 2) {
