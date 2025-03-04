@@ -11,7 +11,7 @@
 
 namespace {
 inline double gaussianFunction(int i, int j, double sigma) {
-  return 1 / (2 * M_PI * sigma * sigma) * exp(-(i * i + j * j) / (2 * sigma * sigma));
+  return 1.0 / (2 * M_PI * sigma * sigma) * std::exp(-(i * i + j * j) / (2 * sigma * sigma));
 }
 
 std::vector<std::vector<char>> gaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
