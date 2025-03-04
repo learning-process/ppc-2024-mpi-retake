@@ -7,8 +7,8 @@
 #include <random>
 #include <vector>
 
-#include "core/task/include/task.hpp"
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/sedova_o_min_of_vector_elements/include/ops_seq.hpp"
 
 TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
