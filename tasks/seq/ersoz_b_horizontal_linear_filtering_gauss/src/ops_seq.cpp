@@ -1,6 +1,9 @@
 #include "seq/ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
 
 #include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #include <vector>
 
 namespace {
