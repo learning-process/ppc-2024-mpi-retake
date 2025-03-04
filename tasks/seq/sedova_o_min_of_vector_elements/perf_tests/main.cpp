@@ -1,8 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <climits>
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <vector>
 
+#include "core/task/include/task.hpp" 
 #include "core/perf/include/perf.hpp"
 #include "seq/sedova_o_min_of_vector_elements/include/ops_seq.hpp"
 
@@ -35,7 +40,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
   }
 
   // Create Task
-  auto testTaskSequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -51,7 +56,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   ASSERT_EQ(ref, global_min[0]);
@@ -86,7 +91,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_task_run) {
   }
 
   // Create Task
-  auto testTaskSequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);
+  auto test_task_sequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -102,7 +107,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   // Create Perf analyzer
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(testTaskSequential);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   ASSERT_EQ(ref, global_min[0]);

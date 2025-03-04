@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <climits>
+#include <cstdint> 
 #include <memory>
 #include <random>
 #include <vector>
 
+#include "core/task/include/task.hpp" 
 #include "seq/sedova_o_min_of_vector_elements/include/ops_seq.hpp"
 
 TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {

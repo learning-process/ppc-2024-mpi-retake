@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <climits>
 #include <cstdint>
 #include <memory>
 #include <random>
