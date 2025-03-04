@@ -172,4 +172,3 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
     }
   }
 }
-
