@@ -37,7 +37,7 @@ std::vector<std::vector<int>> GetRandomMatrix(size_t rows, size_t columns, size_
 TEST(sedova_o_min_of_vector_elements_mpi, test_10x10) {
   size_t rows = 10;
   size_t columns = 10;
-  size_t min = -500;
+  int min = -500;
   size_t max = 500;
 
   boost::mpi::communicator world;
