@@ -201,3 +201,96 @@ TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_WrapAround) {
     ASSERT_EQ(neighbors, expected) << "Incorrect neighbors for rank " << rank;
   }
 }
+
+TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl_MinProcesses) {
+  boost::mpi::communicator world;
+  if (world.size() < 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(4, static_cast<uint8_t>(world.rank()));
+  std::vector<uint8_t> output_data(4, 0);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.RunImpl());
+
+  world.barrier();
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl_NoValidNeighbors) {
+  boost::mpi::communicator world;
+  if (world.size() < 2) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(4, static_cast<uint8_t>(world.rank()));
+  std::vector<uint8_t> output_data(4, 0);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.RunImpl());
+
+  world.barrier();
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestCorrectDataTransmission) {
+  boost::mpi::communicator world;
+  int size = world.size();
+  if (size < 4 || std::sqrt(size) * std::sqrt(size) != size) {
+    GTEST_SKIP() << "The number of processes must be a perfect square and at least 4.";
+    return;
+  }
+
+  int rank = world.rank();
+  int grid_size = static_cast<int>(std::sqrt(size));
+
+  std::vector<uint8_t> input_data(4, static_cast<uint8_t>(rank));
+  std::vector<uint8_t> output_data(4, 0);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+  ASSERT_TRUE(task.RunImpl());
+
+  world.barrier();
+
+  std::vector<int> neighbors = task.ComputeNeighbors(rank, grid_size);
+
+  bool received_valid_data = false;
+  for (int neighbor : neighbors) {
+    if (neighbor >= size) continue;
+
+    if (std::find(output_data.begin(), output_data.end(), static_cast<uint8_t>(neighbor)) != output_data.end()) {
+      received_valid_data = true;
+      break;
+    }
+  }
+
+  ASSERT_TRUE(received_valid_data) << "Process " << rank << " did not receive expected data from its neighbors.";
+}

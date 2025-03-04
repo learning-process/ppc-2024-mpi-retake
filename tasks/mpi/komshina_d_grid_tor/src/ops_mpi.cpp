@@ -52,11 +52,13 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
 
       std::vector<uint8_t> recv_data(task_data->inputs_count[0]);
       world_.recv(neighbor, 0, recv_data);
-    }
 
+      if (task_data->outputs_count[0] >= recv_data.size()) {
+        std::copy(recv_data.begin(), recv_data.end(), task_data->outputs[0]);
+      }
+    }
     world_.barrier();
   }
-
   return true;
 }
 
