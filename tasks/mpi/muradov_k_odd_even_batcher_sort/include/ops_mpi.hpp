@@ -3,11 +3,24 @@
 
 #include <vector>
 
+#include "core/task/include/task.hpp"
+
 namespace muradov_k_odd_even_batcher_sort {
 
-std::vector<int> RandomVector(int size);
 void QSort(std::vector<int>& v, int l, int r);
 void OddEvenBatcherSort(std::vector<int>& v);
+
+class OddEvenBatcherSortTask : public ppc::core::Task {
+ public:
+  explicit OddEvenBatcherSortTask(ppc::core::TaskDataPtr task_data) : ppc::Task(std::move(task_data)) {}
+  bool ValidationImpl() override;
+  bool PreProcessingImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
+
+ private:
+  std::vector<int> data_;
+};
 
 }  // namespace muradov_k_odd_even_batcher_sort
 

@@ -13,15 +13,6 @@
 
 namespace muradov_k_odd_even_batcher_sort {
 
-std::vector<int> RandomVector(int size) {
-  std::mt19937 rng(static_cast<unsigned int>(time(nullptr)));
-  std::vector<int> v(size);
-  for (int i = 0; i < size; ++i) {
-    v[i] = static_cast<int>(rng()) % 1000;
-  }
-  return v;
-}
-
 namespace {
 
 int Partition(std::vector<int>& v, int l, int r) {
@@ -45,7 +36,6 @@ void QSortImpl(std::vector<int>& v, int l, int r) {
   }
 }
 
-// Extracted merge for the descending case.
 void MergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
   int part_size = static_cast<int>(local_part.size());
   int idx1 = part_size - 1;
@@ -66,7 +56,6 @@ void MergeDescending(std::vector<int>& local_part, const std::vector<int>& neigh
   local_part = tmp;
 }
 
-// Extracted merge for the ascending case.
 void MergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
   int part_size = static_cast<int>(local_part.size());
   int idx1 = 0;
@@ -210,6 +199,30 @@ void OddEvenBatcherSort(std::vector<int>& v) {
   if (proc_rank == 0 && padding_count > 0) {
     v.resize(enlarged_size - padding_count);
   }
+}
+
+bool OddEvenBatcherSortTask::ValidationImpl() {
+  return !task_data->inputs.empty() && !task_data->outputs.empty() &&
+         task_data->inputs_count[0] == task_data->outputs_count[0];
+}
+
+bool OddEvenBatcherSortTask::PreProcessingImpl() {
+  unsigned int count = task_data->inputs_count[0];
+  int* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
+  data_.assign(in_ptr, in_ptr + count);
+  return true;
+}
+
+bool OddEvenBatcherSortTask::RunImpl() {
+  OddEvenBatcherSort(data_);
+  return true;
+}
+
+bool OddEvenBatcherSortTask::PostProcessingImpl() {
+  unsigned int count = task_data->outputs_count[0];
+  int* out_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
+  std::copy(data_.begin(), data_.end(), out_ptr);
+  return true;
 }
 
 }  // namespace muradov_k_odd_even_batcher_sort
