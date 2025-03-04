@@ -58,5 +58,9 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   for (int i = 0; i < N - 2; i++)
     result.push_back(std::vector<char>(out.begin() + i * (N - 2), out.begin() + (i + 1) * (N - 2)));
 
-  EXPECT_EQ(expected, result);
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  if (rank == 0) {
+    EXPECT_EQ(expected, result);
+  }
 }
