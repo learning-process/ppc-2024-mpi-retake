@@ -1,13 +1,13 @@
 #include "mpi/sedova_o_min_of_vector_elements/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/environment.hpp> // For boost::mpi::environment
-#include <boost/mpi/communicator.hpp> // For boost::mpi::communicator
-#include <boost/mpi/non_blocking.hpp> // For boost::mpi::request
-#include <boost/mpi/operations.hpp> // For boost::mpi::broadcast
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
+#include <boost/mpi/non_blocking.hpp>
+#include <boost/mpi/operations.hpp>
+#include <boost/mpi/reducer.hpp>
 #include <boost/serialization/string.hpp>
-#include <boost/mpi/collectives.hpp> // For boost::mpi::reduce
-#include <boost/mpi/reducer.hpp> // For boost::mpi::minimum
 #include <climits>
 #include <cmath>
 #include <random>
