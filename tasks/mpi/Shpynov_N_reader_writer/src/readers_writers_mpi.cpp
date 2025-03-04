@@ -1,12 +1,12 @@
+#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
+
 #include <algorithm>
-#include <boost/mpi/status.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi/status.hpp>
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
-
-#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
 
 using namespace std::chrono_literals;
 
@@ -45,7 +45,7 @@ class CSem {  // semaphore class
     return 0;
   }
 
-  void UnlockIfFree(CSem &writer) const{
+  void UnlockIfFree(CSem &writer) const {
     if (this->IsFree()) {
       writer.Unlock();
     }

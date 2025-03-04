@@ -94,8 +94,7 @@ TEST(Shpynov_N_readers_writers_perf, test_task_run) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
     task_data_mpi->outputs_count.emplace_back(crit_res.size());
   }
-  auto test_task_mpi =
-      std::make_shared<shpynov_n_readers_writers_mpi::TestTaskMPI>(task_data_mpi);
+  auto test_task_mpi = std::make_shared<shpynov_n_readers_writers_mpi::TestTaskMPI>(task_data_mpi);
   shpynov_n_readers_writers_mpi::TestTaskMPI test_task_mpi_1(task_data_mpi);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;

@@ -175,8 +175,7 @@ TEST(Shpynov_N_readers_writers, test_different_sizes) {
   std::vector<int> expected_result(crit_res.size() + 1);
   std::vector<int> returned_result(crit_res.size());
 
-  std::shared_ptr<ppc::core::TaskData> task_data_mpi =
-      std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     int writers_count = 0;
