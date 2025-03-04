@@ -15,10 +15,14 @@ TEST(ersoz_b_horizontal_a_vertical_b_mpi, test_pipeline_run) {
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
   constexpr int kIterations = 100;
+  std::vector<int> res;
   for (int i = 0; i < kIterations; ++i) {
-    auto res = GetParallelOperations(matrix1, matrix2, rows, cols);
+    res = GetParallelOperations(matrix1, matrix2, rows, cols);
   }
-  SUCCEED();
+  if (rank == 0) {
+    auto expected = GetSequentialOperations(matrix1, matrix2, rows, cols, rows);
+    ASSERT_EQ(expected, res);
+  }
 }
 
 TEST(ersoz_b_horizontal_a_vertical_b_mpi, test_task_run) {
@@ -26,7 +30,7 @@ TEST(ersoz_b_horizontal_a_vertical_b_mpi, test_task_run) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::size_t rows = 200;
   std::size_t cols = 150;
-  std::size_t b_cols = rows;  // Result dimensions: rows x rows.
+  std::size_t b_cols = rows;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
 
