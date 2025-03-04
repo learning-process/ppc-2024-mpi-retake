@@ -72,9 +72,42 @@ TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_WITH_LOW_RANGE) {
 }
 
 TEST(ersoz_b_rectangular_method_integration_mpi, EXCEPTION_ON_ZERO_COUNT) {
-  // NOLINTBEGIN(modernize-type-traits, modernize-type-traits-variable)
   EXPECT_THROW(GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 5, 0, 0), std::runtime_error);
-  // NOLINTEND(modernize-type-traits, modernize-type-traits-variable)
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_SIN_FROM_0_TO_PI) {
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::sin(x); }, 0, M_PI, 10000);
+  if (rank == 0) {
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::sin(x); }, 0, M_PI, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
+  }
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_X_SQUARE_FROM_0_TO_1) {
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return x * x; }, 0, 1, 10000);
+  if (rank == 0) {
+    double sequential_result = GetIntegralRectangularMethodSequential([](double x) { return x * x; }, 0, 1, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
+  }
+}
+
+TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_EXP_FROM_0_TO_1) {
+  int rank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  double parallel_result = GetIntegralRectangularMethodParallel([](double x) { return std::exp(x); }, 0, 1, 10000);
+  if (rank == 0) {
+    double sequential_result =
+        GetIntegralRectangularMethodSequential([](double x) { return std::exp(x); }, 0, 1, 10000);
+    ASSERT_LT(std::fabs(parallel_result - sequential_result), std::numeric_limits<double>::epsilon() * 1000);
+  }
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_mpi

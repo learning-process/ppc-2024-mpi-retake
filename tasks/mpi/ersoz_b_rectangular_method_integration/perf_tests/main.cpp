@@ -3,11 +3,10 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <chrono>
 #include <cmath>
-#include <cstddef>  // size_t için
+#include <cstddef>
 #include <functional>
-#include <iostream>
+#include <limits>
 
 #include "mpi/ersoz_b_rectangular_method_integration/include/ops_mpi.hpp"
 
@@ -22,15 +21,12 @@ TEST(ersoz_b_rectangular_method_integration_mpi, test_task_run) {
   double b = 100.0;
   size_t count = 10000000;
 
-  auto start = std::chrono::high_resolution_clock::now();
-  double result = GetIntegralRectangularMethodParallel(f, a, b, count);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
+  double parallel_result = GetIntegralRectangularMethodParallel(f, a, b, count);
 
   if (rank == 0) {
-    std::cout << "[MPI Task Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
+    double sequential_result = GetIntegralRectangularMethodSequential(f, a, b, count);
+    ASSERT_NEAR(parallel_result, sequential_result, std::numeric_limits<double>::epsilon() * 1000);
   }
-  SUCCEED();
 }
 
 TEST(ersoz_b_rectangular_method_integration_mpi, test_pipeline_run) {
@@ -42,15 +38,12 @@ TEST(ersoz_b_rectangular_method_integration_mpi, test_pipeline_run) {
   double b = 1000.0;
   size_t count = 10000000;
 
-  auto start = std::chrono::high_resolution_clock::now();
-  double result = GetIntegralRectangularMethodParallel(f, a, b, count);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
+  double parallel_result = GetIntegralRectangularMethodParallel(f, a, b, count);
 
   if (rank == 0) {
-    std::cout << "[MPI Pipeline Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
+    double sequential_result = GetIntegralRectangularMethodSequential(f, a, b, count);
+    ASSERT_NEAR(parallel_result, sequential_result, std::numeric_limits<double>::epsilon() * 1000);
   }
-  SUCCEED();
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_mpi
