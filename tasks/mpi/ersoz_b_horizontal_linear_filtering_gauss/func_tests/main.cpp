@@ -5,7 +5,7 @@
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
-#include "ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
+#include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   constexpr int N = 16;  // Image is N x N

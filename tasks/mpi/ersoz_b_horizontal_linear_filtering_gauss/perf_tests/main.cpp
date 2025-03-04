@@ -7,7 +7,7 @@
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-#include "ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
+#include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
   constexpr int N = 128;
