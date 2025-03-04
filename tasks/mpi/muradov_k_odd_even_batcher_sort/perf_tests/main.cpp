@@ -16,7 +16,6 @@
 
 TEST(muradov_k_odd_even_batcher_sort_mpi, test_pipeline_run) {
   constexpr int n = 256 * 1024;
-  const int k_iterations = 100;
 
   std::vector<int> input(n);
   std::srand(static_cast<unsigned int>(std::time(nullptr)));
