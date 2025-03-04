@@ -5,6 +5,8 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <cstdint>
+#include <string>
 
 #include "core/task/include/task.hpp"
 

@@ -1,12 +1,12 @@
-#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
-
-#include <cstdint>
-#include <memory>
 #include <algorithm>
+#include <boost/mpi/status.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
+
+#include "mpi/Shpynov_N_reader_writer/include/readers_writers_mpi.hpp"
 
 using namespace std::chrono_literals;
 
@@ -26,9 +26,9 @@ class CSem {  // semaphore class
   }
   void Lock() { signal_--; }
   void Unlock() { signal_++; }
-  bool [[nodiscard]] IsOnlyUser() const { return signal_ == 1; }
+  [[nodiscard]] bool IsOnlyUser() const { return signal_ == 1; }
 
-  bool [[nodiscard]] IsFree() const { return signal_ == 0; }
+  [[nodiscard]] bool IsFree() const { return signal_ == 0; }
 
   int CheckAnotherSem(CSem &writer, CSem &read_count) {
     if (this->TryLock()) {
@@ -92,7 +92,7 @@ bool shpynov_n_readers_writers_mpi::TestTaskMPI::RunImpl() {
       stat = world_.recv(boost::mpi::any_source, 0, procedure);
       int sender_name = stat.source();
       std::vector<int> new_res(critical_resource_.size());
-      int tmp;
+      int tmp = 0;
       switch (shpynov_n_readers_writers_mpi::Hasher(procedure)) {
         case kWriteBegin:
           if (writer.TryLock()) {
