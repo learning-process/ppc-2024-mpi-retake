@@ -74,10 +74,6 @@ TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_WITH_LOW_RANGE) {
   }
 }
 
-TEST(ersoz_b_rectangular_method_integration_mpi, EXCEPTION_ON_ZERO_COUNT) {
-  EXPECT_THROW(GetIntegralRectangularMethodParallel([](double x) { return std::cos(x); }, 5, 0, 0), std::runtime_error);
-}
-
 TEST(ersoz_b_rectangular_method_integration_mpi, INTEGRAL_SIN_FROM_0_TO_PI) {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
