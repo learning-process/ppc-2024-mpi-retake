@@ -31,10 +31,10 @@ class TestTaskMPI : public ppc::core::Task {
   std::vector<T> local_input_;
   T result_;
   MPI_Op op_;
-  int size;
-  int rank;
-  int root;
-  MPI_Datatype mpi_type;
+  int size_;
+  int rank_;
+  int root_;
+  MPI_Datatype mpi_type_;
 };
 
 }  // namespace karaseva_e_reduce_mpi

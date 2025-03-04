@@ -10,7 +10,7 @@
 #include "mpi/karaseva_e_reduce/include/ops_mpi.hpp"
 
 TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 10000;
 
   // Create data
   std::vector<int> in(kCount * kCount, 1);
@@ -43,7 +43,7 @@ TEST(karaseva_e_reduce_mpi, test_pipeline_run) {
 }
 
 TEST(karaseva_e_reduce_mpi, test_task_run) {
-  constexpr int kCount = 500;
+  constexpr int kCount = 25000;
 
   // Create data
   std::vector<int> in(kCount * kCount, 1);
