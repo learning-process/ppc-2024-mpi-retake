@@ -12,7 +12,7 @@
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
-  constexpr int N = 128;
+  constexpr int N = 256;
   std::vector<char> in(N * N, 0);
   for (int i = 0; i < N; i++)
     for (int j = 0; j < N; j++) in[i * N + j] = static_cast<char>((i + j) % 256);
@@ -26,7 +26,7 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
 
   auto task = std::make_shared<ersoz_b_test_task_mpi::TestTaskMPI>(task_data);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 100;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [t0]() {
     auto current_time_point = std::chrono::high_resolution_clock::now();
