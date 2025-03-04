@@ -5,7 +5,11 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
+#include <memory>
+#include <ranges>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -132,7 +136,7 @@ TEST(muradov_k_odd_even_batcher_sort_func, compare_with_std_sort) {
     input[i] = std::rand() % 1000;
   }
   std::vector<int> expected = input;
-  std::sort(expected.begin(), expected.end());
+  std::ranges::sort(expected);
   std::vector<int> output(input.size(), 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();

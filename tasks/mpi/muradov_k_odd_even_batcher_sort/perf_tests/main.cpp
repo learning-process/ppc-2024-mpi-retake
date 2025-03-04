@@ -1,12 +1,13 @@
 #define OMPI_SKIP_MPICXX
 
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
+#include <memory>
+#include <ranges>
 #include <vector>
 
 #include "boost/mpi/communicator.hpp"
@@ -15,14 +16,14 @@
 #include "mpi/muradov_k_odd_even_batcher_sort/include/ops_mpi.hpp"
 
 TEST(muradov_k_odd_even_batcher_sort_mpi, test_pipeline_run) {
-  constexpr int n = 256 * 1024;
+  constexpr int kN = 256 * 1024;
 
-  std::vector<int> input(n);
+  std::vector<int> input(kN);
   std::srand(static_cast<unsigned int>(std::time(nullptr)));
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < kN; ++i) {
     input[i] = std::rand() % 1000;
   }
-  std::vector<int> output(n, 0);
+  std::vector<int> output(kN, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
@@ -51,19 +52,19 @@ TEST(muradov_k_odd_even_batcher_sort_mpi, test_pipeline_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     std::vector<int> expected = input;
-    std::sort(expected.begin(), expected.end());
+    std::ranges::sort(expected);
     ASSERT_EQ(output, expected);
   }
 }
 
 TEST(muradov_k_odd_even_batcher_sort_mpi, test_task_run) {
-  constexpr int n = 1024;
-  std::vector<int> input(n);
+  constexpr int kN = 20480;
+  std::vector<int> input(kN);
   std::srand(static_cast<unsigned int>(std::time(nullptr)));
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < kN; ++i) {
     input[i] = std::rand() % 1000;
   }
-  std::vector<int> output(n, 0);
+  std::vector<int> output(kN, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
@@ -92,7 +93,7 @@ TEST(muradov_k_odd_even_batcher_sort_mpi, test_task_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     std::vector<int> expected = input;
-    std::sort(expected.begin(), expected.end());
+    std::ranges::sort(expected);
     ASSERT_EQ(output, expected);
   }
 }

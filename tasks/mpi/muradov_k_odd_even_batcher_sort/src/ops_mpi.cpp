@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -222,7 +223,7 @@ bool OddEvenBatcherSortTask::RunImpl() {
 
 bool OddEvenBatcherSortTask::PostProcessingImpl() {
   int* out_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
-  std::copy(data_.begin(), data_.end(), out_ptr);
+  std::ranges::copy(data_, out_ptr);
   return true;
 }
 
