@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstddef>
 #include <random>
 #include <vector>
 
@@ -12,14 +13,14 @@ std::vector<int> sedova_o_min_of_vector_elements_seq::GetRandomVector(int size, 
   std::mt19937 gen(dev());
   std::uniform_int_distribution<> distrib(min, max);
   std::vector<int> vec(size);
-  std::generate(vec.begin(), vec.end(), [&]() { return distrib(gen); });
+  std::ranges::generate(vec.begin(), vec.end(), [&]() { return distrib(gen); });
   return vec;
 }
 
 std::vector<std::vector<int>> sedova_o_min_of_vector_elements_seq::GetRandomMatrix(int rows, int columns, int min,
                                                                                    int max) {
   std::vector<std::vector<int>> vec(rows);
-  std::generate(vec.begin(), vec.end(), [&]() { return GetRandomVector(columns, min, max); });
+  std::ranges::generate(vec.begin(), vec.end(), [&]() { return GetRandomVector(columns, min, max); });
   return vec;
 }
 
@@ -35,11 +36,13 @@ bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::PreProcessingImpl(
 
 bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::ValidationImpl() {
   return (task_data->inputs_count.size() >= 2) && (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) &&
-         (task_data->outputs_count.size() >= 1) && (task_data->outputs_count[0] == 1);
+         (!task_data->outputs_count.empty()) && (task_data->outputs_count[0] == 1);
 }
 
 bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::RunImpl() {
-  if (input_.empty()) return true;
+  if (input_.empty()) {
+    return true;
+  }
   res_ = input_[0][0];
   for (const auto& row : input_) {
     for (int val : row) {

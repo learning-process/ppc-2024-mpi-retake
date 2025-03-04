@@ -2,6 +2,7 @@
 
 #include <boost/mpi/timer.hpp>
 #include <climits>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -17,7 +18,7 @@ namespace {
 std::vector<int> GetRandomVector(size_t size, size_t min, size_t max) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  std::uniform_int_distribution<> distrib(min, max);
+  std::uniform_int_distribution<> distrib(static_cast<int>(min), static_cast<int>(max));
   std::vector<int> vec(size);
   for (size_t i = 0; i < size; i++) {
     vec[i] = distrib(gen);

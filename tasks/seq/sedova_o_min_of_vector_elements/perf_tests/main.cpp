@@ -27,7 +27,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
   int max = 500;
 
   global_matrix = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
-  int index = gen() % (rows * columns);
+  int index = (static_cast<int>(gen() % (rows * columns)));
   global_matrix[index / columns][index / rows] = ref;
 
   for (unsigned int i = 0; i < global_matrix.size(); i++) {
@@ -78,7 +78,7 @@ TEST(sedova_o_min_of_vector_elements_seq, test_task_run) {
   int max = 500;
 
   global_matrix = sedova_o_min_of_vector_elements_seq::GetRandomMatrix(rows, columns, min, max);
-  int index = gen() % (rows * columns);
+  int index = (static_cast<int>(gen() % (rows * columns)));
   global_matrix[index / columns][index / rows] = ref;
 
   for (unsigned int i = 0; i < global_matrix.size(); i++) {
