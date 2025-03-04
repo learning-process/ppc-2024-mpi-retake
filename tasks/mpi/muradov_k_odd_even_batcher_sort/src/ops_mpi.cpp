@@ -200,7 +200,7 @@ void OddEvenBatcherSort(std::vector<int>& v) {
   }
 }
 
-// --- Implementation of OddEvenBatcherSortTask ---
+// Implementation of OddEvenBatcherSortTask
 
 bool OddEvenBatcherSortTask::ValidationImpl() {
   return !task_data->inputs.empty() && !task_data->outputs.empty() &&
