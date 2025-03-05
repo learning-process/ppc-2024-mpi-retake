@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <vector>
 
 bool shpynov_n_radix_sort_seq::TestTaskSEQ::ValidationImpl() {

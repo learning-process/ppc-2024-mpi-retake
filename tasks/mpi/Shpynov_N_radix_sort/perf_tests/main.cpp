@@ -13,19 +13,19 @@
 TEST(shpynov_n_radix_sort_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   constexpr int kCount = 10;
-  std::vector<int> inputVec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int> input_vec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<int> expected_result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   for (int i = 0; i < kCount; i++) {
-    inputVec.insert(inputVec.end(), inputVec.begin(), inputVec.end());
+    input_vec.insert(input_vec.end(), input_vec.begin(), input_vec.end());
     expected_result.insert(expected_result.end(), expected_result.begin(), expected_result.end());
   }
 
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-    task_data_mpi->inputs_count.emplace_back(inputVec.size());
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+    task_data_mpi->inputs_count.emplace_back(input_vec.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
     task_data_mpi->outputs_count.emplace_back(returned_result.size());
   }
@@ -56,18 +56,18 @@ TEST(shpynov_n_radix_sort_mpi, test_pipeline_run) {
 TEST(shpynov_n_radix_sort_mpi, test_task_run) {
   boost::mpi::communicator world;
   constexpr int kCount = 10;
-  std::vector<int> inputVec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int> input_vec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   std::vector<int> expected_result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   for (int i = 0; i < kCount; i++) {
-    inputVec.insert(inputVec.end(), inputVec.begin(), inputVec.end());
+    input_vec.insert(input_vec.end(), input_vec.begin(), input_vec.end());
     expected_result.insert(expected_result.end(), expected_result.begin(), expected_result.end());
   }
 
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-    task_data_mpi->inputs_count.emplace_back(inputVec.size());
+    task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+    task_data_mpi->inputs_count.emplace_back(input_vec.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
     task_data_mpi->outputs_count.emplace_back(returned_result.size());
   }

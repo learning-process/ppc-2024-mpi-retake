@@ -8,13 +8,13 @@
 #include "seq/Shpynov_N_radix_sort/include/Shpynov_N_radix_sort.hpp"
 
 TEST(shpynov_n_radix_sort_seq, test_single_num) {
-  std::vector<int> inputVec(1, 0);
+  std::vector<int> input_vec(1, 0);
 
   std::vector<int> expected_result(1, 0);
   std::vector<int> returned_result(1, 0);
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
   task_data_seq->inputs_count.emplace_back(1);
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(1);
@@ -29,14 +29,14 @@ TEST(shpynov_n_radix_sort_seq, test_single_num) {
 }
 
 TEST(shpynov_n_radix_sort_seq, test_some_numbers) {
-  std::vector<int> inputVec = {17, 33, 22, 42};
+  std::vector<int> input_vec = {17, 33, 22, 42};
 
   std::vector<int> expected_result = {17, 22, 33, 42};
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-  task_data_seq->inputs_count.emplace_back(inputVec.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(returned_result.size());
 
@@ -50,14 +50,14 @@ TEST(shpynov_n_radix_sort_seq, test_some_numbers) {
 }
 
 TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length) {
-  std::vector<int> inputVec = {17, 33, 22, 420, 1, 0, 5837, 659};
+  std::vector<int> input_vec = {17, 33, 22, 420, 1, 0, 5837, 659};
 
   std::vector<int> expected_result = {0, 1, 17, 22, 33, 420, 659, 5837};
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-  task_data_seq->inputs_count.emplace_back(inputVec.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(returned_result.size());
 
@@ -71,14 +71,14 @@ TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length) {
 }
 
 TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_neg_numbers) {
-  std::vector<int> inputVec = {-17, -33, -22, -420, -1, -5837, -659};
+  std::vector<int> input_vec = {-17, -33, -22, -420, -1, -5837, -659};
 
   std::vector<int> expected_result = {-5837, -659, -420, -33, -22, -17, -1};
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-  task_data_seq->inputs_count.emplace_back(inputVec.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(returned_result.size());
 
@@ -92,14 +92,14 @@ TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_neg_numbers) {
 }
 
 TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_pos_and_neg_numbers) {
-  std::vector<int> inputVec = {17, 33, 22, 420, 1, 0, 5837, 659, -4, -28, -76, -110291};
+  std::vector<int> input_vec = {17, 33, 22, 420, 1, 0, 5837, 659, -4, -28, -76, -110291};
 
   std::vector<int> expected_result = {-110291, -76, -28, -4, 0, 1, 17, 22, 33, 420, 659, 5837};
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-  task_data_seq->inputs_count.emplace_back(inputVec.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(returned_result.size());
 
@@ -113,14 +113,14 @@ TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_pos_and_neg_numbers
 }
 
 TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_pos_and_neg_numbers_with_same_nums) {
-  std::vector<int> inputVec = {17, 33, 22, 420, 1, 17, 0, 5837, 659, -4, -28, 0, -76, -4, -110291};
+  std::vector<int> input_vec = {17, 33, 22, 420, 1, 17, 0, 5837, 659, -4, -28, 0, -76, -4, -110291};
 
   std::vector<int> expected_result = {-110291, -76, -28, -4, -4, 0, 0, 1, 17, 17, 22, 33, 420, 659, 5837};
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-  task_data_seq->inputs_count.emplace_back(inputVec.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(returned_result.size());
 
@@ -133,14 +133,14 @@ TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_pos_and_neg_numbers
   ASSERT_EQ(expected_result, returned_result);
 }
 TEST(shpynov_n_radix_sort_seq, test_invalid) {
-  std::vector<int> inputVec;
+  std::vector<int> input_vec;
 
   std::vector<int> expected_result = {-110291, -76, -28, -4, 0, 1, 17, 22, 33, 420, 659, 5837};
-  std::vector<int> returned_result(inputVec.size());
+  std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(inputVec.data()));
-  task_data_seq->inputs_count.emplace_back(inputVec.size());
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
   task_data_seq->outputs_count.emplace_back(returned_result.size());
 

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstddef>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -11,66 +13,64 @@
 namespace shpynov_n_radix_sort_mpi {
 
 inline int GetMaxAmountOfDigits(std::vector<int>& vec) {
-  int Max = 0;
-  for (int i = 0; i < vec.size(); i++) {
-    if (std::abs(vec[i]) > Max) {
-      Max = std::abs(vec[i]);
-    }
+  int maxNum = 0;
+  for (int i = 0; i < (int)vec.size(); i++) {
+    maxNum = std::max(std::abs(vec[i]), maxNum);
   }
   int count = 0;
-  while (Max) {
-    Max /= 10;
+  while (maxNum != 0) {
+    maxNum /= 10;
     count++;
   }
   return count;
 }
 
-inline std::vector<int> SortBySingleDigit(std::vector<int>& vec, int DigitPlace) {
+inline std::vector<int> SortBySingleDigit(std::vector<int>& vec, int digit_place) {
   std::vector<int> output(vec.size());
   std::vector<int> count(10, 0);
-  for (size_t i = 0; i < vec.size(); i++) {
-    count[(vec[i] / (int)std::pow(10, DigitPlace)) % 10]++;
+  for (int i = 0; i < (int)vec.size(); i++) {
+    count[(vec[i] / (int)std::pow(10, digit_place)) % 10]++;
   }
   for (int i = 1; i < 10; i++) {
     count[i] += count[i - 1];
   }
-  for (int i = vec.size() - 1; i >= 0; i--) {
-    output[count[(vec[i] / (int)std::pow(10, DigitPlace)) % 10] - 1] = vec[i];
-    count[(vec[i] / (int)std::pow(10, DigitPlace)) % 10]--;
+  for (int i = (int)vec.size() - 1; i >= 0; i--) {
+    output[count[(vec[i] / (int)std::pow(10, digit_place)) % 10] - 1] = vec[i];
+    count[(vec[i] / (int)std::pow(10, digit_place)) % 10]--;
   }
-  for (int i = 0; i < vec.size(); i++) {
+  for (int i = 0; i < (int)vec.size(); i++) {
     vec[i] = output[i];
   }
   return output;
 }
 
 inline std::vector<int> RadixSort(std::vector<int>& vec) {
-  std::vector<int> vecPos;
-  std::vector<int> vecNeg;
-  int MaxPosNum = 0;
-  int MaxNegNum = 0;
-  for (int i = 0; i < vec.size(); i++) {
+  std::vector<int> vec_pos;
+  std::vector<int> vec_neg;
+  int max_pos_num = 0;
+  int max_neg_num = 0;
+  for (int i = 0; i < (int)vec.size(); i++) {
     if (vec[i] < 0) {
-      vecNeg.push_back(std::abs(vec[i]));
-      MaxNegNum = GetMaxAmountOfDigits(vecNeg);
+      vec_neg.push_back(std::abs(vec[i]));
+      max_neg_num = GetMaxAmountOfDigits(vec_neg);
     } else {
-      vecPos.push_back(vec[i]);
-      MaxPosNum = GetMaxAmountOfDigits(vecPos);
+      vec_pos.push_back(vec[i]);
+      max_pos_num = GetMaxAmountOfDigits(vec_pos);
     }
   }
-  for (int i = 0; i < MaxNegNum; i++) {
-    SortBySingleDigit(vecNeg, i);
+  for (int i = 0; i < max_neg_num; i++) {
+    SortBySingleDigit(vec_neg, i);
   }
-  std::reverse(vecNeg.begin(), vecNeg.end());
-  for (int i = 0; i < vecNeg.size(); i++) {
-    vecNeg[i] = -vecNeg[i];
+  std::ranges::reverse(vec_neg.begin(), vec_neg.end());
+  for (int i = 0; i < (int)vec_neg.size(); i++) {
+    vec_neg[i] = -vec_neg[i];
   }
-  for (int i = 0; i < MaxPosNum; i++) {
-    SortBySingleDigit(vecPos, i);
+  for (int i = 0; i < max_pos_num; i++) {
+    SortBySingleDigit(vec_pos, i);
   }
   vec.clear();
-  vec.insert(vec.end(), vecNeg.begin(), vecNeg.end());
-  vec.insert(vec.end(), vecPos.begin(), vecPos.end());
+  vec.insert(vec.end(), vec_neg.begin(), vec_neg.end());
+  vec.insert(vec.end(), vec_pos.begin(), vec_pos.end());
   return vec;
 }
 

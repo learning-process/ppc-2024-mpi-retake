@@ -2,10 +2,11 @@
 #include "mpi/Shpynov_N_radix_sort/include/Shpynov_N_radix_sort_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/collectives.hpp>
 #include <cmath>
 #include <cstddef>
+#include <utility>
 #include <vector>
-
 // *** SEQUENTIAL ***
 
 bool shpynov_n_radix_sort_mpi::TestTaskSEQ::ValidationImpl() {
@@ -64,37 +65,38 @@ bool shpynov_n_radix_sort_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool shpynov_n_radix_sort_mpi::TestTaskMPI::RunImpl() {
-  size_t InVecSize = input_.size();
-  boost::mpi::broadcast(world_, InVecSize, 0);
+  size_t in_vec_size = input_.size();
+  boost::mpi::broadcast(world_, in_vec_size, 0);
   std::vector<int> deltas(world_.size(), 0);
-  for (int procNum = 0; procNum < world_.size(); procNum++) {
-    deltas[procNum] = InVecSize / world_.size();
+  for (int proc_num = 0; proc_num < world_.size(); proc_num++) {
+    deltas[proc_num] = in_vec_size / world_.size();
   }
-  for (int i = 0; i < (static_cast<int>(InVecSize) % world_.size()); i++) {
+  for (int i = 0; i < (static_cast<int>(in_vec_size) % world_.size()); i++) {
     deltas[i] += 1;
   }
   if (world_.rank() == 0) {
     int deltas_sum = 0;
-    for (int procNum = 1; procNum < world_.size(); procNum++) {
-      deltas_sum += deltas[procNum - 1];
-      world_.send(procNum, 0, input_.data() + deltas_sum, deltas[procNum]);
+    for (int proc_num = 1; proc_num < world_.size(); proc_num++) {
+      deltas_sum += deltas[proc_num - 1];
+      world_.send(proc_num, 0, input_.data() + deltas_sum, deltas[proc_num]);
     }
-    std::vector<int> LocVec(input_.begin(), input_.begin() + deltas[0]);
-    RadixSort(LocVec);
-    result_ = std::move(LocVec);
+    std::vector<int> loc_vec(input_.begin(), input_.begin() + deltas[0]);
+    RadixSort(loc_vec);
+    result_ = std::move(loc_vec);
     for (int i = 1; i < world_.size(); i++) {
       std::vector<int> RecievedSorted(deltas[i]);
       world_.recv(i, 0, RecievedSorted.data(), deltas[i]);
-      std::vector<int> MergedPart(result_.size() + RecievedSorted.size());
-      std::merge(result_.begin(), result_.end(), RecievedSorted.begin(), RecievedSorted.end(), MergedPart.begin());
-      result_ = MergedPart;
+      std::vector<int> merged_part(result_.size() + RecievedSorted.size());
+      std::ranges::merge(result_.begin(), result_.end(), RecievedSorted.begin(), RecievedSorted.end(),
+                         merged_part.begin());
+      result_ = merged_part;
     }
   } else {
-    std::vector<int> LocVec;
-    LocVec.resize((deltas[world_.rank()]));
-    world_.recv(0, 0, LocVec.data(), deltas[world_.rank()]);
-    RadixSort(LocVec);
-    world_.send(0, 0, LocVec.data(), deltas[world_.rank()]);
+    std::vector<int> loc_vec;
+    loc_vec.resize((deltas[world_.rank()]));
+    world_.recv(0, 0, loc_vec.data(), deltas[world_.rank()]);
+    RadixSort(loc_vec);
+    world_.send(0, 0, loc_vec.data(), deltas[world_.rank()]);
   }
 
   return true;
