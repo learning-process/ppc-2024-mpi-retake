@@ -47,8 +47,8 @@ bool BinarySegmentsMPI::PreProcessingImpl() {
   return true;
 }
 
-void BinarySegmentsMPI::AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences,
-                                  uint32_t label1, uint32_t label2) {
+void BinarySegmentsMPI::AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1,
+                                  uint32_t label2) {
   bool flag1 = false;
   bool flag2 = false;
   size_t l1id = 0;
