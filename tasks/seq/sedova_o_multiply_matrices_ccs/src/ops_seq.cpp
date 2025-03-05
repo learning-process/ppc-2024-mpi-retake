@@ -31,7 +31,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
   // Транспонирование матрицы A
-  transpose_CCS(A_val, A_row_ind, A_col_ptr, rowsA, colsA, At_val, At_row_ind, At_col_ptr);
+  Transponirovanie(A_val, A_row_ind, A_col_ptr, rowsA, colsA, At_val, At_row_ind, At_col_ptr);
 
   rows_At = colsA;
   cols_At = rowsA;
