@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <unordered_map>
+#include <set>
 #include <vector>
 
 namespace leontev_n_binary_seq {
@@ -38,8 +38,38 @@ bool BinarySegmentsSeq::PreProcessingImpl() {
   return true;
 }
 
+void BinarySegmentsSeq::AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1,
+                                  uint32_t label2) {
+  bool flag1 = false;
+  bool flag2 = false;
+  size_t l1id = 0;
+  size_t l2id = 0;
+  for (size_t i = 0; i < label_equivalences.size(); i++) {
+    if (label_equivalences[i].contains(label1)) {
+      flag1 = true;
+      l1id = i;
+    }
+    if (label_equivalences[i].contains(label2)) {
+      flag2 = true;
+      l2id = i;
+    }
+  }
+  if (flag1 && flag2) {
+    if (l1id != l2id) {
+      label_equivalences[l1id].merge(label_equivalences[l2id]);
+      label_equivalences[l2id] = std::set<uint32_t>();
+    }
+  } else if (flag1 && !flag2) {
+    label_equivalences[l1id].insert(label2);
+  } else if (!flag1 && flag2) {
+    label_equivalences[l2id].insert(label1);
+  } else {
+    label_equivalences.emplace_back(std::set<uint32_t>({label1, label2}));
+  }
+}
+
 void BinarySegmentsSeq::LoopProcess(size_t col, size_t row, uint32_t& cur_label,
-                                    std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+                                    std::vector<std::set<uint32_t>>& label_equivalences) {
   if (input_image_[GetIndex(row, col)] == 0) {
     return;
   }
@@ -54,14 +84,14 @@ void BinarySegmentsSeq::LoopProcess(size_t col, size_t row, uint32_t& cur_label,
     labels_[GetIndex(row, col)] = min_label;
     for (uint32_t label : {label_b, label_c, label_d}) {
       if (label != 0 && label != min_label) {
-        label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+        AppendEqs(label_equivalences, std::max(label, min_label), std::min(label, min_label));
       }
     }
   }
 }
 
 bool BinarySegmentsSeq::RunImpl() {
-  std::unordered_map<uint32_t, uint32_t> label_equivalences;
+  std::vector<std::set<uint32_t>> label_equivalences;
   uint32_t cur_label = 1;
   labels_.resize(rows_ * cols_, 0);
   for (size_t row = 0; row < rows_; ++row) {
@@ -70,8 +100,10 @@ bool BinarySegmentsSeq::RunImpl() {
     }
   }
   for (auto& label : labels_) {
-    while (label_equivalences.contains(label)) {
-      label = label_equivalences[label];
+    for (size_t i = 0; i < label_equivalences.size(); i++) {
+      if (label_equivalences[i].contains(label)) {
+        label = *std::min_element(label_equivalences[i].begin(), label_equivalences[i].end());
+      }
     }
   }
   return true;

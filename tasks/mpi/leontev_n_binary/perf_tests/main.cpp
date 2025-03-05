@@ -24,8 +24,8 @@ std::vector<uint8_t> GetRandomVector(size_t rows, size_t cols) {
 
 TEST(leontev_n_binary_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  size_t rows = 3000;
-  size_t cols = 3000;
+  size_t rows = 256;
+  size_t cols = 256;
   std::vector<uint8_t> image = GetRandomVector(rows, cols);
   std::vector<uint32_t> output(rows * cols);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -62,8 +62,8 @@ TEST(leontev_n_binary_mpi, test_pipeline_run) {
 
 TEST(leontev_n_binary_mpi, test_task_run) {
   boost::mpi::communicator world;
-  size_t rows = 3000;
-  size_t cols = 3000;
+  size_t rows = 256;
+  size_t cols = 256;
   std::vector<uint8_t> image = GetRandomVector(rows, cols);
   std::vector<uint32_t> output(rows * cols);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();

@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <unordered_map>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -21,8 +21,8 @@ class BinarySegmentsSeq : public ppc::core::Task {
 
  private:
   [[nodiscard]] size_t GetIndex(size_t i, size_t j) const;
-  void LoopProcess(size_t col, size_t row, uint32_t& cur_label,
-                   std::unordered_map<uint32_t, uint32_t>& label_equivalences);
+  void LoopProcess(size_t col, size_t row, uint32_t& cur_label, std::vector<std::set<uint32_t>>& label_equivalences);
+  void AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1, uint32_t label2);
   std::vector<uint8_t> input_image_;
   std::vector<uint32_t> labels_;
   size_t rows_;

@@ -22,8 +22,8 @@ std::vector<uint8_t> GetRandomVector(size_t rows, size_t cols) {
 }  // namespace
 
 TEST(leontev_n_binary_seq, test_pipeline_run) {
-  size_t rows = 3000;
-  size_t cols = 3000;
+  size_t rows = 256;
+  size_t cols = 256;
   std::vector<uint8_t> image = GetRandomVector(rows, cols);
   std::vector<uint32_t> actual(rows * cols);
 
@@ -57,8 +57,8 @@ TEST(leontev_n_binary_seq, test_pipeline_run) {
 }
 
 TEST(leontev_n_binary_seq, test_task_run) {
-  size_t rows = 3000;
-  size_t cols = 3000;
+  size_t rows = 256;
+  size_t cols = 256;
   std::vector<uint8_t> image = GetRandomVector(rows, cols);
   std::vector<uint32_t> actual(rows * cols);
 

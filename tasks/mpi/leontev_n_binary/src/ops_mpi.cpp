@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <unordered_map>
+#include <set>
 #include <vector>
 
 namespace leontev_n_binary_mpi {
@@ -47,8 +47,38 @@ bool BinarySegmentsMPI::PreProcessingImpl() {
   return true;
 }
 
+void BinarySegmentsMPI::AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences,
+                                  uint32_t label1, uint32_t label2) {
+  bool flag1 = false;
+  bool flag2 = false;
+  size_t l1id = 0;
+  size_t l2id = 0;
+  for (size_t i = 0; i < label_equivalences.size(); i++) {
+    if (label_equivalences[i].contains(label1)) {
+      flag1 = true;
+      l1id = i;
+    }
+    if (label_equivalences[i].contains(label2)) {
+      flag2 = true;
+      l2id = i;
+    }
+  }
+  if (flag1 && flag2) {
+    if (l1id != l2id) {
+      label_equivalences[l1id].merge(label_equivalences[l2id]);
+      label_equivalences[l2id] = std::set<uint32_t>();
+    }
+  } else if (flag1 && !flag2) {
+    label_equivalences[l1id].insert(label2);
+  } else if (!flag1 && flag2) {
+    label_equivalences[l2id].insert(label1);
+  } else {
+    label_equivalences.emplace_back(std::set<uint32_t>({label1, label2}));
+  }
+}
+
 void BinarySegmentsMPI::RootLoopProcess(size_t border, size_t col,
-                                        std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+                                        std::vector<std::set<uint32_t>>& label_equivalences) {
   size_t cur_ind = border + col;
   if (labels_[cur_ind] == 0) {
     return;
@@ -58,17 +88,20 @@ void BinarySegmentsMPI::RootLoopProcess(size_t border, size_t col,
   uint32_t label_d = (col > 0) ? labels_[cur_ind - cols_ - 1] : 0;
   if (label_b != 0 || label_c != 0 || label_d != 0) {
     uint32_t min_label = std::min({label_b, label_c, label_d}, CompNotZero);
-    label_equivalences[labels_[cur_ind]] = min_label;
+    if (labels_[cur_ind] != min_label) {
+      AppendEqs(label_equivalences, std::max(labels_[cur_ind], min_label), std::min(labels_[cur_ind], min_label));
+      labels_[cur_ind] = min_label;
+    }
     for (uint32_t label2 : {label_b, label_c, label_d}) {
       if (label2 != 0 && label2 != min_label) {
-        label_equivalences[std::max(label2, min_label)] = std::min(label2, min_label);
+        AppendEqs(label_equivalences, std::max(label2, min_label), std::min(label2, min_label));
       }
     }
   }
 }
 
 void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
-  std::unordered_map<uint32_t, uint32_t> label_equivalences;
+  std::vector<std::set<uint32_t>> label_equivalences;
   for (int section = 1; section < world_.size(); ++section) {
     int border = offsets[section];
     if (border >= static_cast<int>(rows_ * cols_)) {
@@ -78,9 +111,13 @@ void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
       RootLoopProcess(border, col, label_equivalences);
     }
   }
-  for (auto& label : labels_) {
-    while (label_equivalences.contains(label)) {
-      label = label_equivalences[label];
+  if (world_.size() > 1) {
+    for (auto& label : labels_) {
+      for (size_t i = 0; i < label_equivalences.size(); i++) {
+        if (label_equivalences[i].contains(label)) {
+          label = *std::min_element(label_equivalences[i].begin(), label_equivalences[i].end());
+        }
+      }
     }
   }
   std::vector<size_t> arrived((rows_ * cols_) + 1, 0);
@@ -98,7 +135,7 @@ void BinarySegmentsMPI::RootLoop(std::vector<int>& offsets) {
 
 void BinarySegmentsMPI::LocalLoopProcess(size_t row, size_t col, uint32_t& next_label,
                                          std::vector<uint32_t>& local_labels,
-                                         std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
+                                         std::vector<std::set<uint32_t>>& local_label_equivalences) {
   size_t cur_ind = GetIndex(row, col);
   if (local_image_[cur_ind] == 0) {
     return;
@@ -113,22 +150,24 @@ void BinarySegmentsMPI::LocalLoopProcess(size_t row, size_t col, uint32_t& next_
     local_labels[cur_ind] = min_label;
     for (uint32_t label : {label_b, label_c, label_d}) {
       if (label != 0 && label != min_label) {
-        local_label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+        AppendEqs(local_label_equivalences, std::max(label, min_label), std::min(label, min_label));
       }
     }
   }
 }
 
 void BinarySegmentsMPI::LocalLoop(size_t local_size, uint32_t& next_label, std::vector<uint32_t>& local_labels,
-                                  std::unordered_map<uint32_t, uint32_t>& local_label_equivalences) {
+                                  std::vector<std::set<uint32_t>>& local_label_equivalences) {
   for (size_t row = 0; row < local_size; ++row) {
     for (size_t col = 0; col < cols_; ++col) {
       LocalLoopProcess(row, col, next_label, local_labels, local_label_equivalences);
     }
   }
   for (auto& label : local_labels) {
-    while (local_label_equivalences.contains(label)) {
-      label = local_label_equivalences[label];
+    for (size_t i = 0; i < local_label_equivalences.size(); i++) {
+      if (local_label_equivalences[i].contains(label)) {
+        label = *std::min_element(local_label_equivalences[i].begin(), local_label_equivalences[i].end());
+      }
     }
   }
 }
@@ -153,7 +192,7 @@ bool BinarySegmentsMPI::RunImpl() {
                        static_cast<int>(local_size * cols_), 0);
   uint32_t next_label = 1 + offsets[world_.rank()];
   std::vector<uint32_t> local_labels(local_size * cols_);
-  std::unordered_map<uint32_t, uint32_t> local_label_equivalences;
+  std::vector<std::set<uint32_t>> local_label_equivalences;
   LocalLoop(local_size, next_label, local_labels, local_label_equivalences);
   if (world_.rank() == 0) {
     labels_.resize(rows_ * cols_);

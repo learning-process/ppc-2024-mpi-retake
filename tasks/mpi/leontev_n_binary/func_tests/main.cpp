@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <unordered_map>
+#include <set>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -42,9 +42,38 @@ bool CompNotZero(uint32_t a, uint32_t b) {
   return a < b;
 }
 
+void AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1, uint32_t label2) {
+  bool flag1 = false;
+  bool flag2 = false;
+  size_t l1id = 0;
+  size_t l2id = 0;
+  for (size_t i = 0; i < label_equivalences.size(); i++) {
+    if (label_equivalences[i].contains(label1)) {
+      flag1 = true;
+      l1id = i;
+    }
+    if (label_equivalences[i].contains(label2)) {
+      flag2 = true;
+      l2id = i;
+    }
+  }
+  if (flag1 && flag2) {
+    if (l1id != l2id) {
+      label_equivalences[l1id].merge(label_equivalences[l2id]);
+      label_equivalences[l2id] = std::set<uint32_t>();
+    }
+  } else if (flag1 && !flag2) {
+    label_equivalences[l1id].insert(label2);
+  } else if (!flag1 && flag2) {
+    label_equivalences[l2id].insert(label1);
+  } else {
+    label_equivalences.emplace_back(std::set<uint32_t>({label1, label2}));
+  }
+}
+
 void LoopProcess(size_t row, size_t col, const std::vector<uint8_t>& image, size_t rows, size_t cols,
                  std::vector<uint32_t>& labels, uint32_t& cur_label,
-                 std::unordered_map<uint32_t, uint32_t>& label_equivalences) {
+                 std::vector<std::set<uint32_t>>& label_equivalences) {
   if (image[(row * cols) + col] == 0) {
     return;
   }
@@ -59,7 +88,7 @@ void LoopProcess(size_t row, size_t col, const std::vector<uint8_t>& image, size
     labels[(row * cols) + col] = min_label;
     for (uint32_t label : {label_b, label_c, label_d}) {
       if (label != 0 && label != min_label) {
-        label_equivalences[std::max(label, min_label)] = std::min(label, min_label);
+        AppendEqs(label_equivalences, std::max(label, min_label), std::min(label, min_label));
       }
     }
   }
@@ -67,7 +96,7 @@ void LoopProcess(size_t row, size_t col, const std::vector<uint8_t>& image, size
 
 std::vector<uint32_t> RunSeq(const std::vector<uint8_t>& image, size_t rows, size_t cols) {
   std::vector<uint32_t> labels(rows * cols, 0);
-  std::unordered_map<uint32_t, uint32_t> label_equivalences;
+  std::vector<std::set<uint32_t>> label_equivalences;
   uint32_t cur_label = 1;
   for (size_t row = 0; row < rows; ++row) {
     for (size_t col = 0; col < cols; ++col) {
@@ -75,8 +104,10 @@ std::vector<uint32_t> RunSeq(const std::vector<uint8_t>& image, size_t rows, siz
     }
   }
   for (auto& label : labels) {
-    while (label_equivalences.contains(label)) {
-      label = label_equivalences[label];
+    for (size_t i = 0; i < label_equivalences.size(); i++) {
+      if (label_equivalences[i].contains(label)) {
+        label = *std::min_element(label_equivalences[i].begin(), label_equivalences[i].end());
+      }
     }
   }
   std::vector<size_t> arrived((rows * cols) + 1, 0);
@@ -96,13 +127,15 @@ std::vector<uint32_t> RunSeq(const std::vector<uint8_t>& image, size_t rows, siz
 
 TEST(leontev_n_binary_mpi, random_test) {
   boost::mpi::communicator world;
-  size_t rows = 9;
-  size_t cols = 9;
+  size_t rows = 10;
+  size_t cols = 10;
   std::vector<uint8_t> img = GetRandomVector(rows, cols);
+  std::vector<uint32_t> expected(1, 0);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   std::vector<uint32_t> actual(rows * cols);
   if (world.rank() == 0) {
     TaskEmplacement(task_data_par, img, rows, cols, actual);
+    expected = RunSeq(img, rows, cols);
   }
   leontev_n_binary_mpi::BinarySegmentsMPI binary_segments(task_data_par);
   binary_segments.Validation();
@@ -110,7 +143,6 @@ TEST(leontev_n_binary_mpi, random_test) {
   binary_segments.Run();
   binary_segments.PostProcessing();
   if (world.rank() == 0) {
-    std::vector<uint32_t> expected = RunSeq(img, rows, cols);
     ASSERT_EQ(actual, expected);
   }
 }
