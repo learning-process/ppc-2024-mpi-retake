@@ -1,5 +1,7 @@
 ﻿#include "mpi/sedova_o_multiply_matrices_ccs/include/ops_mpi.hpp"
-
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
