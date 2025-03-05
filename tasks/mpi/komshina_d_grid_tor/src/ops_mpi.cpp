@@ -40,7 +40,7 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
   int grid_size = static_cast<int>(std::sqrt(size));
 
   world_.barrier();
-  
+
   for (int step = 0; step < grid_size; ++step) {
     auto neighbors = ComputeNeighbors(rank, grid_size);
 
