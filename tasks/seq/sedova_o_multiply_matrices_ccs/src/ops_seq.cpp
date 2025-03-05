@@ -6,9 +6,9 @@
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {
   rows_A_ = *reinterpret_cast<int*>(task_data->inputs[0]);
-  cols_A = *reinterpret_cast<int*>(task_data->inputs[1]);
-  rows_B = *reinterpret_cast<int*>(task_data->inputs[2]);
-  cols_B = *reinterpret_cast<int*>(task_data->inputs[3]);
+  cols_A_ = *reinterpret_cast<int*>(task_data->inputs[1]);
+  rows_B_ = *reinterpret_cast<int*>(task_data->inputs[2]);
+  cols_B_ = *reinterpret_cast<int*>(task_data->inputs[3]);
 
   // Загрузка матрицы A_
   auto* a_val_ptr = reinterpret_cast<double*>(task_data->inputs[4]);
@@ -20,7 +20,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   auto* a_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[6]);
   A_col_ptr_.assign(a_col_ptr_ptr, a_col_ptr_ptr + task_data->inputs_count[6]);
 
-  // Загрузка матрицы B
+  // Загрузка матрицы B_
   auto* b_val_ptr = reinterpret_cast<double*>(task_data->inputs[7]);
   B_val_.assign(b_val_ptr, b_val_ptr + task_data->inputs_count[7]);
 
@@ -31,10 +31,10 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   B_col_ptr_.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
   // Транспонирование матрицы A_
-  Transponirovanie(A_val_, A_row_ind_, A_col_ptr_, rows_A_, cols_A, At_val_, At_row_ind_, At_col_ptr_);
+  Transponirovanie(A_val_, A_row_ind_, A_col_ptr_, rows_A_, cols_A_, At_val_, At_row_ind_, At_col_ptr_);
 
-  rows_At = cols_A;
-  cols_At = rows_A_;
+  rows_At_ = cols_A_;
+  cols_At_ = rows_A_;
 
   return true;
 }
@@ -55,10 +55,10 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
 
   res_ptr_.push_back(0);
 
-  std::vector<int> x(rows_At, -1);
-  std::vector<double> x_values(rows_At, 0.0);
+  std::vector<int> x(rows_At_, -1);
+  std::vector<double> x_values(rows_At_, 0.0);
 
-  for (int col_b = 0; col_b < cols_B; ++col_b) {
+  for (int col_b = 0; col_b < cols_B_; ++col_b) {
     std::fill(x.begin(), x.end(), -1);
     std::fill(x_values.begin(), x_values.end(), 0.0);
 
