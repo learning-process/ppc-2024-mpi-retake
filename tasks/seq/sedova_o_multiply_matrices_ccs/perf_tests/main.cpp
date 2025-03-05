@@ -76,7 +76,6 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   std::vector<int> b_col_ptr;
   int rows_b = b.size();
   int cols_b = b[0].size();
-
   std::vector<double> exp_c_val;
   std::vector<int> exp_c_row_ind;
   std::vector<int> exp_c_col_ptr;
