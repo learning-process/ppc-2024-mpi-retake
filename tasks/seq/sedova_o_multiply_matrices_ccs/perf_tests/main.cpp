@@ -36,7 +36,7 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 }
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &A,
-                                                   const std::vector<std::vector<double>> &B) {
+                                                  const std::vector<std::vector<double>> &B) {
   int rows_A = A.size();
   int cols_A = A[0].size();
   int cols_B = B[0].size();
@@ -83,7 +83,7 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
 
   auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(A_, B_);
   sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind,
-                                                    exp_C_col_ptr);
+                                                      exp_C_col_ptr);
 
   std::vector<double> C_val;
   std::vector<int> C_row_ind;

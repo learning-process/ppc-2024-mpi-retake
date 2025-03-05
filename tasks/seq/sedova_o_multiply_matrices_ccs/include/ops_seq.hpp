@@ -6,7 +6,8 @@
 #include "core/task/include/task.hpp"
 
 namespace sedova_o_multiply_matrices_ccs_seq {
-inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int rows, int cols, std::vector<double>& values, std::vector<int>& rowIndices, std::vector<int>& colPtr) {
+inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int rows, int cols, 
+                            std::vector<double>& values, std::vector<int>& rowIndices, std::vector<int>& colPtr) {
   colPtr.clear();
   colPtr.push_back(0);
   for (int j = 0; j < cols; ++j) {
@@ -20,7 +21,9 @@ inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int 
   }
 }
 
-inline void Transponirovanie(const std::vector<double>& values, const std::vector<int>& rowIndices, const std::vector<int>& colPtr, int rows, int cols, std::vector<double>& tValues, std::vector<int>& tRowIndices, std::vector<int>& tColPtr) {
+inline void Transponirovanie(const std::vector<double>& values, const std::vector<int>& rowIndices, 
+                             const std::vector<int>& colPtr, int rows, int cols, std::vector<double>& tValues,
+                             std::vector<int>& tRowIndices, std::vector<int>& tColPtr) {
   std::vector<std::vector<int>> intVectors(rows);
   std::vector<std::vector<double>> realVectors(rows);
 

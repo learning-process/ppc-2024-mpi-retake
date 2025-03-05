@@ -48,7 +48,6 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::ValidationImpl() {
   return rowsA > 0 && colsA > 0 && rowsB > 0 && colsB > 0 && colsA == rowsB;
 }
 
-
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
   res_val.clear();
   res_ind.clear();

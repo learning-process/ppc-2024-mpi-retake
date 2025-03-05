@@ -4,8 +4,8 @@
 #include <cstdint>
 #include <fstream>
 #include <memory>
-#include <string>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -36,7 +36,7 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 }
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &A,
-                                                   const std::vector<std::vector<double>> &B) {
+                                                  const std::vector<std::vector<double>> &B) {
   int rows_A = A.size();
   int cols_A = A[0].size();
   int cols_B = B[0].size();
@@ -53,7 +53,8 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
 
   return result;
 }
-}
+
+}  // namespace sedova_o_multiply_matrices_ccs_seq
 
 TEST(sedova_o_multiply_matrices_ccs_seq, SmallMatrices) {
   std::vector<std::vector<double>> A_ = {{1, 0, 2}, {0, 3, 0}};
