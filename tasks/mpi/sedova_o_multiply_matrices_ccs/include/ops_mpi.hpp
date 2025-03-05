@@ -99,10 +99,8 @@ inline void multiply_CCS(const std::vector<double>& values_A, const std::vector<
   }
 }
 
-inline void Extract(const std::vector<double>& values, const std::vector<int>& row_indices,
-                            const std::vector<int>& col_ptr, int start_col, int end_col,
-                            std::vector<double>& new_values, std::vector<int>& new_row_indices,
-                            std::vector<int>& new_col_ptr) {
+inline void Extract(const std::vector<double>& values, const std::vector<int>& row_indices, const std::vector<int>& col_ptr, int start_col, int end_col, std::vector<double>& new_values, 
+                    std::vector<int>& new_row_indices, std::vector<int>& new_col_ptr) {
   new_values.clear();
   new_row_indices.clear();
   new_col_ptr.clear();

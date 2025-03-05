@@ -41,10 +41,10 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::ValidationImpl() {
-  int rows_a = *reinterpret_cast<int *>(task_data->inputs[0]);
-  int cols_a = *reinterpret_cast<int *>(task_data->inputs[1]);
-  int rows_b = *reinterpret_cast<int *>(task_data->inputs[2]);
-  int cols_b = *reinterpret_cast<int *>(task_data->inputs[3]);
+  int rows_a = *reinterpret_cast<int*>(task_data->inputs[0]);
+  int cols_a = *reinterpret_cast<int*>(task_data->inputs[1]);
+  int rows_b = *reinterpret_cast<int*>(task_data->inputs[2]);
+  int cols_b = *reinterpret_cast<int*>(task_data->inputs[3]);
 
   return rows_a > 0 && cols_a > 0 && rows_b > 0 && cols_b > 0 && cols_a == rows_b;
 }
@@ -108,50 +108,49 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
       loc_res_col_ptr.push_back(loc_res_val.size());
     }
   }
-    std::vector<int> sizes_val;
-    if (comm.rank() == 0) {
-      sizes_val.resize(comm.size());
-    }
-    boost::mpi::gather(comm, loc_res_col_ptr.back(), sizes_val.data(), 0);
-
-    int size_ptr_vector = 0;
-    boost::mpi::reduce(comm, static_cast<int>(loc_res_col_ptr.size() - 1), size_ptr_vector, std::plus<>(), 0);
-
-    std::vector<int> sizes_ptr;
-    if (comm.rank() == 0) {
-      sizes_ptr.resize(size_ptr_vector);
-    }
-    boost::mpi::gather(comm, static_cast<int>(loc_res_col_ptr.size() - 1), sizes_ptr, 0);
-
-    if (comm.rank() == 0) {
-      int sum = std::accumulate(sizes_val.begin(), sizes_val.end(), 0);
-      res_val.resize(sum);
-      res_ind.resize(sum);
-      res_ptr.resize(size_ptr_vector);
-
-      boost::mpi::gatherv(comm, loc_res_val.data(), loc_res_val.size(), res_val.data(), sizes_val, 0);
-      boost::mpi::gatherv(comm, loc_res_row_ind.data(), loc_res_row_ind.size(), res_ind.data(), sizes_val, 0);
-      boost::mpi::gatherv(comm, loc_res_col_ptr.data(), loc_res_col_ptr.size() - 1, res_ptr.data(), sizes_ptr, 0);
-
-      int shift = 0;
-      int offset = 0;
-      for (size_t j = 0; j < sizes_ptr.size(); j++) {
-        shift = sizes_val[j];
-        offset += sizes_ptr[j];
-        for (size_t i = offset; i < res_ptr.size(); i++) {
-          res_ptr[i] += shift;
-        }
-      }
-
-      res_ptr.push_back(sum);
-    } else {
-      boost::mpi::gatherv(comm, loc_res_val.data(), loc_res_val.size(), 0);
-      boost::mpi::gatherv(comm, loc_res_row_ind.data(), loc_res_row_ind.size(), 0);
-      boost::mpi::gatherv(comm, loc_res_col_ptr.data(), loc_res_col_ptr.size() - 1, 0);
-    }
+  std::vector<int> sizes_val;
+  if (comm.rank() == 0) {
+    sizes_val.resize(comm.size());
   }
+  boost::mpi::gather(comm, loc_res_col_ptr.back(), sizes_val.data(), 0);
 
-  return true;
+  int size_ptr_vector = 0;
+  boost::mpi::reduce(comm, static_cast<int>(loc_res_col_ptr.size() - 1), size_ptr_vector, std::plus<>(), 0);
+
+  std::vector<int> sizes_ptr;
+  if (comm.rank() == 0) {
+    sizes_ptr.resize(size_ptr_vector);
+  }
+  boost::mpi::gather(comm, static_cast<int>(loc_res_col_ptr.size() - 1), sizes_ptr, 0);
+
+  if (comm.rank() == 0) {
+    int sum = std::accumulate(sizes_val.begin(), sizes_val.end(), 0);
+    res_val.resize(sum);
+    res_ind.resize(sum);
+    res_ptr.resize(size_ptr_vector);
+
+    boost::mpi::gatherv(comm, loc_res_val.data(), loc_res_val.size(), res_val.data(), sizes_val, 0);
+    boost::mpi::gatherv(comm, loc_res_row_ind.data(), loc_res_row_ind.size(), res_ind.data(), sizes_val, 0);
+    boost::mpi::gatherv(comm, loc_res_col_ptr.data(), loc_res_col_ptr.size() - 1, res_ptr.data(), sizes_ptr, 0);
+
+    int shift = 0;
+    int offset = 0;
+    for (size_t j = 0; j < sizes_ptr.size(); j++) {
+      shift = sizes_val[j];
+      offset += sizes_ptr[j];
+      for (size_t i = offset; i < res_ptr.size(); i++) {
+        res_ptr[i] += shift;
+      }
+    }
+
+    res_ptr.push_back(sum);
+  } else {
+    boost::mpi::gatherv(comm, loc_res_val.data(), loc_res_val.size(), 0);
+    boost::mpi::gatherv(comm, loc_res_row_ind.data(), loc_res_row_ind.size(), 0);
+    boost::mpi::gatherv(comm, loc_res_col_ptr.data(), loc_res_col_ptr.size() - 1, 0);
+  }
+}
+return true;
 }
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PostProcessingImpl() {
