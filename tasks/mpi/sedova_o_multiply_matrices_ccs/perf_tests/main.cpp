@@ -37,9 +37,9 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &a,
                                                   const std::vector<std::vector<double>> &b) {
-  int rows_a = a.size();     // NOLINT
-  int cols_a = a[0].size();  // NOLINT
-  int cols_b = b[0].size();  // NOLINT
+  int rows_a = static_cast<int>(a.size());
+  int cols_a = static_cast<int>(a[0].size());
+  int cols_b = static_cast<int>(b[0].size());
 
   std::vector<std::vector<double>> result(rows_a, std::vector<double>(cols_b, 0.0));
 
