@@ -14,6 +14,7 @@
 TEST(fomin_v_generalized_scatter, test_task_run) {
   boost::mpi::communicator world;
   int local_size = 10;
+  std::vector<int> global_input;
   std::vector<int> local_output(local_size, 0);
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
@@ -63,7 +64,9 @@ TEST(fomin_v_generalized_scatter, test_task_run) {
 
 TEST(fomin_v_generalized_scatter, test_pipeline_run) {
   boost::mpi::communicator world;
+  int local_size = 10;
   std::vector<int> local_output(local_size, 0);
+  std::vector<int> global_input;
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
