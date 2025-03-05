@@ -4,6 +4,8 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#include <mpi.h>
+
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -17,32 +19,36 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
-      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+      in[i * kN + j] = static_cast<char>((i + j) % 256);
     }
   }
 
   std::vector<std::vector<char>> image;
+  image.reserve(kN);
   for (int i = 0; i < kN; i++) {
-    image.push_back(std::vector<char>(in.begin() + (i * kN), in.begin() + ((i + 1) * kN)));
+    image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 
+  // A simple sequential filter (used to compute the expected result)
   auto sequential_filter = [&image](double sigma) -> std::vector<std::vector<char>> {
     int y_dim = static_cast<int>(image.size());
     int x_dim = static_cast<int>(image[0].size());
     std::vector<std::vector<char>> res;
+    res.reserve(y_dim - 2);
     for (int y = 1; y < y_dim - 1; y++) {
       std::vector<char> line;
+      line.reserve(x_dim - 2);
       for (int x = 1; x < x_dim - 1; x++) {
-        double brightness = 0;
+        double brightness = 0.0;
         for (int i = -1; i <= 1; i++) {
           for (int j = -1; j <= 1; j++) {
-            brightness += 1 / (2 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2 * sigma * sigma)) *
+            brightness += 1.0 / (2.0 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma)) *
                           static_cast<int>(image[y + i][x + j]);
           }
         }
         line.push_back(static_cast<char>(brightness));
       }
-      res.push_back(line);
+      res.push_back(std::move(line));
     }
     return res;
   };
@@ -62,8 +68,9 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   task.PostProcessing();
 
   std::vector<std::vector<char>> result;
+  result.reserve(kN - 2);
   for (int i = 0; i < kN - 2; i++) {
-    result.push_back(std::vector<char>(out.begin() + (i * (kN - 2)), out.begin() + ((i + 1) * (kN - 2))));
+    result.emplace_back(out.begin() + (i * (kN - 2)), out.begin() + ((i + 1) * (kN - 2)));
   }
 
   int rank = 0;

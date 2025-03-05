@@ -10,25 +10,31 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace {
 
 inline double GaussianFunction(int i, int j, double sigma) {
-  return 1 / (2 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2 * sigma * sigma));
+  return 1.0 / (2.0 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma));
 }
 
 std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
   int y_dim = static_cast<int>(image.size());
   int x_dim = static_cast<int>(image[0].size());
   int line_blocks = y_dim - 2;
-  int procs, rank, rem, line_blocks_per_proc;
+  int procs = 0;
+  int rank = 0;
+  int rem = 0;
+  int line_blocks_per_proc = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   rem = line_blocks % procs;
   line_blocks_per_proc = line_blocks / procs;
-  int* displs = new int[procs];
-  int* scounts = new int[procs];
+
+  // Use std::vector instead of raw pointers for displacements/counts:
+  std::vector<int> displs(procs, 0);
+  std::vector<int> scounts(procs, 0);
   int offset = 1;
   for (int i = 0; i < procs; i++) {
     displs[i] = offset;
@@ -40,10 +46,11 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
       scounts[i] = line_blocks_per_proc;
     }
   }
-  char* pixels = new char[scounts[rank] * (x_dim - 2)];
+  int local_size = scounts[rank] * (x_dim - 2);
+  char* pixels = new char[local_size];
   for (int y = displs[rank]; y < displs[rank] + scounts[rank]; y++) {
     for (int x = 1; x < x_dim - 1; x++) {
-      double brightness = 0;
+      double brightness = 0.0;
       for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
           brightness += GaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
@@ -52,19 +59,21 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
       pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = static_cast<char>(brightness);
     }
   }
+
   std::vector<std::vector<char>> res;
   if (rank != 0) {
-    MPI_Send(pixels, scounts[rank] * (x_dim - 2), MPI_CHAR, 0, rank, MPI_COMM_WORLD);
+    MPI_Send(pixels, local_size, MPI_CHAR, 0, rank, MPI_COMM_WORLD);
   }
   if (rank == 0) {
     for (int i = 0; i < procs; i++) {
       char* temp_ptr = nullptr;
       if (i != 0) {
-        temp_ptr = new char[scounts[i] * (x_dim - 2)];
-        MPI_Recv(temp_ptr, scounts[i] * (x_dim - 2), MPI_CHAR, i, i, MPI_COMM_WORLD, MPI_STATUSES_IGNORE);
+        int temp_size = scounts[i] * (x_dim - 2);
+        temp_ptr = new char[temp_size];
+        MPI_Recv(temp_ptr, temp_size, MPI_CHAR, i, i, MPI_COMM_WORLD, MPI_STATUSES_IGNORE);
       }
       for (int y = displs[i]; y < displs[i] + scounts[i]; y++) {
-        std::vector<char> line(x_dim - 2);
+        std::vector<char> line(x_dim - 2, 0);
         for (int x = 1; x < x_dim - 1; x++) {
           if (i != 0) {
             line[x - 1] = temp_ptr[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
@@ -72,7 +81,7 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
             line[x - 1] = pixels[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
           }
         }
-        res.push_back(line);
+        res.emplace_back(std::move(line));
       }
       if (i != 0) {
         delete[] temp_ptr;
@@ -80,8 +89,6 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
     }
   }
   delete[] pixels;
-  delete[] displs;
-  delete[] scounts;
   return res;
 }
 
@@ -107,8 +114,12 @@ bool ersoz_b_test_task_mpi::TestTaskMPI::PreProcessingImpl() {
 bool ersoz_b_test_task_mpi::TestTaskMPI::ValidationImpl() {
   unsigned int input_size = task_data->inputs_count[0];
   int computed_size = static_cast<int>(std::sqrt(input_size));
-  if (static_cast<unsigned int>(computed_size * computed_size) != input_size) return false;
-  if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) return false;
+  if (static_cast<unsigned int>(computed_size * computed_size) != input_size) {
+    return false;
+  }
+  if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) {
+    return false;
+  }
   img_size_ = computed_size;  // store for later use
   return true;
 }
