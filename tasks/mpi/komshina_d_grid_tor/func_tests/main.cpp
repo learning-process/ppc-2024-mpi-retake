@@ -205,18 +205,70 @@ TEST(komshina_d_grid_torus_topology_mpi, ComputeNeighbors_WrapAround) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl) {
   boost::mpi::communicator world;
-  if (world.size() < 4) {
+  if (world.size() != 4) {
     GTEST_SKIP() << "Not enough processes for this test.";
     return;
   }
 
-  int rank = world.rank();
-  int size = world.size();
-  int grid_size = static_cast<int>(std::sqrt(size));
+  std::vector<uint8_t> input_data(4);
+  std::iota(input_data.begin(), input_data.end(), 9);
+  std::vector<uint8_t> output_data(4);
 
-  ASSERT_EQ(grid_size * grid_size, size) << "Process count must be a perfect square.";
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
 
-  std::vector<uint8_t> input_data(4, static_cast<uint8_t>(rank));
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+
+  ASSERT_TRUE(task.RunImpl());
+
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    ASSERT_NE(output_data[i], input_data[i]) << "Output data should be different from input data at index " << i;
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestMinimalInput) {
+  boost::mpi::communicator world;
+  if (world.size() != 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(1, 9);
+  std::vector<uint8_t> output_data(1);
+
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(input_data.data());
+  task_data_mpi->inputs_count.emplace_back(input_data.size());
+  task_data_mpi->outputs.emplace_back(output_data.data());
+  task_data_mpi->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+
+  ASSERT_TRUE(task.RunImpl());
+
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    ASSERT_NE(output_data[i], input_data[i]) << "Output data should be different from input data at index " << i;
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestTorusGridDataTransfer) {
+  boost::mpi::communicator world;
+  if (world.size() != 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
+
+  std::vector<uint8_t> input_data(4);
+  std::iota(input_data.begin(), input_data.end(), 9);
   std::vector<uint8_t> output_data(4, 0);
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -226,21 +278,51 @@ TEST(komshina_d_grid_torus_topology_mpi, TestRunImpl) {
   task_data_mpi->outputs_count.emplace_back(output_data.size());
 
   komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data_mpi);
-  ASSERT_TRUE(task.ValidationImpl());
 
+  ASSERT_TRUE(task.ValidationImpl());
   ASSERT_TRUE(task.PreProcessingImpl());
 
-  world.barrier();
   ASSERT_TRUE(task.RunImpl());
-  world.barrier();
-
-  auto neighbors = task.ComputeNeighbors(rank, grid_size);
-  for (int neighbor : neighbors) {
-    ASSERT_GE(neighbor, 0);
-    ASSERT_LT(neighbor, size);
-  }
 
   for (size_t i = 0; i < output_data.size(); ++i) {
-    EXPECT_NE(output_data[i], 0) << "Output data should be modified by communication.";
+    ASSERT_NE(output_data[i], 0) << "Process " << world.rank() << " output data should not be zero at index " << i;
+    ASSERT_NE(output_data[i], input_data[i]) << "Output data should be different from input data at index " << i;
+  }
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(output_data[0], input_data[1]);
+    ASSERT_EQ(output_data[1], input_data[2]);
+  } else if (world.rank() == 1) {
+    ASSERT_EQ(output_data[1], input_data[2]);
+    ASSERT_EQ(output_data[2], input_data[3]);
+  }
+}
+
+TEST(komshina_d_grid_torus_topology_mpi, TestNeighborProcessingWithOutOfBoundsNeighbor) {
+  boost::mpi::communicator world;
+  int size = world.size();
+  if (size < 4) return;
+
+  std::vector<uint8_t> input_data(4, 1);
+  std::vector<uint8_t> output_data(4, 0);
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(input_data.data());
+  task_data->inputs_count.emplace_back(input_data.size());
+  task_data->outputs.emplace_back(output_data.data());
+  task_data->outputs_count.emplace_back(output_data.size());
+
+  komshina_d_grid_torus_topology_mpi::TestTaskMPI task(task_data);
+
+  auto neighbors = komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbors(world.rank(), 2);
+  neighbors.push_back(size + 1);
+
+  ASSERT_TRUE(task.ValidationImpl());
+  ASSERT_TRUE(task.PreProcessingImpl());
+
+  ASSERT_TRUE(task.RunImpl());
+
+  for (size_t i = 0; i < output_data.size(); ++i) {
+    EXPECT_EQ(output_data[i], 1) << "Only valid neighbors should influence output.";
   }
 }

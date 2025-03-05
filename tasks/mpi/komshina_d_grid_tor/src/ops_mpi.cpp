@@ -68,12 +68,11 @@ std::vector<int> komshina_d_grid_torus_topology_mpi::TestTaskMPI::ComputeNeighbo
   int x = rank % grid_size;
   int y = rank / grid_size;
 
-  int left = (x == 0) ? (rank + grid_size - 1) : (rank - 1);
-  int right = (x == grid_size - 1) ? (rank - (grid_size - 1)) : (rank + 1);
-  int up = (y == 0) ? (rank + (grid_size - 1) * grid_size) : (rank - grid_size);
-  int down = (y == grid_size - 1) ? (rank - (grid_size - 1) * grid_size) : (rank + grid_size);
+  int left = ((x - 1 + grid_size) % grid_size) + (y * grid_size);
+  int right = ((x + 1) % grid_size) + (y * grid_size);
 
-  std::vector<int> neighbors = {left, right, up, down};
+  int up = x + (((y - 1 + grid_size) % grid_size) * grid_size);
+  int down = x + (((y + 1) % grid_size) * grid_size);
 
-  return neighbors;
+  return {left, right, up, down};
 }
