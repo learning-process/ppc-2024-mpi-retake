@@ -1,13 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <memory>
 #include <numeric>
-#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -36,7 +34,10 @@ TEST(komshina_d_grid_torus_topology_mpi, TestInsufficientNodes) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestValidation) {
   boost::mpi::communicator world;
-  if (world.size() != 4) return;
+  if (world.size() != 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -61,7 +62,10 @@ TEST(komshina_d_grid_torus_topology_mpi, TestValidation) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestDataTransmission) {
   boost::mpi::communicator world;
-  if (world.size() < 4) return;
+  if (world.size() < 4) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -84,6 +88,7 @@ TEST(komshina_d_grid_torus_topology_mpi, TestLargeData) {
   boost::mpi::communicator world;
   if (world.size() < 4) {
     GTEST_SKIP() << "Not enough processes for this test.";
+    return;
   }
 
   size_t large_size = 1000;
@@ -111,7 +116,10 @@ TEST(komshina_d_grid_torus_topology_mpi, TestLargeData) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestNonMatchingInputOutputSizes) {
   boost::mpi::communicator world;
-  if (world.size() < 2) return;
+  if (world.size() < 2) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
@@ -131,7 +139,10 @@ TEST(komshina_d_grid_torus_topology_mpi, TestNonMatchingInputOutputSizes) {
 
 TEST(komshina_d_grid_torus_topology_mpi, TestSmallNumberOfProcesses) {
   boost::mpi::communicator world;
-  if (world.size() < 2) return;
+  if (world.size() < 2) {
+    GTEST_SKIP() << "Not enough processes for this test.";
+    return;
+  }
 
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);

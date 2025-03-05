@@ -1,9 +1,11 @@
 #include "mpi/komshina_d_grid_tor/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/exception.hpp>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 using namespace std::chrono_literals;
@@ -28,18 +30,18 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::ValidationImpl() {
   int size = boost::mpi::communicator().size();
   int sqrt_size = static_cast<int>(std::sqrt(size));
   return sqrt_size * sqrt_size == size;
-  
+
   return true;
 }
 
 bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
   int rank = world_.rank();
   int size = world_.size();
-  int grid_size = std::sqrt(size);
+  int grid_size = static_cast<int>(std::sqrt(size));
 
   world_.barrier();
-
-   for (int step = 0; step < grid_size; ++step) {
+  
+  for (int step = 0; step < grid_size; ++step) {
     auto neighbors = ComputeNeighbors(rank, grid_size);
 
     for (int neighbor : neighbors) {
@@ -53,10 +55,10 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
           world_.recv(neighbor, 0, recv_data);
 
           if (task_data->outputs_count[0] >= send_data.size()) {
-            std::copy(send_data.begin(), send_data.end(), task_data->outputs[0]);
+            std::ranges::copy(send_data, task_data->outputs[0]);
           }
         } catch (const boost::mpi::exception& e) {
-          std::cerr << "Error when exchanging data with process " << neighbor << ": " << e.what() << std::endl;
+          std::cerr << "Error when exchanging data with process " << neighbor << ": " << e.what() << "\n";
         }
       }
     }
