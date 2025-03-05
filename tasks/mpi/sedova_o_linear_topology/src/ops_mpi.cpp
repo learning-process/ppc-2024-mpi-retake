@@ -57,14 +57,14 @@ bool sedova_o_linear_topology_mpi::TestTaskMPI::RunImpl() {
   boost::mpi::broadcast(world_, input_, 0);
   std::vector<int> all_ranks(world_.size());
   boost::mpi::all_gather(world_, world_.rank(), all_ranks);
-  bool order_is_ok = true;
+  bool res = true;
   for (size_t i = 0; i < all_ranks.size(); ++i) {
     if (all_ranks[i] != static_cast<int>(i)) {
-      order_is_ok = false;
+      res = false;
       break;
     }
   }
-  rec_ = order_is_ok;
+  rec_ = res;
   boost::mpi::broadcast(world_, rec_, 0);
   return true;
 }
