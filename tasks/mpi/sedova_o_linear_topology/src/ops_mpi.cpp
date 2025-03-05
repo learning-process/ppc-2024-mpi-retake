@@ -1,19 +1,20 @@
 #include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/all_gather.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstddef>
 #include <random>
 #include <vector>
 
-std::vector<int> sedova_o_linear_topology_mpi::GetRandomVector(int size) {
+std::vector<int> sedova_o_linear_topology_mpi::GetRandomVector(size_t size) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::vector<int> vec(size);
-  for (int i = 0; i < size; i++) {
-    vec[i] = gen() % 100;
+  for (size_t i = 0; i < size; i++) {
+    vec[i] = distrib(gen);
   }
   return vec;
 }
