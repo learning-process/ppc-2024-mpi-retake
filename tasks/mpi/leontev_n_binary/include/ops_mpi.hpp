@@ -29,7 +29,6 @@ class BinarySegmentsMPI : public ppc::core::Task {
                  std::vector<std::set<uint32_t>>& local_label_equivalences);
   void LocalLoopProcess(size_t row, size_t col, uint32_t& next_label, std::vector<uint32_t>& local_labels,
                         std::vector<std::set<uint32_t>>& local_label_equivalences);
-  void AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1, uint32_t label2);
   boost::mpi::communicator world_;
   std::vector<uint8_t> input_image_;
   std::vector<uint8_t> local_image_;

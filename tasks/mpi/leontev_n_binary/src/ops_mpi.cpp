@@ -24,31 +24,8 @@ bool CompNotZero(uint32_t a, uint32_t b) {
   }
   return a < b;
 }
-}  // namespace
 
-size_t BinarySegmentsMPI::GetIndex(size_t i, size_t j) const { return (i * cols_) + j; }
-
-bool BinarySegmentsMPI::ValidationImpl() {
-  if (world_.rank() == 0) {
-    return !task_data->inputs.empty() && !task_data->outputs.empty() && task_data->inputs_count.size() == 2 &&
-           task_data->outputs_count.size() == 2 && task_data->inputs_count[0] == task_data->outputs_count[0] &&
-           task_data->inputs_count[1] == task_data->outputs_count[1];
-  }
-  return true;
-}
-
-bool BinarySegmentsMPI::PreProcessingImpl() {
-  if (world_.rank() == 0) {
-    rows_ = task_data->inputs_count[0];
-    cols_ = task_data->inputs_count[1];
-    input_image_.resize(rows_ * cols_);
-    std::copy_n(reinterpret_cast<uint8_t*>(task_data->inputs[0]), rows_ * cols_, input_image_.begin());
-  }
-  return true;
-}
-
-void BinarySegmentsMPI::AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1,
-                                  uint32_t label2) {
+void AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1, uint32_t label2) {
   bool flag1 = false;
   bool flag2 = false;
   size_t l1id = 0;
@@ -75,6 +52,28 @@ void BinarySegmentsMPI::AppendEqs(std::vector<std::set<uint32_t>>& label_equival
   } else {
     label_equivalences.emplace_back(std::set<uint32_t>({label1, label2}));
   }
+}
+}  // namespace
+
+size_t BinarySegmentsMPI::GetIndex(size_t i, size_t j) const { return (i * cols_) + j; }
+
+bool BinarySegmentsMPI::ValidationImpl() {
+  if (world_.rank() == 0) {
+    return !task_data->inputs.empty() && !task_data->outputs.empty() && task_data->inputs_count.size() == 2 &&
+           task_data->outputs_count.size() == 2 && task_data->inputs_count[0] == task_data->outputs_count[0] &&
+           task_data->inputs_count[1] == task_data->outputs_count[1];
+  }
+  return true;
+}
+
+bool BinarySegmentsMPI::PreProcessingImpl() {
+  if (world_.rank() == 0) {
+    rows_ = task_data->inputs_count[0];
+    cols_ = task_data->inputs_count[1];
+    input_image_.resize(rows_ * cols_);
+    std::copy_n(reinterpret_cast<uint8_t*>(task_data->inputs[0]), rows_ * cols_, input_image_.begin());
+  }
+  return true;
 }
 
 void BinarySegmentsMPI::RootLoopProcess(size_t border, size_t col,

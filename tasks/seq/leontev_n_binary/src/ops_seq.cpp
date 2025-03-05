@@ -19,27 +19,8 @@ bool CompNotZero(uint32_t a, uint32_t b) {
   }
   return a < b;
 }
-}  // namespace
 
-size_t BinarySegmentsSeq::GetIndex(size_t i, size_t j) const { return (i * cols_) + j; }
-
-bool BinarySegmentsSeq::ValidationImpl() {
-  return !task_data->inputs.empty() && !task_data->outputs.empty() && task_data->inputs_count.size() == 2 &&
-         task_data->outputs_count.size() == 2 && task_data->inputs_count[0] == task_data->outputs_count[0] &&
-         task_data->inputs_count[1] == task_data->outputs_count[1];
-}
-
-bool BinarySegmentsSeq::PreProcessingImpl() {
-  rows_ = task_data->inputs_count[0];
-  cols_ = task_data->inputs_count[1];
-  size_t total_pixels = rows_ * cols_;
-  input_image_.resize(total_pixels);
-  std::copy_n(reinterpret_cast<uint8_t*>(task_data->inputs[0]), total_pixels, input_image_.begin());
-  return true;
-}
-
-void BinarySegmentsSeq::AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1,
-                                  uint32_t label2) {
+void AppendEqs(std::vector<std::set<uint32_t>>& label_equivalences, uint32_t label1, uint32_t label2) {
   bool flag1 = false;
   bool flag2 = false;
   size_t l1id = 0;
@@ -66,6 +47,24 @@ void BinarySegmentsSeq::AppendEqs(std::vector<std::set<uint32_t>>& label_equival
   } else {
     label_equivalences.emplace_back(std::set<uint32_t>({label1, label2}));
   }
+}
+}  // namespace
+
+size_t BinarySegmentsSeq::GetIndex(size_t i, size_t j) const { return (i * cols_) + j; }
+
+bool BinarySegmentsSeq::ValidationImpl() {
+  return !task_data->inputs.empty() && !task_data->outputs.empty() && task_data->inputs_count.size() == 2 &&
+         task_data->outputs_count.size() == 2 && task_data->inputs_count[0] == task_data->outputs_count[0] &&
+         task_data->inputs_count[1] == task_data->outputs_count[1];
+}
+
+bool BinarySegmentsSeq::PreProcessingImpl() {
+  rows_ = task_data->inputs_count[0];
+  cols_ = task_data->inputs_count[1];
+  size_t total_pixels = rows_ * cols_;
+  input_image_.resize(total_pixels);
+  std::copy_n(reinterpret_cast<uint8_t*>(task_data->inputs[0]), total_pixels, input_image_.begin());
+  return true;
 }
 
 void BinarySegmentsSeq::LoopProcess(size_t col, size_t row, uint32_t& cur_label,
