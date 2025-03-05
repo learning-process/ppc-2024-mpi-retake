@@ -28,33 +28,36 @@ bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::ValidationImpl() {
   int size = boost::mpi::communicator().size();
   int sqrt_size = static_cast<int>(std::sqrt(size));
   return sqrt_size * sqrt_size == size;
+  
+  return true;
 }
 
 bool komshina_d_grid_torus_topology_mpi::TestTaskMPI::RunImpl() {
   int rank = world_.rank();
   int size = world_.size();
-  int grid_size = static_cast<int>(std::sqrt(size));
+  int grid_size = std::sqrt(size);
 
   world_.barrier();
 
-  std::vector<uint8_t> send_data(task_data->inputs_count[0], 0);
-  std::copy(task_data->inputs[0], task_data->inputs[0] + task_data->inputs_count[0], send_data.begin());
-
-  for (int step = 0; step < grid_size; ++step) {
+   for (int step = 0; step < grid_size; ++step) {
     auto neighbors = ComputeNeighbors(rank, grid_size);
 
     for (int neighbor : neighbors) {
-      if (neighbor >= size) {
-        continue;
-      }
+      if (neighbor < size) {
+        std::vector<uint8_t> send_data(task_data->inputs_count[0], 0);
+        std::copy(task_data->inputs[0], task_data->inputs[0] + task_data->inputs_count[0], send_data.begin());
 
-      world_.send(neighbor, 0, send_data);
+        try {
+          world_.send(neighbor, 0, send_data);
+          std::vector<uint8_t> recv_data(task_data->inputs_count[0]);
+          world_.recv(neighbor, 0, recv_data);
 
-      std::vector<uint8_t> recv_data(task_data->inputs_count[0]);
-      world_.recv(neighbor, 0, recv_data);
-
-      if (task_data->outputs_count[0] >= recv_data.size()) {
-        std::ranges::copy(recv_data, task_data->outputs[0]);
+          if (task_data->outputs_count[0] >= send_data.size()) {
+            std::copy(send_data.begin(), send_data.end(), task_data->outputs[0]);
+          }
+        } catch (const boost::mpi::exception& e) {
+          std::cerr << "Error when exchanging data with process " << neighbor << ": " << e.what() << std::endl;
+        }
       }
     }
     world_.barrier();

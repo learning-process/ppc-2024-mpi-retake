@@ -18,12 +18,11 @@ class TestTaskMPI : public ppc::core::Task {
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
-  static std::vector<int> ComputeNeighbors(int rank, int grid_size);
 
  private:
   boost::mpi::communicator world_;
   boost::mpi::status status_;
-  friend class TestNeighborOutOfBounds_Test;
+  static std::vector<int> ComputeNeighbors(int rank, int grid_size);
 };
 
 }  // namespace komshina_d_grid_torus_topology_mpi
