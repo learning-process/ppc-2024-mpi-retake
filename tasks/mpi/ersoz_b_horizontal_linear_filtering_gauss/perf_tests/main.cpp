@@ -13,7 +13,7 @@
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 TEST(ersoz_b_test_task_mpi, test_pipeline_run) {  // NOLINT(readability-function-cognitive-complexity)
-  constexpr int kN = 256;
+  constexpr int kN = 1024;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
@@ -30,7 +30,7 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {  // NOLINT(readability-function
 
   auto task = std::make_shared<ersoz_b_test_task_mpi::TestTaskMPI>(task_data);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 100;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [t0]() {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -64,7 +64,7 @@ TEST(ersoz_b_test_task_mpi, test_task_run) {  // NOLINT(readability-function-cog
 
   auto task = std::make_shared<ersoz_b_test_task_mpi::TestTaskMPI>(task_data);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 100;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [t0]() {
     auto current_time_point = std::chrono::high_resolution_clock::now();
