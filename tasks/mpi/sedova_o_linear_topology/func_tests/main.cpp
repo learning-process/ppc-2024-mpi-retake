@@ -10,6 +10,19 @@
 #include "core/task/include/task.hpp"
 #include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
+namespace {
+std::vector<int> sedova_o_linear_topology_mpi::GetRandomVector(size_t size) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::uniform_int_distribution<> distrib(1, 500);
+  std::vector<int> vec(size);
+  for (size_t i = 0; i < size; i++) {
+    vec[i] = distrib(gen);
+  }
+  return vec;
+}
+}  // namespace
+
 TEST(sedova_o_linear_topology_mpi, test_1000) {
   boost::mpi::communicator world;
   std::vector<int> input;
