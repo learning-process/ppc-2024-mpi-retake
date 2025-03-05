@@ -20,7 +20,7 @@ TEST(sedova_o_linear_topology_mpi, test_pipeline_run) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    const int count = 500000;
+    const int count = 50000000;
     input = sedova_o_linear_topology_mpi::GetRandomVector(count);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input.data()));
     task_data_par->inputs_count.emplace_back(input.size());
@@ -61,7 +61,7 @@ TEST(sedova_o_linear_topology_mpi, test_task_run) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    const int count = 500000;
+    const int count = 50000000;
     input = sedova_o_linear_topology_mpi::GetRandomVector(count);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(input.data()));
     task_data_par->inputs_count.emplace_back(input.size());
