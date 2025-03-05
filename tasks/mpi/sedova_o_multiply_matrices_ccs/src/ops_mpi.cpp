@@ -50,7 +50,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
-  color = static_cast<int>(world.rank() < cols_B);
+  color = static_cast<int>(world.rank() < cols_b);
   comm = world.split(color);
 
   boost::mpi::broadcast(comm, B_val, 0);
@@ -63,7 +63,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
   boost::mpi::broadcast(comm, rows_At, 0);
 
   if (color == 1) {
-    auto pair = Segments(cols_B, comm.size(), comm.rank());
+    auto pair = Segments(cols_b, comm.size(), comm.rank());
 
     loc_start = pair.first;
     loc_end = pair.second;
@@ -78,30 +78,30 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
     loc_res_col_ptr.clear();
     loc_res_col_ptr.push_back(0);
 
-    std::vector<int> X(rows_At, -1);
-    std::vector<double> X_values(rows_At, 0.0);
+    std::vector<int> x(rows_At, -1);
+    std::vector<double> x_values(rows_At, 0.0);
 
-    for (int col_B = 0; col_B < loc_cols; ++col_B) {
-      std::fill(X.begin(), X.end(), -1);
-      std::fill(X_values.begin(), X_values.end(), 0.0);
+    for (int cols_b = 0; cols_b < loc_cols; ++cols_b) {
+      std::ranges::fill(x.begin(), x.end(), -1);
+      std::ranges::fill(x_values.begin(), x_values.end(), 0.0);
 
       for (int i = loc_col_ptr[col_B]; i < loc_col_ptr[col_B + 1]; ++i) {
-        int row_B = loc_row_ind[i];
-        X[row_B] = i;
-        X_values[row_B] = loc_val[i];
+        int cols_b = loc_row_ind[i];
+        x[cols_b] = i;
+        x_values[cols_b] = loc_val[i];
       }
 
-      for (int col_A = 0; col_A < static_cast<int>(At_col_ptr.size() - 1); ++col_A) {
+      for (int col_a = 0; col_a < static_cast<int>(At_col_ptr.size() - 1); ++col_a) {
         double sum = 0.0;
-        for (int i = At_col_ptr[col_A]; i < At_col_ptr[col_A + 1]; ++i) {
-          int row_A = At_row_ind[i];
-          if (X[row_A] != -1) {
-            sum += At_val[i] * X_values[row_A];
+        for (int i = At_col_ptr[col_a]; i < At_col_ptr[col_a + 1]; ++i) {
+          int row_a = At_row_ind[i];
+          if (X[row_a] != -1) {
+            sum += At_val[i] * X_values[row_a];
           }
         }
         if (sum != 0.0) {
           loc_res_val.push_back(sum);
-          loc_res_row_ind.push_back(col_A);
+          loc_res_row_ind.push_back(col_a);
         }
       }
 
