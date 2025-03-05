@@ -1,4 +1,4 @@
-#include "mpi/sedova_o_multiply_matrices_ccs/include/ops_mpi.hpp"
+п»ї#include "mpi/sedova_o_multiply_matrices_ccs/include/ops_mpi.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -11,7 +11,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
   rowsB = *reinterpret_cast<int*>(task_data->inputs[2]);
   colsB = *reinterpret_cast<int*>(task_data->inputs[3]);
 
-  // Загрузка матрицы A
+  // Р—Р°РіСЂСѓР·РєР° РјР°С‚СЂРёС†С‹ A
   auto* a_val_ptr = reinterpret_cast<double*>(task_data->inputs[4]);
   A_val.assign(a_val_ptr, a_val_ptr + task_data->inputs_count[4]);
 
@@ -21,7 +21,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
   auto* a_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[6]);
   A_col_ptr.assign(a_col_ptr_ptr, a_col_ptr_ptr + task_data->inputs_count[6]);
 
-  // Загрузка матрицы B
+  // Р—Р°РіСЂСѓР·РєР° РјР°С‚СЂРёС†С‹ B
   auto* b_val_ptr = reinterpret_cast<double*>(task_data->inputs[7]);
   B_val.assign(b_val_ptr, b_val_ptr + task_data->inputs_count[7]);
 
@@ -31,7 +31,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
   auto* b_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[9]);
   B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
-  // Транспонирование матрицы A
+  // РўСЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°РЅРёРµ РјР°С‚СЂРёС†С‹ A
   Transponirovanie(A_val, A_row_ind, A_col_ptr, rowsA, colsA, At_val, At_row_ind, At_col_ptr);
 
   rows_At = colsA;
@@ -71,9 +71,43 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
 
     Extract(B_val, B_row_ind, B_col_ptr, loc_start, loc_end, loc_val, loc_row_ind, loc_col_ptr);
 
-    multiply_CCS(At_val, At_row_ind, At_col_ptr, rows_At, loc_val, loc_row_ind, loc_col_ptr, loc_cols, loc_res_val,
-                 loc_res_row_ind, loc_res_col_ptr);
+    loc_res_val.clear();
+    loc_res_row_ind.clear();
+    loc_res_col_ptr.clear();
 
+    loc_res_col_ptr.clear();
+    loc_res_col_ptr.push_back(0);
+
+    std::vector<int> X(rows_At, -1);
+    std::vector<double> X_values(rows_At, 0.0);
+
+    for (int col_B = 0; col_B < loc_cols; ++col_B) {
+      std::fill(X.begin(), X.end(), -1);
+      std::fill(X_values.begin(), X_values.end(), 0.0);
+
+      for (int i = loc_col_ptr[col_B]; i < loc_col_ptr[col_B + 1]; ++i) {
+        int row_B = loc_row_ind[i];
+        X[row_B] = i;
+        X_values[row_B] = loc_val[i];
+      }
+
+      for (int col_A = 0; col_A < static_cast<int>(At_col_ptr.size() - 1); ++col_A) {
+        double sum = 0.0;
+        for (int i = At_col_ptr[col_A]; i < At_col_ptr[col_A + 1]; ++i) {
+          int row_A = At_row_ind[i];
+          if (X[row_A] != -1) {
+            sum += At_val[i] * X_values[row_A];
+          }
+        }
+        if (sum != 0.0) {
+          loc_res_val.push_back(sum);
+          loc_res_row_ind.push_back(col_A);
+        }
+      }
+
+      loc_res_col_ptr.push_back(loc_res_val.size());
+    }
+  }
     std::vector<int> sizes_val;
     if (comm.rank() == 0) {
       sizes_val.resize(comm.size());
