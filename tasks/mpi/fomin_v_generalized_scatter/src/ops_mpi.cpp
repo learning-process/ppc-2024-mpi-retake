@@ -125,34 +125,32 @@ int fomin_v_generalized_scatter::generalized_scatter(const void* sendbuf, int se
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::pre_processing() {
   if (world.rank() == 0) {
     // Check count elements of output
-    return taskData->outputs_count[0] == 1;
+    return task_data->outputs_count[0] == 1;
   }
   return true;
 }
 
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::validation() {
-  internal_order_test();
-  return taskData->inputs_count[0] % taskData->outputs_count[0] == 0;
+  return task_data->inputs_count[0] % task_data->outputs_count[0] == 0;
 }
 
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::run() {
-  internal_order_test();
   int rank = world.rank();
   int size = world.size();
   int root = 0;
 
-  int sendcount = taskData->inputs_count[0];
+  int sendcount = task_data->inputs_count[0];
   int recvcount = sendcount / size;
 
   if (rank == root) {
-    int err = generalized_scatter(taskData->inputs[0], sendcount, MPI_INT, taskData->outputs[0], recvcount, MPI_INT,
+    int err = generalized_scatter(task_data->inputs[0], sendcount, MPI_INT, task_data->outputs[0], recvcount, MPI_INT,
                                   root, MPI_COMM_WORLD);
     if (err != MPI_SUCCESS) {
       // std::cerr << "Error in generalized_scatter on root process." << std::endl;
       return false;
     }
   } else {
-    int err = generalized_scatter(nullptr, 0, MPI_INT, taskData->outputs[0], recvcount, MPI_INT, root, MPI_COMM_WORLD);
+    int err = generalized_scatter(nullptr, 0, MPI_INT, task_data->outputs[0], recvcount, MPI_INT, root, MPI_COMM_WORLD);
     if (err != MPI_SUCCESS) {
       // std::cerr << "Error in generalized_scatter on process " << rank << std::endl;
       return false;
@@ -163,7 +161,6 @@ bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::run() {
 }
 
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::post_processing() {
-  internal_order_test();
-  reinterpret_cast<int*>(taskData->outputs[0])[0] = res;
+  reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
   return true;
 }
