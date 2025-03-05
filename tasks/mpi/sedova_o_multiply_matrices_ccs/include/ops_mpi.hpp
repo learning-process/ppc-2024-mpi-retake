@@ -24,7 +24,7 @@ inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int 
         row_indices.push_back(i);
       }
     }
-    col_ptr.push_back(static_cast<int>(values.size()));
+    col_ptr.push_back(values.size());  // NOLINT
   }
 }
 
@@ -54,7 +54,7 @@ inline void Transponirovanie(const std::vector<double>& values, const std::vecto
       t_row_indices.push_back(int_vectors[i][j]);
       t_values.push_back(real_vectors[i][j]);
     }
-    t_col_ptr.(static_cast<int>(t_values.size()));
+    t_col_ptr.(t_values.size());  //NOLINT
   }
 }
 
@@ -72,7 +72,7 @@ inline void Extract(const std::vector<double>& values, const std::vector<int>& r
       new_values.push_back(values[k]);
       new_row_indices.push_back(row_indices[k]);
     }
-    new_col_ptr.(static_cast<int>(new_values.size()));
+    new_col_ptr.(new_values.size());  //NOLINT
   }
 }
 

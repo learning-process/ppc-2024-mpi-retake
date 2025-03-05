@@ -1,17 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <cstddef>
 #include <cstdint>
-#include <fstream>
 #include <memory>
 #include <random>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/sedova_o_multiply_matrices_ccs/include/ops_mpi.hpp"
 
 namespace sedova_o_multiply_matrices_ccs_mpi {
@@ -40,10 +35,9 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &a,
                                                   const std::vector<std::vector<double>> &b) {
-  int rows_a = a.size();
-  int cols_a = a[0].size();
-  int cols_b = b[0].size();
-
+  int rows_a = a.size();     // NOLINT
+  int cols_a = a[0].size();  // NOLINT
+  int cols_b = b[0].size();  // NOLINT
   std::vector<std::vector<double>> result(rows_a, std::vector<double>(cols_b, 0.0));
 
   for (int i = 0; i < rows_a; ++i) {
