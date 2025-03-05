@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <cmath>
 #include <cstddef>
 #include <utility>
@@ -69,7 +70,7 @@ bool shpynov_n_radix_sort_mpi::TestTaskMPI::RunImpl() {
   boost::mpi::broadcast(world_, in_vec_size, 0);
   std::vector<int> deltas(world_.size(), 0);
   for (int proc_num = 0; proc_num < world_.size(); proc_num++) {
-    deltas[proc_num] = in_vec_size / world_.size();
+    deltas[proc_num] = (unsigned int)in_vec_size / world_.size();
   }
   for (int i = 0; i < (static_cast<int>(in_vec_size) % world_.size()); i++) {
     deltas[i] += 1;
@@ -84,10 +85,10 @@ bool shpynov_n_radix_sort_mpi::TestTaskMPI::RunImpl() {
     RadixSort(loc_vec);
     result_ = std::move(loc_vec);
     for (int i = 1; i < world_.size(); i++) {
-      std::vector<int> RecievedSorted(deltas[i]);
-      world_.recv(i, 0, RecievedSorted.data(), deltas[i]);
-      std::vector<int> merged_part(result_.size() + RecievedSorted.size());
-      std::ranges::merge(result_.begin(), result_.end(), RecievedSorted.begin(), RecievedSorted.end(),
+      std::vector<int> recieved_sorted(deltas[i]);
+      world_.recv(i, 0, recieved_sorted.data(), deltas[i]);
+      std::vector<int> merged_part(result_.size() + recieved_sorted.size());
+      std::ranges::merge(result_.begin(), result_.end(), recieved_sorted.begin(), recieved_sorted.end(),
                          merged_part.begin());
       result_ = merged_part;
     }

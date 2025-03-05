@@ -4,7 +4,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
-#include <cstddef>
 #include <utility>
 #include <vector>
 
@@ -13,13 +12,13 @@
 namespace shpynov_n_radix_sort_mpi {
 
 inline int GetMaxAmountOfDigits(std::vector<int>& vec) {
-  int maxNum = 0;
+  int max_num = 0;
   for (int i = 0; i < (int)vec.size(); i++) {
-    maxNum = std::max(std::abs(vec[i]), maxNum);
+    max_num = std::max(std::abs(vec[i]), max_num);
   }
   int count = 0;
-  while (maxNum != 0) {
-    maxNum /= 10;
+  while (max_num != 0) {
+    max_num /= 10;
     count++;
   }
   return count;
