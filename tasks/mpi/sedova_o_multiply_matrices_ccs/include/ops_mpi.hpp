@@ -23,7 +23,7 @@ inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int 
         row_indices.push_back(i);
       }
     }
-    col_ptr.push_back(values.size());
+    col_ptr.push_back(static_cast<int>(values.size()));
   }
 }
 
@@ -53,7 +53,7 @@ inline void Transponirovanie(const std::vector<double>& values, const std::vecto
       t_row_indices.push_back(int_vectors[i][j]);
       t_values.push_back(real_vectors[i][j]);
     }
-    t_col_ptr.push_back(t_values.size());
+    t_col_ptr.(static_cast<int>(t_values.size()));
   }
 }
 
@@ -71,7 +71,7 @@ inline void Extract(const std::vector<double>& values, const std::vector<int>& r
       new_values.push_back(values[k]);
       new_row_indices.push_back(row_indices[k]);
     }
-    new_col_ptr.push_back(new_values.size());
+    new_col_ptr.(static_cast<int>(new_values.size()));
   }
 }
 
@@ -91,45 +91,45 @@ inline std::pair<int, int> Segments(int n, int size, int rank) {
   return segments[rank];
 }
 
-inline void MultiplyCCS(const std::vector<double>& values_A, const std::vector<int>& row_indices_A,
-                        const std::vector<int>& col_ptr_A, int num_rows_A, const std::vector<double>& values_B,
-                        const std::vector<int>& row_indices_B, const std::vector<int>& col_ptr_B, int num_cols_B,
-                        std::vector<double>& values_C, std::vector<int>& row_indices_C, std::vector<int>& col_ptr_C) {
-  values_C.clear();
-  row_indices_C.clear();
-  col_ptr_C.clear();
+inline void MultiplyCCS(const std::vector<double>& values_a, const std::vector<int>& row_indices_a,
+                        const std::vector<int>& col_ptr_a, int num_rows_a, const std::vector<double>& values_b,
+                        const std::vector<int>& row_indices_b, const std::vector<int>& col_ptr_b, int num_cols_b,
+                        std::vector<double>& values_c, std::vector<int>& row_indices_c, std::vector<int>& col_ptr_c) {
+  values_c.clear();
+  row_indices_c.clear();
+  col_ptr_c.clear();
 
-  col_ptr_C.clear();
-  col_ptr_C.push_back(0);
+  col_ptr_c.clear();
+  col_ptr_c.push_back(0);
 
-  std::vector<int> X(num_rows_A, -1);
-  std::vector<double> X_values(num_rows_A, 0.0);
+  std::vector<int> X(num_rows_a, -1);
+  std::vector<double> X_values(num_rows_a, 0.0);
 
-  for (int col_B = 0; col_B < num_cols_B; ++col_B) {
+  for (int col_B = 0; col_B < num_cols_b; ++col_B) {
     std::fill(X.begin(), X.end(), -1);
     std::fill(X_values.begin(), X_values.end(), 0.0);
 
-    for (int i = col_ptr_B[col_B]; i < col_ptr_B[col_B + 1]; ++i) {
-      int row_B = row_indices_B[i];
+    for (int i = col_ptr_b[col_B]; i < col_ptr_b[col_B + 1]; ++i) {
+      int row_B = row_indices_b[i];
       X[row_B] = i;
-      X_values[row_B] = values_B[i];
+      X_values[row_B] = values_b[i];
     }
 
-    for (int col_A = 0; col_A < static_cast<int>(col_ptr_A.size() - 1); ++col_A) {
+    for (int col_A = 0; col_A < static_cast<int>(col_ptr_a.size() - 1); ++col_A) {
       double sum = 0.0;
-      for (int i = col_ptr_A[col_A]; i < col_ptr_A[col_A + 1]; ++i) {
-        int row_A = row_indices_A[i];
+      for (int i = col_ptr_a[col_A]; i < col_ptr_a[col_A + 1]; ++i) {
+        int row_A = row_indices_a[i];
         if (X[row_A] != -1) {
-          sum += values_A[i] * X_values[row_A];
+          sum += values_a[i] * X_values[row_A];
         }
       }
       if (sum != 0.0) {
-        values_C.push_back(sum);
-        row_indices_C.push_back(col_A);
+        values_c.push_back(sum);
+        row_indices_c.push_back(col_A);
       }
     }
 
-    col_ptr_C.push_back(values_C.size());
+    col_ptr_c.push_back(values_c.size());
   }
 }
 
