@@ -4,7 +4,7 @@
 #include <boost/mpi/collectives/all_gather.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/vector.hpp> // NOLINT
+#include <boost/serialization/vector.hpp>  // NOLINT
 #include <cmath>
 #include <cstddef>
 #include <random>
