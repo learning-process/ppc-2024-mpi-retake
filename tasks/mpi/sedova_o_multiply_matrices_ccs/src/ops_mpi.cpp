@@ -1,5 +1,6 @@
 ﻿#include "mpi/sedova_o_multiply_matrices_ccs/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
@@ -44,12 +45,12 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::ValidationImpl() {
-  int rows_A_ = *reinterpret_cast<int*>(task_data->inputs[0]);
-  int cols_A_ = *reinterpret_cast<int*>(task_data->inputs[1]);
-  int rows_B_ = *reinterpret_cast<int*>(task_data->inputs[2]);
-  int cols_B_ = *reinterpret_cast<int*>(task_data->inputs[3]);
+  int rows_a = *reinterpret_cast<int*>(task_data->inputs[0]);
+  int cols_a = *reinterpret_cast<int*>(task_data->inputs[1]);
+  int rows_a = *reinterpret_cast<int*>(task_data->inputs[2]);
+  int cols_a = *reinterpret_cast<int*>(task_data->inputs[3]);
 
-  return rows_A_ > 0 && cols_A_ > 0 && rows_B_ > 0 && cols_B_ > 0 && cols_A_ == rows_B_;
+  return rows_a > 0 && cols_a > 0 && rows_b > 0 && cols_b > 0 && cols_a == rows_b;
 }
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
@@ -84,14 +85,14 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
     std::vector<int> x(rows_At_, -1);
     std::vector<double> x_values(rows_At_, 0.0);
 
-    for (int cols_B_ = 0; cols_B_ < loc_cols_; ++cols_B_) {
+    for (int cols_b = 0; cols_b < loc_cols_; ++cols_b) {
       std::ranges::fill(x.begin(), x.end(), -1);
       std::ranges::fill(x_values.begin(), x_values.end(), 0.0);
 
-      for (int i = loc_col_ptr_[col_B]; i < loc_col_ptr_[col_B + 1]; ++i) {
-        int cols_B_ = loc_row_ind_[i];
-        x[cols_B_] = i;
-        x_values[cols_B_] = loc_val_[i];
+      for (int i = loc_col_ptr_[col_b]; i < loc_col_ptr_[col_b + 1]; ++i) {
+        int cols_b = loc_row_ind_[i];
+        x[cols_b] = i;
+        x_values[cols_b] = loc_val_[i];
       }
 
       for (int col_a = 0; col_a < static_cast<int>(At_col_ptr_.size() - 1); ++col_a) {
