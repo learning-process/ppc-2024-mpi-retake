@@ -70,7 +70,7 @@ bool shpynov_n_radix_sort_mpi::TestTaskMPI::RunImpl() {
   boost::mpi::broadcast(world_, in_vec_size, 0);
   std::vector<int> deltas(world_.size(), 0);
   for (int proc_num = 0; proc_num < world_.size(); proc_num++) {
-    deltas[proc_num] = (unsigned int)in_vec_size / world_.size();
+    deltas[proc_num] = (int)in_vec_size / world_.size();
   }
   for (int i = 0; i < (static_cast<int>(in_vec_size) % world_.size()); i++) {
     deltas[i] += 1;
