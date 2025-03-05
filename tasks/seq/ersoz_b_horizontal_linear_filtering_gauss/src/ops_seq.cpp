@@ -4,24 +4,26 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#include <cstdint>
 #include <vector>
 
 namespace {
-inline double gaussianFunction(int i, int j, double sigma) {
-  return 1 / (2 * M_PI * sigma * sigma) * exp(-(i * i + j * j) / (2 * sigma * sigma));
+
+inline double GaussianFunction(int i, int j, double sigma) {
+  return 1 / (2 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2 * sigma * sigma));
 }
 
-std::vector<std::vector<char>> sequentialGaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
-  int Y = static_cast<int>(image.size());
-  int X = static_cast<int>(image[0].size());
+std::vector<std::vector<char>> SequentialGaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
+  int y_dim = static_cast<int>(image.size());
+  int x_dim = static_cast<int>(image[0].size());
   std::vector<std::vector<char>> res;
-  for (int y = 1; y < Y - 1; y++) {
+  for (int y = 1; y < y_dim - 1; y++) {
     std::vector<char> line;
-    for (int x = 1; x < X - 1; x++) {
+    for (int x = 1; x < x_dim - 1; x++) {
       double brightness = 0;
       for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
-          brightness += gaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
+          brightness += GaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
         }
       }
       line.push_back(static_cast<char>(brightness));
@@ -30,6 +32,7 @@ std::vector<std::vector<char>> sequentialGaussianFilter(const std::vector<std::v
   }
   return res;
 }
+
 }  // namespace
 
 bool ersoz_b_test_task_seq::TestTaskSequential::PreProcessingImpl() {
@@ -53,12 +56,12 @@ bool ersoz_b_test_task_seq::TestTaskSequential::ValidationImpl() {
   int computed_size = static_cast<int>(std::sqrt(input_size));
   if (static_cast<unsigned int>(computed_size * computed_size) != input_size) return false;
   if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) return false;
-  img_size_ = computed_size;  // store for later use
+  img_size_ = computed_size;
   return true;
 }
 
 bool ersoz_b_test_task_seq::TestTaskSequential::RunImpl() {
-  output_image_ = sequentialGaussianFilter(input_image_, sigma_);
+  output_image_ = SequentialGaussianFilter(input_image_, sigma_);
   return true;
 }
 

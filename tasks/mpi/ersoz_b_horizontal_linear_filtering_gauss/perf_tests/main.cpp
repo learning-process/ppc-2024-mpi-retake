@@ -5,6 +5,8 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -12,12 +14,15 @@
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
-  constexpr int N = 256;
-  std::vector<char> in(N * N, 0);
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++) in[i * N + j] = static_cast<char>((i + j) % 256);
+  constexpr int kN = 256;
+  std::vector<char> in(kN * kN, 0);
+  for (int i = 0; i < kN; i++) {
+    for (int j = 0; j < kN; j++) {
+      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+    }
+  }
 
-  std::vector<char> out((N - 2) * (N - 2), 0);
+  std::vector<char> out((kN - 2) * (kN - 2), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data->inputs_count.push_back(in.size());
@@ -43,12 +48,15 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
 }
 
 TEST(ersoz_b_test_task_mpi, test_task_run) {
-  constexpr int N = 256;
-  std::vector<char> in(N * N, 0);
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++) in[i * N + j] = static_cast<char>((i + j) % 256);
+  constexpr int kN = 256;
+  std::vector<char> in(kN * kN, 0);
+  for (int i = 0; i < kN; i++) {
+    for (int j = 0; j < kN; j++) {
+      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+    }
+  }
 
-  std::vector<char> out((N - 2) * (N - 2), 0);
+  std::vector<char> out((kN - 2) * (kN - 2), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data->inputs_count.push_back(in.size());

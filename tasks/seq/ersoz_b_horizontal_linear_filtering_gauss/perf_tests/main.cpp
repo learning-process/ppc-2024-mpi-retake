@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -8,15 +10,18 @@
 #include "seq/ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
 
 TEST(ersoz_b_test_task_seq, test_pipeline_run) {
-  constexpr int N = 128;
-  std::vector<char> in(N * N, 0);
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++) in[i * N + j] = static_cast<char>((i + j) % 256);
+  constexpr int kN = 128;
+  std::vector<char> in(kN * kN, 0);
+  for (int i = 0; i < kN; i++) {
+    for (int j = 0; j < kN; j++) {
+      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+    }
+  }
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data->inputs_count.push_back(in.size());
-  std::vector<char> out((N - 2) * (N - 2), 0);
+  std::vector<char> out((kN - 2) * (kN - 2), 0);
   task_data->outputs.push_back(reinterpret_cast<uint8_t*>(out.data()));
   task_data->outputs_count.push_back(out.size());
 
@@ -37,12 +42,15 @@ TEST(ersoz_b_test_task_seq, test_pipeline_run) {
 }
 
 TEST(ersoz_b_test_task_seq, test_task_run) {
-  constexpr int N = 128;
-  std::vector<char> in(N * N, 0);
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++) in[i * N + j] = static_cast<char>((i + j) % 256);
+  constexpr int kN = 128;
+  std::vector<char> in(kN * kN, 0);
+  for (int i = 0; i < kN; i++) {
+    for (int j = 0; j < kN; j++) {
+      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+    }
+  }
 
-  std::vector<char> out((N - 2) * (N - 2), 0);
+  std::vector<char> out((kN - 2) * (kN - 2), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data->inputs_count.push_back(in.size());

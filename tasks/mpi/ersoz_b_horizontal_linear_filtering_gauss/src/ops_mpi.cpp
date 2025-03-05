@@ -7,72 +7,75 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#include <cstdint>
 #include <cstdlib>
+#include <memory>
 #include <vector>
 
 namespace {
-inline double gaussianFunction(int i, int j, double sigma) {
-  return 1 / (2 * M_PI * sigma * sigma) * exp(-(i * i + j * j) / (2 * sigma * sigma));
+
+inline double GaussianFunction(int i, int j, double sigma) {
+  return 1 / (2 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2 * sigma * sigma));
 }
 
-std::vector<std::vector<char>> gaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
-  int Y = static_cast<int>(image.size());
-  int X = static_cast<int>(image[0].size());
-  int lineBlocks = Y - 2;
-  int procs, rank, rem, lineBlocksPerProc;
+std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
+  int y_dim = static_cast<int>(image.size());
+  int x_dim = static_cast<int>(image[0].size());
+  int line_blocks = y_dim - 2;
+  int procs, rank, rem, line_blocks_per_proc;
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  rem = lineBlocks % procs;
-  lineBlocksPerProc = lineBlocks / procs;
+  rem = line_blocks % procs;
+  line_blocks_per_proc = line_blocks / procs;
   int* displs = new int[procs];
   int* scounts = new int[procs];
   int offset = 1;
   for (int i = 0; i < procs; i++) {
     displs[i] = offset;
     if (i < rem) {
-      offset += lineBlocksPerProc + 1;
-      scounts[i] = lineBlocksPerProc + 1;
+      offset += line_blocks_per_proc + 1;
+      scounts[i] = line_blocks_per_proc + 1;
     } else {
-      offset += lineBlocksPerProc;
-      scounts[i] = lineBlocksPerProc;
+      offset += line_blocks_per_proc;
+      scounts[i] = line_blocks_per_proc;
     }
   }
-  char* pixels = new char[scounts[rank] * (X - 2)];
+  char* pixels = new char[scounts[rank] * (x_dim - 2)];
   for (int y = displs[rank]; y < displs[rank] + scounts[rank]; y++) {
-    for (int x = 1; x < X - 1; x++) {
+    for (int x = 1; x < x_dim - 1; x++) {
       double brightness = 0;
       for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
-          brightness += gaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
+          brightness += GaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
         }
       }
-      pixels[(y - displs[rank]) * (X - 2) + (x - 1)] = static_cast<char>(brightness);
+      pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = static_cast<char>(brightness);
     }
   }
   std::vector<std::vector<char>> res;
   if (rank != 0) {
-    MPI_Send(pixels, scounts[rank] * (X - 2), MPI_CHAR, 0, rank, MPI_COMM_WORLD);
+    MPI_Send(pixels, scounts[rank] * (x_dim - 2), MPI_CHAR, 0, rank, MPI_COMM_WORLD);
   }
   if (rank == 0) {
     for (int i = 0; i < procs; i++) {
-      char* _p = nullptr;
+      char* temp_ptr = nullptr;
       if (i != 0) {
-        _p = new char[scounts[i] * (X - 2)];
-        MPI_Recv(_p, scounts[i] * (X - 2), MPI_CHAR, i, i, MPI_COMM_WORLD, MPI_STATUSES_IGNORE);
+        temp_ptr = new char[scounts[i] * (x_dim - 2)];
+        MPI_Recv(temp_ptr, scounts[i] * (x_dim - 2), MPI_CHAR, i, i, MPI_COMM_WORLD, MPI_STATUSES_IGNORE);
       }
       for (int y = displs[i]; y < displs[i] + scounts[i]; y++) {
-        std::vector<char> line(X - 2);
-        for (int x = 1; x < X - 1; x++) {
+        std::vector<char> line(x_dim - 2);
+        for (int x = 1; x < x_dim - 1; x++) {
           if (i != 0) {
-            line[x - 1] = _p[(y - displs[i]) * (X - 2) + (x - 1)];
+            line[x - 1] = temp_ptr[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
           } else {
-            line[x - 1] = pixels[(y - displs[i]) * (X - 2) + (x - 1)];
+            line[x - 1] = pixels[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
           }
         }
         res.push_back(line);
       }
       if (i != 0) {
-        delete[] _p;
+        delete[] temp_ptr;
       }
     }
   }
@@ -81,6 +84,7 @@ std::vector<std::vector<char>> gaussianFilter(const std::vector<std::vector<char
   delete[] scounts;
   return res;
 }
+
 }  // namespace
 
 bool ersoz_b_test_task_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -110,7 +114,7 @@ bool ersoz_b_test_task_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool ersoz_b_test_task_mpi::TestTaskMPI::RunImpl() {
-  output_image_ = gaussianFilter(input_image_, sigma_);
+  output_image_ = GaussianFilter(input_image_, sigma_);
   world_.barrier();
   return true;
 }
