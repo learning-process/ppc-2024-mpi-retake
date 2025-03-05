@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/serialization/array.hpp>   //NOLINT
@@ -102,30 +103,30 @@ inline void MultiplyCCS(const std::vector<double>& values_a, const std::vector<i
   col_ptr_c.clear();
   col_ptr_c.push_back(0);
 
-  std::vector<int> X(num_rows_a, -1);
-  std::vector<double> X_values(num_rows_a, 0.0);
+  std::vector<int> x(num_rows_a, -1);
+  std::vector<double> x_values(num_rows_a, 0.0);
 
-  for (int col_B = 0; col_B < num_cols_b; ++col_B) {
-    std::fill(X.begin(), X.end(), -1);
-    std::fill(X_values.begin(), X_values.end(), 0.0);
+  for (int col_b = 0; col_b < num_cols_b; ++col_b) {
+    std::ranges::fill(x.begin(), x.end(), -1);
+    std::ranges::fill(x_values.begin(), x_values.end(), 0.0);
 
-    for (int i = col_ptr_b[col_B]; i < col_ptr_b[col_B + 1]; ++i) {
-      int row_B = row_indices_b[i];
-      X[row_B] = i;
-      X_values[row_B] = values_b[i];
+    for (int i = col_ptr_b[col_b]; i < col_ptr_b[col_b + 1]; ++i) {
+      int row_b = row_indices_b[i];
+      x[row_b] = i;
+      x_values[row_b] = values_b[i];
     }
 
-    for (int col_A = 0; col_A < static_cast<int>(col_ptr_a.size() - 1); ++col_A) {
+    for (int col_a = 0; col_a < static_cast<int>(col_ptr_a.size() - 1); ++col_a) {
       double sum = 0.0;
-      for (int i = col_ptr_a[col_A]; i < col_ptr_a[col_A + 1]; ++i) {
-        int row_A = row_indices_a[i];
-        if (X[row_A] != -1) {
-          sum += values_a[i] * X_values[row_A];
+      for (int i = col_ptr_a[col_a]; i < col_ptr_a[col_a + 1]; ++i) {
+        int row_a = row_indices_a[i];
+        if (x[row_a] != -1) {
+          sum += values_a[i] * x_values[row_a];
         }
       }
       if (sum != 0.0) {
         values_c.push_back(sum);
-        row_indices_c.push_back(col_A);
+        row_indices_c.push_back(col_a);
       }
     }
 
