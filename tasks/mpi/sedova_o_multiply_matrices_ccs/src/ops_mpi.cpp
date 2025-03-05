@@ -48,8 +48,8 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::ValidationImpl() {
   int rows_a = *reinterpret_cast<int*>(task_data->inputs[0]);
   int cols_a = *reinterpret_cast<int*>(task_data->inputs[1]);
-  int rows_a = *reinterpret_cast<int*>(task_data->inputs[2]);
-  int cols_a = *reinterpret_cast<int*>(task_data->inputs[3]);
+  int rows_b = *reinterpret_cast<int*>(task_data->inputs[2]);
+  int cols_b = *reinterpret_cast<int*>(task_data->inputs[3]);
 
   return rows_a > 0 && cols_a > 0 && rows_b > 0 && cols_b > 0 && cols_a == rows_b;
 }
