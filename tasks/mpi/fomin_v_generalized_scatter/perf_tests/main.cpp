@@ -49,7 +49,7 @@ TEST(fomin_v_generalized_scatter, test_task_run) {
     received_data.resize(world.size() * local_size);
   }
 
-  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(),local_size, MPI_INT, 0, world);
+  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(), local_size, MPI_INT, 0, world);
 
   if (world.rank() == 0) {
     for (int i = 0; i < world.size(); ++i) {
@@ -98,12 +98,12 @@ TEST(fomin_v_generalized_scatter, test_pipeline_run) {
     received_data.resize(world.size() * local_size);
   }
 
-  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(),local_size, MPI_INT, 0, world);
+  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(), local_size, MPI_INT, 0, world);
 
   if (world.rank() == 0) {
     for (int i = 0; i < world.size(); ++i) {
       for (int j = 0; j < local_size; ++j) {
-        ASSERT_EQ(received_data[i * local_size + j],global_input[i * local_size + j]);
+        ASSERT_EQ(received_data[i * local_size + j], global_input[i * local_size + j]);
       }
     }
   }
