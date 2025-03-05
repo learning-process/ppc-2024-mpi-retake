@@ -3,10 +3,13 @@
 #include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <functional>
+#include <numeric>
 #include <vector>
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -55,7 +58,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
-  color_ = static_cast<int>(world_.rank() < cols_B);
+  color_ = static_cast<int>(world_.rank() < cols_B_);
   comm_ = world_.split(color_);
 
   boost::mpi::broadcast(comm_, B_val_, 0);
@@ -130,9 +133,9 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PostProcessingImpl() {
     auto* c_row_ind_ptr = reinterpret_cast<int*>(task_data->outputs[1]);
     auto* c_col_ptr_ptr = reinterpret_cast<int*>(task_data->outputs[2]);
 
-    std::copy(res_val_.begin(), res_val_.end(), c_val_ptr);
-    std::copy(res_ind_.begin(), res_ind_.end(), c_row_ind_ptr);
-    std::copy(res_ptr_.begin(), res_ptr_.end(), c_col_ptr_ptr);
+    std::ranges::copy(res_val_.begin(), res_val_.end(), c_val_ptr);
+    std::ranges::copy(res_ind_.begin(), res_ind_.end(), c_row_ind_ptr);
+    std::ranges::copy(res_ptr_.begin(), res_ptr_.end(), c_col_ptr_ptr);
   }
 
   return true;
