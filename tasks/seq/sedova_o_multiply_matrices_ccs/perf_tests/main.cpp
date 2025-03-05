@@ -19,7 +19,7 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> row_dist(0, rows - 1);
   std::uniform_int_distribution<> col_dist(0, cols - 1);
-  std::uniform_real_distribution<> value_dist(-128.0, 128.0);
+  std::uniform_real_distribution<> value_dist(-10.0, 10.0);
 
   int count = 0;
   while (count < non_zero_count) {
@@ -37,15 +37,15 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &a,
                                                   const std::vector<std::vector<double>> &b) {
-  int rows_A = a.size();
-  int cols_A = a[0].size();
-  int cols_B = b[0].size();
+  int rows_a = a.size();
+  int cols_a = a[0].size();
+  int cols_b = b[0].size();
 
-  std::vector<std::vector<double>> result(rows_A, std::vector<double>(cols_B, 0.0));
+  std::vector<std::vector<double>> result(rows_a, std::vector<double>(cols_b, 0.0));
 
-  for (int i = 0; i < rows_A; ++i) {
-    for (int j = 0; j < cols_B; ++j) {
-      for (int k = 0; k < cols_A; ++k) {
+  for (int i = 0; i < rows_a; ++i) {
+    for (int j = 0; j < cols_b; ++j) {
+      for (int k = 0; k < cols_a; ++k) {
         result[i][j] += a[i][k] * b[k][j];
       }
     }
@@ -59,74 +59,75 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
 TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   int size = 256;
   int elements = 6553;
-  std::vector<std::vector<double>> a_;
-  std::vector<std::vector<double>> b_;
+  std::vector<std::vector<double>> a;
+  std::vector<std::vector<double>> b;
 
-  a_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
-  b_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  a = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  b = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
 
-  std::vector<double> A_val;
-  std::vector<int> A_row_ind;
-  std::vector<int> A_col_ptr;
-  int rows_A = a_.size();
-  int cols_A = a_[0].size();
+  std::vector<double> a_val;
+  std::vector<int> a_row_ind;
+  std::vector<int> a_col_ptr;
+  int rows_a = a.size();
+  int cols_a = a[0].size();
 
-  std::vector<double> B_val;
-  std::vector<int> B_row_ind;
-  std::vector<int> B_col_ptr;
-  int rows_B = b_.size();
-  int cols_B = b_[0].size();
+  std::vector<double> b_val;
+  std::vector<int> b_row_ind;
+  std::vector<int> b_col_ptr;
+  int rows_b = b.size();
+  int cols_b = b[0].size();
 
-  std::vector<double> exp_C_val;
-  std::vector<int> exp_C_row_ind;
-  std::vector<int> exp_C_col_ptr;
+  std::vector<double> exp_c_val;
+  std::vector<int> exp_c_row_ind;
+  std::vector<int> exp_c_col_ptr;
 
-  auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a_, b_);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind,
-                                                      exp_C_col_ptr);
+  auto exp_c = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a, b);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+                                                      exp_c_col_ptr);
 
-  std::vector<double> C_val;
-  std::vector<int> C_row_ind;
-  std::vector<int> C_col_ptr;
+  std::vector<double> c_val;
+  std::vector<int> c_row_ind;
+  std::vector<int> c_col_ptr;
 
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(a_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(b_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_A));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_A));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_B));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_b));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_B));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));
   task_data->inputs_count.emplace_back(1);
 
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_val.data()));
-  task_data->inputs_count.emplace_back(A_val.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_row_ind.data()));
-  task_data->inputs_count.emplace_back(A_row_ind.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_col_ptr.data()));
-  task_data->inputs_count.emplace_back(A_col_ptr.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
+  task_data->inputs_count.emplace_back(a_val.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
+  task_data->inputs_count.emplace_back(a_row_ind.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
+  task_data->inputs_count.emplace_back(a_col_ptr.size());
 
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_val.data()));
-  task_data->inputs_count.emplace_back(B_val.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_row_ind.data()));
-  task_data->inputs_count.emplace_back(B_row_ind.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_col_ptr.data()));
-  task_data->inputs_count.emplace_back(B_col_ptr.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
+  task_data->inputs_count.emplace_back(b_val.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
+  task_data->inputs_count.emplace_back(b_row_ind.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
+  task_data->inputs_count.emplace_back(b_col_ptr.size());
 
-  C_val.resize(exp_C_val.size());
-  C_row_ind.resize(exp_C_row_ind.size());
-  C_col_ptr.resize(exp_C_col_ptr.size());
+  
+  c_val.resize(exp_c_val.size());
+  c_row_ind.resize(exp_c_row_ind.size());
+  c_col_ptr.resize(exp_c_col_ptr.size());
 
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_val.data()));
-  task_data->outputs_count.emplace_back(C_val.size());
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_row_ind.data()));
-  task_data->outputs_count.emplace_back(C_row_ind.size());
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_col_ptr.data()));
-  task_data->outputs_count.emplace_back(C_col_ptr.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
+  task_data->outputs_count.emplace_back(c_val.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
+  task_data->outputs_count.emplace_back(c_row_ind.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
+  task_data->outputs_count.emplace_back(c_col_ptr.size());
 
   auto task = std::make_shared<sedova_o_multiply_matrices_ccs_seq::TestTaskSequential>(task_data);
 
@@ -143,82 +144,82 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  ASSERT_EQ(exp_C_val, C_val);
-  ASSERT_EQ(exp_C_row_ind, C_row_ind);
-  ASSERT_EQ(exp_C_col_ptr, C_col_ptr);
+  ASSERT_EQ(exp_c_val, c_val);
+  ASSERT_EQ(exp_c_row_ind, c_row_ind);
+  ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
 }
 
 TEST(sedova_o_multiply_matrices_ccs_seq, test_task_run) {
   int size = 256;
   int elements = 6553;
-  std::vector<std::vector<double>> a_;
-  std::vector<std::vector<double>> B_;
+  std::vector<std::vector<double>> a;
+  std::vector<std::vector<double>> b;
 
-  a_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
-  b_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  a = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  b = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
 
-  std::vector<double> A_val;
-  std::vector<int> A_row_ind;
-  std::vector<int> A_col_ptr;
-  int rows_A = a_.size();
-  int cols_A = a_[0].size();
+  std::vector<double> a_val;
+  std::vector<int> a_row_ind;
+  std::vector<int> a_col_ptr;
+  int rows_a = a.size();
+  int cols_a = a[0].size();
 
-  std::vector<double> B_val;
-  std::vector<int> B_row_ind;
-  std::vector<int> B_col_ptr;
-  int rows_B = b_.size();
-  int cols_B = b_[0].size();
+  std::vector<double> b_val;
+  std::vector<int> b_row_ind;
+  std::vector<int> b_col_ptr;
+  int rows_b = b.size();
+  int cols_b = b[0].size();
 
-  std::vector<double> exp_C_val;
-  std::vector<int> exp_C_row_ind;
-  std::vector<int> exp_C_col_ptr;
+  std::vector<double> exp_c_val;
+  std::vector<int> exp_c_row_ind;
+  std::vector<int> exp_c_col_ptr;
 
-  auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a_, b_);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind,
-                                                      exp_C_col_ptr);
+  auto exp_c = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a, b);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+                                                      exp_c_col_ptr);
 
-  std::vector<double> C_val;
-  std::vector<int> C_row_ind;
-  std::vector<int> C_col_ptr;
+  std::vector<double> c_val;
+  std::vector<int> c_row_ind;
+  std::vector<int> c_col_ptr;
 
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(a_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(b_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_A));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_A));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_B));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_b));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_B));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));
   task_data->inputs_count.emplace_back(1);
 
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_val.data()));
-  task_data->inputs_count.emplace_back(A_val.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_row_ind.data()));
-  task_data->inputs_count.emplace_back(A_row_ind.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_col_ptr.data()));
-  task_data->inputs_count.emplace_back(A_col_ptr.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
+  task_data->inputs_count.emplace_back(a_val.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
+  task_data->inputs_count.emplace_back(a_row_ind.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
+  task_data->inputs_count.emplace_back(a_col_ptr.size());
 
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_val.data()));
-  task_data->inputs_count.emplace_back(B_val.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_row_ind.data()));
-  task_data->inputs_count.emplace_back(B_row_ind.size());
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_col_ptr.data()));
-  task_data->inputs_count.emplace_back(B_col_ptr.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
+  task_data->inputs_count.emplace_back(b_val.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
+  task_data->inputs_count.emplace_back(b_row_ind.size());
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
+  task_data->inputs_count.emplace_back(b_col_ptr.size());
 
-  C_val.resize(exp_C_val.size());
-  C_row_ind.resize(exp_C_row_ind.size());
-  C_col_ptr.resize(exp_C_col_ptr.size());
+  c_val.resize(exp_c_val.size());
+  c_row_ind.resize(exp_c_row_ind.size());
+  c_col_ptr.resize(exp_c_col_ptr.size());
 
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_val.data()));
-  task_data->outputs_count.emplace_back(C_val.size());
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_row_ind.data()));
-  task_data->outputs_count.emplace_back(C_row_ind.size());
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_col_ptr.data()));
-  task_data->outputs_count.emplace_back(C_col_ptr.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
+  task_data->outputs_count.emplace_back(c_val.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
+  task_data->outputs_count.emplace_back(c_row_ind.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
+  task_data->outputs_count.emplace_back(c_col_ptr.size());
 
   auto task = std::make_shared<sedova_o_multiply_matrices_ccs_seq::TestTaskSequential>(task_data);
 
@@ -235,7 +236,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  ASSERT_EQ(exp_C_val, C_val);
-  ASSERT_EQ(exp_C_row_ind, C_row_ind);
-  ASSERT_EQ(exp_C_col_ptr, C_col_ptr);
+
+  ASSERT_EQ(exp_c_val, c_val);
+  ASSERT_EQ(exp_c_row_ind, c_row_ind);
+  ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
 }

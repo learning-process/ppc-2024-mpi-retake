@@ -40,15 +40,15 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &a,
                                                   const std::vector<std::vector<double>> &b) {
-  int rows_A = a.size();
-  int cols_A = a[0].size();
-  int cols_B = b[0].size();
+  int rows_a = a.size();
+  int cols_a = a[0].size();
+  int cols_b = b[0].size();
 
-  std::vector<std::vector<double>> result(rows_A, std::vector<double>(cols_B, 0.0));
+  std::vector<std::vector<double>> result(rows_a, std::vector<double>(cols_b, 0.0));
 
-  for (int i = 0; i < rows_A; ++i) {
-    for (int j = 0; j < cols_B; ++j) {
-      for (int k = 0; k < cols_A; ++k) {
+  for (int i = 0; i < rows_a; ++i) {
+    for (int j = 0; j < cols_b; ++j) {
+      for (int k = 0; k < cols_a; ++k) {
         result[i][j] += a[i][k] * b[k][j];
       }
     }
@@ -60,67 +60,69 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
 }  // namespace sedova_o_multiply_matrices_ccs_mpi
 
 TEST(sedova_o_multiply_matrices_ccs_mpi, SmallMatrices) {
-  std::vector<std::vector<double>> a_ = {{1, 0, 2}, {0, 3, 0}};
-  std::vector<std::vector<double>> b_ = {{0, 4, 0, 0, 1}, {5, 0, 0, 2, 0}, {0, 0, 3, 0, 6}};
+  std::vector<std::vector<double>> a = {{1, 0, 2}, {0, 3, 0}};
+  std::vector<std::vector<double>> b = {{0, 4, 0, 0, 1}, {5, 0, 0, 2, 0}, {0, 0, 3, 0, 6}};
   boost::mpi::communicator world;
-  std::vector<double> A_val_;
-  std::vector<int> A_row_ind_;
-  std::vector<int> A_col_ptr_;
-  int rows_A_ = a_.size();
-  int cols_A_ = a_[0].size();
+  std::vector<double> a_val;
+  std::vector<int> a_row_ind;
+  std::vector<int> a_col_ptr;
+  int rows_a = a.size();
+  int cols_a = a[0].size();
 
-  std::vector<double> B_val_;
-  std::vector<int> B_row_ind_;
-  std::vector<int> B_col_ptr_;
-  int rows_B_ = b_.size();
-  int cols_B_ = b_[0].size();
+  std::vector<double> b_val;
+  std::vector<int> b_row_ind;
+  std::vector<int> b_col_ptr;
+  int rows_b = b.size();
+  int cols_b = b[0].size();
 
-  std::vector<double> exp_C_val;
-  std::vector<int> exp_C_row_ind;
-  std::vector<int> exp_C_col_ptr;
+  std::vector<double> exp_c_val;
+  std::vector<int> exp_c_row_ind;
+  std::vector<int> exp_c_col_ptr;
 
   if (world.rank() == 0) {
-    auto exp_C = MultiplyMatrices(a_, b_);
-    Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind, exp_C_col_ptr);
+    auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+                                                        exp_c_col_ptr);
   }
-  std::vector<double> C_val;
-  std::vector<int> C_row_ind;
-  std::vector<int> C_col_ptr;
+  std::vector<double> c_val;
+  std::vector<int> c_row_ind;
+  std::vector<int> c_col_ptr;
 
-  Convertirovanie(a_, rows_A_, cols_A_, A_val_, A_row_ind_, A_col_ptr_);
-  Convertirovanie(b_, rows_B_, cols_B_, B_val_, B_row_ind_, B_col_ptr_);
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_A_));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_A_));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_B_));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_b));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_B_));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));
   task_data->inputs_count.emplace_back(1);
+
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_val_.data()));
-    task_data->inputs_count.emplace_back(A_val_.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_row_ind_.data()));
-    task_data->inputs_count.emplace_back(A_row_ind_.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_col_ptr_.data()));
-    task_data->inputs_count.emplace_back(A_col_ptr_.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
+    task_data->inputs_count.emplace_back(a_val.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
+    task_data->inputs_count.emplace_back(a_row_ind.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
+    task_data->inputs_count.emplace_back(a_col_ptr.size());
 
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_val_.data()));
-    task_data->inputs_count.emplace_back(B_val_.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_row_ind_.data()));
-    task_data->inputs_count.emplace_back(B_row_ind_.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_col_ptr_.data()));
-    task_data->inputs_count.emplace_back(B_col_ptr_.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
+    task_data->inputs_count.emplace_back(b_val.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
+    task_data->inputs_count.emplace_back(b_row_ind.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
+    task_data->inputs_count.emplace_back(b_col_ptr.size());
 
-    C_val.resize(exp_C_val.size());
-    C_row_ind.resize(exp_C_row_ind.size());
-    C_col_ptr.resize(exp_C_col_ptr.size());
+    c_val.resize(exp_c_val.size());
+    c_row_ind.resize(exp_c_row_ind.size());
+    c_col_ptr.resize(exp_c_col_ptr.size());
 
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_val.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_row_ind.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_col_ptr.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
   }
 
   TestTaskMPI task(task_data);
@@ -131,75 +133,77 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, SmallMatrices) {
     task.RunImpl();
     task.PostProcessingImpl();
     if (world.rank() == 0) {
-      ASSERT_EQ(exp_C_val, C_val);
-      ASSERT_EQ(exp_C_row_ind, C_row_ind);
-      ASSERT_EQ(exp_C_col_ptr, C_col_ptr);
+      ASSERT_EQ(exp_c_val, c_val);
+      ASSERT_EQ(exp_c_row_ind, c_row_ind);
+      ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
     }
   }
 }
 
 TEST(sedova_o_multiply_matrices_ccs_mpi, Random3x5And5x4) {
-  auto a_ = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(3, 5, 5);
-  auto b_ = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(5, 4, 10);
+  auto a = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(3, 5, 5);
+  auto b = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(5, 4, 10);
   boost::mpi::communicator world;
-  std::vector<double> A_val;
-  std::vector<int> A_row_ind;
-  std::vector<int> A_col_ptr;
-  int rows_A = a_.size();
-  int cols_A = a_[0].size();
+  std::vector<double> a_val;
+  std::vector<int> a_row_ind;
+  std::vector<int> a_col_ptr;
+  int rows_a = a.size();
+  int cols_a = a[0].size();
 
-  std::vector<double> B_val;
-  std::vector<int> B_row_ind;
-  std::vector<int> B_col_ptr;
-  int rows_B = b_.size();
-  int cols_B = b_[0].size();
+  std::vector<double> b_val;
+  std::vector<int> b_row_ind;
+  std::vector<int> b_col_ptr;
+  int rows_b = b.size();
+  int cols_b = b[0].size();
 
-  std::vector<double> exp_C_val;
-  std::vector<int> exp_C_row_ind;
-  std::vector<int> exp_C_col_ptr;
+  std::vector<double> exp_c_val;
+  std::vector<int> exp_c_row_ind;
+  std::vector<int> exp_c_col_ptr;
 
   if (world.rank() == 0) {
-    auto exp_C = MultiplyMatrices(a_, b_);
-    Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind, exp_C_col_ptr);
+    auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+                                                        exp_c_col_ptr);
   }
-  std::vector<double> C_val;
-  std::vector<int> C_row_ind;
-  std::vector<int> C_col_ptr;
+  std::vector<double> c_val;
+  std::vector<int> c_row_ind;
+  std::vector<int> c_col_ptr;
 
-  Convertirovanie(a_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
-  Convertirovanie(b_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_A));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_A));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_a));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_B));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_b));
   task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_B));
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));
   task_data->inputs_count.emplace_back(1);
+
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_val.data()));
-    task_data->inputs_count.emplace_back(A_val.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_row_ind.data()));
-    task_data->inputs_count.emplace_back(A_row_ind.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(A_col_ptr.data()));
-    task_data->inputs_count.emplace_back(A_col_ptr.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
+    task_data->inputs_count.emplace_back(a_val.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
+    task_data->inputs_count.emplace_back(a_row_ind.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
+    task_data->inputs_count.emplace_back(a_col_ptr.size());
 
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_val.data()));
-    task_data->inputs_count.emplace_back(B_val.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_row_ind.data()));
-    task_data->inputs_count.emplace_back(B_row_ind.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(B_col_ptr.data()));
-    task_data->inputs_count.emplace_back(B_col_ptr.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
+    task_data->inputs_count.emplace_back(b_val.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
+    task_data->inputs_count.emplace_back(b_row_ind.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
+    task_data->inputs_count.emplace_back(b_col_ptr.size());
 
-    C_val.resize(exp_C_val.size());
-    C_row_ind.resize(exp_C_row_ind.size());
-    C_col_ptr.resize(exp_C_col_ptr.size());
+    c_val.resize(exp_c_val.size());
+    c_row_ind.resize(exp_c_row_ind.size());
+    c_col_ptr.resize(exp_c_col_ptr.size());
 
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_val.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_row_ind.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(C_col_ptr.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
   }
 
   TestTaskMPI task(task_data);
@@ -210,9 +214,9 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, Random3x5And5x4) {
     task.RunImpl();
     task.PostProcessingImpl();
     if (world.rank() == 0) {
-      ASSERT_EQ(exp_C_val, C_val);
-      ASSERT_EQ(exp_C_row_ind, C_row_ind);
-      ASSERT_EQ(exp_C_col_ptr, C_col_ptr);
+      ASSERT_EQ(exp_c_val, c_val);
+      ASSERT_EQ(exp_c_row_ind, c_row_ind);
+      ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
     }
   }
 }

@@ -100,7 +100,7 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  int rows_A_, cols_A_, rows_B_, cols_B_, rows_At_, cols_At_;
+  int rows_A, cols_A, rows_B, cols_B, rows_At, cols_At;
   std::vector<std::vector<double>> A_, B_;
   std::vector<double> A_val_, B_val_, At_val_;
   std::vector<int> A_row_ind_, A_col_ptr_, B_row_ind_, B_col_ptr_, At_row_ind_, At_col_ptr_;
