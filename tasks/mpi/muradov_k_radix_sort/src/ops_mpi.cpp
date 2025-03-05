@@ -67,7 +67,7 @@ void SequentialRadixSort(std::vector<int>& v) {
 }
 
 void MergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
-  int i = 0, j = 0, k = 0;
+  std::size_t i = 0, j = 0, k = 0;
   while (i < local_part.size() && j < neighbor_part.size()) {
     if (local_part[i] < neighbor_part[j])
       tmp[k++] = local_part[i++];
@@ -80,7 +80,9 @@ void MergeAscending(std::vector<int>& local_part, const std::vector<int>& neighb
 }
 
 void MergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
-  int i = local_part.size() - 1, j = neighbor_part.size() - 1, k = local_part.size() - 1;
+  int i = static_cast<int>(local_part.size()) - 1;
+  int j = static_cast<int>(neighbor_part.size()) - 1;
+  int k = static_cast<int>(local_part.size()) - 1;
   while (i >= 0 && j >= 0) {
     if (local_part[i] > neighbor_part[j])
       tmp[k--] = local_part[i--];
@@ -106,7 +108,7 @@ std::vector<std::pair<int, int>> BuildAllocation(int proc_num) {
     std::vector<int> right(vec.begin() + mid, vec.end());
     Allocation(left);
     Allocation(right);
-    for (int i = 0; i < left.size() && i < right.size(); ++i) {
+    for (std::size_t i = 0; i < left.size() && i < right.size(); ++i) {
       schedule.emplace_back(left[i], right[i]);
     }
   };
@@ -116,8 +118,7 @@ std::vector<std::pair<int, int>> BuildAllocation(int proc_num) {
 }  // namespace
 
 void MPI_RadixSort(std::vector<int>& v) {
-  int proc_rank = 0;
-  int proc_count = 0;
+  int proc_rank = 0, proc_count = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &proc_count);
   if (proc_count <= 1 || static_cast<int>(v.size()) <= proc_count) {
@@ -145,7 +146,7 @@ void MPI_RadixSort(std::vector<int>& v) {
   SequentialRadixSort(local_part);
   std::vector<int> tmp(part_size);
   std::vector<int> neighbor_part(part_size);
-  for (size_t i = 0; i < schedule.size(); ++i) {
+  for (std::size_t i = 0; i < schedule.size(); ++i) {
     int proc_first = schedule[i].first;
     int proc_second = schedule[i].second;
     MPI_Status status;
