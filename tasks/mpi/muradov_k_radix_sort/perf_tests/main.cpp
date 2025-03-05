@@ -1,14 +1,13 @@
 #define OMPI_SKIP_MPICXX
 #include <gtest/gtest.h>
 #include <mpi.h>
-
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <memory>
 #include <vector>
-
+#include <algorithm>
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/muradov_k_radix_sort/include/ops_mpi.hpp"
@@ -44,7 +43,7 @@ TEST(muradov_k_radix_sort_mpi, test_pipeline_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   if (proc_rank == 0) {
     std::vector<int> expected = input;
-    std::ranges::sort(expected);
+    std::sort(expected.begin(), expected.end());
     ASSERT_EQ(output, expected);
   }
 }
@@ -80,7 +79,7 @@ TEST(muradov_k_radix_sort_mpi, test_task_run) {
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   if (proc_rank == 0) {
     std::vector<int> expected = input;
-    std::ranges::sort(expected);
+    std::sort(expected.begin(), expected.end());
     ASSERT_EQ(output, expected);
   }
 }
