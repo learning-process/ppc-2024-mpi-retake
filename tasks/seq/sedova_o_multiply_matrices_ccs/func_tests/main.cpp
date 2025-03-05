@@ -37,13 +37,13 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
 
 std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &a,
                                                   const std::vector<std::vector<double>> &b) {
-  int rows_A = a.size();
+  int rows_A_ = a.size();
   int cols_A = a[0].size();
   int cols_B = b[0].size();
 
-  std::vector<std::vector<double>> result(rows_A, std::vector<double>(cols_B, 0.0));
+  std::vector<std::vector<double>> result(rows_A_, std::vector<double>(cols_B, 0.0));
 
-  for (int i = 0; i < rows_A; ++i) {
+  for (int i = 0; i < rows_A_; ++i) {
     for (int j = 0; j < cols_B; ++j) {
       for (int k = 0; k < cols_A; ++k) {
         result[i][j] += a[i][k] * b[k][j];
