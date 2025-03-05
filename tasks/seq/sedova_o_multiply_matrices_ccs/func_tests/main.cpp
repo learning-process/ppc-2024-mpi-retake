@@ -62,8 +62,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, SmallMatrices) {
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
   std::vector<int> a_col_ptr;
-  int rows_a = a.size();
-  int cols_a = a[0].size();
+  int rows_a = static_cast<int>(a.size());
+  int cols_a = static_cast<int>(a[0].size());
 
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
@@ -76,7 +76,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, SmallMatrices) {
   std::vector<int> exp_c_col_ptr;
 
   auto exp_c = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a, b);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
+                                                      static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
                                                       exp_c_col_ptr);
 
   std::vector<double> c_val;
@@ -136,8 +137,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, Random3x5And5x4) {
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
   std::vector<int> a_col_ptr;
-  int rows_a = a.size();
-  int cols_a = a[0].size();
+  int rows_a = static_cast<int>(a.size());
+  int cols_a = static_cast<int>(a[0].size());
 
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
@@ -150,7 +151,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, Random3x5And5x4) {
   std::vector<int> exp_c_col_ptr;
 
   auto exp_c = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a, b);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
+                                                      static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
                                                       exp_c_col_ptr);
 
   std::vector<double> c_val;

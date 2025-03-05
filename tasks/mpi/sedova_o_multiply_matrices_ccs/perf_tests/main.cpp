@@ -3,6 +3,9 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/timer.hpp>
+#include <chrono>
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <vector>
 
@@ -72,14 +75,14 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
   std::vector<int> a_col_ptr;
-  int rows_a = a.size();
-  int cols_a = a[0].size();
+  int rows_a = static_cast<int>(a.size());
+  int cols_a = static_cast<int>(a[0].size());
 
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
   std::vector<int> b_col_ptr;
-  int rows_b = b.size();
-  int cols_b = b[0].size();
+  int rows_b = static_cast<int>(b.size());
+  int cols_b = static_cast<int>(b[0].size());
 
   std::vector<double> exp_c_val;
   std::vector<int> exp_c_row_ind;
@@ -87,8 +90,8 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
-                                                        exp_c_col_ptr);
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()), static_cast<int>(exp_c[0].size()),
+                                                        exp_c_val, exp_c_row_ind, exp_c_col_ptr);
   }
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
@@ -172,14 +175,14 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_task_run) {
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
   std::vector<int> a_col_ptr;
-  int rows_a = a.size();
-  int cols_a = a[0].size();
+  int rows_a = static_cast<int>(a.size());
+  int cols_a = static_cast<int>(a[0].size());
 
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
   std::vector<int> b_col_ptr;
-  int rows_b = b.size();
-  int cols_b = b[0].size();
+  int rows_b = static_cast<int>(b.size());
+  int cols_b = static_cast<int>(b[0].size());
 
   std::vector<double> exp_c_val;
   std::vector<int> exp_c_row_ind;
@@ -187,8 +190,8 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_task_run) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
-                                                        exp_c_col_ptr);
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()), static_cast<int>(exp_c[0].size()), 
+                                                        exp_c_val, exp_c_row_ind, exp_c_col_ptr);
   }
   std::vector<double> c_val;
   std::vector<int> c_row_ind;

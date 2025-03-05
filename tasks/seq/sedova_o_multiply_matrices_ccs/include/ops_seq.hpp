@@ -61,9 +61,9 @@ class TestTaskSequential : public ppc::core::Task {
 
  private:
   int rows_A_, cols_A, rows_B, cols_B, rows_At, cols_At;
-  std::vector<std::vector<double>> A, B;
-  std::vector<double> A_val, B_val, At_val, res_val;
-  std::vector<int> A_row_ind, A_col_ptr, B_row_ind, B_col_ptr, At_row_ind, At_col_ptr, res_ind, res_ptr;
+  std::vector<std::vector<double>> A_, B;
+  std::vector<double> A_val_, B_val_, At_val_, res_val_;
+  std::vector<int> A_row_ind_, A_col_ptr_, B_row_ind_, B_col_ptr_, At_row_ind_, At_col_ptr_, res_ind_, res_ptr_;
 };
 
 }  // namespace sedova_o_multiply_matrices_ccs_seq

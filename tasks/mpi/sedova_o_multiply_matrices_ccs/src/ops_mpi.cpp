@@ -102,10 +102,10 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
       res_ind_.resize(sum);
       res_ptr_.resize(size_ptr_vector);
 
-      boost::mpi::gatherv(comm_, loc_res_val_.data(), loc_res_val_.size(), res_val_.data(), sizes_val, 0);  // NOLINT
-      boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), loc_res_row_ind_.size(), res_ind_.data(), sizes_val,
+      boost::mpi::gatherv(comm_, loc_res_val_.data(), static_cast<int>(loc_res_val_.size()), res_val_.data(), sizes_val, 0);  // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), static_cast<int>(loc_res_row_ind_.size()), res_ind_.data(), sizes_val,
                           0);  // NOLINT
-      boost::mpi::gatherv(comm_, loc_res_col_ptr_.data(), loc_res_col_ptr_.size() - 1, res_ptr_.data(), sizes_ptr,
+      boost::mpi::gatherv(comm_, loc_res_col_ptr_.data(), static_cast<int>(loc_res_col_ptr_.size() - 1), res_ptr_.data(), sizes_ptr,
                           0);  // NOLINT
 
       int shift = 0;
@@ -120,9 +120,9 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
 
       res_ptr_.push_back(sum);
     } else {
-      boost::mpi::gatherv(comm_, loc_res_val_.data(), loc_res_val_.size(), 0);  // NOLINT
-      boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), loc_res_row_ind_.size(), 0);  // NOLINT
-      boost::mpi::gatherv(comm_, loc_res_col_ptr_.data(), loc_res_col_ptr_.size() - 1, 0);  // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_val_.data(), static_cast<int>(loc_res_val_.size()), 0);  // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), static_cast<int>(loc_res_row_ind_.size()), 0);  // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_col_ptr_.data(), static_cast<int>(loc_res_col_ptr_.size() - 1), 0);  // NOLINT
     }
   }
 

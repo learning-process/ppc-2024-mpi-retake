@@ -75,7 +75,8 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, SmallMatrices) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
+                                                        static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
                                                         exp_c_col_ptr);
   }
   std::vector<double> c_val;
@@ -156,7 +157,8 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, Random3x5And5x4) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
+                                                        static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
                                                         exp_c_col_ptr);
   }
   std::vector<double> c_val;

@@ -10,28 +10,28 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   rows_B = *reinterpret_cast<int*>(task_data->inputs[2]);
   cols_B = *reinterpret_cast<int*>(task_data->inputs[3]);
 
-  // Загрузка матрицы A
+  // Загрузка матрицы A_
   auto* a_val_ptr = reinterpret_cast<double*>(task_data->inputs[4]);
-  A_val.assign(a_val_ptr, a_val_ptr + task_data->inputs_count[4]);
+  A_val_.assign(a_val_ptr, a_val_ptr + task_data->inputs_count[4]);
 
   auto* a_row_ind_ptr = reinterpret_cast<int*>(task_data->inputs[5]);
-  A_row_ind.assign(a_row_ind_ptr, a_row_ind_ptr + task_data->inputs_count[5]);
+  A_row_ind_.assign(a_row_ind_ptr, a_row_ind_ptr + task_data->inputs_count[5]);
 
   auto* a_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[6]);
-  A_col_ptr.assign(a_col_ptr_ptr, a_col_ptr_ptr + task_data->inputs_count[6]);
+  A_col_ptr_.assign(a_col_ptr_ptr, a_col_ptr_ptr + task_data->inputs_count[6]);
 
   // Загрузка матрицы B
   auto* b_val_ptr = reinterpret_cast<double*>(task_data->inputs[7]);
-  B_val.assign(b_val_ptr, b_val_ptr + task_data->inputs_count[7]);
+  B_val_.assign(b_val_ptr, b_val_ptr + task_data->inputs_count[7]);
 
   auto* b_row_ind_ptr = reinterpret_cast<int*>(task_data->inputs[8]);
-  B_row_ind.assign(b_row_ind_ptr, b_row_ind_ptr + task_data->inputs_count[8]);
+  B_row_ind_.assign(b_row_ind_ptr, b_row_ind_ptr + task_data->inputs_count[8]);
 
   auto* b_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[9]);
-  B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
+  B_col_ptr_.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
-  // Транспонирование матрицы A
-  Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A_, cols_A, At_val, At_row_ind, At_col_ptr);
+  // Транспонирование матрицы A_
+  Transponirovanie(A_val_, A_row_ind_, A_col_ptr_, rows_A_, cols_A, At_val_, At_row_ind_, At_col_ptr_);
 
   rows_At = cols_A;
   cols_At = rows_A_;
@@ -49,11 +49,11 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
-  res_val.clear();
-  res_ind.clear();
-  res_ptr.clear();
+  res_val_.clear();
+  res_ind_.clear();
+  res_ptr_.clear();
 
-  res_ptr.push_back(0);
+  res_ptr_.push_back(0);
 
   std::vector<int> x(rows_At, -1);
   std::vector<double> x_values(rows_At, 0.0);
@@ -62,27 +62,27 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
     std::fill(x.begin(), x.end(), -1);
     std::fill(x_values.begin(), x_values.end(), 0.0);
 
-    for (int i = B_col_ptr[col_b]; i < B_col_ptr[col_b + 1]; ++i) {
-      int row_b = B_row_ind[i];
+    for (int i = B_col_ptr_[col_b]; i < B_col_ptr_[col_b + 1]; ++i) {
+      int row_b = B_row_ind_[i];
       x[row_b] = i;
-      x_values[row_b] = B_val[i];
+      x_values[row_b] = B_val_[i];
     }
 
-    for (int col_a = 0; col_a < static_cast<int>(At_col_ptr.size() - 1); ++col_a) {
+    for (int col_a = 0; col_a < static_cast<int>(At_col_ptr_.size() - 1); ++col_a) {
       double sum = 0.0;
-      for (int i = At_col_ptr[col_a]; i < At_col_ptr[col_a + 1]; ++i) {
-        int row_a = At_row_ind[i];
+      for (int i = At_col_ptr_[col_a]; i < At_col_ptr_[col_a + 1]; ++i) {
+        int row_a = At_row_ind_[i];
         if (x[row_a] != -1) {
-          sum += At_val[i] * x_values[row_a];
+          sum += At_val_[i] * x_values[row_a];
         }
       }
       if (sum != 0.0) {
-        res_val.push_back(sum);
-        res_ind.push_back(col_a);
+        res_val_.push_back(sum);
+        res_ind_.push_back(col_a);
       }
     }
 
-    res_ptr.push_back(res_val.size());
+    res_ptr_.push_back(res_val_.size());
   }
 
   return true;
@@ -93,9 +93,9 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PostProcessingImpl(
   auto* c_row_ind_ptr = reinterpret_cast<int*>(task_data->outputs[1]);
   auto* c_col_ptr_ptr = reinterpret_cast<int*>(task_data->outputs[2]);
 
-  std::copy(res_val.begin(), res_val.end(), c_val_ptr);
-  std::copy(res_ind.begin(), res_ind.end(), c_row_ind_ptr);
-  std::copy(res_ptr.begin(), res_ptr.end(), c_col_ptr_ptr);
+  std::copy(res_val_.begin(), res_val_.end(), c_val_ptr);
+  std::copy(res_ind_.begin(), res_ind_.end(), c_row_ind_ptr);
+  std::copy(res_ptr_.begin(), res_ptr_.end(), c_col_ptr_ptr);
 
   return true;
 }
