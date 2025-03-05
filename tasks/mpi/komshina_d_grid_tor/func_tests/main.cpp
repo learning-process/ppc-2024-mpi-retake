@@ -144,6 +144,12 @@ TEST(komshina_d_grid_torus_topology_mpi, TestSmallNumberOfProcesses) {
     return;
   }
 
+  int sqrt_size = static_cast<int>(std::sqrt(world.size()));
+  if (sqrt_size * sqrt_size != world.size()) {
+    GTEST_SKIP() << "Test requires a square number of processes.";
+    return;
+  }
+
   std::vector<uint8_t> input_data(4);
   std::iota(input_data.begin(), input_data.end(), 9);
   std::vector<uint8_t> output_data(4);
