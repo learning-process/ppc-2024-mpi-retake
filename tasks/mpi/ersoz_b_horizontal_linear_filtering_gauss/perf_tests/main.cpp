@@ -47,7 +47,7 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {  // NOLINT(readability-function
 }
 
 TEST(ersoz_b_test_task_mpi, test_task_run) {  // NOLINT(readability-function-cognitive-complexity)
-  constexpr int kN = 256;
+  constexpr int kN = 512;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
