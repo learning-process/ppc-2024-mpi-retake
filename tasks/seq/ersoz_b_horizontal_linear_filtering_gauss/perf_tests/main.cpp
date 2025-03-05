@@ -3,7 +3,6 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
-#include <utility>  // For std::move
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
