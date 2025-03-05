@@ -17,16 +17,13 @@ TEST(fomin_v_generalized_scatter, test_task_run) {
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(
-        reinterpret_cast<uint8_t *>(global_input.data()));
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_input.data()));
     task_data->inputs_count.emplace_back(global_input.size());
   }
-  task_data->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(local_output.data()));
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(local_output.data()));
   task_data->outputs_count.emplace_back(local_output.size());
 
-  auto test_task = std::make_shared<
-      fomin_v_generalized_scatter::GeneralizedScatterTestParallel>(task_data);
+  auto test_task = std::make_shared<fomin_v_generalized_scatter::GeneralizedScatterTestParallel>(task_data);
   ASSERT_TRUE(test_task->validation());
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -34,9 +31,7 @@ TEST(fomin_v_generalized_scatter, test_task_run) {
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                        current_time_point - t0)
-                        .count();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
 
@@ -54,14 +49,12 @@ TEST(fomin_v_generalized_scatter, test_task_run) {
     received_data.resize(world.size() * local_size);
   }
 
-  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(),
-             local_size, MPI_INT, 0, world);
+  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(),local_size, MPI_INT, 0, world);
 
   if (world.rank() == 0) {
     for (int i = 0; i < world.size(); ++i) {
       for (int j = 0; j < local_size; ++j) {
-        ASSERT_EQ(received_data[i * local_size + j],
-                  global_input[i * local_size + j]);
+        ASSERT_EQ(received_data[i * local_size + j], global_input[i * local_size + j]);
       }
     }
   }
@@ -73,16 +66,13 @@ TEST(fomin_v_generalized_scatter, test_pipeline_run) {
 
   auto task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(
-        reinterpret_cast<uint8_t *>(global_input.data()));
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_input.data()));
     task_data->inputs_count.emplace_back(global_input.size());
   }
-  task_data->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(local_output.data()));
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(local_output.data()));
   task_data->outputs_count.emplace_back(local_output.size());
 
-  auto test_task = std::make_shared<
-      fomin_v_generalized_scatter::GeneralizedScatterTestParallel>(task_data);
+  auto test_task = std::make_shared<fomin_v_generalized_scatter::GeneralizedScatterTestParallel>(task_data);
   ASSERT_TRUE(test_task->validation());
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -90,9 +80,7 @@ TEST(fomin_v_generalized_scatter, test_pipeline_run) {
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                        current_time_point - t0)
-                        .count();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
 
@@ -110,14 +98,12 @@ TEST(fomin_v_generalized_scatter, test_pipeline_run) {
     received_data.resize(world.size() * local_size);
   }
 
-  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(),
-             local_size, MPI_INT, 0, world);
+  MPI_Gather(local_output.data(), local_size, MPI_INT, received_data.data(),local_size, MPI_INT, 0, world);
 
   if (world.rank() == 0) {
     for (int i = 0; i < world.size(); ++i) {
       for (int j = 0; j < local_size; ++j) {
-        ASSERT_EQ(received_data[i * local_size + j],
-                  global_input[i * local_size + j]);
+        ASSERT_EQ(received_data[i * local_size + j],global_input[i * local_size + j]);
       }
     }
   }
