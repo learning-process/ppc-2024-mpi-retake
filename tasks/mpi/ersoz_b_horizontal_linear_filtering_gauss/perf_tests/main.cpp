@@ -6,14 +6,13 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
-#include <utility>  // For std::move
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
-TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
+TEST(ersoz_b_test_task_mpi, test_pipeline_run) {  // NOLINT(readability-function-cognitive-complexity)
   constexpr int kN = 256;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
@@ -47,7 +46,7 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
   }
 }
 
-TEST(ersoz_b_test_task_mpi, test_task_run) {
+TEST(ersoz_b_test_task_mpi, test_task_run) {  // NOLINT(readability-function-cognitive-complexity)
   constexpr int kN = 256;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {

@@ -19,7 +19,7 @@ inline double GaussianFunction(int i, int j, double sigma) {
 }
 
 // Computes the filtered brightness for a given pixel location.
-// (Renamed from "compute_pixel" to "ComputePixel" per naming rules.)
+// (Renamed from "compute_pixel" to "ComputePixel" per naming conventions.)
 inline char ComputePixel(const std::vector<std::vector<char>>& image, int y, int x, double sigma) {
   double brightness = 0.0;
   for (int i = -1; i <= 1; i++) {
@@ -31,7 +31,8 @@ inline char ComputePixel(const std::vector<std::vector<char>>& image, int y, int
 }
 
 // Helper function to compute displacements and counts for splitting work among MPI processes.
-void computeDisplsAndScounts(int line_blocks, int procs, int& rem, int& line_blocks_per_proc, std::vector<int>& displs,
+// Renamed from "computeDisplsAndScounts" to "ComputeDisplsAndScounts" per naming convention.
+void ComputeDisplsAndScounts(int line_blocks, int procs, int& rem, int& line_blocks_per_proc, std::vector<int>& displs,
                              std::vector<int>& scounts) {
   rem = line_blocks % procs;
   line_blocks_per_proc = line_blocks / procs;
@@ -58,11 +59,11 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
   int rank = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
   int rem = 0;
   int line_blocks_per_proc = 0;
-  std::vector<int> displs, scounts;
-  computeDisplsAndScounts(line_blocks, procs, rem, line_blocks_per_proc, displs, scounts);
+  std::vector<int> displs;
+  std::vector<int> scounts;
+  ComputeDisplsAndScounts(line_blocks, procs, rem, line_blocks_per_proc, displs, scounts);
 
   int local_size = scounts[rank] * (x_dim - 2);
   std::vector<char> pixels(local_size, 0);

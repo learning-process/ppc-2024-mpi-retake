@@ -13,7 +13,8 @@
 // Removed unused "core/util/include/util.hpp"
 #include "seq/ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
 
-TEST(ersoz_b_test_task_seq, test_gaussian_filter_small) {
+// Suppress cognitive complexity warnings in this test.
+TEST(ersoz_b_test_task_seq, test_gaussian_filter_small) {  // NOLINT(readability-function-cognitive-complexity)
   constexpr int kN = 16;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
@@ -28,7 +29,8 @@ TEST(ersoz_b_test_task_seq, test_gaussian_filter_small) {
     image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 
-  auto sequential_filter = [&image](double sigma) -> std::vector<std::vector<char>> {
+  auto sequential_filter =
+      [&image](double sigma) -> std::vector<std::vector<char>> {  // NOLINT(readability-function-cognitive-complexity)
     int y_dim = static_cast<int>(image.size());
     int x_dim = static_cast<int>(image[0].size());
     std::vector<std::vector<char>> res;
