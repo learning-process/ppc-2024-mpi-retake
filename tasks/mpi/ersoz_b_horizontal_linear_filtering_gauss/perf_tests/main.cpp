@@ -2,13 +2,12 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <utility>  // For std::move
 #include <vector>
-
-// Removed direct include of <mpi.h> since boost::mpi is used.
-#include <boost/mpi/communicator.hpp>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"

@@ -19,7 +19,8 @@ inline double GaussianFunction(int i, int j, double sigma) {
 }
 
 // Computes the filtered brightness for a given pixel location.
-inline char compute_pixel(const std::vector<std::vector<char>>& image, int y, int x, double sigma) {
+// (Renamed from "compute_pixel" to "ComputePixel" per naming rules.)
+inline char ComputePixel(const std::vector<std::vector<char>>& image, int y, int x, double sigma) {
   double brightness = 0.0;
   for (int i = -1; i <= 1; i++) {
     for (int j = -1; j <= 1; j++) {
@@ -29,21 +30,14 @@ inline char compute_pixel(const std::vector<std::vector<char>>& image, int y, in
   return static_cast<char>(brightness);
 }
 
-std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
-  int y_dim = static_cast<int>(image.size());
-  int x_dim = static_cast<int>(image[0].size());
-  int line_blocks = y_dim - 2;
-  int procs = 0;
-  int rank = 0;
-  MPI_Comm_size(MPI_COMM_WORLD, &procs);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  int rem = line_blocks % procs;
-  int line_blocks_per_proc = line_blocks / procs;
-
-  // Compute displacements and counts for each process.
-  std::vector<int> displs(procs, 0);
-  std::vector<int> scounts(procs, 0);
+// Helper function to compute displacements and counts for splitting work among MPI processes.
+void computeDisplsAndScounts(int line_blocks, int procs, int& rem, int& line_blocks_per_proc, std::vector<int>& displs,
+                             std::vector<int>& scounts) {
+  rem = line_blocks % procs;
+  line_blocks_per_proc = line_blocks / procs;
   int offset = 1;
+  displs.resize(procs);
+  scounts.resize(procs);
   for (int i = 0; i < procs; i++) {
     displs[i] = offset;
     if (i < rem) {
@@ -54,6 +48,21 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
       scounts[i] = line_blocks_per_proc;
     }
   }
+}
+
+std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
+  int y_dim = static_cast<int>(image.size());
+  int x_dim = static_cast<int>(image[0].size());
+  int line_blocks = y_dim - 2;
+  int procs = 0;
+  int rank = 0;
+  MPI_Comm_size(MPI_COMM_WORLD, &procs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  int rem = 0;
+  int line_blocks_per_proc = 0;
+  std::vector<int> displs, scounts;
+  computeDisplsAndScounts(line_blocks, procs, rem, line_blocks_per_proc, displs, scounts);
 
   int local_size = scounts[rank] * (x_dim - 2);
   std::vector<char> pixels(local_size, 0);
@@ -61,7 +70,7 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
   // Compute the local portion of the filtered image.
   for (int y = displs[rank]; y < displs[rank] + scounts[rank]; y++) {
     for (int x = 1; x < x_dim - 1; x++) {
-      pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = compute_pixel(image, y, x, sigma);
+      pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = ComputePixel(image, y, x, sigma);
     }
   }
 

@@ -8,10 +8,11 @@
 
 #include <cstdint>
 #include <memory>
+#include <utility>  // For std::move
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
+// Removed unused "core/util/include/util.hpp"
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
@@ -26,7 +27,6 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   std::vector<std::vector<char>> image;
   image.reserve(kN);
   for (int i = 0; i < kN; i++) {
-    // Use emplace_back for direct construction from iterators.
     image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 

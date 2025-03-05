@@ -10,7 +10,6 @@ namespace ersoz_b_test_task_mpi {
 
 class TestTaskMPI : public ppc::core::Task {
  public:
-  // Removed the redundant initializer for world_
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;

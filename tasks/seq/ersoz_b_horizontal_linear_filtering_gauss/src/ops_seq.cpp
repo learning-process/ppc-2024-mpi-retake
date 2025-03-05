@@ -5,6 +5,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 #include <cstdint>
+#include <utility>  // For std::move
 #include <vector>
 
 namespace {
@@ -42,7 +43,7 @@ bool ersoz_b_test_task_seq::TestTaskSequential::PreProcessingImpl() {
   std::vector<char> flat(in_ptr, in_ptr + input_size);
   input_image_.resize(img_size_);
   for (int i = 0; i < img_size_; i++) {
-    input_image_[i] = std::vector<char>(flat.begin() + (i * img_size_), flat.begin() + ((i + 1) * img_size_));
+    input_image_[i] = std::vector<char>(flat.begin() + i * img_size_, flat.begin() + ((i + 1) * img_size_));
   }
   output_image_.resize(img_size_ - 2);
   for (int i = 0; i < img_size_ - 2; i++) {
