@@ -1,13 +1,14 @@
 #define OMPI_SKIP_MPICXX
 
 #include <gtest/gtest.h>
-#include <mpi.h>
 
-#include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstdint>
 #include <memory>
 #include <vector>
+
+// Removed direct include of <mpi.h> since boost::mpi is used.
+#include <boost/mpi/communicator.hpp>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
@@ -18,7 +19,7 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
-      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+      in[(i * kN) + j] = static_cast<char>((i + j) % 256);
     }
   }
 
@@ -52,7 +53,7 @@ TEST(ersoz_b_test_task_mpi, test_task_run) {
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
-      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+      in[(i * kN) + j] = static_cast<char>((i + j) % 256);
     }
   }
 

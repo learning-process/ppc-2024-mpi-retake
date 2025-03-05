@@ -1,4 +1,3 @@
-#define OMPI_SKIP_MPICXX
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 #include <mpi.h>
@@ -9,14 +8,25 @@
 #endif
 #include <cstdint>
 #include <cstdlib>
-#include <memory>
 #include <utility>
 #include <vector>
 
 namespace {
 
+// Computes the Gaussian function for given offsets.
 inline double GaussianFunction(int i, int j, double sigma) {
-  return 1.0 / (2.0 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma));
+  return 1.0 / (2.0 * M_PI * sigma * sigma) * exp(-((i * i) + (j * j)) / (2.0 * sigma * sigma));
+}
+
+// Computes the filtered brightness for a given pixel location.
+inline char compute_pixel(const std::vector<std::vector<char>>& image, int y, int x, double sigma) {
+  double brightness = 0.0;
+  for (int i = -1; i <= 1; i++) {
+    for (int j = -1; j <= 1; j++) {
+      brightness += GaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
+    }
+  }
+  return static_cast<char>(brightness);
 }
 
 std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
@@ -25,14 +35,12 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
   int line_blocks = y_dim - 2;
   int procs = 0;
   int rank = 0;
-  int rem = 0;
-  int line_blocks_per_proc = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  rem = line_blocks % procs;
-  line_blocks_per_proc = line_blocks / procs;
+  int rem = line_blocks % procs;
+  int line_blocks_per_proc = line_blocks / procs;
 
-  // Use std::vector instead of raw pointers for displacements/counts:
+  // Compute displacements and counts for each process.
   std::vector<int> displs(procs, 0);
   std::vector<int> scounts(procs, 0);
   int offset = 1;
@@ -46,49 +54,42 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
       scounts[i] = line_blocks_per_proc;
     }
   }
+
   int local_size = scounts[rank] * (x_dim - 2);
-  char* pixels = new char[local_size];
+  std::vector<char> pixels(local_size, 0);
+
+  // Compute the local portion of the filtered image.
   for (int y = displs[rank]; y < displs[rank] + scounts[rank]; y++) {
     for (int x = 1; x < x_dim - 1; x++) {
-      double brightness = 0.0;
-      for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-          brightness += GaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
-        }
-      }
-      pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = static_cast<char>(brightness);
+      pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = compute_pixel(image, y, x, sigma);
     }
   }
 
   std::vector<std::vector<char>> res;
   if (rank != 0) {
-    MPI_Send(pixels, local_size, MPI_CHAR, 0, rank, MPI_COMM_WORLD);
+    MPI_Send(pixels.data(), local_size, MPI_CHAR, 0, rank, MPI_COMM_WORLD);
   }
   if (rank == 0) {
     for (int i = 0; i < procs; i++) {
-      char* temp_ptr = nullptr;
+      std::vector<char> temp;
       if (i != 0) {
         int temp_size = scounts[i] * (x_dim - 2);
-        temp_ptr = new char[temp_size];
-        MPI_Recv(temp_ptr, temp_size, MPI_CHAR, i, i, MPI_COMM_WORLD, MPI_STATUSES_IGNORE);
+        temp.resize(temp_size);
+        MPI_Recv(temp.data(), temp_size, MPI_CHAR, i, i, MPI_COMM_WORLD, MPI_STATUSES_IGNORE);
       }
       for (int y = displs[i]; y < displs[i] + scounts[i]; y++) {
         std::vector<char> line(x_dim - 2, 0);
         for (int x = 1; x < x_dim - 1; x++) {
           if (i != 0) {
-            line[x - 1] = temp_ptr[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
+            line[x - 1] = temp[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
           } else {
             line[x - 1] = pixels[((y - displs[i]) * (x_dim - 2)) + (x - 1)];
           }
         }
         res.emplace_back(std::move(line));
       }
-      if (i != 0) {
-        delete[] temp_ptr;
-      }
     }
   }
-  delete[] pixels;
   return res;
 }
 

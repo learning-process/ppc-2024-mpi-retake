@@ -19,13 +19,14 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
-      in[i * kN + j] = static_cast<char>((i + j) % 256);
+      in[(i * kN) + j] = static_cast<char>((i + j) % 256);
     }
   }
 
   std::vector<std::vector<char>> image;
   image.reserve(kN);
   for (int i = 0; i < kN; i++) {
+    // Use emplace_back for direct construction from iterators.
     image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 
@@ -42,13 +43,13 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
         double brightness = 0.0;
         for (int i = -1; i <= 1; i++) {
           for (int j = -1; j <= 1; j++) {
-            brightness += 1.0 / (2.0 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma)) *
+            brightness += (1.0 / (2.0 * M_PI * sigma * sigma)) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma)) *
                           static_cast<int>(image[y + i][x + j]);
           }
         }
-        line.push_back(static_cast<char>(brightness));
+        line.emplace_back(static_cast<char>(brightness));
       }
-      res.push_back(std::move(line));
+      res.emplace_back(std::move(line));
     }
     return res;
   };

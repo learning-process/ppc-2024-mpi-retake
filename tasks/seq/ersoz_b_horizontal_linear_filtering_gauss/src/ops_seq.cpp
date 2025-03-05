@@ -10,7 +10,7 @@
 namespace {
 
 inline double GaussianFunction(int i, int j, double sigma) {
-  return 1 / (2 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2 * sigma * sigma));
+  return 1.0 / (2 * M_PI * sigma * sigma) * exp(-(((i * i)) + ((j * j))) / (2 * sigma * sigma));
 }
 
 std::vector<std::vector<char>> SequentialGaussianFilter(const std::vector<std::vector<char>>& image, double sigma) {
@@ -26,9 +26,9 @@ std::vector<std::vector<char>> SequentialGaussianFilter(const std::vector<std::v
           brightness += GaussianFunction(i, j, sigma) * static_cast<int>(image[y + i][x + j]);
         }
       }
-      line.push_back(static_cast<char>(brightness));
+      line.emplace_back(static_cast<char>(brightness));
     }
-    res.push_back(line);
+    res.emplace_back(std::move(line));
   }
   return res;
 }
@@ -42,7 +42,7 @@ bool ersoz_b_test_task_seq::TestTaskSequential::PreProcessingImpl() {
   std::vector<char> flat(in_ptr, in_ptr + input_size);
   input_image_.resize(img_size_);
   for (int i = 0; i < img_size_; i++) {
-    input_image_[i] = std::vector<char>(flat.begin() + i * img_size_, flat.begin() + (i + 1) * img_size_);
+    input_image_[i] = std::vector<char>(flat.begin() + (i * img_size_), flat.begin() + ((i + 1) * img_size_));
   }
   output_image_.resize(img_size_ - 2);
   for (int i = 0; i < img_size_ - 2; i++) {
@@ -54,8 +54,12 @@ bool ersoz_b_test_task_seq::TestTaskSequential::PreProcessingImpl() {
 bool ersoz_b_test_task_seq::TestTaskSequential::ValidationImpl() {
   unsigned int input_size = task_data->inputs_count[0];
   int computed_size = static_cast<int>(std::sqrt(input_size));
-  if (static_cast<unsigned int>(computed_size * computed_size) != input_size) return false;
-  if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) return false;
+  if (static_cast<unsigned int>(computed_size * computed_size) != input_size) {
+    return false;
+  }
+  if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) {
+    return false;
+  }
   img_size_ = computed_size;
   return true;
 }

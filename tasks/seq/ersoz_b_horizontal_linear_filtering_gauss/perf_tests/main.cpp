@@ -14,7 +14,7 @@ TEST(ersoz_b_test_task_seq, test_pipeline_run) {
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
-      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+      in[(i * kN) + j] = static_cast<char>((i + j) % 256);
     }
   }
 
@@ -46,7 +46,7 @@ TEST(ersoz_b_test_task_seq, test_task_run) {
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
-      in[((i * kN) + j)] = static_cast<char>((i + j) % 256);
+      in[(i * kN) + j] = static_cast<char>((i + j) % 256);
     }
   }
 
