@@ -91,6 +91,48 @@ inline std::pair<int, int> Segments(int n, int size, int rank) {
   return segments[rank];
 }
 
+inline void MultiplyCCS(const std::vector<double>& values_A, const std::vector<int>& row_indices_A,
+                         const std::vector<int>& col_ptr_A, int num_rows_A, const std::vector<double>& values_B,
+                         const std::vector<int>& row_indices_B, const std::vector<int>& col_ptr_B, int num_cols_B,
+                         std::vector<double>& values_C, std::vector<int>& row_indices_C, std::vector<int>& col_ptr_C) {
+  values_C.clear();
+  row_indices_C.clear();
+  col_ptr_C.clear();
+
+  col_ptr_C.clear();
+  col_ptr_C.push_back(0);
+
+  std::vector<int> X(num_rows_A, -1);
+  std::vector<double> X_values(num_rows_A, 0.0);
+
+  for (int col_B = 0; col_B < num_cols_B; ++col_B) {
+    std::fill(X.begin(), X.end(), -1);
+    std::fill(X_values.begin(), X_values.end(), 0.0);
+
+    for (int i = col_ptr_B[col_B]; i < col_ptr_B[col_B + 1]; ++i) {
+      int row_B = row_indices_B[i];
+      X[row_B] = i;
+      X_values[row_B] = values_B[i];
+    }
+
+    for (int col_A = 0; col_A < static_cast<int>(col_ptr_A.size() - 1); ++col_A) {
+      double sum = 0.0;
+      for (int i = col_ptr_A[col_A]; i < col_ptr_A[col_A + 1]; ++i) {
+        int row_A = row_indices_A[i];
+        if (X[row_A] != -1) {
+          sum += values_A[i] * X_values[row_A];
+        }
+      }
+      if (sum != 0.0) {
+        values_C.push_back(sum);
+        row_indices_C.push_back(col_A);
+      }
+    }
+
+    col_ptr_C.push_back(values_C.size());
+  }
+}
+
 class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
@@ -99,16 +141,16 @@ class TestTaskMPI : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
- private:
+  private:
   int rows_A, cols_A, rows_B, cols_B, rows_At, cols_At;
-  std::vector<std::vector<double>> A_, B_;
-  std::vector<double> A_val_, B_val_, At_val_;
-  std::vector<int> A_row_ind_, A_col_ptr_, B_row_ind_, B_col_ptr_, At_row_ind_, At_col_ptr_;
-  int color_, loc_start_, loc_end_, loc_cols_;
-  std::vector<double> loc_val_, loc_res_val_, res_val_;
-  std::vector<int> loc_row_ind_, loc_col_ptr_, loc_res_row_ind_, loc_res_col_ptr_, res_ind_, res_ptr_;
+  std::vector<std::vector<double>> A, B;
+  std::vector<double> A_val, B_val, At_val;
+  std::vector<int> A_row_ind, A_col_ptr, B_row_ind, B_col_ptr, At_row_ind, At_col_ptr;
+  int color, loc_start, loc_end, loc_cols;
+  std::vector<double> loc_val, loc_res_val, res_val;
+  std::vector<int> loc_row_ind, loc_col_ptr, loc_res_row_ind, loc_res_col_ptr, res_ind, res_ptr;
 
-  boost::mpi::communicator world_, comm_;
+  boost::mpi::communicator world, comm;
 };
 
 }  // namespace sedova_o_multiply_matrices_ccs_mpi
