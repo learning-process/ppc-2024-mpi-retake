@@ -50,8 +50,7 @@ void Step(int tkt, size_t i, bool rang_is_head, int dv, std::vector<double>& hea
 bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::PreProcessingImpl() {
   // Init value for input and output
   output_ = std::vector<double>(row_size_, 0);
-  broadcast(world_, row_size_, 0);
-  broadcast(world_, col_size_, 0);
+
   return true;
 }
 
@@ -81,6 +80,8 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::ValidationImpl() {
 }
 
 bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
+  broadcast(world_, row_size_, 0);
+  broadcast(world_, col_size_, 0);
   int r = world_.rank();
   size_t sz = world_.size();
   size_t ost = col_size_ % sz;
