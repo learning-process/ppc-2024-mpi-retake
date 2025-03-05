@@ -1,37 +1,76 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <iostream>
+#include <cstdint>
+#include <cstdlib>
+#include <ctime>
+#include <memory>
 #include <vector>
 
-#include "seq/muradov_k_odd_even_batcher_sort/include/ops_seq.hpp"
+#include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
+#include "seq/muradov_k_radix_sort/include/ops_seq.hpp"
 
-namespace mk = muradov_k_odd_even_batcher_sort;
-
-TEST(muradov_k_odd_even_batcher_sort_seq, test_pipeline_run) {
-  const int k_iterations = 100;
-  // Use a large vector (e.g., 256K integers)
-  const int n = 256 * 1024;
-  std::vector<int> original = mk::RandomVector(n);
-  auto start = std::chrono::high_resolution_clock::now();
-  for (int i = 0; i < k_iterations; i++) {
-    std::vector<int> v = original;  // copy unsorted vector
-    mk::OddEvenBatcherSort(v);
+TEST(muradov_k_radix_sort_seq, test_pipeline_run) {
+  constexpr int kN = 256 * 1024;
+  std::vector<int> input(kN);
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));
+  for (int i = 0; i < kN; ++i) {
+    input[i] = std::rand() % 1000;
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> total_time = end - start;
-  double avg_time = total_time.count() / k_iterations;
-  std::cout << "test_pipeline_run: Average sequential sort time: " << avg_time << " seconds.\n";
-  SUCCEED();
+  std::vector<int> output(kN, 0);
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
+  task_data->inputs_count.emplace_back(input.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
+  task_data->outputs_count.emplace_back(output.size());
+  task_data->state_of_testing = ppc::core::TaskData::kPerf;
+  auto sort_task = std::make_shared<muradov_k_radix_sort::RadixSortTask>(task_data);
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [t0]() {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(sort_task);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
+  std::vector<int> expected = input;
+  std::ranges::sort(expected);
+  ASSERT_EQ(output, expected);
 }
 
-TEST(muradov_k_odd_even_batcher_sort_seq, test_task_run) {
-  const int n = 1024;
-  std::vector<int> v = mk::RandomVector(n);
-  auto start = std::chrono::high_resolution_clock::now();
-  mk::OddEvenBatcherSort(v);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-  std::cout << "test_task_run: Sequential sort round-trip time: " << elapsed.count() << " seconds.\n";
-  SUCCEED();
+TEST(muradov_k_radix_sort_seq, test_task_run) {
+  constexpr int kN = 20480;
+  std::vector<int> input(kN);
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));
+  for (int i = 0; i < kN; ++i) {
+    input[i] = std::rand() % 1000;
+  }
+  std::vector<int> output(kN, 0);
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
+  task_data->inputs_count.emplace_back(input.size());
+  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(output.data()));
+  task_data->outputs_count.emplace_back(output.size());
+  task_data->state_of_testing = ppc::core::TaskData::kPerf;
+  auto sort_task = std::make_shared<muradov_k_radix_sort::RadixSortTask>(task_data);
+  auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
+  perf_attr->num_running = 10;
+  const auto t0 = std::chrono::high_resolution_clock::now();
+  perf_attr->current_timer = [t0]() {
+    auto current_time_point = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
+    return static_cast<double>(duration) * 1e-9;
+  };
+  auto perf_results = std::make_shared<ppc::core::PerfResults>();
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(sort_task);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
+  ppc::core::Perf::PrintPerfStatistic(perf_results);
+  std::vector<int> expected = input;
+  std::ranges::sort(expected);
+  ASSERT_EQ(output, expected);
 }

@@ -1,52 +1,88 @@
-#include "seq/muradov_k_odd_even_batcher_sort/include/ops_seq.hpp"
+#include "seq/muradov_k_radix_sort/include/ops_seq.hpp"
 
 #include <algorithm>
-#include <cstdlib>
-#include <ctime>
-#include <random>
 #include <vector>
 
-namespace muradov_k_odd_even_batcher_sort {
-
-std::vector<int> RandomVector(int size) {
-  std::mt19937 rng(static_cast<unsigned int>(time(nullptr)));
-  std::vector<int> v(size);
-  for (int i = 0; i < size; ++i) {
-    v[i] = static_cast<int>(rng() % 1000);
-  }
-  return v;
-}
+namespace muradov_k_radix_sort {
 
 namespace {
-// Partition function for quicksort.
-int Partition(std::vector<int>& v, int l, int r) {
-  int pivot = v[r];
-  int i = l - 1;
-  for (int j = l; j < r; ++j) {
-    if (v[j] <= pivot) {
-      ++i;
-      std::swap(v[i], v[j]);
-    }
+void CountingSortForRadix(std::vector<int>& arr, int exp) {
+  int n = static_cast<int>(arr.size());
+  std::vector<int> output(n);
+  int count[10] = {0};
+  for (int i = 0; i < n; ++i) {
+    int digit = (arr[i] / exp) % 10;
+    count[digit]++;
   }
-  std::swap(v[i + 1], v[r]);
-  return i + 1;
-}
-
-void QSortImpl(std::vector<int>& v, int l, int r) {
-  if (l < r) {
-    int p = Partition(v, l, r);
-    QSortImpl(v, l, p - 1);
-    QSortImpl(v, p + 1, r);
+  for (int i = 1; i < 10; ++i) {
+    count[i] += count[i - 1];
   }
-}
-}  // anonymous namespace
-
-void QSort(std::vector<int>& v, int l, int r) { QSortImpl(v, l, r); }
-
-void OddEvenBatcherSort(std::vector<int>& v) {
-  if (!v.empty()) {
-    QSort(v, 0, static_cast<int>(v.size()) - 1);
+  for (int i = n - 1; i >= 0; --i) {
+    int digit = (arr[i] / exp) % 10;
+    output[count[digit] - 1] = arr[i];
+    count[digit]--;
+  }
+  for (int i = 0; i < n; ++i) {
+    arr[i] = output[i];
   }
 }
 
-}  // namespace muradov_k_odd_even_batcher_sort
+void LSDRadixSort(std::vector<int>& arr) {
+  if (arr.empty()) return;
+  int max_val = *std::max_element(arr.begin(), arr.end());
+  for (int exp = 1; max_val / exp > 0; exp *= 10) {
+    CountingSortForRadix(arr, exp);
+  }
+}
+
+void SequentialRadixSort(std::vector<int>& v) {
+  std::vector<int> negatives;
+  std::vector<int> non_negatives;
+  for (int x : v) {
+    if (x < 0)
+      negatives.push_back(-x);
+    else
+      non_negatives.push_back(x);
+  }
+  LSDRadixSort(non_negatives);
+  LSDRadixSort(negatives);
+  std::reverse(negatives.begin(), negatives.end());
+  for (int& x : negatives) {
+    x = -x;
+  }
+  int index = 0;
+  for (int x : negatives) {
+    v[index++] = x;
+  }
+  for (int x : non_negatives) {
+    v[index++] = x;
+  }
+}
+}  // namespace
+
+void RadixSort(std::vector<int>& v) { SequentialRadixSort(v); }
+
+bool RadixSortTask::ValidationImpl() {
+  return !task_data->inputs.empty() && !task_data->outputs.empty() &&
+         task_data->inputs_count[0] == task_data->outputs_count[0];
+}
+
+bool RadixSortTask::PreProcessingImpl() {
+  unsigned int count = task_data->inputs_count[0];
+  int* in_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
+  data_.assign(in_ptr, in_ptr + count);
+  return true;
+}
+
+bool RadixSortTask::RunImpl() {
+  RadixSort(data_);
+  return true;
+}
+
+bool RadixSortTask::PostProcessingImpl() {
+  int* out_ptr = reinterpret_cast<int*>(task_data->outputs[0]);
+  std::ranges::copy(data_, out_ptr);
+  return true;
+}
+
+}  // namespace muradov_k_radix_sort

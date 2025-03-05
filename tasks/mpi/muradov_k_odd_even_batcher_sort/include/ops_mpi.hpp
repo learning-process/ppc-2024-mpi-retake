@@ -1,19 +1,18 @@
-#ifndef MURADOV_K_ODD_EVEN_BATCHER_SORT_OPS_MPI_HPP
-#define MURADOV_K_ODD_EVEN_BATCHER_SORT_OPS_MPI_HPP
+#ifndef MURADOV_K_RADIX_SORT_OPS_MPI_HPP
+#define MURADOV_K_RADIX_SORT_OPS_MPI_HPP
 
-#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
-namespace muradov_k_odd_even_batcher_sort {
+namespace muradov_k_radix_sort {
 
-void QSort(std::vector<int>& v, int l, int r);
-void OddEvenBatcherSort(std::vector<int>& v);
+void RadixSort(std::vector<int>& v);
+void MPI_RadixSort(std::vector<int>& v);
 
-class OddEvenBatcherSortTask : public ppc::core::Task {
+class RadixSortTask : public ppc::core::Task {
  public:
-  explicit OddEvenBatcherSortTask(ppc::core::TaskDataPtr task_data) : ppc::core::Task(std::move(task_data)) {}
+  explicit RadixSortTask(ppc::core::TaskDataPtr task_data) : ppc::core::Task(std::move(task_data)) {}
   bool ValidationImpl() override;
   bool PreProcessingImpl() override;
   bool RunImpl() override;
@@ -23,6 +22,6 @@ class OddEvenBatcherSortTask : public ppc::core::Task {
   std::vector<int> data_;
 };
 
-}  // namespace muradov_k_odd_even_batcher_sort
+}  // namespace muradov_k_radix_sort
 
-#endif  // MURADOV_K_ODD_EVEN_BATCHER_SORT_OPS_MPI_HPP
+#endif
