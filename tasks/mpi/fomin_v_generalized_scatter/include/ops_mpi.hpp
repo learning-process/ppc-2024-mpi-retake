@@ -27,10 +27,10 @@ class GeneralizedScatterTestParallel : public ppc::core::Task {
  public:
   explicit GeneralizedScatterTestParallel(std::shared_ptr<ppc::core::TaskData> taskData_)
       : Task(std::move(taskData_)) {}
-  bool pre_processing() override;
-  bool validation() override;
-  bool run() override;
-  bool post_processing() override;
+  bool pre_processing();
+  bool validation();
+  bool run();
+  bool post_processing();
 
  private:
   int res{};
