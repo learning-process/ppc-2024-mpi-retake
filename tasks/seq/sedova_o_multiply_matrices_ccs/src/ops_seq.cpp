@@ -1,4 +1,4 @@
-#include "seq/sedova_o_multiply_matrices_ccs/include/ops_seq.hpp"
+п»ї#include "seq/sedova_o_multiply_matrices_ccs/include/ops_seq.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -10,7 +10,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   rows_B = *reinterpret_cast<int *>(taskData->inputs[2]);
   cols_B = *reinterpret_cast<int *>(taskData->inputs[3]);
 
-  // Загрузка матрицы A
+  // Р—Р°РіСЂСѓР·РєР° РјР°С‚СЂРёС†С‹ A
   auto AValPtr = reinterpret_cast<double *>(taskData->inputs[4]);
   A_val.assign(AValPtr, AValPtr + taskData->inputs_count[4]);
 
@@ -20,7 +20,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   auto AColPtrPtr = reinterpret_cast<int *>(taskData->inputs[6]);
   A_col_ptr.assign(AColPtrPtr, AColPtrPtr + taskData->inputs_count[6]);
 
-  // Загрузка матрицы B
+  // Р—Р°РіСЂСѓР·РєР° РјР°С‚СЂРёС†С‹ B
   auto BValPtr = reinterpret_cast<double *>(taskData->inputs[7]);
   B_val.assign(BValPtr, BValPtr + taskData->inputs_count[7]);
 
@@ -30,7 +30,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   auto BColPtrPtr = reinterpret_cast<int *>(taskData->inputs[9]);
   B_col_ptr.assign(BColPtrPtr, BColPtrPtr + taskData->inputs_count[9]);
 
-  // Транспонирование матрицы A
+  // РўСЂР°РЅСЃРїРѕРЅРёСЂРѕРІР°РЅРёРµ РјР°С‚СЂРёС†С‹ A
   Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A, cols_A, At_val, At_row_ind, At_col_ptr);
 
   rows_At = cols_A;
