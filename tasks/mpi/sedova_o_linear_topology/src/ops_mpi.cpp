@@ -13,6 +13,7 @@
 std::vector<int> sedova_o_linear_topology_mpi::GetRandomVector(size_t size) {
   std::random_device dev;
   std::mt19937 gen(dev());
+  std::uniform_int_distribution<> distrib(1, 500);
   std::vector<int> vec(size);
   for (size_t i = 0; i < size; i++) {
     vec[i] = distrib(gen);

@@ -10,7 +10,7 @@
 
 namespace sedova_o_linear_topology_mpi {
 
-std::vector<int> GetRandomVector(int size);
+std::vector<int> GetRandomVector(size_t size);
 
 class TestTaskMPI : public ppc::core::Task {
  public:
