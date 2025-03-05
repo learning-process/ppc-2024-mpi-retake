@@ -39,7 +39,6 @@ TEST(sedova_o_min_of_vector_elements_seq, test_pipeline_run) {
     task_data_seq->outputs_count.emplace_back(global_min.size());
   }
 
-  // Create Task
   auto test_task_sequential = std::make_shared<sedova_o_min_of_vector_elements_seq::TestTaskSequential>(task_data_seq);
 
   // Create Perf attributes
