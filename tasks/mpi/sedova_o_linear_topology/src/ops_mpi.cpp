@@ -1,8 +1,8 @@
 #include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/all_gather.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstddef>
