@@ -115,7 +115,6 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   task_data->inputs_count.emplace_back(b_row_ind.size());
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
   task_data->inputs_count.emplace_back(b_col_ptr.size());
- 
   c_val.resize(exp_c_val.size());
   c_row_ind.resize(exp_c_row_ind.size());
   c_col_ptr.resize(exp_c_col_ptr.size());
@@ -207,7 +206,6 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_task_run) {
   task_data->inputs_count.emplace_back(b_row_ind.size());
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
   task_data->inputs_count.emplace_back(b_col_ptr.size());
-
   c_val.resize(exp_c_val.size());
   c_row_ind.resize(exp_c_row_ind.size());
   c_col_ptr.resize(exp_c_col_ptr.size());
