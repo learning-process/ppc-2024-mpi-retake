@@ -70,9 +70,9 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
   if (color == 1) {
     auto pair = Segments(cols_B, comm.size(), comm.rank());
 
-    loc_start_ = pair.first;
-    loc_end_ = pair.second;
-    loc_cols_ = loc_end_ - loc_start_;
+    loc_start = pair.first;
+    loc_end = pair.second;
+    loc_cols = loc_end - loc_start;
 
     Extract(B_val, B_row_ind, B_col_ptr, loc_start, loc_end, loc_val, loc_row_ind, loc_col_ptr);
 
