@@ -35,18 +35,18 @@ std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero
   return matrix;
 }
 
-std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &A,
-                                                  const std::vector<std::vector<double>> &B) {
-  int rows_A = A.size();
-  int cols_A = A[0].size();
-  int cols_B = B[0].size();
+std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<double>> &a,
+                                                  const std::vector<std::vector<double>> &b) {
+  int rows_A = a.size();
+  int cols_A = a[0].size();
+  int cols_B = b[0].size();
 
   std::vector<std::vector<double>> result(rows_A, std::vector<double>(cols_B, 0.0));
 
   for (int i = 0; i < rows_A; ++i) {
     for (int j = 0; j < cols_B; ++j) {
       for (int k = 0; k < cols_A; ++k) {
-        result[i][j] += A[i][k] * B[k][j];
+        result[i][j] += a[i][k] * b[k][j];
       }
     }
   }
@@ -59,29 +59,29 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
 TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   int size = 256;
   int elements = 6553;
-  std::vector<std::vector<double>> A_;
-  std::vector<std::vector<double>> B_;
+  std::vector<std::vector<double>> a_;
+  std::vector<std::vector<double>> b_;
 
-  A_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
-  B_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  a_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  b_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
 
   std::vector<double> A_val;
   std::vector<int> A_row_ind;
   std::vector<int> A_col_ptr;
-  int rows_A = A_.size();
-  int cols_A = A_[0].size();
+  int rows_A = a_.size();
+  int cols_A = a_[0].size();
 
   std::vector<double> B_val;
   std::vector<int> B_row_ind;
   std::vector<int> B_col_ptr;
-  int rows_B = B_.size();
-  int cols_B = B_[0].size();
+  int rows_B = b_.size();
+  int cols_B = b_[0].size();
 
   std::vector<double> exp_C_val;
   std::vector<int> exp_C_row_ind;
   std::vector<int> exp_C_col_ptr;
 
-  auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(A_, B_);
+  auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a_, b_);
   sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind,
                                                       exp_C_col_ptr);
 
@@ -89,8 +89,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   std::vector<int> C_row_ind;
   std::vector<int> C_col_ptr;
 
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(A_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(B_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(a_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(b_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
@@ -151,29 +151,29 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
 TEST(sedova_o_multiply_matrices_ccs_seq, test_task_run) {
   int size = 256;
   int elements = 6553;
-  std::vector<std::vector<double>> A_;
+  std::vector<std::vector<double>> a_;
   std::vector<std::vector<double>> B_;
 
-  A_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
-  B_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  a_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
+  b_ = sedova_o_multiply_matrices_ccs_seq::GenerateMatrix(size, size, elements);
 
   std::vector<double> A_val;
   std::vector<int> A_row_ind;
   std::vector<int> A_col_ptr;
-  int rows_A = A_.size();
-  int cols_A = A_[0].size();
+  int rows_A = a_.size();
+  int cols_A = a_[0].size();
 
   std::vector<double> B_val;
   std::vector<int> B_row_ind;
   std::vector<int> B_col_ptr;
-  int rows_B = B_.size();
-  int cols_B = B_[0].size();
+  int rows_B = b_.size();
+  int cols_B = b_[0].size();
 
   std::vector<double> exp_C_val;
   std::vector<int> exp_C_row_ind;
   std::vector<int> exp_C_col_ptr;
 
-  auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(A_, B_);
+  auto exp_C = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a_, b_);
   sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_C, exp_C.size(), exp_C[0].size(), exp_C_val, exp_C_row_ind,
                                                       exp_C_col_ptr);
 
@@ -181,8 +181,8 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_task_run) {
   std::vector<int> C_row_ind;
   std::vector<int> C_col_ptr;
 
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(A_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
-  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(B_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(a_, rows_A, cols_A, A_val, A_row_ind, A_col_ptr);
+  sedova_o_multiply_matrices_ccs_seq::Convertirovanie(b_, rows_B, cols_B, B_val, B_row_ind, B_col_ptr);
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
