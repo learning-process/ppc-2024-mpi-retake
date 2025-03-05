@@ -16,31 +16,31 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
   cols_B_ = *reinterpret_cast<int*>(task_data->inputs[3]);
 
   if (world.rank() == 0) {
-  // Загрузка матрицы A
-  auto* a_val_ptr = reinterpret_cast<double*>(task_data->inputs[4]);
-  A_val.assign(a_val_ptr, a_val_ptr + task_data->inputs_count[4]);
+    // Загрузка матрицы A
+    auto* a_val_ptr = reinterpret_cast<double*>(task_data->inputs[4]);
+    A_val.assign(a_val_ptr, a_val_ptr + task_data->inputs_count[4]);
 
-  auto* a_row_ind_ptr = reinterpret_cast<int*>(task_data->inputs[5]);
-  A_row_ind.assign(a_row_ind_ptr, a_row_ind_ptr + task_data->inputs_count[5]);
+    auto* a_row_ind_ptr = reinterpret_cast<int*>(task_data->inputs[5]);
+    A_row_ind.assign(a_row_ind_ptr, a_row_ind_ptr + task_data->inputs_count[5]);
 
-  auto* a_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[6]);
-  A_col_ptr.assign(a_col_ptr_ptr, a_col_ptr_ptr + task_data->inputs_count[6]);
+    auto* a_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[6]);
+    A_col_ptr.assign(a_col_ptr_ptr, a_col_ptr_ptr + task_data->inputs_count[6]);
 
-  // Загрузка матрицы B
-  auto* b_val_ptr = reinterpret_cast<double*>(task_data->inputs[7]);
-  B_val.assign(b_val_ptr, b_val_ptr + task_data->inputs_count[7]);
+    // Загрузка матрицы B
+    auto* b_val_ptr = reinterpret_cast<double*>(task_data->inputs[7]);
+    B_val.assign(b_val_ptr, b_val_ptr + task_data->inputs_count[7]);
 
-  auto* b_row_ind_ptr = reinterpret_cast<int*>(task_data->inputs[8]);
-  B_row_ind.assign(b_row_ind_ptr, b_row_ind_ptr + task_data->inputs_count[8]);
+    auto* b_row_ind_ptr = reinterpret_cast<int*>(task_data->inputs[8]);
+    B_row_ind.assign(b_row_ind_ptr, b_row_ind_ptr + task_data->inputs_count[8]);
 
-  auto* b_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[9]);
-  B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
+    auto* b_col_ptr_ptr = reinterpret_cast<int*>(task_data->inputs[9]);
+    B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
-  // Транспонирование матрицы A
-  Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A, cols_A, At_val, At_row_ind, At_col_ptr);
+    // Транспонирование матрицы A
+    Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A, cols_A, At_val, At_row_ind, At_col_ptr);
 
-  rows_At = cols_A;
-  cols_At = rows_A;
+    rows_At = cols_A;
+    cols_At = rows_A;
   }
   return true;
 }
@@ -77,7 +77,7 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
     Extract(B_val, B_row_ind, B_col_ptr, loc_start, loc_end, loc_val, loc_row_ind, loc_col_ptr);
 
     MultiplyCCS(At_val, At_row_ind, At_col_ptr, rows_At, loc_val, loc_row_ind, loc_col_ptr, loc_cols, loc_res_val,
-                 loc_res_row_ind, loc_res_col_ptr);
+                loc_res_row_ind, loc_res_col_ptr);
     std::vector<int> sizes_val;
     if (comm.rank() == 0) {
       sizes_val.resize(comm.size());

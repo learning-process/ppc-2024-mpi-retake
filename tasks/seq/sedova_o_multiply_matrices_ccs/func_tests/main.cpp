@@ -151,7 +151,7 @@ TEST(sedova_o_multiply_matrices_ccs_seq, Random3x5And5x4) {
 
   auto exp_c = sedova_o_multiply_matrices_ccs_seq::MultiplyMatrices(a, b);
   sedova_o_multiply_matrices_ccs_seq::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val, exp_c_row_ind,
-                                                    exp_c_col_ptr);
+                                                      exp_c_col_ptr);
 
   std::vector<double> c_val;
   std::vector<int> c_row_ind;

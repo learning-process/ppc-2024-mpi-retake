@@ -92,9 +92,9 @@ inline std::pair<int, int> Segments(int n, int size, int rank) {
 }
 
 inline void MultiplyCCS(const std::vector<double>& values_A, const std::vector<int>& row_indices_A,
-                         const std::vector<int>& col_ptr_A, int num_rows_A, const std::vector<double>& values_B,
-                         const std::vector<int>& row_indices_B, const std::vector<int>& col_ptr_B, int num_cols_B,
-                         std::vector<double>& values_C, std::vector<int>& row_indices_C, std::vector<int>& col_ptr_C) {
+                        const std::vector<int>& col_ptr_A, int num_rows_A, const std::vector<double>& values_B,
+                        const std::vector<int>& row_indices_B, const std::vector<int>& col_ptr_B, int num_cols_B,
+                        std::vector<double>& values_C, std::vector<int>& row_indices_C, std::vector<int>& col_ptr_C) {
   values_C.clear();
   row_indices_C.clear();
   col_ptr_C.clear();
@@ -141,7 +141,7 @@ class TestTaskMPI : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  private:
+ private:
   int rows_A, cols_A, rows_B, cols_B, rows_At, cols_At;
   std::vector<std::vector<double>> A, B;
   std::vector<double> A_val, B_val, At_val;

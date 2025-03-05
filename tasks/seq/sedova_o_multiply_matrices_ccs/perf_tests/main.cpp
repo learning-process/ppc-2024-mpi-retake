@@ -116,7 +116,6 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
   task_data->inputs_count.emplace_back(b_row_ind.size());
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
   task_data->inputs_count.emplace_back(b_col_ptr.size());
-
   
   c_val.resize(exp_c_val.size());
   c_row_ind.resize(exp_c_row_ind.size());
@@ -235,7 +234,6 @@ TEST(sedova_o_multiply_matrices_ccs_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
 
   ASSERT_EQ(exp_c_val, c_val);
   ASSERT_EQ(exp_c_row_ind, c_row_ind);
