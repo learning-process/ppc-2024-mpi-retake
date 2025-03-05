@@ -10,10 +10,10 @@
 #include <vector>
 
 bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::PreProcessingImpl() {
-  rows_A_ = *reinterpret_cast<int*>(task_data->inputs[0]);
-  cols_A_ = *reinterpret_cast<int*>(task_data->inputs[1]);
-  rows_B_ = *reinterpret_cast<int*>(task_data->inputs[2]);
-  cols_B_ = *reinterpret_cast<int*>(task_data->inputs[3]);
+  rows_A = *reinterpret_cast<int*>(task_data->inputs[0]);
+  cols_A = *reinterpret_cast<int*>(task_data->inputs[1]);
+  rows_B = *reinterpret_cast<int*>(task_data->inputs[2]);
+  cols_B = *reinterpret_cast<int*>(task_data->inputs[3]);
 
   if (world.rank() == 0) {
     // Загрузка матрицы A
