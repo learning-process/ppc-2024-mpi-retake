@@ -5,10 +5,10 @@
 #include <vector>
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {
-  rowsA = *reinterpret_cast<int*>(task_data->inputs[0]);
-  colsA = *reinterpret_cast<int*>(task_data->inputs[1]);
-  rowsB = *reinterpret_cast<int*>(task_data->inputs[2]);
-  colsB = *reinterpret_cast<int*>(task_data->inputs[3]);
+  rows_A = *reinterpret_cast<int*>(task_data->inputs[0]);
+  cols_A = *reinterpret_cast<int*>(task_data->inputs[1]);
+  rows_B = *reinterpret_cast<int*>(task_data->inputs[2]);
+  cols_B = *reinterpret_cast<int*>(task_data->inputs[3]);
 
   // Загрузка матрицы A
   auto* a_val_ptr = reinterpret_cast<double*>(task_data->inputs[4]);
@@ -31,10 +31,10 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
   // Транспонирование матрицы A
-  Transponirovanie(A_val, A_row_ind, A_col_ptr, rowsA, colsA, At_val, At_row_ind, At_col_ptr);
+  Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A, cols_A, At_val, At_row_ind, At_col_ptr);
 
-  rows_At = colsA;
-  cols_At = rowsA;
+  rows_At = cols_A;
+  cols_At = rows_A;
 
   return true;
 }
