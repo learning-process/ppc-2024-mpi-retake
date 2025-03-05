@@ -26,7 +26,7 @@ TEST(fomin_v_generalized_scatter, test_task_run) {
   task_data->outputs_count.emplace_back(local_output.size());
 
   auto test_task = std::make_shared<fomin_v_generalized_scatter::GeneralizedScatterTestParallel>(task_data);
-  ASSERT_TRUE(test_task->validation());
+  ASSERT_TRUE(test_task->ValidationImpl());
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -77,7 +77,7 @@ TEST(fomin_v_generalized_scatter, test_pipeline_run) {
   task_data->outputs_count.emplace_back(local_output.size());
 
   auto test_task = std::make_shared<fomin_v_generalized_scatter::GeneralizedScatterTestParallel>(task_data);
-  ASSERT_TRUE(test_task->validation());
+  ASSERT_TRUE(test_task->ValidationImpl());
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
