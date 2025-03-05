@@ -2,6 +2,7 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
+#include <boost/mpi.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
