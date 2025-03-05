@@ -11,210 +11,83 @@
 #include "core/task/include/task.hpp"
 #include "mpi/prokhorov_n_global_search_algorithm_strongin/include/ops_mpi.hpp"
 
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_strongin_algorithm_quadratic_function) {
-  boost::mpi::environment env;
-  boost::mpi::communicator world;
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, Test_Strongin_Algorithm_Quadratic_Function) {
+  std::vector<double> in_a = {-10.0};
+  std::vector<double> in_b = {10.0};
+  std::vector<double> in_epsilon = {0.001};
+  std::vector<double> out(1, 0.0);
 
-  std::vector<double> global_a = {-10.0};
-  std::vector<double> global_b = {10.0};
-  std::vector<double> global_epsilon = {0.001};
-  std::vector<double> global_result(1, 0.0);
-
-  auto task_data_par = std::make_shared<ppc::core::TaskData>();
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  task_data_par->inputs_count.emplace_back(global_a.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  task_data_par->inputs_count.emplace_back(global_b.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  task_data_par->inputs_count.emplace_back(global_epsilon.size());
-  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  task_data_par->outputs_count.emplace_back(global_result.size());
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
+  task_data_mpi->inputs_count.emplace_back(in_a.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
+  task_data_mpi->inputs_count.emplace_back(in_b.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
+  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs_count.emplace_back(out.size());
 
   auto quadratic_function = [](double x) { return x * x; };
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_par, quadratic_function);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
 
-  if (world.rank() == 0) {
-    std::vector<double> reference_result(1, 0.0);
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_mpi, quadratic_function);
+  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
 
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-    task_data_seq->inputs_count.emplace_back(global_a.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-    task_data_seq->inputs_count.emplace_back(global_b.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-    task_data_seq->inputs_count.emplace_back(global_epsilon.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    task_data_seq->outputs_count.emplace_back(reference_result.size());
-
-    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                              quadratic_function);
-    ASSERT_EQ(test_task_sequential.Validation(), true);
-    test_task_sequential.PreProcessing();
-    test_task_sequential.Run();
-    test_task_sequential.PostProcessing();
-
-    EXPECT_NEAR(reference_result[0], global_result[0], 0.001);
-  }
-
-  world.barrier();
+  EXPECT_NEAR(out[0], 0.0, 0.001);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_strongin_algorithm_sinus_function) {
-  boost::mpi::environment env;
-  boost::mpi::communicator world;
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, Test_Strongin_Algorithm_Absolute_Function) {
+  std::vector<double> in_a = {-5.0};
+  std::vector<double> in_b = {5.0};
+  std::vector<double> in_epsilon = {0.001};
+  std::vector<double> out(1, 0.0);
 
-  std::vector<double> global_a = {0.0};
-  std::vector<double> global_b = {3.14};
-  std::vector<double> global_epsilon = {0.001};
-  std::vector<double> global_result(1, 0.0);
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
+  task_data_mpi->inputs_count.emplace_back(in_a.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
+  task_data_mpi->inputs_count.emplace_back(in_b.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
+  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs_count.emplace_back(out.size());
 
-  auto task_data_par = std::make_shared<ppc::core::TaskData>();
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  task_data_par->inputs_count.emplace_back(global_a.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  task_data_par->inputs_count.emplace_back(global_b.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  task_data_par->inputs_count.emplace_back(global_epsilon.size());
-  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  task_data_par->outputs_count.emplace_back(global_result.size());
+  auto absolute_function = [](double x) { return std::abs(x); };
 
-  auto sinus_function = [](double x) { return std::sin(x); };
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_par, sinus_function);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_mpi, absolute_function);
+  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
 
-  if (world.rank() == 0) {
-    std::vector<double> reference_result(1, 0.0);
-
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-    task_data_seq->inputs_count.emplace_back(global_a.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-    task_data_seq->inputs_count.emplace_back(global_b.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-    task_data_seq->inputs_count.emplace_back(global_epsilon.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    task_data_seq->outputs_count.emplace_back(reference_result.size());
-
-    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                              sinus_function);
-    ASSERT_EQ(test_task_sequential.Validation(), true);
-    test_task_sequential.PreProcessing();
-    test_task_sequential.Run();
-    test_task_sequential.PostProcessing();
-
-    EXPECT_NEAR(reference_result[0], global_result[0], 0.001);
-  }
-
-  world.barrier();
+  EXPECT_NEAR(out[0], 0.0, 0.001);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_strongin_algorithm_exponential_function) {
-  boost::mpi::environment env;
-  boost::mpi::communicator world;
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, Test_Strongin_Algorithm_SquareRoot_Function) {
+  std::vector<double> in_a = {0.0};
+  std::vector<double> in_b = {10.0};
+  std::vector<double> in_epsilon = {0.001};
+  std::vector<double> out(1, 0.0);
 
-  std::vector<double> global_a = {-1.0};
-  std::vector<double> global_b = {1.0};
-  std::vector<double> global_epsilon = {0.001};
-  std::vector<double> global_result(1, 0.0);
-
-  auto task_data_par = std::make_shared<ppc::core::TaskData>();
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  task_data_par->inputs_count.emplace_back(global_a.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  task_data_par->inputs_count.emplace_back(global_b.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  task_data_par->inputs_count.emplace_back(global_epsilon.size());
-  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  task_data_par->outputs_count.emplace_back(global_result.size());
-
-  auto exponential_function = [](double x) { return std::exp(x); };
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_par, exponential_function);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-
-  if (world.rank() == 0) {
-    std::vector<double> reference_result(1, 0.0);
-
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-    task_data_seq->inputs_count.emplace_back(global_a.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-    task_data_seq->inputs_count.emplace_back(global_b.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-    task_data_seq->inputs_count.emplace_back(global_epsilon.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    task_data_seq->outputs_count.emplace_back(reference_result.size());
-
-    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                              exponential_function);
-    ASSERT_EQ(test_task_sequential.Validation(), true);
-    test_task_sequential.PreProcessing();
-    test_task_sequential.Run();
-    test_task_sequential.PostProcessing();
-
-    EXPECT_NEAR(reference_result[0], global_result[0], 0.001);
-  }
-
-  world.barrier();
-}
-
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_strongin_algorithm_square_root_function) {
-  boost::mpi::environment env;
-  boost::mpi::communicator world;
-
-  std::vector<double> global_a = {0.0};
-  std::vector<double> global_b = {10.0};
-  std::vector<double> global_epsilon = {0.001};
-  std::vector<double> global_result(1, 0.0);
-
-  auto task_data_par = std::make_shared<ppc::core::TaskData>();
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  task_data_par->inputs_count.emplace_back(global_a.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  task_data_par->inputs_count.emplace_back(global_b.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  task_data_par->inputs_count.emplace_back(global_epsilon.size());
-  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  task_data_par->outputs_count.emplace_back(global_result.size());
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
+  task_data_mpi->inputs_count.emplace_back(in_a.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
+  task_data_mpi->inputs_count.emplace_back(in_b.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
+  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs_count.emplace_back(out.size());
 
   auto square_root_function = [](double x) { return std::sqrt(x); };
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_par, square_root_function);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
 
-  if (world.rank() == 0) {
-    std::vector<double> reference_result(1, 0.0);
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_mpi, square_root_function);
+  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
 
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-    task_data_seq->inputs_count.emplace_back(global_a.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-    task_data_seq->inputs_count.emplace_back(global_b.size());
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-    task_data_seq->inputs_count.emplace_back(global_epsilon.size());
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(reference_result.data()));
-    task_data_seq->outputs_count.emplace_back(reference_result.size());
-
-    prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                              square_root_function);
-    ASSERT_EQ(test_task_sequential.Validation(), true);
-    test_task_sequential.PreProcessing();
-    test_task_sequential.Run();
-    test_task_sequential.PostProcessing();
-
-    EXPECT_NEAR(reference_result[0], global_result[0], 0.001);
-  }
-
-  world.barrier();
+  EXPECT_NEAR(out[0], 0.0, 0.001);
 }

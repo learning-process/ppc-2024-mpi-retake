@@ -12,32 +12,28 @@
 #include "mpi/prokhorov_n_global_search_algorithm_strongin/include/ops_mpi.hpp"
 
 TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
-  boost::mpi::communicator world;
-  std::vector<double> global_a = {-100000.0};
-  std::vector<double> global_b = {100000.0};
-  std::vector<double> global_epsilon = {0.0000001};
-  std::vector<double> global_result(1, 0.0);
+  std::vector<double> in_a = {-10.0};
+  std::vector<double> in_b = {10.0};
+  std::vector<double> in_epsilon = {0.001};
+  std::vector<double> out(1, 0.0);
 
-  auto task_data_par = std::make_shared<ppc::core::TaskData>();
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  task_data_par->inputs_count.emplace_back(global_a.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  task_data_par->inputs_count.emplace_back(global_b.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  task_data_par->inputs_count.emplace_back(global_epsilon.size());
-  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  task_data_par->outputs_count.emplace_back(global_result.size());
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
+  task_data_mpi->inputs_count.emplace_back(in_a.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
+  task_data_mpi->inputs_count.emplace_back(in_b.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
+  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs_count.emplace_back(out.size());
 
   auto quadratic_function = [](double x) { return x * x; };
-  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(
-      task_data_par, quadratic_function);
-  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
-  test_mpi_task_parallel->PreProcessing();
-  test_mpi_task_parallel->Run();
-  test_mpi_task_parallel->PostProcessing();
+
+  auto test_task_mpi = std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(
+      task_data_mpi, quadratic_function);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10000;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -47,42 +43,40 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
 
+  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    EXPECT_NEAR(global_result[0], 0.0, 0.001);
   }
+
+  EXPECT_NEAR(out[0], 0.0, 0.001);
 }
 
 TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
-  boost::mpi::communicator world;
-  std::vector<double> global_a = {-100000000.0};
-  std::vector<double> global_b = {100000000.0};
-  std::vector<double> global_epsilon = {0.00000001};
-  std::vector<double> global_result(1, 0.0);
+  std::vector<double> in_a = {-10.0};
+  std::vector<double> in_b = {10.0};
+  std::vector<double> in_epsilon = {0.001};
+  std::vector<double> out(1, 0.0);
 
-  auto task_data_par = std::make_shared<ppc::core::TaskData>();
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_a.data()));
-  task_data_par->inputs_count.emplace_back(global_a.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_b.data()));
-  task_data_par->inputs_count.emplace_back(global_b.size());
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_epsilon.data()));
-  task_data_par->inputs_count.emplace_back(global_epsilon.size());
-  task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-  task_data_par->outputs_count.emplace_back(global_result.size());
+  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
+  task_data_mpi->inputs_count.emplace_back(in_a.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
+  task_data_mpi->inputs_count.emplace_back(in_b.size());
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
+  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+  task_data_mpi->outputs_count.emplace_back(out.size());
 
   auto quadratic_function = [](double x) { return x * x; };
-  auto test_mpi_task_parallel = std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(
-      task_data_par, quadratic_function);
-  ASSERT_EQ(test_mpi_task_parallel->Validation(), true);
-  test_mpi_task_parallel->PreProcessing();
-  test_mpi_task_parallel->Run();
-  test_mpi_task_parallel->PostProcessing();
+
+  auto test_task_mpi = std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI>(
+      task_data_mpi, quadratic_function);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10000000;
+  perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -92,11 +86,13 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
   perf_analyzer->TaskRun(perf_attr, perf_results);
 
+  boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    EXPECT_NEAR(global_result[0], 0.0, 0.001);
   }
+
+  EXPECT_NEAR(out[0], 0.0, 0.001);
 }

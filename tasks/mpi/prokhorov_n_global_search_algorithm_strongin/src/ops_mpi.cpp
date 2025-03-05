@@ -1,148 +1,46 @@
 #include "mpi/prokhorov_n_global_search_algorithm_strongin/include/ops_mpi.hpp"
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/collectives/gather.hpp>
-#include <boost/mpi/communicator.hpp>
+#include <algorithm>
 #include <cmath>
-#include <functional>
+#include <cstddef>
 #include <vector>
-
-namespace prokhorov_n_global_search_algorithm_strongin_mpi {
-
-bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::PreProcessingImpl() {
-  a_ = reinterpret_cast<double*>(task_data->inputs[0])[0];
-  b_ = reinterpret_cast<double*>(task_data->inputs[1])[0];
-  epsilon_ = reinterpret_cast<double*>(task_data->inputs[2])[0];
-
-  result_ = 0.0;
-  return true;
-}
-
-bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::ValidationImpl() {
-  return task_data->inputs_count[0] == 1 && task_data->inputs_count[1] == 1 && task_data->inputs_count[2] == 1 &&
-         task_data->outputs_count[0] == 1;
-}
-
-bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::RunImpl() {
-  result_ = StronginAlgorithm();
-  return true;
-}
-
-bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::PostProcessingImpl() {
-  reinterpret_cast<double*>(task_data->outputs[0])[0] = result_;
-  return true;
-}
-
-double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::StronginAlgorithm() {
-  double x_min = a_;
-  double f_min = f_(x_min);
-
-  while ((b_ - a_) > epsilon_) {
-    double x1 = a_ + ((b_ - a_) / 3.0);
-    double x2 = b_ - ((b_ - a_) / 3.0);
-
-    double f1 = f_(x1);
-    double f2 = f_(x2);
-
-    if (f1 < f2) {
-      b_ = x2;
-      if (f1 < f_min) {
-        f_min = f1;
-        x_min = x1;
-      }
-    } else {
-      a_ = x1;
-      if (f2 < f_min) {
-        f_min = f2;
-        x_min = x2;
-      }
-    }
-  }
-
-  return x_min;
-}
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    result_ = 0;
-    a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
-    b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
-    epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
+    a_ = reinterpret_cast<double*>(task_data->inputs[0])[0];
+    b_ = reinterpret_cast<double*>(task_data->inputs[0])[1];
+    epsilon_ = reinterpret_cast<double*>(task_data->inputs[0])[2];
   }
+
+  boost::mpi::broadcast(world_, a_, 0);
+  boost::mpi::broadcast(world_, b_, 0);
+  boost::mpi::broadcast(world_, epsilon_, 0);
 
   return true;
 }
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::ValidationImpl() {
-  if (world_.rank() == 0) {
-    return task_data->outputs_count[0] == 1;
+  if (task_data->inputs_count[0] == 0 || task_data->inputs_count[1] == 0 || task_data->inputs_count[2] == 0) {
+    return false;
   }
-  return true;
+
+  return (a_ < b_) && (epsilon_ > 0);
 }
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::RunImpl() {
-  if (world_.size() == 1) {
-    result_ = StronginAlgorithm();
-  } else {
-    result_ = StronginAlgorithmParallel();
+  double local_a = a_ + (b_ - a_) * world_.rank() / world_.size();
+  double local_b = a_ + (b_ - a_) * (world_.rank() + 1) / world_.size();
+
+  double local_result = StronginAlgorithm(local_a, local_b);
+
+  std::vector<double> all_results;
+  boost::mpi::gather(world_, local_result, all_results, 0);
+
+  if (world_.rank() == 0) {
+    result_ = *std::min_element(all_results.begin(), all_results.end());
   }
+
   return true;
-}
-
-double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::StronginAlgorithmParallel() {
-  double local_a = 0.0;
-  double local_b = 0.0;
-  int rank = world_.rank();
-  int size = world_.size();
-
-  double interval_length = (b_ - a_) / size;
-  local_a = a_ + rank * interval_length;
-  local_b = local_a + interval_length;
-
-  double local_x_min = local_a;
-  double local_f_min = f_(local_x_min);
-
-  while ((local_b - local_a) > epsilon_) {
-    double x1 = local_a + ((local_b - local_a) / 3.0);
-    double x2 = local_b - ((local_b - local_a) / 3.0);
-
-    double f1 = f_(x1);
-    double f2 = f_(x2);
-
-    if (f1 < f2) {
-      local_b = x2;
-      if (f1 < local_f_min) {
-        local_f_min = f1;
-        local_x_min = x1;
-      }
-    } else {
-      local_a = x1;
-      if (f2 < local_f_min) {
-        local_f_min = f2;
-        local_x_min = x2;
-      }
-    }
-  }
-
-  std::vector<double> all_x_mins(size);
-  boost::mpi::gather(world_, local_x_min, all_x_mins, 0);
-
-  if (rank == 0) {
-    double global_x_min = all_x_mins[0];
-    double global_f_min = f_(global_x_min);
-
-    for (int i = 1; i < size; ++i) {
-      double current_f = f_(all_x_mins[i]);
-      if (current_f < global_f_min) {
-        global_f_min = current_f;
-        global_x_min = all_x_mins[i];
-      }
-    }
-
-    return global_x_min;
-  }
-
-  return 0.0;
 }
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PostProcessingImpl() {
@@ -152,33 +50,46 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PostProcessi
   return true;
 }
 
-double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::StronginAlgorithm() {
-  double x_min = a_;
-  double f_min = f_(x_min);
+double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::StronginAlgorithm(double local_a,
+                                                                                        double local_b) {
+  std::vector<double> y = {local_a, local_b};
+  std::vector<double> z = {f_(local_a), f_(local_b)};
+  int n = y.size() - 1;
+  double M, m, r = 2.0;
+  const int max_iterations = 1000;
+  int iteration = 0;
 
-  while ((b_ - a_) > epsilon_) {
-    double x1 = a_ + ((b_ - a_) / 3.0);
-    double x2 = b_ - ((b_ - a_) / 3.0);
+  while (iteration < max_iterations) {
+    iteration++;
 
-    double f1 = f_(x1);
-    double f2 = f_(x2);
+    M = 0.0;
+    for (int i = 1; i <= n; ++i) {
+      double delta = std::abs((z[i] - z[i - 1]) / (y[i] - y[i - 1]));
+      if (delta > M) M = delta;
+    }
+    m = (M == 0) ? 1 : r * M;
 
-    if (f1 < f2) {
-      b_ = x2;
-      if (f1 < f_min) {
-        f_min = f1;
-        x_min = x1;
-      }
-    } else {
-      a_ = x1;
-      if (f2 < f_min) {
-        f_min = f2;
-        x_min = x2;
-      }
+    std::vector<double> R(n);
+    for (int i = 1; i <= n; ++i) {
+      R[i - 1] = m * (y[i] - y[i - 1]) + std::pow(z[i] - z[i - 1], 2) / (m * (y[i] - y[i - 1])) - 2 * (z[i] + z[i - 1]);
+    }
+
+    auto max_R = std::max_element(R.begin(), R.end());
+    int s = std::distance(R.begin(), max_R);
+    double tau = (y[s + 1] + y[s]) / 2 - (z[s + 1] - z[s]) / (2 * m);
+    y.insert(y.begin() + s + 1, tau);
+    z.insert(z.begin() + s + 1, f_(tau));
+    n++;
+
+    double max_interval = 0.0;
+    for (int i = 1; i <= n; ++i) {
+      double interval = y[i] - y[i - 1];
+      if (interval > max_interval) max_interval = interval;
+    }
+    if (max_interval < epsilon_) {
+      return *std::min_element(z.begin(), z.end());
     }
   }
 
-  return x_min;
+  return *std::min_element(z.begin(), z.end());
 }
-
-}  // namespace prokhorov_n_global_search_algorithm_strongin_mpi

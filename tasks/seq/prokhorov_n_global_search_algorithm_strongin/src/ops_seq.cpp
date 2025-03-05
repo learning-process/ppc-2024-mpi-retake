@@ -1,65 +1,83 @@
-// Copyright 2024 Nesterov Alexander
 #include "seq/prokhorov_n_global_search_algorithm_strongin/include/ops_seq.hpp"
 
-#include <chrono>
+#include <algorithm>
 #include <cmath>
-#include <thread>
-
-using namespace std::chrono_literals;
+#include <cstddef>
+#include <vector>
 
 namespace prokhorov_n_global_search_algorithm_strongin_seq {
 
-bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PreProcessingImpl() {
+bool TestTaskSequential::PreProcessingImpl() {
   a_ = reinterpret_cast<double*>(task_data->inputs[0])[0];
-  b_ = reinterpret_cast<double*>(task_data->inputs[1])[0];
-  epsilon_ = reinterpret_cast<double*>(task_data->inputs[2])[0];
-
-  result_ = 0.0;
+  b_ = reinterpret_cast<double*>(task_data->inputs[0])[1];
+  epsilon_ = reinterpret_cast<double*>(task_data->inputs[0])[2];
   return true;
 }
 
-bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::ValidationImpl() {
-  return task_data->inputs_count[0] == 1 && task_data->inputs_count[1] == 1 && task_data->inputs_count[2] == 1 &&
-         task_data->outputs_count[0] == 1;
+bool TestTaskSequential::ValidationImpl() {
+  if (task_data->inputs_count[0] == 0 || task_data->inputs_count[1] == 0 || task_data->inputs_count[2] == 0) {
+    return false;
+  }
+
+  a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
+  b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
+  epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
+
+  return (a_ < b_) && (epsilon_ > 0);
 }
 
-bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::RunImpl() {
+bool TestTaskSequential::RunImpl() {
   result_ = StronginAlgorithm();
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
   return true;
 }
 
-bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PostProcessingImpl() {
+bool TestTaskSequential::PostProcessingImpl() {
   reinterpret_cast<double*>(task_data->outputs[0])[0] = result_;
   return true;
 }
 
-double prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm() {
-  double x_min = a_;
-  double f_min = f_(x_min);
+double TestTaskSequential::StronginAlgorithm() {
+  std::vector<double> y = {a_, b_};
+  std::vector<double> z = {f_(a_), f_(b_)};
+  int n = y.size() - 1;
+  double M, m, r = 2.0;
+  const int max_iterations = 1000;
+  int iteration = 0;
 
-  while ((b_ - a_) > epsilon_) {
-    double x1 = a_ + ((b_ - a_) / 3.0);
-    double x2 = b_ - ((b_ - a_) / 3.0);
+  while (iteration < max_iterations) {
+    iteration++;
 
-    double f1 = f_(x1);
-    double f2 = f_(x2);
+    M = 0.0;
+    for (int i = 1; i <= n; ++i) {
+      double delta = std::abs((z[i] - z[i - 1]) / (y[i] - y[i - 1]));
+      if (delta > M) M = delta;
+    }
+    m = (M == 0) ? 1 : r * M;
 
-    if (f1 < f2) {
-      b_ = x2;
-      if (f1 < f_min) {
-        f_min = f1;
-        x_min = x1;
-      }
-    } else {
-      a_ = x1;
-      if (f2 < f_min) {
-        f_min = f2;
-        x_min = x2;
-      }
+    std::vector<double> R(n);
+    for (int i = 1; i <= n; ++i) {
+      R[i - 1] = m * (y[i] - y[i - 1]) + std::pow(z[i] - z[i - 1], 2) / (m * (y[i] - y[i - 1])) - 2 * (z[i] + z[i - 1]);
+    }
+
+    auto max_R = std::max_element(R.begin(), R.end());
+    int s = std::distance(R.begin(), max_R);
+    double tau = (y[s + 1] + y[s]) / 2 - (z[s + 1] - z[s]) / (2 * m);
+    y.insert(y.begin() + s + 1, tau);
+    z.insert(z.begin() + s + 1, f_(tau));
+    n++;
+
+    double max_interval = 0.0;
+    for (int i = 1; i <= n; ++i) {
+      double interval = y[i] - y[i - 1];
+      if (interval > max_interval) max_interval = interval;
+    }
+    if (max_interval < epsilon_) {
+      auto min_z = std::min_element(z.begin(), z.end());
+      return y[std::distance(z.begin(), min_z)];
     }
   }
 
-  return x_min;
+  auto min_z = std::min_element(z.begin(), z.end());
+  return y[std::distance(z.begin(), min_z)];
 }
 }  // namespace prokhorov_n_global_search_algorithm_strongin_seq

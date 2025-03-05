@@ -113,5 +113,5 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, Test_Strongin_Algorithm_L
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  EXPECT_NEAR(out[0], 0.1, 0.001);
+  EXPECT_NEAR(out[0], 0.1, 0.001);  // ќжидаем x = 0.1
 }
