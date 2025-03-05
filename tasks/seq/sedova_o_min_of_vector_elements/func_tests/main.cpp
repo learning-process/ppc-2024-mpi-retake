@@ -9,6 +9,25 @@
 #include "core/task/include/task.hpp"
 #include "seq/sedova_o_min_of_vector_elements/include/ops_seq.hpp"
 
+namespace sedova_o_min_of_vector_elements_seq {
+namespace {
+std::vector<int> GetRandomVector(int size, int min, int max) {
+  std::random_device dev;
+  std::mt19937 gen(dev());
+  std::uniform_int_distribution<> distrib(min, max);
+  std::vector<int> vec(size);
+  std::ranges::generate(vec.begin(), vec.end(), [&]() { return distrib(gen); });
+  return vec;
+}
+
+std::vector<std::vector<int>> GetRandomMatrix(int rows, int columns, int min, int max) {
+  std::vector<std::vector<int>> vec(rows);
+  std::ranges::generate(vec.begin(), vec.end(), [&]() { return GetRandomVector(columns, min, max); });
+  return vec;
+}
+}  // namespace
+}  // namespace sedova_o_min_of_vector_elements_seq
+
 TEST(sedova_o_min_of_vector_elements_seq, test_10x10) {
   std::random_device dev;
   std::mt19937 gen(dev());
