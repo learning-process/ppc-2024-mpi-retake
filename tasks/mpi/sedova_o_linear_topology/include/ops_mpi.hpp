@@ -10,8 +10,6 @@
 
 namespace sedova_o_linear_topology_mpi {
 
-std::vector<int> GetRandomVector(size_t size);
-
 class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
