@@ -15,7 +15,7 @@
 #include "mpi/sedova_o_multiply_matrices_ccs/include/ops_mpi.hpp"
 
 namespace sedova_o_multiply_matrices_ccs_mpi {
-
+namespace {
 std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero_count) {
   std::vector<std::vector<double>> matrix(rows, std::vector<double>(cols, 0.0));
   std::random_device rd;
@@ -56,7 +56,7 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
 
   return result;
 }
-
+}  // namespace
 }  // namespace sedova_o_multiply_matrices_ccs_mpi
 
 TEST(sedova_o_multiply_matrices_ccs_mpi, SmallMatrices) {

@@ -12,7 +12,7 @@
 #include "seq/sedova_o_multiply_matrices_ccs/include/ops_seq.hpp"
 
 namespace sedova_o_multiply_matrices_ccs_seq {
-
+namespace {
 std::vector<std::vector<double>> GenerateMatrix(int rows, int cols, int non_zero_count) {
   std::vector<std::vector<double>> matrix(rows, std::vector<double>(cols, 0.0));
   std::random_device rd;
@@ -53,7 +53,7 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
 
   return result;
 }
-
+}  // namespace
 }  // namespace sedova_o_multiply_matrices_ccs_seq
 
 TEST(sedova_o_multiply_matrices_ccs_seq, test_pipeline_run) {
