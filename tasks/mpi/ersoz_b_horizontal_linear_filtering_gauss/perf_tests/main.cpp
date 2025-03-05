@@ -12,7 +12,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
-TEST(ersoz_b_test_task_mpi, test_pipeline_run) {  // NOLINT(readability-function-cognitive-complexity)
+TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
   constexpr int kN = 512;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
