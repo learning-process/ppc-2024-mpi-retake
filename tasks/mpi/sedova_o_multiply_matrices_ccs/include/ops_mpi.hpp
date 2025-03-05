@@ -143,15 +143,15 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  int rows_A, cols_A, rows_B, cols_B, rows_At, cols_At;
-  std::vector<std::vector<double>> A, B;
-  std::vector<double> A_val, B_val, At_val;
-  std::vector<int> A_row_ind, A_col_ptr, B_row_ind, B_col_ptr, At_row_ind, At_col_ptr;
-  int color, loc_start, loc_end, loc_cols;
-  std::vector<double> loc_val, loc_res_val, res_val;
-  std::vector<int> loc_row_ind, loc_col_ptr, loc_res_row_ind, loc_res_col_ptr, res_ind, res_ptr;
+  int rows_A_, cols_A_, rows_B_, cols_B_, rows_At_, cols_At_;
+  std::vector<std::vector<double>> A_, B_;
+  std::vector<double> A_val_, B_val_, At_val_;
+  std::vector<int> A_row_ind_, A_col_ptr_, B_row_ind_, B_col_ptr_, At_row_ind_, At_col_ptr_;
+  int color_, loc_start_, loc_end_, loc_cols_;
+  std::vector<double> loc_val_, loc_res_val_, res_val_;
+  std::vector<int> loc_row_ind_, loc_col_ptr_, loc_res_row_ind_, loc_res_col_ptr_, res_ind_, res_ptr_;
 
-  boost::mpi::communicator world, comm;
+  boost::mpi::communicator world_, comm_;
 };
 
 }  // namespace sedova_o_multiply_matrices_ccs_mpi

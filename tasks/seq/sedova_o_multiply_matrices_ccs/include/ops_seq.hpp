@@ -60,7 +60,7 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  int rows_A, cols_A, rows_B, cols_B, rows_At, cols_At;
+  int rows_A_, cols_A, rows_B, cols_B, rows_At, cols_At;
   std::vector<std::vector<double>> A, B;
   std::vector<double> A_val, B_val, At_val, res_val;
   std::vector<int> A_row_ind, A_col_ptr, B_row_ind, B_col_ptr, At_row_ind, At_col_ptr, res_ind, res_ptr;

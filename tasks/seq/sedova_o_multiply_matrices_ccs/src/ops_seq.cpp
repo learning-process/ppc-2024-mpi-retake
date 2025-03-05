@@ -5,7 +5,7 @@
 #include <vector>
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {
-  rows_A = *reinterpret_cast<int*>(task_data->inputs[0]);
+  rows_A_ = *reinterpret_cast<int*>(task_data->inputs[0]);
   cols_A = *reinterpret_cast<int*>(task_data->inputs[1]);
   rows_B = *reinterpret_cast<int*>(task_data->inputs[2]);
   cols_B = *reinterpret_cast<int*>(task_data->inputs[3]);
@@ -31,10 +31,10 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   B_col_ptr.assign(b_col_ptr_ptr, b_col_ptr_ptr + task_data->inputs_count[9]);
 
   // Транспонирование матрицы A
-  Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A, cols_A, At_val, At_row_ind, At_col_ptr);
+  Transponirovanie(A_val, A_row_ind, A_col_ptr, rows_A_, cols_A, At_val, At_row_ind, At_col_ptr);
 
   rows_At = cols_A;
-  cols_At = rows_A;
+  cols_At = rows_A_;
 
   return true;
 }
