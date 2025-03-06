@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
-#include <ranges>
 #include <vector>
 
 namespace muradov_k_radix_sort {

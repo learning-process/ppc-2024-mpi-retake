@@ -1,7 +1,6 @@
 #include "seq/muradov_k_radix_sort/include/ops_seq.hpp"
 
 #include <algorithm>
-#include <ranges>
 #include <vector>
 
 namespace muradov_k_radix_sort {
