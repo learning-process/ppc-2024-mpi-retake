@@ -7,12 +7,12 @@
 
 using namespace std::chrono_literals;
 
-bool SentenceCountParallel::PreProcessingImpl() {
+bool fomin_v_sentence_count::SentenceCountParallel::PreProcessingImpl() {
   int world_rank = world.rank();
 
   if (world_rank == 0) {
     char *input_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
-    input_size = taskData->inputs_count[0];
+    input_size = task_data->inputs_count[0];
     input_vec.assign(input_ptr, input_ptr + input_size);
   }
 
@@ -37,19 +37,19 @@ bool SentenceCountParallel::PreProcessingImpl() {
     displs[i] = (i > 0) ? (displs[i - 1] + recv_counts[i - 1]) : 0;
   }
 
-  boost::mpi::scatterv(world, input_vec, recv_counts, displs, local_input_vec.data(), 0);
+  boost::mpi::scatterv(world, input_vec.data(), recv_counts, displs, local_input_vec.data(), portion_size, 0);
 
   return true;
 }
 
-bool SentenceCountParallel::ValidationImpl() {
+bool fomin_v_sentence_count::SentenceCountParallel::ValidationImpl() {
   if (world.rank() == 0) {
     return task_data->inputs_count[0] == input_size && task_data->outputs_count[0] == 1;
   }
   return true;
 }
 
-bool SentenceCountParallel::RunImpl() {
+bool fomin_v_sentence_count::SentenceCountParallel::RunImpl() {
   local_sentence_count = 0;
 
   for (int i = 0; i < portion_size; ++i) {
@@ -64,7 +64,7 @@ bool SentenceCountParallel::RunImpl() {
   return true;
 }
 
-bool SentenceCountParallel::PostProcessingImpl() {
+bool fomin_v_sentence_count::SentenceCountParallel::PostProcessingImpl() {
   int total_sentence_count = 0;
 
   boost::mpi::reduce(world, local_sentence_count, total_sentence_count, std::plus<int>(), 0);
