@@ -88,7 +88,7 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()), 
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
                                                         static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
                                                         exp_c_col_ptr);
   }
