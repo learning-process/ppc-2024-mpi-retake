@@ -75,6 +75,11 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val,  //  NOLINT
                                                         exp_c_row_ind, exp_c_col_ptr);
   }
+
+  boost::mpi::broadcast(world, exp_c_val.size(), 0);      //  NOLINT
+  boost::mpi::broadcast(world, exp_c_row_ind.size(), 0);  //  NOLINT
+  boost::mpi::broadcast(world, exp_c_col_ptr.size(), 0);  //  NOLINT
+
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
@@ -124,6 +129,9 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     task.RunImpl();                                                 //  NOLINT
     task.PostProcessingImpl();                                      //  NOLINT
     if (world.rank() == 0) {                                        //  NOLINT
+      boost::mpi::broadcast(world, exp_c_val, 0);
+      boost::mpi::broadcast(world, exp_c_row_ind, 0);
+      boost::mpi::broadcast(world, exp_c_col_ptr, 0);
       ASSERT_EQ(exp_c_val, c_val);                                  //  NOLINT
       ASSERT_EQ(exp_c_row_ind, c_row_ind);                          //  NOLINT
       ASSERT_EQ(exp_c_col_ptr, c_col_ptr);                          //  NOLINT

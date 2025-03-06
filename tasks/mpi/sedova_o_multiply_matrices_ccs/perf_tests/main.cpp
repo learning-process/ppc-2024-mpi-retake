@@ -88,10 +88,14 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
-                                                        static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
-                                                        exp_c_col_ptr);
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val,  //  NOLINT
+                                                        exp_c_row_ind, exp_c_col_ptr);
   }
+
+  boost::mpi::broadcast(world, exp_c_val.size(), 0);      //  NOLINT
+  boost::mpi::broadcast(world, exp_c_row_ind.size(), 0);  //  NOLINT
+  boost::mpi::broadcast(world, exp_c_col_ptr.size(), 0);  //  NOLINT
+
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
@@ -151,6 +155,9 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
+    boost::mpi::broadcast(world, exp_c_val, 0);
+    boost::mpi::broadcast(world, exp_c_row_ind, 0);
+    boost::mpi::broadcast(world, exp_c_col_ptr, 0);
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(exp_c_val, c_val);
     ASSERT_EQ(exp_c_row_ind, c_row_ind);
@@ -189,10 +196,14 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_task_run) {
 
   if (world.rank() == 0) {
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
-                                                        static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
-                                                        exp_c_col_ptr);
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val,  //  NOLINT
+                                                        exp_c_row_ind, exp_c_col_ptr);
   }
+
+  boost::mpi::broadcast(world, exp_c_val.size(), 0);      //  NOLINT
+  boost::mpi::broadcast(world, exp_c_row_ind.size(), 0);  //  NOLINT
+  boost::mpi::broadcast(world, exp_c_col_ptr.size(), 0);  //  NOLINT
+
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
@@ -252,6 +263,9 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
+    boost::mpi::broadcast(world, exp_c_val, 0);
+    boost::mpi::broadcast(world, exp_c_row_ind, 0);
+    boost::mpi::broadcast(world, exp_c_col_ptr, 0);
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(exp_c_val, c_val);
     ASSERT_EQ(exp_c_row_ind, c_row_ind);
