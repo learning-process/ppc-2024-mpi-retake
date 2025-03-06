@@ -57,77 +57,77 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
   std::vector<int> a_col_ptr;
-  int rows_a = static_cast<int>(a.size());
-  int cols_a = static_cast<int>(a[0].size());
+  int rows_a = static_cast<int>(a.size());                                                                           //  NOLINT
+  int cols_a = static_cast<int>(a[0].size());                                                                        //  NOLINT
 
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
   std::vector<int> b_col_ptr;
-  int rows_b = static_cast<int>(b.size());
-  int cols_b = static_cast<int>(b[0].size());
+  int rows_b = static_cast<int>(b.size());                                                                            //  NOLINT
+  int cols_b = static_cast<int>(b[0].size());                                                                         //  NOLINT
 
-  std::vector<double> exp_c_val;
-  std::vector<int> exp_c_row_ind;
-  std::vector<int> exp_c_col_ptr;
+  std::vector<double> exp_c_val;                                                                                      //  NOLINT
+  std::vector<int> exp_c_row_ind;                                                                                     //  NOLINT
+  std::vector<int> exp_c_col_ptr;                                                                                     //  NOLINT
 
-  if (world.rank() == 0) {
-    auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),
-                                                        static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,
+  if (world.rank() == 0) {                                                                                  
+    auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);                                          //  NOLINT
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),                        //  NOLINT
+                                                        static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,  //  NOLINT
                                                         exp_c_col_ptr);
   }
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
 
-  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);
-  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);                //  NOLINT
+  sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);                //  NOLINT
 
-  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_a));
-  task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_a));
-  task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_b));
-  task_data->inputs_count.emplace_back(1);
-  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));
-  task_data->inputs_count.emplace_back(1);
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();                           //  NOLINT
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_a));                                               //  NOLINT
+  task_data->inputs_count.emplace_back(1);                                                                            //  NOLINT
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_a));                                               //  NOLINT
+  task_data->inputs_count.emplace_back(1);                                                                            //  NOLINT
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&rows_b));                                               //  NOLINT
+  task_data->inputs_count.emplace_back(1);                                                                            //  NOLINT
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));                                               //  NOLINT
+  task_data->inputs_count.emplace_back(1);                                                                            //  NOLINT
 
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
-    task_data->inputs_count.emplace_back(a_val.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
-    task_data->inputs_count.emplace_back(a_row_ind.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
-    task_data->inputs_count.emplace_back(a_col_ptr.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));                                        //  NOLINT
+    task_data->inputs_count.emplace_back(a_val.size());                                                               //  NOLINT
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));                                    //  NOLINT
+    task_data->inputs_count.emplace_back(a_row_ind.size());                                                           //  NOLINT
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));                                    //  NOLINT
+    task_data->inputs_count.emplace_back(a_col_ptr.size());                                                           //  NOLINT
 
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
-    task_data->inputs_count.emplace_back(b_val.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
-    task_data->inputs_count.emplace_back(b_row_ind.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
-    task_data->inputs_count.emplace_back(b_col_ptr.size());
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));                                        //  NOLINT
+    task_data->inputs_count.emplace_back(b_val.size());                                                               //  NOLINT
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));                                    //  NOLINT
+    task_data->inputs_count.emplace_back(b_row_ind.size());                                                           //  NOLINT
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));                                    //  NOLINT
+    task_data->inputs_count.emplace_back(b_col_ptr.size());                                                           //  NOLINT
 
-    c_val.resize(exp_c_val.size());
-    c_row_ind.resize(exp_c_row_ind.size());
-    c_col_ptr.resize(exp_c_col_ptr.size());
+    c_val.resize(exp_c_val.size());                                                                                   //  NOLINT
+    c_row_ind.resize(exp_c_row_ind.size());                                                                           //  NOLINT
+    c_col_ptr.resize(exp_c_col_ptr.size());                                                                           //  NOLINT
 
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));                                       //  NOLINT
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));                                   //  NOLINT
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));                                   //  NOLINT
   }
 
-  sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI task(task_data);
-  bool validation_impl = task.ValidationImpl();
-  boost::mpi::broadcast(world, validation_impl, 0);
-  if (validation_impl) {
+  sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI task(task_data);                                                    //  NOLINT
+  bool validation_impl = task.ValidationImpl();                                                                       //  NOLINT
+  boost::mpi::broadcast(world, validation_impl, 0);                                                                   //  NOLINT
+  if (validation_impl) {                                                                                      
     task.PreProcessingImpl();
     task.RunImpl();
     task.PostProcessingImpl();
     if (world.rank() == 0) {
-      ASSERT_EQ(exp_c_val, c_val);
-      ASSERT_EQ(exp_c_row_ind, c_row_ind);
-      ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
+      ASSERT_EQ(exp_c_val, c_val);                                                                                    //  NOLINT
+      ASSERT_EQ(exp_c_row_ind, c_row_ind);                                                                            //  NOLINT
+      ASSERT_EQ(exp_c_col_ptr, c_col_ptr);                                                                            //  NOLINT
     }
   }
 }
@@ -137,11 +137,11 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
 TEST(sedova_o_multiply_matrices_ccs_mpi, SmallMatrices) {
   std::vector<std::vector<double>> a = {{1, 0, 2}, {0, 3, 0}};
   std::vector<std::vector<double>> b = {{0, 4, 0, 0, 1}, {5, 0, 0, 2, 0}, {0, 0, 3, 0, 6}};
-  sedova_o_multiply_matrices_ccs_mpi::FuncTestTemplate(a, b);
+  sedova_o_multiply_matrices_ccs_mpi::FuncTestTemplate(a, b);                                                         //  NOLINT
 }
 
 TEST(sedova_o_multiply_matrices_ccs_mpi, Random3x5And5x4) {
   auto a = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(3, 5, 5);
   auto b = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(5, 4, 10);
-  sedova_o_multiply_matrices_ccs_mpi::FuncTestTemplate(a, b);
+  sedova_o_multiply_matrices_ccs_mpi::FuncTestTemplate(a, b);                                                         //  NOLINT
 }
