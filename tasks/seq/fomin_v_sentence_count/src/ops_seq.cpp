@@ -6,7 +6,7 @@ using namespace std::chrono_literals;
 
 bool fomin_v_sentence_count::SentenceCountSequential::PreProcessingImpl() {
   // Получаем входную строку
-  input_ = std::string(std::move(reinterpret_cast<char*>(task_data->inputs[0])));
+  input_ = std::string(std::move(reinterpret_cast<char *>(task_data->inputs[0])));
   sentence_count = 0;
   return true;
 }
