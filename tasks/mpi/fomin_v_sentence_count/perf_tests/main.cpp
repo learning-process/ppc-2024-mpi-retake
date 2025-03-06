@@ -16,7 +16,6 @@ TEST(fomin_v_sentence_count, test_parallel_pipeline_run) {
 
   if (world.rank() == 0) {
     global_text = "Hello! How are you? I am fine.";
-    text_size = global_text.size();
     task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_text.data()));
     task_data_mpi->inputs_count.emplace_back(global_text.size());
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_sentence_count.data()));
@@ -57,7 +56,6 @@ TEST(fomin_v_sentence_count, test_sequential_task_run) {
 
   if (world.rank() == 0) {
     global_text = "Hello! How are you? I am fine.";
-    text_size = global_text.size();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_text.data()));
     task_data_seq->inputs_count.emplace_back(global_text.size());
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_sentence_count.data()));
