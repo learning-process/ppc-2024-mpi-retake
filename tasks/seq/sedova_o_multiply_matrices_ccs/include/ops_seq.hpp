@@ -1,10 +1,8 @@
 #pragma once
 
-#include <stddef>
-#include <utility>
-#include <vector>
-
-#include "core/task/include/task.hpp"
+#include <ñstddef>
+#include <utility>  // NOLINT
+#include <vector>   // NOLINT
 
 namespace sedova_o_multiply_matrices_ccs_seq {
 inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int rows, int cols,
