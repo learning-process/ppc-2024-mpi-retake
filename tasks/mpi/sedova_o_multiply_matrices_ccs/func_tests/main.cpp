@@ -52,7 +52,7 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
   return result;
 }
 
-void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vector<std::vector<double>> &b) {
+void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vector<std::vector<double>> &b) {        // NOLINT
   boost::mpi::communicator world;
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
