@@ -25,7 +25,6 @@ std::vector<int> GetSequentialOperations(const std::vector<int>& matrix1, const 
   if (matrix2.size() != a_cols * b_cols) {
     throw std::invalid_argument("Invalid dimensions for matrix2");
   }
-
   std::vector<int> result(a_rows * b_cols, 0);
   for (std::size_t i = 0; i < a_rows; ++i) {
     for (std::size_t j = 0; j < b_cols; ++j) {
@@ -48,6 +47,5 @@ std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const st
   if (matrix2.size() != a_cols * b_cols) {
     throw std::invalid_argument("Invalid dimensions for matrix2");
   }
-
   return GetSequentialOperations(matrix1, matrix2, a_rows, a_cols, b_cols);
 }

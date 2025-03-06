@@ -2,7 +2,6 @@
 #define ERSOZ_B_HORIZONTAL_A_VERTICAL_B_MPI_HPP
 
 #include <cstddef>
-#include <stdexcept>
 #include <vector>
 
 std::vector<int> GetRandomMatrix(std::size_t row_count, std::size_t column_count);

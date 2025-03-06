@@ -7,7 +7,7 @@
 
 #include "mpi/ersoz_b_horizontal_a_vertical_b/include/ops_mpi.hpp"
 
-// Test: Generation of matrices
+// Test: Generation of matrices.
 TEST(Generation_Matrix, can_generate_square_matrix) {
   auto mat = GetRandomMatrix(10, 10);
   ASSERT_EQ(mat.size(), 100U);
@@ -18,7 +18,7 @@ TEST(Generation_Matrix, can_generate_arbitrary_matrix) {
   ASSERT_EQ(mat.size(), 150U);
 }
 
-// Tests for sequential operationss
+// Tests for sequential operations.
 TEST(Sequential_Operations_MPI, GetSequentialOperations_can_work_with_square_matrix) {
   std::vector<int> matrix1 = GetRandomMatrix(10, 10);
   std::vector<int> matrix2 = GetRandomMatrix(10, 10);

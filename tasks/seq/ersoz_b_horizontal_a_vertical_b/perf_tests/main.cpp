@@ -23,7 +23,6 @@ TEST(ersoz_b_horizontal_a_vertical_b_seq, test_pipeline_run) {
   }
   double avg_time = total_time / kIterations;
   std::cout << "test_pipeline_run - Average Parallel Multiplication Time: " << avg_time << " seconds\n";
-
   auto expected = GetSequentialOperations(matrix1, matrix2, a_rows, a_cols, a_rows);
   ASSERT_EQ(expected, result);
   SUCCEED();
@@ -48,7 +47,6 @@ TEST(ersoz_b_horizontal_a_vertical_b_seq, test_task_run) {
 
   std::cout << "test_task_run - Sequential Time: " << seq_time << " seconds, Parallel Time: " << par_time
             << " seconds\n";
-
   ASSERT_EQ(result_seq, result_par);
   SUCCEED();
 }

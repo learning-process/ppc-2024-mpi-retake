@@ -33,14 +33,12 @@ TEST(ersoz_b_horizontal_a_vertical_b_mpi, test_task_run) {
   std::size_t b_cols = rows;
   auto matrix1 = GetRandomMatrix(rows, cols);
   auto matrix2 = GetRandomMatrix(cols, rows);
-
   std::vector<int> res_seq;
   std::vector<int> res_par;
   if (rank == 0) {
     res_seq = GetSequentialOperations(matrix1, matrix2, rows, cols, b_cols);
   }
   res_par = GetParallelOperations(matrix1, matrix2, rows, cols);
-
   if (rank == 0) {
     ASSERT_EQ(res_seq, res_par);
   }
