@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/timer.hpp>
 #include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <boost/mpi/timer.hpp>
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
