@@ -7,7 +7,6 @@
 #include <boost/serialization/vector.hpp>  // NOLINT
 #include <cmath>
 #include <cstddef>
-#include <random>
 #include <vector>
 
 bool sedova_o_linear_topology_mpi::TestTaskMPI::PreProcessingImpl() {

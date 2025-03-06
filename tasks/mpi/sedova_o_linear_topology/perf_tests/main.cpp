@@ -2,9 +2,11 @@
 
 #include <boost/mpi/timer.hpp>
 #include <climits>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <random>
 
 #include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
