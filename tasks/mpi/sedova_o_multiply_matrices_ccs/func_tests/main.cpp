@@ -132,9 +132,9 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
       boost::mpi::broadcast(world, exp_c_val, 0);
       boost::mpi::broadcast(world, exp_c_row_ind, 0);
       boost::mpi::broadcast(world, exp_c_col_ptr, 0);
-      ASSERT_EQ(exp_c_val, c_val);                                  //  NOLINT
-      ASSERT_EQ(exp_c_row_ind, c_row_ind);                          //  NOLINT
-      ASSERT_EQ(exp_c_col_ptr, c_col_ptr);                          //  NOLINT
+      ASSERT_EQ(exp_c_val, c_val);
+      ASSERT_EQ(exp_c_row_ind, c_row_ind);
+      ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
     }
   }
 }
