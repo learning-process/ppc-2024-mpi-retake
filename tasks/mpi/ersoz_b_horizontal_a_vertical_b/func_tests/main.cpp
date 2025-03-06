@@ -7,7 +7,7 @@
 
 #include "mpi/ersoz_b_horizontal_a_vertical_b/include/ops_mpi.hpp"
 
-// Test: Generation of matrices.
+// Test: Generation of matrices
 TEST(Generation_Matrix, can_generate_square_matrix) {
   auto mat = GetRandomMatrix(10, 10);
   ASSERT_EQ(mat.size(), 100U);
