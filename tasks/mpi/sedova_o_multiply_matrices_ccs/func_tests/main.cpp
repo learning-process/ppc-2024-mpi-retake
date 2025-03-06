@@ -57,25 +57,23 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
   std::vector<int> a_col_ptr;
-  int rows_a = static_cast<int>(a.size());     //  NOLINT
-  int cols_a = static_cast<int>(a[0].size());  //  NOLINT
+  int rows_a = a.size();     //  NOLINT
+  int cols_a = a[0].size();  //  NOLINT
 
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
   std::vector<int> b_col_ptr;
-  int rows_b = static_cast<int>(b.size());     //  NOLINT
-  int cols_b = static_cast<int>(b[0].size());  //  NOLINT
+  int rows_b = b.size());     //  NOLINT
+  int cols_b = b[0].size();  //  NOLINT
 
   std::vector<double> exp_c_val;
   std::vector<int> exp_c_row_ind;
   std::vector<int> exp_c_col_ptr;
 
-  if (world.rank() == 0) {                                                                             //  NOLINT
-    auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);                           //  NOLINT
-    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),         //  NOLINT
-                                                        static_cast<int>(exp_c[0].size()), exp_c_val,  //  NOLINT
-                                                        exp_c_row_ind,                                 //  NOLINT
-                                                        exp_c_col_ptr);
+  if (world.rank() == 0) {                                                                                //  NOLINT
+    auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);                              //  NOLINT
+    sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val,  //  NOLINT
+                                                        exp_c_row_ind, exp_c_col_ptr);
   }
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
