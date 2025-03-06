@@ -28,7 +28,7 @@ TEST(muradov_k_radix_sort_seq, test_pipeline_run) {
   task_data->state_of_testing = ppc::core::TaskData::kPerf;
   auto sort_task = std::make_shared<muradov_k_radix_sort::RadixSortTask>(task_data);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 300;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [t0]() {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -60,7 +60,7 @@ TEST(muradov_k_radix_sort_seq, test_task_run) {
   task_data->state_of_testing = ppc::core::TaskData::kPerf;
   auto sort_task = std::make_shared<muradov_k_radix_sort::RadixSortTask>(task_data);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 300;
   const auto t0 = std::chrono::high_resolution_clock::now();
   perf_attr->current_timer = [t0]() {
     auto current_time_point = std::chrono::high_resolution_clock::now();
