@@ -18,7 +18,7 @@ TEST(Generation_Matrix, can_generate_arbitrary_matrix) {
   ASSERT_EQ(mat.size(), 150U);
 }
 
-// Tests for sequential operations.
+// Tests for sequential operationss
 TEST(Sequential_Operations_MPI, GetSequentialOperations_can_work_with_square_matrix) {
   std::vector<int> matrix1 = GetRandomMatrix(10, 10);
   std::vector<int> matrix2 = GetRandomMatrix(10, 10);
