@@ -8,8 +8,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <vector>
 #include <random>
+#include <vector>
 
 namespace sedova_o_linear_topology_mpi {
 namespace {
