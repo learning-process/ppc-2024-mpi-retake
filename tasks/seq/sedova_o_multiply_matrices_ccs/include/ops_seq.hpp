@@ -50,7 +50,6 @@ inline void Transponirovanie(const std::vector<double>& values, const std::vecto
     t_col_ptr.push_back(t_values.size());  // NOLINT
   }
 }
-}
 class TestTaskSequential : public ppc::core::Task {
  public:
   explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
