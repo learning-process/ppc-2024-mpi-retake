@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <сstddef>  // NOLINT
+#include <cstddef>  // NOLINT
 #include <utility>  // NOLINT
 #include <vector>   // NOLINT
 
