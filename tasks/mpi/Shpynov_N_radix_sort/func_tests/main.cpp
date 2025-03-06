@@ -60,7 +60,6 @@ TEST(shpynov_n_radix_sort_mpi, test_tiny_vector) {
   }
 }
 TEST(shpynov_n_radix_sort_mpi, test_lots_of_zeros) {
-  GTEST_SKIP();
   boost::mpi::communicator world;
   constexpr int kCount = 10;
   std::vector<int> input_vec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -192,6 +191,7 @@ TEST(shpynov_n_radix_sort_mpi, test_some_numbers_diff_length_pos_and_neg_numbers
     ASSERT_EQ(expected_result, returned_result);
   }
 }
+
 TEST(shpynov_n_radix_sort_mpi, test_invalid) {
   boost::mpi::communicator world;
   std::vector<int> input_vec;
@@ -208,5 +208,86 @@ TEST(shpynov_n_radix_sort_mpi, test_invalid) {
   shpynov_n_radix_sort_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
   if (world.rank() == 0) {
     ASSERT_NE(test_task_mpi.ValidationImpl(), true);
+  }
+}
+
+TEST(shpynov_n_radix_sort_mpi, test_tiny_random_vector) {
+  boost::mpi::communicator world;
+  std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(2);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+
+  std::vector<int> returned_result(input_vec.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_mpi->inputs_count.emplace_back(input_vec.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
+  task_data_mpi->outputs_count.emplace_back(returned_result.size());
+
+  shpynov_n_radix_sort_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  if (world.rank() == 0) {
+    ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  }
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(expected_result, returned_result);
+  }
+}
+
+TEST(shpynov_n_radix_sort_mpi, test_average_random_vector) {
+  boost::mpi::communicator world;
+  std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(30);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+
+  std::vector<int> returned_result(input_vec.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_mpi->inputs_count.emplace_back(input_vec.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
+  task_data_mpi->outputs_count.emplace_back(returned_result.size());
+
+  shpynov_n_radix_sort_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  if (world.rank() == 0) {
+    ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  }
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(expected_result, returned_result);
+  }
+}
+
+TEST(shpynov_n_radix_sort_mpi, test_big_random_vector) {
+  boost::mpi::communicator world;
+  std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(2000);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+
+  std::vector<int> returned_result(input_vec.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
+
+  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_mpi->inputs_count.emplace_back(input_vec.size());
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
+  task_data_mpi->outputs_count.emplace_back(returned_result.size());
+
+  shpynov_n_radix_sort_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
+  if (world.rank() == 0) {
+    ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
+  }
+  test_task_mpi.PreProcessingImpl();
+  test_task_mpi.RunImpl();
+  test_task_mpi.PostProcessingImpl();
+
+  if (world.rank() == 0) {
+    ASSERT_EQ(expected_result, returned_result);
   }
 }

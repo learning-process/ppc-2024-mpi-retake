@@ -132,6 +132,7 @@ TEST(shpynov_n_radix_sort_seq, test_some_numbers_diff_length_pos_and_neg_numbers
 
   ASSERT_EQ(expected_result, returned_result);
 }
+
 TEST(shpynov_n_radix_sort_seq, test_invalid) {
   std::vector<int> input_vec;
 
@@ -146,4 +147,67 @@ TEST(shpynov_n_radix_sort_seq, test_invalid) {
 
   shpynov_n_radix_sort_seq::TestTaskSEQ test_task_seq(task_data_seq);
   ASSERT_NE(test_task_seq.ValidationImpl(), true);
+}
+
+TEST(shpynov_n_radix_sort_seq, test_random_number) {
+  std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(1);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+  std::vector<int> returned_result(input_vec.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
+  task_data_seq->outputs_count.emplace_back(returned_result.size());
+
+  shpynov_n_radix_sort_seq::TestTaskSEQ test_task_seq(task_data_seq);
+  ASSERT_EQ(test_task_seq.ValidationImpl(), true);
+  test_task_seq.PreProcessingImpl();
+  test_task_seq.RunImpl();
+  test_task_seq.PostProcessingImpl();
+
+  ASSERT_EQ(expected_result, returned_result);
+}
+
+TEST(shpynov_n_radix_sort_seq, test_random_small_vector) {
+  std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(20);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+  std::vector<int> returned_result(input_vec.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
+  task_data_seq->outputs_count.emplace_back(returned_result.size());
+
+  shpynov_n_radix_sort_seq::TestTaskSEQ test_task_seq(task_data_seq);
+  ASSERT_EQ(test_task_seq.ValidationImpl(), true);
+  test_task_seq.PreProcessingImpl();
+  test_task_seq.RunImpl();
+  test_task_seq.PostProcessingImpl();
+
+  ASSERT_EQ(expected_result, returned_result);
+}
+
+TEST(shpynov_n_radix_sort_seq, test_random_big_vector) {
+  std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(1000);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+  std::vector<int> returned_result(input_vec.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
+  task_data_seq->inputs_count.emplace_back(input_vec.size());
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(returned_result.data()));
+  task_data_seq->outputs_count.emplace_back(returned_result.size());
+
+  shpynov_n_radix_sort_seq::TestTaskSEQ test_task_seq(task_data_seq);
+  ASSERT_EQ(test_task_seq.ValidationImpl(), true);
+  test_task_seq.PreProcessingImpl();
+  test_task_seq.RunImpl();
+  test_task_seq.PostProcessingImpl();
+
+  ASSERT_EQ(expected_result, returned_result);
 }

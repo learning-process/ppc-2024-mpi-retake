@@ -10,13 +10,10 @@
 #include "seq/Shpynov_N_radix_sort/include/Shpynov_N_radix_sort.hpp"
 
 TEST(shpynov_n_radix_sort_seq, test_pipeline_run) {
-  constexpr int kCount = 10;
-  std::vector<int> input_vec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  std::vector<int> expected_result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  for (int i = 0; i < kCount; i++) {
-    input_vec.insert(input_vec.end(), input_vec.begin(), input_vec.end());
-    expected_result.insert(expected_result.end(), expected_result.begin(), expected_result.end());
-  }
+  constexpr int kCount = 5000;
+  std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(kCount);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
 
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -29,7 +26,7 @@ TEST(shpynov_n_radix_sort_seq, test_pipeline_run) {
   auto test_task_seq = std::make_shared<shpynov_n_radix_sort_seq::TestTaskSEQ>(task_data_seq);
   shpynov_n_radix_sort_seq::TestTaskSEQ test_task_seq_1(task_data_seq);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 50;
   const auto t0 = std::chrono::high_resolution_clock::now();
 
   perf_attr->current_timer = [&] {
@@ -49,14 +46,13 @@ TEST(shpynov_n_radix_sort_seq, test_pipeline_run) {
 }
 
 TEST(shpynov_n_radix_sort_seq, test_task_run) {
-  constexpr int kCount = 10;
-  std::vector<int> input_vec = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  std::vector<int> expected_result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  for (int i = 0; i < kCount; i++) {
-    input_vec.insert(input_vec.end(), input_vec.begin(), input_vec.end());
-    expected_result.insert(expected_result.end(), expected_result.begin(), expected_result.end());
-  }
+  constexpr int kCount = 5000;
+  std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(kCount);
+  std::vector<int> expected_result = input_vec;
+  std::sort(expected_result.begin(), expected_result.end());
+
   std::vector<int> returned_result(input_vec.size());
+
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_vec.data()));
@@ -67,7 +63,7 @@ TEST(shpynov_n_radix_sort_seq, test_task_run) {
   auto test_task_seq = std::make_shared<shpynov_n_radix_sort_seq::TestTaskSEQ>(task_data_seq);
   shpynov_n_radix_sort_seq::TestTaskSEQ test_task_seq_1(task_data_seq);
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 10;
+  perf_attr->num_running = 50;
   const auto t0 = std::chrono::high_resolution_clock::now();
 
   perf_attr->current_timer = [&] {

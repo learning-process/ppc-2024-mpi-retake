@@ -2,12 +2,23 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace shpynov_n_radix_sort_seq {
+
+inline std::vector<int> GetRandVec(int size) {
+  std::vector<int> vec(size);
+  std::srand(std::time({}));
+  for (int i = 0; i < size; ++i) {
+    vec[i] = static_cast<int>((std::rand() % 2000) - 1000);
+  }
+  return vec;
+}
 
 inline int GetMaxAmountOfDigits(std::vector<int>& vec) {
   int max_num = 0;
