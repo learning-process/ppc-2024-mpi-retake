@@ -13,6 +13,7 @@
 namespace muradov_k_radix_sort {
 
 namespace {
+
 void CountingSortForRadix(std::vector<int>& arr, int exp) {
   int n = static_cast<int>(arr.size());
   std::vector<int> output(n);
@@ -123,7 +124,8 @@ std::vector<std::pair<int, int>> BuildAllocation(int proc_num) {
   Allocation(v);
   return schedule;
 }
-}  // namespace
+
+}  // anonymous namespace
 
 void MPI_RadixSort(std::vector<int>& v) {
   int proc_rank = 0, proc_count = 0;
@@ -135,11 +137,26 @@ void MPI_RadixSort(std::vector<int>& v) {
     }
     return;
   }
-  std::vector<std::pair<int, int>> schedule = BuildAllocation(proc_count);
   int padding_count = 0;
+  int orig_size = 0;
+  int pad_value = 0;
+  bool pad_at_beginning = false;
   if (proc_rank == 0) {
+    orig_size = static_cast<int>(v.size());
+    int min_val = v[0], max_val = v[0];
+    for (int x : v) {
+      if (x < min_val) min_val = x;
+      if (x > max_val) max_val = x;
+    }
+    if (max_val < 0) {
+      pad_value = min_val - 1;
+      pad_at_beginning = true;
+    } else {
+      pad_value = max_val + 1;
+      pad_at_beginning = false;
+    }
     while (v.size() % proc_count != 0) {
-      v.push_back(0);
+      v.push_back(pad_value);
       ++padding_count;
     }
   }
@@ -154,6 +171,7 @@ void MPI_RadixSort(std::vector<int>& v) {
   SequentialRadixSort(local_part);
   std::vector<int> tmp(part_size);
   std::vector<int> neighbor_part(part_size);
+  std::vector<std::pair<int, int>> schedule = BuildAllocation(proc_count);
   for (std::size_t i = 0; i < schedule.size(); ++i) {
     int proc_first = schedule[i].first;
     int proc_second = schedule[i].second;
@@ -169,8 +187,12 @@ void MPI_RadixSort(std::vector<int>& v) {
     }
   }
   MPI_Gather(local_part.data(), part_size, MPI_INT, v.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
-  if (proc_rank == 0 && padding_count > 0) {
-    v.resize(enlarged_size - padding_count);
+  if (proc_rank == 0) {
+    if (pad_at_beginning) {
+      v.erase(v.begin(), v.begin() + padding_count);
+    } else {
+      v.resize(enlarged_size - padding_count);
+    }
   }
 }
 
