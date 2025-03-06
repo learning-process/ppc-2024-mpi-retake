@@ -37,6 +37,7 @@ bool NumOfAlternationsSigns::ValidationImpl() {
 bool NumOfAlternationsSigns::RunImpl() {
   int id = world_.rank();
   int size = world_.size();
+  output_= 0;
   if (size == 1) {
     for (int i = 0; i < static_cast<int>(input_.size()) - 1; ++i) {
       if (input_[i] * input_[i + 1] < 0) {
