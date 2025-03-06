@@ -8,20 +8,16 @@ TEST(Sequential_Sobel_Edge_Detection, Test_Sobel_4x4) {
   // Создание тестового изображения 4x4
   const int width = 4;
   const int height = 4;
-  std::vector<unsigned char> input_image = {100, 100, 100, 100, 100, 200,
-                                            200, 100, 100, 200, 200, 100,
-                                            100, 100, 100, 100};
+  std::vector<unsigned char> input_image = {100, 100, 100, 100, 100, 200, 200, 100,
+                                            100, 200, 200, 100, 100, 100, 100, 100};
   std::vector<unsigned char> output_image(width * height, 0);
 
   // Создание TaskData
-  std::shared_ptr<ppc::core::TaskData> task_data_seq =
-      std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(input_image.data()));
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_image.data()));
   task_data_seq->inputs_count.emplace_back(width);
   task_data_seq->inputs_count.emplace_back(height);
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_image.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_image.data()));
   task_data_seq->outputs_count.emplace_back(width);
   task_data_seq->outputs_count.emplace_back(height);
 
@@ -54,14 +50,11 @@ TEST(Sequential_Sobel_Edge_Detection, Test_Sobel_8x8) {
   }
   std::vector<unsigned char> output_image(width * height, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_seq =
-      std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(input_image.data()));
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_image.data()));
   task_data_seq->inputs_count.emplace_back(width);
   task_data_seq->inputs_count.emplace_back(height);
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_image.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_image.data()));
   task_data_seq->outputs_count.emplace_back(width);
   task_data_seq->outputs_count.emplace_back(height);
 
@@ -92,14 +85,11 @@ TEST(Sequential_Sobel_Edge_Detection, Test_Sobel_16x16) {
   }
   std::vector<unsigned char> output_image(width * height, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_seq =
-      std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(input_image.data()));
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_image.data()));
   task_data_seq->inputs_count.emplace_back(width);
   task_data_seq->inputs_count.emplace_back(height);
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_image.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_image.data()));
   task_data_seq->outputs_count.emplace_back(width);
   task_data_seq->outputs_count.emplace_back(height);
 
@@ -130,14 +120,11 @@ TEST(Sequential_Sobel_Edge_Detection, Test_Sobel_32x32) {
   }
   std::vector<unsigned char> output_image(width * height, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_seq =
-      std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(input_image.data()));
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_image.data()));
   task_data_seq->inputs_count.emplace_back(width);
   task_data_seq->inputs_count.emplace_back(height);
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_image.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_image.data()));
   task_data_seq->outputs_count.emplace_back(width);
   task_data_seq->outputs_count.emplace_back(height);
 
@@ -168,14 +155,11 @@ TEST(Sequential_Sobel_Edge_Detection, Test_Sobel_64x64) {
   }
   std::vector<unsigned char> output_image(width * height, 0);
 
-  std::shared_ptr<ppc::core::TaskData> task_data_seq =
-      std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(input_image.data()));
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(input_image.data()));
   task_data_seq->inputs_count.emplace_back(width);
   task_data_seq->inputs_count.emplace_back(height);
-  task_data_seq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_image.data()));
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_image.data()));
   task_data_seq->outputs_count.emplace_back(width);
   task_data_seq->outputs_count.emplace_back(height);
 
