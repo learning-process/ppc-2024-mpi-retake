@@ -93,7 +93,7 @@ void MPI_RadixSort(std::vector<int>& v) {
     }
     return;
   }
-  // Padding: on rank 0, compute pad value based on input range.
+  // Padding on rank 0.
   int padding_count = 0;
   int pad_value = 0;
   bool pad_at_beginning = false;
@@ -124,26 +124,30 @@ void MPI_RadixSort(std::vector<int>& v) {
   std::vector<int> local_array(part_size);
   MPI_Scatter(v.data(), part_size, MPI_INT, local_array.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
   SequentialRadixSort(local_array);
-  // Tree-based merge reduction.
-  int current_size = part_size;
-  for (int d = 1; d < proc_count; d *= 2) {
-    if (proc_rank % (2 * d) == 0) {
-      if (proc_rank + d < proc_count) {
-        std::vector<int> recv_array(current_size);
-        MPI_Status status;
-        MPI_Recv(recv_array.data(), current_size, MPI_INT, proc_rank + d, 0, MPI_COMM_WORLD, &status);
+  // Tree-based merge reduction (binary tree reduction handling variable sizes)
+  int my_size = part_size;
+  int step = 1;
+  while (step < proc_count) {
+    if (proc_rank % (2 * step) == 0) {
+      int src = proc_rank + step;
+      if (src < proc_count) {
+        int recv_size = 0;
+        MPI_Recv(&recv_size, 1, MPI_INT, src, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        std::vector<int> recv_array(recv_size);
+        MPI_Recv(recv_array.data(), recv_size, MPI_INT, src, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::vector<int> merged = MergeTwoAscending(local_array, recv_array);
         local_array = merged;
-        current_size *= 2;
+        my_size = local_array.size();
       }
     } else {
-      int target = proc_rank - (proc_rank % (2 * d));
-      MPI_Send(local_array.data(), current_size, MPI_INT, target, 0, MPI_COMM_WORLD);
+      int target = proc_rank - (proc_rank % (2 * step));
+      MPI_Send(&my_size, 1, MPI_INT, target, 0, MPI_COMM_WORLD);
+      MPI_Send(local_array.data(), my_size, MPI_INT, target, 0, MPI_COMM_WORLD);
       break;
     }
+    step *= 2;
   }
   if (proc_rank == 0) {
-    // Remove padded elements.
     if (pad_at_beginning)
       v = std::vector<int>(local_array.begin() + padding_count, local_array.end());
     else
