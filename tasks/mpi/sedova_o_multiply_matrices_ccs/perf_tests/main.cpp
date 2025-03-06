@@ -155,9 +155,6 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
-    boost::mpi::broadcast(world, exp_c_val, 0);
-    boost::mpi::broadcast(world, exp_c_row_ind, 0);
-    boost::mpi::broadcast(world, exp_c_col_ptr, 0);
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(exp_c_val, c_val);
     ASSERT_EQ(exp_c_row_ind, c_row_ind);
@@ -263,9 +260,6 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
-    boost::mpi::broadcast(world, exp_c_val, 0);
-    boost::mpi::broadcast(world, exp_c_row_ind, 0);
-    boost::mpi::broadcast(world, exp_c_col_ptr, 0);
     ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(exp_c_val, c_val);
     ASSERT_EQ(exp_c_row_ind, c_row_ind);
