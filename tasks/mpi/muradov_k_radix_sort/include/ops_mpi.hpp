@@ -9,7 +9,7 @@
 namespace muradov_k_radix_sort {
 
 void RadixSort(std::vector<int>& v);
-void MPI_RadixSort(std::vector<int>& v);
+void MpiRadixSort(std::vector<int>& v);
 
 class RadixSortTask : public ppc::core::Task {
  public:

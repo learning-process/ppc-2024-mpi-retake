@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <memory>
+#include <ranges>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -40,7 +41,7 @@ TEST(muradov_k_radix_sort_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> expected = input;
-  std::sort(expected.begin(), expected.end());
+  std::ranges::sort(expected);
   ASSERT_EQ(output, expected);
 }
 
@@ -72,6 +73,6 @@ TEST(muradov_k_radix_sort_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> expected = input;
-  std::sort(expected.begin(), expected.end());
+  std::ranges::sort(expected);
   ASSERT_EQ(output, expected);
 }

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <ranges>
 #include <vector>
 
 namespace muradov_k_radix_sort {
@@ -37,7 +38,7 @@ void LSDRadixSort(std::vector<int>& arr) {
   if (arr.empty()) {
     return;
   }
-  int max_val = *std::max_element(arr.begin(), arr.end());
+  int max_val = *std::ranges::max_element(arr);
   for (int exp = 1; max_val / exp > 0; exp *= 10) {
     CountingSortForRadix(arr, exp);
   }
@@ -55,7 +56,7 @@ void SequentialRadixSort(std::vector<int>& v) {
   }
   LSDRadixSort(non_negatives);
   LSDRadixSort(negatives);
-  std::reverse(negatives.begin(), negatives.end());
+  std::ranges::reverse(negatives);
   for (int& x : negatives) {
     x = -x;
   }
@@ -83,16 +84,16 @@ std::vector<int> MergeTwoAscending(const std::vector<int>& a, const std::vector<
   }
   while (i < a.size()) {
     res[k++] = a[i++];
-  };
+  }
   while (j < b.size()) {
     res[k++] = b[j++];
-  };
+  }
   return res;
 }
 
 }  // anonymous namespace
 
-void MPI_RadixSort(std::vector<int>& v) {
+void MpiRadixSort(std::vector<int>& v) {
   int proc_rank = 0;
   int proc_count = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
@@ -148,7 +149,7 @@ void MPI_RadixSort(std::vector<int>& v) {
         MPI_Recv(recv_array.data(), recv_size, MPI_INT, src, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         std::vector<int> merged = MergeTwoAscending(local_array, recv_array);
         local_array = merged;
-        my_size = local_array.size();
+        my_size = static_cast<int>(local_array.size());
       }
     } else {
       int target = proc_rank - (proc_rank % (2 * step));
@@ -167,7 +168,7 @@ void MPI_RadixSort(std::vector<int>& v) {
   }
 }
 
-void RadixSort(std::vector<int>& v) { MPI_RadixSort(v); }
+void RadixSort(std::vector<int>& v) { MpiRadixSort(v); }
 
 bool RadixSortTask::ValidationImpl() {
   return !task_data->inputs.empty() && !task_data->outputs.empty() &&

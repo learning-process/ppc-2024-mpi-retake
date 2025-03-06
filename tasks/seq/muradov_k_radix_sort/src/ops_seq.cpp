@@ -1,6 +1,7 @@
 #include "seq/muradov_k_radix_sort/include/ops_seq.hpp"
 
 #include <algorithm>
+#include <ranges>
 #include <vector>
 
 namespace muradov_k_radix_sort {
@@ -28,8 +29,10 @@ void CountingSortForRadix(std::vector<int>& arr, int exp) {
 }
 
 void LSDRadixSort(std::vector<int>& arr) {
-  if (arr.empty()) return;
-  int max_val = *std::max_element(arr.begin(), arr.end());
+  if (arr.empty()) {
+    return;
+  }
+  int max_val = *std::ranges::max_element(arr);
   for (int exp = 1; max_val / exp > 0; exp *= 10) {
     CountingSortForRadix(arr, exp);
   }
@@ -47,7 +50,7 @@ void SequentialRadixSort(std::vector<int>& v) {
   }
   LSDRadixSort(non_negatives);
   LSDRadixSort(negatives);
-  std::reverse(negatives.begin(), negatives.end());
+  std::ranges::reverse(negatives);
   for (int& x : negatives) {
     x = -x;
   }
