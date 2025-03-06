@@ -4,7 +4,7 @@
 #include <cmath>
 #include <vector>     // NOLINT
 
-bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {
+bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {  // NOLINT
   rows_A_ = *reinterpret_cast<int*>(task_data->inputs[0]);
   cols_A_ = *reinterpret_cast<int*>(task_data->inputs[1]);
   rows_B_ = *reinterpret_cast<int*>(task_data->inputs[2]);
@@ -39,7 +39,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
   return true;
 }
 
-bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::ValidationImpl() {
+bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::ValidationImpl() {  // NOLINT
   int rows_a = *reinterpret_cast<int*>(task_data->inputs[0]);  // NOLINT
   int cols_a = *reinterpret_cast<int*>(task_data->inputs[1]);  // NOLINT
   int rows_b = *reinterpret_cast<int*>(task_data->inputs[2]);  // NOLINT
@@ -48,7 +48,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::ValidationImpl() {
   return rows_a > 0 && cols_a > 0 && rows_b > 0 && cols_b > 0 && cols_a == rows_b;
 }
 
-bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
+bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {  // NOLINT
   res_val_.clear();
   res_ind_.clear();
   res_ptr_.clear();
@@ -88,7 +88,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
   return true;
 }
 
-bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PostProcessingImpl() {
+bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PostProcessingImpl() {  // NOLINT
   auto* c_val_ptr = reinterpret_cast<double*>(task_data->outputs[0]);
   auto* c_row_ind_ptr = reinterpret_cast<int*>(task_data->outputs[1]);
   auto* c_col_ptr_ptr = reinterpret_cast<int*>(task_data->outputs[2]);
