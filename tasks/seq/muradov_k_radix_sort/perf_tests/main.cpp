@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -39,7 +40,7 @@ TEST(muradov_k_radix_sort_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> expected = input;
-  std::ranges::sort(expected);
+  std::sort(expected.begin(), expected.end());
   ASSERT_EQ(output, expected);
 }
 
@@ -50,7 +51,7 @@ TEST(muradov_k_radix_sort_seq, test_task_run) {
   for (int i = 0; i < kN; ++i) {
     input[i] = std::rand() % 1000;
   }
-  std::vector<int> output(kN, 0);
+  std::vector<int> output(input.size(), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
   task_data->inputs_count.emplace_back(input.size());
@@ -71,6 +72,6 @@ TEST(muradov_k_radix_sort_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   std::vector<int> expected = input;
-  std::ranges::sort(expected);
+  std::sort(expected.begin(), expected.end());
   ASSERT_EQ(output, expected);
 }
