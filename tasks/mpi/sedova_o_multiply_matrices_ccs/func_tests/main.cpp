@@ -74,7 +74,7 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);                           //  NOLINT
     sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),         //  NOLINT
                                                         static_cast<int>(exp_c[0].size()), exp_c_val,  //  NOLINT
-                                                        exp_c_row_ind,  //  NOLINT
+                                                        exp_c_row_ind,                                 //  NOLINT
                                                         exp_c_col_ptr);
   }
   std::vector<double> c_val;
