@@ -67,62 +67,18 @@ void SequentialRadixSort(std::vector<int>& v) {
   }
 }
 
-void MergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
-  int part_size = static_cast<int>(local_part.size());
-  int idx1 = 0, idx2 = 0;
-  for (int j = 0; j < part_size; ++j) {
-    if (idx1 < part_size && idx2 < part_size) {
-      if (local_part[idx1] < neighbor_part[idx2])
-        tmp[j] = local_part[idx1++];
-      else
-        tmp[j] = neighbor_part[idx2++];
-    } else if (idx1 < part_size) {
-      tmp[j] = local_part[idx1++];
-    } else {
-      tmp[j] = neighbor_part[idx2++];
-    }
+std::vector<int> MergeTwoAscending(const std::vector<int>& a, const std::vector<int>& b) {
+  std::vector<int> res(a.size() + b.size());
+  std::size_t i = 0, j = 0, k = 0;
+  while (i < a.size() && j < b.size()) {
+    if (a[i] <= b[j])
+      res[k++] = a[i++];
+    else
+      res[k++] = b[j++];
   }
-  local_part = tmp;
-}
-
-void MergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
-  int part_size = static_cast<int>(local_part.size());
-  int idx1 = part_size - 1, idx2 = part_size - 1;
-  for (int j = part_size - 1; j >= 0; --j) {
-    if (idx1 >= 0 && idx2 >= 0) {
-      if (local_part[idx1] > neighbor_part[idx2])
-        tmp[j] = local_part[idx1--];
-      else
-        tmp[j] = neighbor_part[idx2--];
-    } else if (idx1 >= 0) {
-      tmp[j] = local_part[idx1--];
-    } else {
-      tmp[j] = neighbor_part[idx2--];
-    }
-  }
-  local_part = tmp;
-}
-
-std::vector<std::pair<int, int>> BuildAllocation(int proc_num) {
-  std::vector<int> v(proc_num);
-  for (int i = 0; i < proc_num; ++i) {
-    v[i] = i;
-  }
-  std::vector<std::pair<int, int>> schedule;
-  std::function<void(const std::vector<int>&)> Allocation = [&](const std::vector<int>& vec) {
-    int size = static_cast<int>(vec.size());
-    if (size <= 1) return;
-    int mid = size / 2;
-    std::vector<int> left(vec.begin(), vec.begin() + mid);
-    std::vector<int> right(vec.begin() + mid, vec.end());
-    Allocation(left);
-    Allocation(right);
-    for (std::size_t i = 0; i < left.size() && i < right.size(); ++i) {
-      schedule.emplace_back(left[i], right[i]);
-    }
-  };
-  Allocation(v);
-  return schedule;
+  while (i < a.size()) res[k++] = a[i++];
+  while (j < b.size()) res[k++] = b[j++];
+  return res;
 }
 
 }  // anonymous namespace
@@ -137,6 +93,7 @@ void MPI_RadixSort(std::vector<int>& v) {
     }
     return;
   }
+  // Padding: on rank 0, compute pad value based on input range.
   int padding_count = 0;
   int pad_value = 0;
   bool pad_at_beginning = false;
@@ -164,33 +121,33 @@ void MPI_RadixSort(std::vector<int>& v) {
   }
   MPI_Bcast(&enlarged_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
   int part_size = enlarged_size / proc_count;
-  std::vector<int> local_part(part_size);
-  MPI_Scatter(v.data(), part_size, MPI_INT, local_part.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
-  SequentialRadixSort(local_part);
-  std::vector<int> tmp(part_size);
-  std::vector<int> neighbor_part(part_size);
-  std::vector<std::pair<int, int>> schedule = BuildAllocation(proc_count);
-  for (std::size_t i = 0; i < schedule.size(); ++i) {
-    int proc_first = schedule[i].first;
-    int proc_second = schedule[i].second;
-    MPI_Status status;
-    if (proc_rank == proc_second) {
-      MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD, &status);
-      MPI_Send(local_part.data(), part_size, MPI_INT, proc_first, 0, MPI_COMM_WORLD);
-      MergeDescending(local_part, neighbor_part, tmp);
-    } else if (proc_rank == proc_first) {
-      MPI_Send(local_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD);
-      MPI_Recv(neighbor_part.data(), part_size, MPI_INT, proc_second, 0, MPI_COMM_WORLD, &status);
-      MergeAscending(local_part, neighbor_part, tmp);
+  std::vector<int> local_array(part_size);
+  MPI_Scatter(v.data(), part_size, MPI_INT, local_array.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
+  SequentialRadixSort(local_array);
+  // Tree-based merge reduction.
+  int current_size = part_size;
+  for (int d = 1; d < proc_count; d *= 2) {
+    if (proc_rank % (2 * d) == 0) {
+      if (proc_rank + d < proc_count) {
+        std::vector<int> recv_array(current_size);
+        MPI_Status status;
+        MPI_Recv(recv_array.data(), current_size, MPI_INT, proc_rank + d, 0, MPI_COMM_WORLD, &status);
+        std::vector<int> merged = MergeTwoAscending(local_array, recv_array);
+        local_array = merged;
+        current_size *= 2;
+      }
+    } else {
+      int target = proc_rank - (proc_rank % (2 * d));
+      MPI_Send(local_array.data(), current_size, MPI_INT, target, 0, MPI_COMM_WORLD);
+      break;
     }
   }
-  MPI_Gather(local_part.data(), part_size, MPI_INT, v.data(), part_size, MPI_INT, 0, MPI_COMM_WORLD);
   if (proc_rank == 0) {
-    if (pad_at_beginning) {
-      v.erase(v.begin(), v.begin() + padding_count);
-    } else {
-      v.resize(enlarged_size - padding_count);
-    }
+    // Remove padded elements.
+    if (pad_at_beginning)
+      v = std::vector<int>(local_array.begin() + padding_count, local_array.end());
+    else
+      v = std::vector<int>(local_array.begin(), local_array.end() - padding_count);
   }
 }
 
