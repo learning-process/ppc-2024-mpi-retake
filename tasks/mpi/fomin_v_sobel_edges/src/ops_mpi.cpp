@@ -15,6 +15,9 @@ using namespace std::chrono_literals;
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
+    if (task_data->inputs.empty() || !task_data->inputs[0]) {
+      throw std::runtime_error("Input data is not initialized on root process");
+    }
     input_image_ = *reinterpret_cast<std::vector<unsigned char> *>(task_data->inputs[0]);
     width_ = task_data->inputs_count[0];
     height_ = task_data->inputs_count[1];
@@ -23,43 +26,40 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   boost::mpi::broadcast(world, width_, 0);
   boost::mpi::broadcast(world, height_, 0);
 
-  int delta_height = height_ / world.size();
-  local_height_ = delta_height;
-  if (world.rank() == world.size() - 1) {
-    local_height_ = height_ - delta_height * (world.size() - 1);
+  if (width_ <= 0 || height_ <= 0) {
+    return true;
   }
+
+  const int delta_height = height_ / world.size();
+  local_height_ = (world.rank() == world.size() - 1) ? height_ - delta_height * (world.size() - 1) : delta_height;
 
   local_input_image_.resize((local_height_ + 2) * width_, 0);
   local_output_image_.resize(local_height_ * width_, 0);
 
   std::vector<int> send_counts(world.size(), delta_height * width_);
   std::vector<int> displacements(world.size(), 0);
-  for (int proc = 1; proc < world.size(); ++proc) {
-    displacements[proc] = proc * delta_height * width_;
-  }
 
   if (world.rank() == 0) {
-    boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
-                         delta_height * width_, 0);
-  } else {
-    boost::mpi::scatterv(world, local_input_image_.data() + width_, delta_height * width_, 0);
+    for (int proc = 1; proc < world.size(); ++proc) {
+      displacements[proc] = proc * delta_height * width_;
+    }
+    send_counts.back() = (height_ - delta_height * (world.size() - 1)) * width_;
   }
+
+  boost::mpi::scatterv(world, world.rank() == 0 ? input_image_.data() : nullptr, send_counts, displacements,
+                       local_input_image_.data() + width_, local_height_ * width_, 0);
 
   return true;
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
-  bool is_valid = true;
+  bool valid = true;
   if (world.rank() == 0) {
-    is_valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2;
-    if (is_valid) {
-      int width = task_data->inputs_count[0];
-      int height = task_data->inputs_count[1];
-      is_valid = (width > 0) && (height > 0);
-    }
+    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 && width_ > 0 && height_ > 0 &&
+            !input_image_.empty();
   }
-  boost::mpi::broadcast(world, is_valid, 0);
-  return is_valid;
+  boost::mpi::broadcast(world, valid, 0);
+  return valid;
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
