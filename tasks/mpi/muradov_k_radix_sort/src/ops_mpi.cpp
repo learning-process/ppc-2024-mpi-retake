@@ -6,8 +6,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
-#include <functional>
-#include <utility>
 #include <vector>
 
 namespace muradov_k_radix_sort {
@@ -36,7 +34,9 @@ void CountingSortForRadix(std::vector<int>& arr, int exp) {
 }
 
 void LSDRadixSort(std::vector<int>& arr) {
-  if (arr.empty()) return;
+  if (arr.empty()) {
+    return;
+  }
   int max_val = *std::max_element(arr.begin(), arr.end());
   for (int exp = 1; max_val / exp > 0; exp *= 10) {
     CountingSortForRadix(arr, exp);
@@ -47,10 +47,11 @@ void SequentialRadixSort(std::vector<int>& v) {
   std::vector<int> negatives;
   std::vector<int> non_negatives;
   for (int x : v) {
-    if (x < 0)
+    if (x < 0) {
       negatives.push_back(-x);
-    else
+    } else {
       non_negatives.push_back(x);
+    }
   }
   LSDRadixSort(non_negatives);
   LSDRadixSort(negatives);
@@ -69,22 +70,31 @@ void SequentialRadixSort(std::vector<int>& v) {
 
 std::vector<int> MergeTwoAscending(const std::vector<int>& a, const std::vector<int>& b) {
   std::vector<int> res(a.size() + b.size());
-  std::size_t i = 0, j = 0, k = 0;
+  std::size_t i = 0;
+  std::size_t j = 0;
+  std::size_t k = 0;
+
   while (i < a.size() && j < b.size()) {
-    if (a[i] <= b[j])
+    if (a[i] <= b[j]) {
       res[k++] = a[i++];
-    else
+    } else {
       res[k++] = b[j++];
+    }
   }
-  while (i < a.size()) res[k++] = a[i++];
-  while (j < b.size()) res[k++] = b[j++];
+  while (i < a.size()) {
+    res[k++] = a[i++]
+  };
+  while (j < b.size()) {
+    res[k++] = b[j++]
+  };
   return res;
 }
 
 }  // anonymous namespace
 
 void MPI_RadixSort(std::vector<int>& v) {
-  int proc_rank = 0, proc_count = 0;
+  int proc_rank = 0;
+  int proc_count = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &proc_count);
   if (proc_count <= 1 || static_cast<int>(v.size()) <= proc_count) {
@@ -98,10 +108,11 @@ void MPI_RadixSort(std::vector<int>& v) {
   int pad_value = 0;
   bool pad_at_beginning = false;
   if (proc_rank == 0) {
-    int min_val = v[0], max_val = v[0];
+    int min_val = v[0];
+    int max_val = v[0];
     for (int x : v) {
-      if (x < min_val) min_val = x;
-      if (x > max_val) max_val = x;
+      min_val = std::min(x, min_val);
+      max_val = std::max(x, max_val);
     }
     if (max_val < 0) {
       pad_value = min_val - 1;
@@ -148,10 +159,11 @@ void MPI_RadixSort(std::vector<int>& v) {
     step *= 2;
   }
   if (proc_rank == 0) {
-    if (pad_at_beginning)
+    if (pad_at_beginning) {
       v = std::vector<int>(local_array.begin() + padding_count, local_array.end());
-    else
+    } else {
       v = std::vector<int>(local_array.begin(), local_array.end() - padding_count);
+    }
   }
 }
 
