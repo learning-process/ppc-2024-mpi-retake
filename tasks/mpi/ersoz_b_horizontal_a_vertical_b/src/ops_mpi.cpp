@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <random>
+#include <stdexcept>
 #include <vector>
 
 std::vector<int> GetRandomMatrix(std::size_t row_count, std::size_t column_count) {
@@ -22,6 +23,13 @@ std::vector<int> GetRandomMatrix(std::size_t row_count, std::size_t column_count
 
 std::vector<int> GetSequentialOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
                                          std::size_t a_rows, std::size_t a_cols, std::size_t b_cols) {
+  if (matrix1.size() != a_rows * a_cols) {
+    throw std::invalid_argument("Invalid dimensions for matrix1");
+  }
+  if (matrix2.size() != a_cols * b_cols) {
+    throw std::invalid_argument("Invalid dimensions for matrix2");
+  }
+
   std::vector<int> result(a_rows * b_cols, 0);
   for (std::size_t i = 0; i < a_rows; ++i) {
     for (std::size_t j = 0; j < b_cols; ++j) {
@@ -37,9 +45,15 @@ std::vector<int> GetSequentialOperations(const std::vector<int>& matrix1, const 
 
 std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const std::vector<int>& matrix2,
                                        std::size_t a_rows, std::size_t a_cols) {
-  std::size_t b_cols = a_rows;
-  int size = 0;
-  int rank = 0;
+  const std::size_t b_cols = a_rows;
+  if (matrix1.size() != a_rows * a_cols) {
+    throw std::invalid_argument("Invalid dimensions for matrix1");
+  }
+  if (matrix2.size() != a_cols * b_cols) {
+    throw std::invalid_argument("Invalid dimensions for matrix2");
+  }
+
+  int size = 0, rank = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   if (size == 1) {
@@ -48,6 +62,7 @@ std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const st
   std::size_t rows_per_proc = a_rows / size;
   std::size_t remainder = a_rows % size;
   std::size_t local_rows = rows_per_proc + (static_cast<std::size_t>(rank) < remainder ? 1 : 0);
+
   std::vector<int> sendcounts(size);
   std::vector<int> displs(size);
   for (int i = 0; i < size; i++) {
@@ -62,8 +77,10 @@ std::vector<int> GetParallelOperations(const std::vector<int>& matrix1, const st
   std::vector<int> local_matrix1(local_rows * a_cols);
   MPI_Scatterv(matrix1.data(), sendcounts.data(), displs.data(), MPI_INT, local_matrix1.data(), sendcounts[rank],
                MPI_INT, 0, MPI_COMM_WORLD);
+
   std::vector<int> local_matrix2(matrix2);
   MPI_Bcast(local_matrix2.data(), static_cast<int>(a_cols * b_cols), MPI_INT, 0, MPI_COMM_WORLD);
+
   std::vector<int> local_result(local_rows * b_cols, 0);
   for (std::size_t i = 0; i < local_rows; i++) {
     for (std::size_t j = 0; j < b_cols; j++) {
