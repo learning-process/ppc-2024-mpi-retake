@@ -14,7 +14,7 @@ class SentenceCountSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  char *input_;
+  std::string input_;
   int sentence_count;
 };
 
