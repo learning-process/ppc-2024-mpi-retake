@@ -8,9 +8,14 @@
 namespace prokhorov_n_global_search_algorithm_strongin_seq {
 
 bool TestTaskSequential::PreProcessingImpl() {
-  a_ = reinterpret_cast<double*>(task_data->inputs[0])[0];
-  b_ = reinterpret_cast<double*>(task_data->inputs[0])[1];
-  epsilon_ = reinterpret_cast<double*>(task_data->inputs[0])[2];
+  if (task_data->inputs_count[0] == 0 || task_data->inputs_count[1] == 0 || task_data->inputs_count[2] == 0) {
+    return false;
+  }
+
+  a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
+  b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
+  epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
+
   return true;
 }
 
@@ -27,15 +32,8 @@ bool TestTaskSequential::RunImpl() {
   return true;
 }
 
-bool TestTaskSequential::PreProcessingImpl() {
-  if (task_data->inputs_count[0] == 0 || task_data->inputs_count[1] == 0 || task_data->inputs_count[2] == 0) {
-    return false;
-  }
-
-  a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
-  b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
-  epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
-
+bool TestTaskSequential::PostProcessingImpl() {
+  reinterpret_cast<double*>(task_data->outputs[0])[0] = result_;
   return true;
 }
 
