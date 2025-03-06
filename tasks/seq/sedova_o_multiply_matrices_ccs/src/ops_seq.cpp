@@ -2,7 +2,7 @@
 
 #include <algorithm>  // NOLINT
 #include <cmath>
-#include <vector>     // NOLINT
+#include <vector>  // NOLINT
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {  // NOLINT
   rows_A_ = *reinterpret_cast<int*>(task_data->inputs[0]);
@@ -40,10 +40,10 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl()
 }
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::ValidationImpl() {  // NOLINT
-  int rows_a = *reinterpret_cast<int*>(task_data->inputs[0]);  // NOLINT
-  int cols_a = *reinterpret_cast<int*>(task_data->inputs[1]);  // NOLINT
-  int rows_b = *reinterpret_cast<int*>(task_data->inputs[2]);  // NOLINT
-  int cols_b = *reinterpret_cast<int*>(task_data->inputs[3]);  // NOLINT
+  int rows_a = *reinterpret_cast<int*>(task_data->inputs[0]);                    // NOLINT
+  int cols_a = *reinterpret_cast<int*>(task_data->inputs[1]);                    // NOLINT
+  int rows_b = *reinterpret_cast<int*>(task_data->inputs[2]);                    // NOLINT
+  int cols_b = *reinterpret_cast<int*>(task_data->inputs[3]);                    // NOLINT
 
   return rows_a > 0 && cols_a > 0 && rows_b > 0 && cols_b > 0 && cols_a == rows_b;
 }
