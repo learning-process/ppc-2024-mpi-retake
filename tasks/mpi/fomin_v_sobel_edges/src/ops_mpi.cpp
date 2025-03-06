@@ -20,8 +20,8 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     height_ = task_data->inputs_count[1];
   }
 
-  broadcast(world, width_, 0);
-  broadcast(world, height_, 0);
+  boost::mpi::broadcast(world, width_, 0);
+  boost::mpi::broadcast(world, height_, 0);
 
   int delta_height = height_ / world.size();
   local_height_ = delta_height;
@@ -40,10 +40,10 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
       displacements[proc] = proc * delta_height * width_;
     }
 
-    mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
+    boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
                   delta_height * width_, 0);
   } else {
-    mpi::scatterv(world, local_input_image_.data() + width_, local_height_ * width_, 0);
+    boost::mpi::scatterv(world, local_input_image_.data() + width_, local_height_ * width_, 0);
   }
 
   return true;
@@ -57,7 +57,6 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
-  internal_order_test();
 
   const int Gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
   const int Gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
@@ -107,7 +106,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
     displacements[proc] = proc * (height_ / world.size()) * width_;
   }
 
-  mpi::gatherv(world, local_output_image_.data(), local_height_ * width_, output_image_.data(), recv_counts,
+  boost::mpi::gatherv(world, local_output_image_.data(), local_height_ * width_, output_image_.data(), recv_counts,
                displacements, 0);
 
   if (world.rank() == 0) {
