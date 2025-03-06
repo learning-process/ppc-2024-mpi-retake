@@ -67,30 +67,38 @@ void SequentialRadixSort(std::vector<int>& v) {
 }
 
 void MergeAscending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
-  std::size_t i = 0, j = 0, k = 0;
-  while (i < local_part.size() && j < neighbor_part.size()) {
-    if (local_part[i] < neighbor_part[j])
-      tmp[k++] = local_part[i++];
-    else
-      tmp[k++] = neighbor_part[j++];
+  int part_size = static_cast<int>(local_part.size());
+  int idx1 = 0, idx2 = 0;
+  for (int j = 0; j < part_size; ++j) {
+    if (idx1 < part_size && idx2 < part_size) {
+      if (local_part[idx1] < neighbor_part[idx2])
+        tmp[j] = local_part[idx1++];
+      else
+        tmp[j] = neighbor_part[idx2++];
+    } else if (idx1 < part_size) {
+      tmp[j] = local_part[idx1++];
+    } else {
+      tmp[j] = neighbor_part[idx2++];
+    }
   }
-  while (i < local_part.size()) tmp[k++] = local_part[i++];
-  while (j < neighbor_part.size()) tmp[k++] = neighbor_part[j++];
   local_part = tmp;
 }
 
 void MergeDescending(std::vector<int>& local_part, const std::vector<int>& neighbor_part, std::vector<int>& tmp) {
-  int i = static_cast<int>(local_part.size()) - 1;
-  int j = static_cast<int>(neighbor_part.size()) - 1;
-  int k = static_cast<int>(local_part.size()) - 1;
-  while (i >= 0 && j >= 0) {
-    if (local_part[i] > neighbor_part[j])
-      tmp[k--] = local_part[i--];
-    else
-      tmp[k--] = neighbor_part[j--];
+  int part_size = static_cast<int>(local_part.size());
+  int idx1 = part_size - 1, idx2 = part_size - 1;
+  for (int j = part_size - 1; j >= 0; --j) {
+    if (idx1 >= 0 && idx2 >= 0) {
+      if (local_part[idx1] > neighbor_part[idx2])
+        tmp[j] = local_part[idx1--];
+      else
+        tmp[j] = neighbor_part[idx2--];
+    } else if (idx1 >= 0) {
+      tmp[j] = local_part[idx1--];
+    } else {
+      tmp[j] = neighbor_part[idx2--];
+    }
   }
-  while (i >= 0) tmp[k--] = local_part[i--];
-  while (j >= 0) tmp[k--] = neighbor_part[j--];
   local_part = tmp;
 }
 
