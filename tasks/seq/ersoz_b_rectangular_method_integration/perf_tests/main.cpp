@@ -2,7 +2,7 @@
 
 #include <chrono>
 #include <cmath>
-#include <cstddef>  // Added for size_t
+#include <cstddef>
 #include <functional>
 #include <iostream>
 
@@ -21,7 +21,9 @@ TEST(ersoz_b_rectangular_method_integration_seq, test_task_run) {
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "[Seq Task Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
-  SUCCEED();
+
+  double expected = std::sin(b) - std::sin(a);
+  ASSERT_NEAR(result, expected, 1e-3);
 }
 
 TEST(ersoz_b_rectangular_method_integration_seq, test_pipeline_run) {
@@ -35,7 +37,9 @@ TEST(ersoz_b_rectangular_method_integration_seq, test_pipeline_run) {
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
   std::cout << "[Seq Pipeline Run] Result: " << result << ", Time: " << elapsed.count() << " seconds\n";
-  SUCCEED();
+
+  double expected = std::sin(b) - std::sin(a);
+  ASSERT_NEAR(result, expected, 0.1);
 }
 
 }  // namespace ersoz_b_rectangular_method_integration_seq
