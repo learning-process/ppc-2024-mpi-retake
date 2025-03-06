@@ -32,7 +32,7 @@ TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_FROM_0_TO_709) {
   ASSERT_LT(std::fabs(result - reference_sum), std::numeric_limits<double>::epsilon() * 10000);
 }
 
-TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_WITH_LOW_RANGE) {
+TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_WITH_LOW_RANGE) {  // test1
   double result = GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 1, 1.01, 10000);
   double reference_sum = GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 1, 1.01, 10000);
   ASSERT_LT(std::fabs(result - reference_sum), std::numeric_limits<double>::epsilon() * 1000);
