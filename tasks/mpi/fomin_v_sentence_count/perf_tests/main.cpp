@@ -41,9 +41,9 @@ TEST(fomin_v_sentence_count, test_parallel_pipeline_run) {
 
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sentenceCountParallel);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
+  perfAnalyzer->PipelineRun(perfAttr, perfResults);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
+    ppc::core::Perf::PrintPerfStatistic(perfResults);
     ASSERT_EQ(3, global_sentence_count[0]);  // Ожидаемое количество предложений
   }
 }
@@ -83,9 +83,9 @@ TEST(fomin_v_sentence_count, test_sequential_task_run) {
 
   // Create Perf analyzer
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sentenceCountSequential);
-  perfAnalyzer->task_run(perfAttr, perfResults);
+  perfAnalyzer->TaskRun(perfAttr, perfResults);
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
+    ppc::core::Perf::PrintPerfStatistic(perfResults);
     ASSERT_EQ(3, global_sentence_count[0]);  // Ожидаемое количество предложений
   }
 }
