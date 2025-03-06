@@ -138,11 +138,9 @@ void MPI_RadixSort(std::vector<int>& v) {
     return;
   }
   int padding_count = 0;
-  int orig_size = 0;
   int pad_value = 0;
   bool pad_at_beginning = false;
   if (proc_rank == 0) {
-    orig_size = static_cast<int>(v.size());
     int min_val = v[0], max_val = v[0];
     for (int x : v) {
       if (x < min_val) min_val = x;
