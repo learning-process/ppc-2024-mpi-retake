@@ -6,7 +6,6 @@
 
 #include "seq/ersoz_b_horizontal_a_vertical_b/include/ops_seq.hpp"
 
-// Matris oluşturma testleri
 TEST(Generation_Matrix, can_generate_square_matrix) {
   auto mat = GetRandomMatrix(10, 10);
   ASSERT_EQ(mat.size(), 100U);
@@ -17,7 +16,6 @@ TEST(Generation_Matrix, can_generate_arbitrary_matrix) {
   ASSERT_EQ(mat.size(), 150U);
 }
 
-// Sequential işlemler testleri
 TEST(Sequential_Operations_SEQ, GetSequentialOperations_can_work_with_square_matrix) {
   std::vector<int> matrix1 = GetRandomMatrix(10, 10);
   std::vector<int> matrix2 = GetRandomMatrix(10, 10);
@@ -48,7 +46,6 @@ TEST(Sequential_Operations_SEQ, GetSequentialOperations_works_correctly_with_arb
   ASSERT_EQ(expected, res);
 }
 
-// Parallel işlemler testleri
 TEST(Parallel_Operations_SEQ, GetParallelOperations_can_work_with_square_matrix) {
   std::vector<int> matrix1 = GetRandomMatrix(20, 20);
   std::vector<int> matrix2 = GetRandomMatrix(20, 20);
@@ -57,7 +54,6 @@ TEST(Parallel_Operations_SEQ, GetParallelOperations_can_work_with_square_matrix)
 }
 
 TEST(Parallel_Operations_SEQ, GetParallelOperations_can_work_with_arbitrary_matrix) {
-  // matrix1: 20x30, matrix2: 30x20 ⇒ sonuç: 20x20
   std::vector<int> matrix1 = GetRandomMatrix(20, 30);
   std::vector<int> matrix2 = GetRandomMatrix(30, 20);
   auto res = GetParallelOperations(matrix1, matrix2, 20, 30);
@@ -116,6 +112,7 @@ TEST(Parallel_Operations_SEQ, GetParallelOperations_works_correctly_with_odd_siz
 
 TEST(Sequential_Operations_SEQ, Throws_On_Invalid_Matrix1_Size) {
   std::vector<int> matrix1 = {1, 2, 3};
+  std::vector<int> matrix2 = {1, 2, 3, 4};
   EXPECT_THROW(GetSequentialOperations(matrix1, matrix2, 2, 2, 2), std::invalid_argument);  // NOLINT
 }
 
