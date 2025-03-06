@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -152,7 +153,7 @@ TEST(shpynov_n_radix_sort_seq, test_invalid) {
 TEST(shpynov_n_radix_sort_seq, test_random_number) {
   std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(1);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
@@ -173,7 +174,7 @@ TEST(shpynov_n_radix_sort_seq, test_random_number) {
 TEST(shpynov_n_radix_sort_seq, test_random_small_vector) {
   std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(20);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 
@@ -194,7 +195,7 @@ TEST(shpynov_n_radix_sort_seq, test_random_small_vector) {
 TEST(shpynov_n_radix_sort_seq, test_random_big_vector) {
   std::vector<int> input_vec = shpynov_n_radix_sort_seq::GetRandVec(1000);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
 

@@ -16,7 +16,7 @@ TEST(shpynov_n_radix_sort_mpi, test_pipeline_run) {
   constexpr int kCount = 5000;
   std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(kCount);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
 
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -56,7 +56,7 @@ TEST(shpynov_n_radix_sort_mpi, test_task_run) {
   constexpr int kCount = 5000;
   std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(kCount);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
 
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();

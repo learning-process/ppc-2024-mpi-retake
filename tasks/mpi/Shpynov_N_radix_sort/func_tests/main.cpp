@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
@@ -215,7 +216,7 @@ TEST(shpynov_n_radix_sort_mpi, test_tiny_random_vector) {
   boost::mpi::communicator world;
   std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(2);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
 
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -242,7 +243,7 @@ TEST(shpynov_n_radix_sort_mpi, test_average_random_vector) {
   boost::mpi::communicator world;
   std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(30);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
 
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();
@@ -269,7 +270,7 @@ TEST(shpynov_n_radix_sort_mpi, test_big_random_vector) {
   boost::mpi::communicator world;
   std::vector<int> input_vec = shpynov_n_radix_sort_mpi::GetRandVec(2000);
   std::vector<int> expected_result = input_vec;
-  std::sort(expected_result.begin(), expected_result.end());
+  std::ranges::sort(expected_result.begin(), expected_result.end());
 
   std::vector<int> returned_result(input_vec.size());
   std::shared_ptr<ppc::core::TaskData> task_data_mpi = std::make_shared<ppc::core::TaskData>();

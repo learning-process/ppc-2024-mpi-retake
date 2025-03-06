@@ -17,7 +17,7 @@ inline std::vector<int> GetRandVec(int size) {
   std::vector<int> vec(size);
   std::srand(std::time({}));
   for (int i = 0; i < size; ++i) {
-    vec[i] = static_cast<int>((std::rand() % 2000) - 1000);
+    vec[i] = (std::rand() % 2000) - 1000;
   }
   return vec;
 }
