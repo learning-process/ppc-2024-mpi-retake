@@ -50,7 +50,6 @@ void Step(int tkt, size_t i, bool rang_is_head, int dv, std::vector<double>& hea
 bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::PreProcessingImpl() {
   // Init value for input and output
   
-
   return true;
 }
 
