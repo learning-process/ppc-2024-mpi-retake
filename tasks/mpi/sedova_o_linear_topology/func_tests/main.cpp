@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "core/task/include/task.hpp"
+#include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
@@ -8,8 +10,6 @@
 #include <memory>
 #include <vector>
 #include <random>
-#include "core/task/include/task.hpp"
-#include "mpi/sedova_o_linear_topology/include/ops_mpi.hpp"
 
 namespace sedova_o_linear_topology_mpi {
 namespace {
