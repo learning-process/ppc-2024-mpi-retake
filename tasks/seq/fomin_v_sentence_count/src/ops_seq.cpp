@@ -13,7 +13,8 @@ bool fomin_v_sentence_count::SentenceCountSequential::PreProcessingImpl() {
 
 bool fomin_v_sentence_count::SentenceCountSequential::ValidationImpl() {
   // Проверяем, что входные данные содержат строку
-  return task_data->inputs_count[0] == 1 && task_data->outputs_count[0] == 1;
+  return task_data->inputs_count.size() == 1 && task_data->outputs_count.size() == 1 &&
+         task_data->outputs_count[0] == 1;
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::RunImpl() {
