@@ -7,9 +7,9 @@
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    a_ = reinterpret_cast<double*>(task_data->inputs[0])[0];
-    b_ = reinterpret_cast<double*>(task_data->inputs[0])[1];
-    epsilon_ = reinterpret_cast<double*>(task_data->inputs[0])[2];
+    a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
+    b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
+    epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
   }
 
   boost::mpi::broadcast(world_, a_, 0);
