@@ -12,7 +12,7 @@ bool fomin_v_sentence_count::SentenceCountParallel::PreProcessingImpl() {
 
   if (world_rank == 0) {
     char *input_ptr = reinterpret_cast<char *>(task_data->inputs[0]);
-    input_size = task_data->inputs_count[0];
+    input_size = static_cast<int>(task_data->inputs_count[0]);
     input_vec.assign(input_ptr, input_ptr + input_size);
   }
 
@@ -44,7 +44,7 @@ bool fomin_v_sentence_count::SentenceCountParallel::PreProcessingImpl() {
 
 bool fomin_v_sentence_count::SentenceCountParallel::ValidationImpl() {
   if (world.rank() == 0) {
-    return task_data->inputs_count[0] == input_size && task_data->outputs_count[0] == 1;
+    return task_data->inputs_count[0] == static_cast<unsigned int>(input_size) && task_data->outputs_count[0] == 1;
   }
   return true;
 }
