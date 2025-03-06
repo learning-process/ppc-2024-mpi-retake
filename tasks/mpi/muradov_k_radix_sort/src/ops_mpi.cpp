@@ -43,6 +43,7 @@ void LSDRadixSort(std::vector<int>& arr) {
   }
 }
 
+// seq
 void SequentialRadixSort(std::vector<int>& v) {
   std::vector<int> negatives;
   std::vector<int> non_negatives;
