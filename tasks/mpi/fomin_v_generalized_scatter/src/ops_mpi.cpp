@@ -131,12 +131,10 @@ bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::PreProcessingI
 }
 
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::ValidationImpl() {
-  internal_order_test();
   return task_data->inputs_count[0] % task_data->outputs_count[0] == 0;
 }
 
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::RunImpl() {
-  internal_order_test();
   int rank = world.rank();
   int size = world.size();
   int root = 0;
@@ -163,7 +161,6 @@ bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::RunImpl() {
 }
 
 bool fomin_v_generalized_scatter::GeneralizedScatterTestParallel::PostProcessingImpl() {
-  internal_order_test();
   reinterpret_cast<int*>(task_data->outputs[0])[0] = res;
   return true;
 }
