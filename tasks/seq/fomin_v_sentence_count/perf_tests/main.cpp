@@ -42,8 +42,8 @@ TEST(sequential_sentence_count_perf_test, test_pipeline_run) {
 
   // Создаем анализатор производительности
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sentenceCountTask);
-  perfAnalyzer->pipeline_run(perfAttr, perfResults);
-  ppc::core::Perf::print_perf_statistic(perfResults);
+  perfAnalyzer->PipelineRun(perfAttr, perfResults);
+  ppc::core::Perf::PrintPerfStatistic(perfResults);
 
   // Проверяем результат
   ASSERT_EQ(5, out[0]);  // Ожидаемое количество предложений
@@ -79,8 +79,8 @@ TEST(sequential_sentence_count_perf_test, test_task_run) {
 
   // Создаем анализатор производительности
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(sentenceCountTask);
-  perfAnalyzer->task_run(perfAttr, perfResults);
-  ppc::core::Perf::print_perf_statistic(perfResults);
+  perfAnalyzer->TaskRun(perfAttr, perfResults);
+  ppc::core::Perf::PrintPerfStatistic(perfResults);
 
   // Проверяем результат
   ASSERT_EQ(5, out[0]);  // Ожидаемое количество предложений
