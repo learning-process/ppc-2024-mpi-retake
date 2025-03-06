@@ -70,7 +70,7 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   std::vector<int> exp_c_row_ind;                                                                                     //  NOLINT
   std::vector<int> exp_c_col_ptr;                                                                                     //  NOLINT
 
-  if (world.rank() == 0) {                                                                                  
+  if (world.rank() == 0) {                                                                                            //  NOLINT
     auto exp_c = sedova_o_multiply_matrices_ccs_mpi::MultiplyMatrices(a, b);                                          //  NOLINT
     sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, static_cast<int>(exp_c.size()),                        //  NOLINT
                                                         static_cast<int>(exp_c[0].size()), exp_c_val, exp_c_row_ind,  //  NOLINT
@@ -93,7 +93,7 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&cols_b));                                               //  NOLINT
   task_data->inputs_count.emplace_back(1);                                                                            //  NOLINT
 
-  if (world.rank() == 0) {
+  if (world.rank() == 0) {                                                                                            //  NOLINT
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));                                        //  NOLINT
     task_data->inputs_count.emplace_back(a_val.size());                                                               //  NOLINT
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));                                    //  NOLINT
@@ -120,11 +120,11 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI task(task_data);                                                    //  NOLINT
   bool validation_impl = task.ValidationImpl();                                                                       //  NOLINT
   boost::mpi::broadcast(world, validation_impl, 0);                                                                   //  NOLINT
-  if (validation_impl) {                                                                                      
-    task.PreProcessingImpl();
-    task.RunImpl();
-    task.PostProcessingImpl();
-    if (world.rank() == 0) {
+  if (validation_impl) {                                                                                              //  NOLINT
+    task.PreProcessingImpl();                                                                                         //  NOLINT
+    task.RunImpl();                                                                                                   //  NOLINT
+    task.PostProcessingImpl();                                                                                        //  NOLINT
+    if (world.rank() == 0) {                                                                                          //  NOLINT
       ASSERT_EQ(exp_c_val, c_val);                                                                                    //  NOLINT
       ASSERT_EQ(exp_c_row_ind, c_row_ind);                                                                            //  NOLINT
       ASSERT_EQ(exp_c_col_ptr, c_col_ptr);                                                                            //  NOLINT
