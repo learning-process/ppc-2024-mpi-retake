@@ -4,6 +4,8 @@
 #include <utility>  // NOLINT
 #include <vector>   // NOLINT
 
+#include "core/task/include/task.hpp"
+
 namespace sedova_o_multiply_matrices_ccs_seq {
 inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int rows, int cols,
                             std::vector<double>& values, std::vector<int>& row_indices, std::vector<int>& col_ptr) {
