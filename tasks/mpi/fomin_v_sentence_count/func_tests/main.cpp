@@ -16,7 +16,7 @@ TEST(fomin_v_sentence_count, Test_Empty_String) {
 
   // Create and run parallel task
   fomin_v_sentence_count::SentenceCountParallel sentenceCountParallel(task_data_mpi);
-  ASSERT_EQ(sentenceCountParallel.validation(), true);
+  ASSERT_EQ(sentenceCountParallel.ValidationImpl(), true);
   sentenceCountParallel.PreProcessingImpl();
   sentenceCountParallel.RunImpl();
   sentenceCountParallel.PostProcessingImpl();
@@ -40,7 +40,7 @@ TEST(fomin_v_sentence_count, Test_Single_Sentence) {
 
   // Create and run parallel task
   fomin_v_sentence_count::SentenceCountParallel sentenceCountParallel(task_data_mpi);
-  ASSERT_EQ(sentenceCountParallel.validation(), true);
+  ASSERT_EQ(sentenceCountParallel.ValidationImpl(), true);
   sentenceCountParallel.PreProcessingImpl();
   sentenceCountParallel.RunImpl();
   sentenceCountParallel.PostProcessingImpl();
@@ -64,7 +64,7 @@ TEST(fomin_v_sentence_count, Test_Multiple_Sentences) {
 
   // Create and run parallel task
   fomin_v_sentence_count::SentenceCountParallel sentenceCountParallel(task_data_mpi);
-  ASSERT_EQ(sentenceCountParallel.validation(), true);
+  ASSERT_EQ(sentenceCountParallel.ValidationImpl(), true);
   sentenceCountParallel.PreProcessingImpl();
   sentenceCountParallel.RunImpl();
   sentenceCountParallel.PostProcessingImpl();

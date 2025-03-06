@@ -29,8 +29,7 @@ class SentenceCountSequential : public ppc::core::Task {
 
 class SentenceCountParallel : public ppc::core::Task {
  public:
-  explicit SentenceCountParallel(std::shared_ptr<ppc::core::TaskData> taskData_, std::string ops_)
-      : Task(std::move(taskData_)), ops(std::move(ops_)) {}
+  explicit SentenceCountParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -43,7 +42,6 @@ class SentenceCountParallel : public ppc::core::Task {
   int input_size{};
   int portion_size{};
   int local_sentence_count{};
-  std::string ops;
   boost::mpi::communicator world;
 };
 
