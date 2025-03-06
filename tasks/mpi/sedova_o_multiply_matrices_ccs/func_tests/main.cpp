@@ -63,7 +63,7 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   std::vector<double> b_val;
   std::vector<int> b_row_ind;
   std::vector<int> b_col_ptr;
-  int rows_b = b.size());     //  NOLINT
+  int rows_b = b.size());    //  NOLINT
   int cols_b = b[0].size();  //  NOLINT
 
   std::vector<double> exp_c_val;
