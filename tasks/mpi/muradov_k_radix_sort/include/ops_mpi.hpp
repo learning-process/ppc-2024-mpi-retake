@@ -1,6 +1,7 @@
 #ifndef MURADOV_K_RADIX_SORT_OPS_MPI_HPP
 #define MURADOV_K_RADIX_SORT_OPS_MPI_HPP
 
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"

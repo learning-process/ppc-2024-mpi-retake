@@ -35,15 +35,15 @@ void LSDRadixSort(std::vector<int>& arr) {
   }
 }
 
-// seq
 void SequentialRadixSort(std::vector<int>& v) {
   std::vector<int> negatives;
   std::vector<int> non_negatives;
   for (int x : v) {
-    if (x < 0)
+    if (x < 0) {
       negatives.push_back(-x);
-    else
+    } else {
       non_negatives.push_back(x);
+    }
   }
   LSDRadixSort(non_negatives);
   LSDRadixSort(negatives);

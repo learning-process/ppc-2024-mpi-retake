@@ -82,10 +82,10 @@ std::vector<int> MergeTwoAscending(const std::vector<int>& a, const std::vector<
     }
   }
   while (i < a.size()) {
-    res[k++] = a[i++]
+    res[k++] = a[i++];
   };
   while (j < b.size()) {
-    res[k++] = b[j++]
+    res[k++] = b[j++];
   };
   return res;
 }
