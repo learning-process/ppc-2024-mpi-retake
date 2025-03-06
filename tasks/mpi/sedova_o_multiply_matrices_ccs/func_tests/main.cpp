@@ -52,7 +52,7 @@ std::vector<std::vector<double>> MultiplyMatrices(const std::vector<std::vector<
   return result;
 }
 
-void func_test_template(const std::vector<std::vector<double>> &a, const std::vector<std::vector<double>> &b) {
+void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vector<std::vector<double>> &b) {
   boost::mpi::communicator world;
   std::vector<double> a_val;
   std::vector<int> a_row_ind;
@@ -137,11 +137,11 @@ void func_test_template(const std::vector<std::vector<double>> &a, const std::ve
 TEST(sedova_o_multiply_matrices_ccs_mpi, SmallMatrices) {
   std::vector<std::vector<double>> a = {{1, 0, 2}, {0, 3, 0}};
   std::vector<std::vector<double>> b = {{0, 4, 0, 0, 1}, {5, 0, 0, 2, 0}, {0, 0, 3, 0, 6}};
-  sedova_o_multiply_matrices_ccs_mpi::func_test_template(a, b);
+  sedova_o_multiply_matrices_ccs_mpi::FuncTestTemplate(a, b);
 }
 
 TEST(sedova_o_multiply_matrices_ccs_mpi, Random3x5And5x4) {
   auto a = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(3, 5, 5);
   auto b = sedova_o_multiply_matrices_ccs_mpi::GenerateMatrix(5, 4, 10);
-  sedova_o_multiply_matrices_ccs_mpi::func_test_template(a, b);
+  sedova_o_multiply_matrices_ccs_mpi::FuncTestTemplate(a, b);
 }
