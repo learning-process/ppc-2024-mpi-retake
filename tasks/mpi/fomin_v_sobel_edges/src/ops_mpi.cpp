@@ -42,7 +42,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
                          delta_height * width_, 0);
   } else {
-    boost::mpi::scatterv(world, 0, local_input_image_.data() + width_, delta_height * width_);
+    boost::mpi::scatterv(world, local_input_image_.data() + width_, delta_height * width_, 0);
   }
 
   return true;
