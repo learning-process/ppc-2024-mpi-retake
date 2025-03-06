@@ -110,6 +110,7 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
     head = new_head;
     if (head == r) {
       head_vec = std::vector(local_input.data() + (tkt * row_size_), local_input.data() + ((tkt + 1) * row_size_));
+      head_vec[i] += (double)(head_vec[i] == 0);
     }
     broadcast(world_, head_vec.data(), static_cast<int>(row_size_), head);
     Step(static_cast<int>(tkt), i, (r == head), static_cast<int>(dv), head_vec, local_input);
