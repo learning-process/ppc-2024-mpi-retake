@@ -1,7 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <ppc/core/perf.hpp>
+#include <boost/mpi/timer.hpp>
+#include <chrono>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
+#include "boost/mpi/communicator.hpp"
+#include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/fomin_v_sentence_count/include/ops_seq.hpp"
 
 TEST(sequential_sentence_count_perf_test, test_pipeline_run) {
