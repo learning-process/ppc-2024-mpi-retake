@@ -79,8 +79,8 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
 
     Extract(B_val_, B_row_ind_, B_col_ptr_, loc_start_, loc_end_, loc_val_, loc_row_ind_, loc_col_ptr_);
 
-    MultiplyCCS(At_val_, At_row_ind_, At_col_ptr_, rows_At_, loc_val_, loc_row_ind_, loc_col_ptr_, loc_cols_, loc_res_val_,
-                loc_res_row_ind_, loc_res_col_ptr_);
+    MultiplyCCS(At_val_, At_row_ind_, At_col_ptr_, rows_At_, loc_val_, loc_row_ind_, loc_col_ptr_, loc_cols_,
+                loc_res_val_, loc_res_row_ind_, loc_res_col_ptr_);
     std::vector<int> sizes_val;
     if (comm_.rank() == 0) {
       sizes_val.resize(comm_.size());
@@ -102,7 +102,8 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
       res_ind_.resize(sum);
       res_ptr_.resize(size_ptr_vector);
 
-      boost::mpi::gatherv(comm_, loc_res_val_.data(), static_cast<int>(loc_res_val_.size()), res_val_.data(), sizes_val, 0);  // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_val_.data(), static_cast<int>(loc_res_val_.size()), res_val_.data(), sizes_val, 
+                          0);  // NOLINT
       boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), static_cast<int>(loc_res_row_ind_.size()), res_ind_.data(), sizes_val,
                           0);  // NOLINT
       boost::mpi::gatherv(comm_, loc_res_col_ptr_.data(), static_cast<int>(loc_res_col_ptr_.size() - 1), res_ptr_.data(), sizes_ptr,
@@ -120,8 +121,8 @@ bool sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI::RunImpl() {
 
       res_ptr_.push_back(sum);
     } else {
-      boost::mpi::gatherv(comm_, loc_res_val_.data(), static_cast<int>(loc_res_val_.size()), 0);  // NOLINT
-      boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), static_cast<int>(loc_res_row_ind_.size()), 0);  // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_val_.data(), static_cast<int>(loc_res_val_.size()), 0);              // NOLINT
+      boost::mpi::gatherv(comm_, loc_res_row_ind_.data(), static_cast<int>(loc_res_row_ind_.size()), 0);      // NOLINT
       boost::mpi::gatherv(comm_, loc_res_col_ptr_.data(), static_cast<int>(loc_res_col_ptr_.size() - 1), 0);  // NOLINT
     }
   }
