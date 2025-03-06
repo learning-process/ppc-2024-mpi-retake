@@ -2,7 +2,6 @@
 
 #include "mpi/fomin_v_sentence_count/include/ops_mpi.hpp"
 
-
 TEST(fomin_v_sentence_count, Test_Empty_String) {
   boost::mpi::communicator world;
   std::string input = "";

@@ -31,10 +31,10 @@ class SentenceCountParallel : public ppc::core::Task {
  public:
   explicit SentenceCountParallel(std::shared_ptr<ppc::core::TaskData> taskData_, std::string ops_)
       : Task(std::move(taskData_)), ops(std::move(ops_)) {}
-      bool PreProcessingImpl() override;
-      bool ValidationImpl() override;
-      bool RunImpl() override;
-      bool PostProcessingImpl() override;
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
 
  private:
  private:

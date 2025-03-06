@@ -75,14 +75,12 @@ bool SentenceCountParallel::PostProcessingImpl() {
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::PreProcessingImpl() {
-
   input_ = reinterpret_cast<char *>(task_data->inputs[0]);
   sentence_count = 0;
   return true;
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::ValidationImpl() {
-
   return task_data->inputs_count[0] == 1 && task_data->outputs_count[0] == 1;
 }
 
@@ -96,7 +94,6 @@ bool fomin_v_sentence_count::SentenceCountSequential::RunImpl() {
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::PostProcessingImpl() {
-
   reinterpret_cast<int *>(task_data->outputs[0])[0] = sentence_count;
   return true;
 }

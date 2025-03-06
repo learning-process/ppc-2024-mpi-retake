@@ -4,7 +4,6 @@
 
 #include "seq/fomin_v_sentence_count/include/ops_seq.hpp"
 
-
 TEST(sequential_sentence_count_perf_test, test_pipeline_run) {
   // Входная строка с несколькими предложениями
   std::string input = "Hello world! How are you? I'm fine. This is a test. Another sentence!";

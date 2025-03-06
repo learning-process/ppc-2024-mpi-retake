@@ -2,7 +2,6 @@
 
 #include "seq/fomin_v_sentence_count/include/ops_seq.hpp"
 
-
 TEST(Sequential, Test_Sentence_Count_Simple) {
   // Входная строка с 3 предложениями
   std::string input = "Hello world! How are you? I'm fine.";
