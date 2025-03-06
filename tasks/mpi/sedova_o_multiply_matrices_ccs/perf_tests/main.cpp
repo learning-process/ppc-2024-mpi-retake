@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/timer.hpp>
 #include <chrono>
 #include <cstdint>
 #include <memory>

@@ -130,7 +130,7 @@ inline void MultiplyCCS(const std::vector<double>& values_a, const std::vector<i
       }
     }
 
-    col_ptr_c.push_back(values_c.size());
+    col_ptr_c.push_back(values_c.size());  //  NOLINT
   }
 }
 

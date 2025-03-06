@@ -7,50 +7,50 @@
 
 namespace sedova_o_multiply_matrices_ccs_seq {
 inline void Convertirovanie(const std::vector<std::vector<double>>& matrix, int rows, int cols,
-                            std::vector<double>& values, std::vector<int>& rowIndices, std::vector<int>& colPtr) {
-  colPtr.clear();
-  colPtr.push_back(0);
+                            std::vector<double>& values, std::vector<int>& row_indices, std::vector<int>& col_ptr) {
+  col_ptr.clear();
+  col_ptr.push_back(0);
   for (int j = 0; j < cols; ++j) {
     for (int i = 0; i < rows; ++i) {
       if (matrix[i][j] != 0.0) {
         values.push_back(matrix[i][j]);
-        rowIndices.push_back(i);
+        row_indices.push_back(i);
       }
     }
-    colPtr.push_back(values.size());
+    col_ptr.push_back(values.size());  // NOLINT
   }
 }
 
-inline void Transponirovanie(const std::vector<double>& values, const std::vector<int>& rowIndices,
-                             const std::vector<int>& colPtr, int rows, int cols, std::vector<double>& tValues,
-                             std::vector<int>& tRowIndices, std::vector<int>& tColPtr) {
-  std::vector<std::vector<int>> intVectors(rows);
-  std::vector<std::vector<double>> realVectors(rows);
+inline void Transponirovanie(const std::vector<double>& values, const std::vector<int>& row_indices,
+                             const std::vector<int>& col_ptr, int rows, int cols, std::vector<double>& t_values,
+                             std::vector<int>& t_row_indices, std::vector<int>& t_col_ptr) {
+  std::vector<std::vector<int>> int_vectors(rows);
+  std::vector<std::vector<double>> real_vectors(rows);
 
   for (int col = 0; col < cols; ++col) {
-    for (int i = colPtr[col]; i < colPtr[col + 1]; ++i) {
-      int row = rowIndices[i];
+    for (int i = col_ptr[col]; i < col_ptr[col + 1]; ++i) {
+      int row = row_indices[i];
       double value = values[i];
 
-      intVectors[row].push_back(col);
-      realVectors[row].push_back(value);
+      int_vectors[row].push_back(col);
+      real_vectors[row].push_back(value);
     }
   }
 
-  tColPtr.clear();
-  tValues.clear();
-  tRowIndices.clear();
+  t_col_ptr.clear();
+  t_values.clear();
+  t_row_indices.clear();
 
-  tColPtr.push_back(0);
+  t_col_ptr.push_back(0);
   for (int i = 0; i < rows; ++i) {
-    for (size_t j = 0; j < intVectors[i].size(); ++j) {
-      tRowIndices.push_back(intVectors[i][j]);
-      tValues.push_back(realVectors[i][j]);
+    for (size_t j = 0; j < int_vectors[i].size(); ++j) {
+      t_row_indices.push_back(int_vectors[i][j]);
+      t_values.push_back(real_vectors[i][j]);
     }
-    tColPtr.push_back(tValues.size());
+    t_col_ptr.push_back(t_values.size());  // NOLINT
   }
 }
-
+}
 class TestTaskSequential : public ppc::core::Task {
  public:
   explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}

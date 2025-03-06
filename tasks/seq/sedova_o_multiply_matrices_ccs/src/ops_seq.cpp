@@ -1,7 +1,7 @@
 ﻿#include "seq/sedova_o_multiply_matrices_ccs/include/ops_seq.hpp"
 
+#include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <vector>
 
 bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PreProcessingImpl() {
@@ -59,8 +59,8 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
   std::vector<double> x_values(rows_At_, 0.0);
 
   for (int col_b = 0; col_b < cols_B_; ++col_b) {
-    std::fill(x.begin(), x.end(), -1);
-    std::fill(x_values.begin(), x_values.end(), 0.0);
+    std::ranges::fill(x.begin(), x.end(), -1);
+    std::ranges::fill(x_values.begin(), x_values.end(), 0.0);
 
     for (int i = B_col_ptr_[col_b]; i < B_col_ptr_[col_b + 1]; ++i) {
       int row_b = B_row_ind_[i];
@@ -82,7 +82,7 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::RunImpl() {
       }
     }
 
-    res_ptr_.push_back(res_val_.size());
+    res_ptr_.push_back(res_val_.size());  // NOLINT
   }
 
   return true;
@@ -93,9 +93,9 @@ bool sedova_o_multiply_matrices_ccs_seq::TestTaskSequential::PostProcessingImpl(
   auto* c_row_ind_ptr = reinterpret_cast<int*>(task_data->outputs[1]);
   auto* c_col_ptr_ptr = reinterpret_cast<int*>(task_data->outputs[2]);
 
-  std::copy(res_val_.begin(), res_val_.end(), c_val_ptr);
-  std::copy(res_ind_.begin(), res_ind_.end(), c_row_ind_ptr);
-  std::copy(res_ptr_.begin(), res_ptr_.end(), c_col_ptr_ptr);
+  std::ranges::copy(res_val_.begin(), res_val_.end(), c_val_ptr);
+  std::ranges::copy(res_ind_.begin(), res_ind_.end(), c_row_ind_ptr);
+  std::ranges::copy(res_ptr_.begin(), res_ptr_.end(), c_col_ptr_ptr);
 
   return true;
 }
