@@ -24,22 +24,15 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::Valida
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskSequential::RunImpl() {
-  unsigned short i = 0;
-  unsigned short j = 0;
-  unsigned short count = 0;
   auto dimension = (unsigned short)sqrt(static_cast<unsigned short>(input_matrix_A_.size()));
-  while (i != dimension) {
-    j = 0;
-    while (j != dimension) {
-      count = 0;
-      while (count != dimension) {
+  output_matrix_C_.resize(dimension * dimension, 0.0);
+  for (unsigned short i = 0; i < dimension; ++i) {
+    for (unsigned short j = 0; j < dimension; ++j) {
+      for (unsigned short k = 0; k < dimension; ++k) {
         output_matrix_C_[(i * dimension) + j] +=
-            input_matrix_A_[(i * dimension) + count] * input_matrix_B_[(count * dimension) + j];
-        count++;
+            input_matrix_A_[(i * dimension) + k] * input_matrix_B_[(k * dimension) + j];
       }
-      j++;
     }
-    i++;
   }
   return true;
 }
@@ -74,9 +67,9 @@ void deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::HandleTr
   if (world_.rank() == 0) {
     dimension_ = static_cast<unsigned short>(std::sqrt(static_cast<unsigned short>(input_matrix_A_.size())));
     output_matrix_C_.resize(dimension_ * dimension_, 0.0);
-    for (unsigned short i = 0; i < dimension_; i++) {
-      for (unsigned short j = 0; j < dimension_; j++) {
-        for (unsigned short k = 0; k < dimension_; k++) {
+    for (unsigned short i = 0; i < dimension_; ++i) {
+      for (unsigned short j = 0; j < dimension_; ++j) {
+        for (unsigned short k = 0; k < dimension_; ++k) {
           output_matrix_C_[(i * dimension_) + j] +=
               input_matrix_A_[(i * dimension_) + k] * input_matrix_B_[(k * dimension_) + j];
         }
@@ -272,14 +265,13 @@ bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::RunImpl(
   } else {
     HandleTrivialCase();
   }
-  world_.barrier();
   return true;
 }
 
 bool deryabin_m_cannons_algorithm_mpi::CannonsAlgorithmMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     reinterpret_cast<std::vector<double>*>(task_data->outputs[0])[0] = output_matrix_C_;
+    output_matrix_C_.clear();
   }
-  output_matrix_C_.clear();
   return true;
 }
