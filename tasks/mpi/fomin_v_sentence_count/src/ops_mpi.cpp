@@ -72,6 +72,7 @@ bool fomin_v_sentence_count::SentenceCountParallel::PostProcessingImpl() {
   if (world.rank() == 0) {
     reinterpret_cast<int *>(task_data->outputs[0])[0] = total_sentence_count;
   }
+  return true;
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::PreProcessingImpl() {
