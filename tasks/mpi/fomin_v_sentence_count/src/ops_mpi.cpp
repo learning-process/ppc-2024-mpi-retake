@@ -44,7 +44,8 @@ bool fomin_v_sentence_count::SentenceCountParallel::PreProcessingImpl() {
 
 bool fomin_v_sentence_count::SentenceCountParallel::ValidationImpl() {
   if (world.rank() == 0) {
-    return task_data->inputs_count[0] == static_cast<unsigned int>(input_size) && task_data->outputs_count[0] == 1;
+    return task_data->inputs_count.size() == 1 && task_data->outputs_count.size() == 1 &&
+           task_data->outputs_count[0] == 1;
   }
   return true;
 }
@@ -55,9 +56,7 @@ bool fomin_v_sentence_count::SentenceCountParallel::RunImpl() {
   for (int i = 0; i < portion_size; ++i) {
     if (ispunct(local_input_vec[i]) &&
         (local_input_vec[i] == '.' || local_input_vec[i] == '!' || local_input_vec[i] == '?')) {
-      if (i == portion_size - 1 || isspace(local_input_vec[i + 1])) {
-        local_sentence_count++;
-      }
+      local_sentence_count++;
     }
   }
 
@@ -82,7 +81,8 @@ bool fomin_v_sentence_count::SentenceCountSequential::PreProcessingImpl() {
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::ValidationImpl() {
-  return task_data->inputs_count[0] == 1 && task_data->outputs_count[0] == 1;
+  return task_data->inputs_count.size() == 1 && task_data->outputs_count.size() == 1 &&
+         task_data->outputs_count[0] == 1;
 }
 
 bool fomin_v_sentence_count::SentenceCountSequential::RunImpl() {

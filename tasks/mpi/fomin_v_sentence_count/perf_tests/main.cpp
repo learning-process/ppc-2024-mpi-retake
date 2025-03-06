@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi/timer.hpp>
 #include <chrono>
 #include <cstdint>
 #include <memory>
@@ -37,7 +36,6 @@ TEST(fomin_v_sentence_count, test_parallel_pipeline_run) {
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
-  const boost::mpi::timer current_timer;
   perfAttr->current_timer = [&] { return current_timer.elapsed(); };
 
   // Create and init perf results
@@ -77,7 +75,6 @@ TEST(fomin_v_sentence_count, test_sequential_task_run) {
   // Create Perf attributes
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 10;
-  const boost::mpi::timer current_timer;
   perfAttr->current_timer = [&] { return current_timer.elapsed(); };
 
   // Create and init perf results
