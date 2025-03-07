@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <random>
 #include <string>
 #include <vector>
 
@@ -13,11 +12,11 @@
 #include "mpi/chernova_n_topology_ring/include/ops_mpi.hpp"
 
 namespace {
-const std::string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+const std::string kAlphabet = "abcdefghijklmnopqrstuvwxyz";
 
 std::vector<char> GenerateData(int k) {
   std::string result;
-  size_t j = ALPHABET.size();
+  size_t j = kAlphabet.size();
   int tmp = 7;
   int i = 0;
   while (i < k) {
@@ -26,7 +25,7 @@ std::vector<char> GenerateData(int k) {
       result += ' ';
       i++;
     } else {
-      result += ALPHABET[r];
+      result += kAlphabet[r];
     }
   }
 
