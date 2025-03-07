@@ -22,8 +22,8 @@ class GlobalOptSequential : public ppc::core::Task {
   friend bool CheckConstraints(double x, double y, int constraint_num, std::vector<double> constraints);
   friend double ComputeFunction(double x, double y, std::vector<double> params);
   friend double GetConstraintsSum(double x, double y, int num, std::vector<double> vec);
-  friend bool IsAcceptable (double x, double y, int constraint_num, std::vector<double> constraints);
-  
+  friend bool IsAcceptable(double x, double y, int constraint_num, std::vector<double> constraints);
+
   double delta;
   std::vector<double> bounds;
   std::vector<double> params;
@@ -36,6 +36,6 @@ class GlobalOptSequential : public ppc::core::Task {
 bool CheckConstraints(double x, double y, int constraint_num, std::vector<double> constraints);
 double ComputeFunction(double x, double y, std::vector<double> params);
 double GetConstraintsSum(double x, double y, int num, std::vector<double> vec);
-bool IsAcceptable (double x, double y, int constraint_num, std::vector<double> constraints);
+bool IsAcceptable(double x, double y, int constraint_num, std::vector<double> constraints);
 
-}  // namespace tarakanov_d_global_opt_two_dim_prob_mpi
+}  // namespace tarakanov_d_global_opt_two_dim_prob_seq
