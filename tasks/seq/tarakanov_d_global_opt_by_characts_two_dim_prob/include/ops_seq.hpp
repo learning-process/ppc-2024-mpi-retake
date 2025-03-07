@@ -24,12 +24,12 @@ class GlobalOptSequential : public ppc::core::Task {
   friend double GetConstraintsSum(double x, double y, int num, std::vector<double> vec);
   friend bool IsAcceptable (double x, double y, int constraint_num, std::vector<double> constraints);
   
-  double step;
+  double delta;
   std::vector<double> bounds;
-  std::vector<double> func_params;
-  std::vector<double> constraints;
+  std::vector<double> params;
+  std::vector<double> constr;
   int mode;
-  int num_constraints;
+  int constr_num;
   double result;
 };
 
