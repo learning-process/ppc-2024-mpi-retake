@@ -15,12 +15,44 @@ using namespace std::chrono_literals;
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
-    input_image_ = std::vector<unsigned char>(static_cast<unsigned char *>(task_data->inputs[0]),
-                                              static_cast<unsigned char *>(task_data->inputs[0]) + width_ * height_);
+    width_ = task_data->inputs_count[0];
+    height_ = task_data->inputs_count[1];
+
+    // Проверка перед созданием вектора
+    if (width_ <= 0 || height_ <= 0) {
+      throw std::runtime_error("Invalid image dimensions");
+    }
+
+    input_image_.resize(width_ * height_);
+    std::copy(static_cast<unsigned char *>(task_data->inputs[0]),
+              static_cast<unsigned char *>(task_data->inputs[0]) + width_ * height_, input_image_.begin());
   }
 
   boost::mpi::broadcast(world, width_, 0);
   boost::mpi::broadcast(world, height_, 0);
+
+  // Защита от деления на ноль и отрицательных размеров
+  const int num_procs = std::max(1, world.size());
+  int delta_height = height_ / num_procs;
+  local_height_ = delta_height;
+
+  if (world.rank() == num_procs - 1) {
+    local_height_ = height_ - delta_height * (num_procs - 1);
+  }
+
+  // Проверка корректности локальной высоты
+  if (local_height_ < 0 || width_ <= 0) {
+    throw std::runtime_error("Invalid local partition dimensions");
+  }
+
+  // Вычисление с проверкой переполнения
+  const size_t buffer_size = static_cast<size_t>(local_height_ + 2) * width_;
+  if (buffer_size > local_input_image_.max_size()) {
+    throw std::runtime_error("Buffer size exceeds maximum allowed");
+  }
+
+  local_input_image_.resize(buffer_size, 0);
+  local_output_image_.resize(static_cast<size_t>(local_height_) * width_, 0);
 
   int delta_height = height_ / world.size();
   local_height_ = (world.rank() == world.size() - 1) ? height_ - delta_height * (world.size() - 1) : delta_height;
