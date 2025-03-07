@@ -9,7 +9,7 @@
 
 TEST(shishkarev_a_dijkstra_algorithm_mpi, test_PipelineRun) {
   boost::mpi::communicator world;
-  int count_size_vector = 1000;
+  int count_size_vector = 10000;
   int st = 0;
   std::vector<int> global_matrix(count_size_vector * count_size_vector, 3);
   std::vector<int32_t> global_path(count_size_vector, 3);
@@ -54,7 +54,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, test_PipelineRun) {
 
 TEST(shishkarev_a_dijkstra_algorithm_mpi, test_task_run) {
   boost::mpi::communicator world;
-  int count_size_vector = 1000;
+  int count_size_vector = 10000;
   int st = 5;
   std::vector<int> global_matrix(count_size_vector * count_size_vector, 3);
   std::vector<int32_t> global_path(count_size_vector, 3);
