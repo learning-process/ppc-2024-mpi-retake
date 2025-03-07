@@ -1,8 +1,11 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "seq/shishkarev_a_dijkstra_algorithm/include/ops_seq.hpp"
 
 TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Graph_3x3) {
@@ -14,20 +17,20 @@ TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Graph_3x3) {
   std::vector<int> ans = {0, 2, 4};
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.emplace_back(matrix.size());
-  taskDataSeq->inputs_count.emplace_back(size);
-  taskDataSeq->inputs_count.emplace_back(st);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-  taskDataSeq->outputs_count.emplace_back(res.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->inputs_count.emplace_back(st);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   // Create Task
-  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   ASSERT_EQ(ans, res);
 }
 
@@ -40,20 +43,20 @@ TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Graph_4x4) {
   std::vector<int> ans = {0, 5, 8, 3};
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.emplace_back(matrix.size());
-  taskDataSeq->inputs_count.emplace_back(size);
-  taskDataSeq->inputs_count.emplace_back(st);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-  taskDataSeq->outputs_count.emplace_back(res.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->inputs_count.emplace_back(st);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   // Create Task
-  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   ASSERT_EQ(ans, res);
 }
 
@@ -66,20 +69,20 @@ TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Graph_5x5) {
   std::vector<int> ans = {0, 5, 6, 3, 5};
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.emplace_back(matrix.size());
-  taskDataSeq->inputs_count.emplace_back(size);
-  taskDataSeq->inputs_count.emplace_back(st);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-  taskDataSeq->outputs_count.emplace_back(res.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->inputs_count.emplace_back(st);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   // Create Task
-  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_EQ(testTaskSequential.ValidationImpl(), true);
-  testTaskSequential.PreProcessingImpl();
-  testTaskSequential.RunImpl();
-  testTaskSequential.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
+  test_task_sequential.PreProcessingImpl();
+  test_task_sequential.RunImpl();
+  test_task_sequential.PostProcessingImpl();
   ASSERT_EQ(ans, res);
 }
 
@@ -91,17 +94,17 @@ TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Negative_Value) {
   std::vector<int> res(size, 0);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.emplace_back(matrix.size());
-  taskDataSeq->inputs_count.emplace_back(size);
-  taskDataSeq->inputs_count.emplace_back(st);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-  taskDataSeq->outputs_count.emplace_back(res.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->inputs_count.emplace_back(st);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   // Create Task
-  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_FALSE(testTaskSequential.ValidationImpl());
+  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_FALSE(test_task_sequential.ValidationImpl());
 }
 
 TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Source_Vertex_False) {
@@ -112,15 +115,15 @@ TEST(shishkarev_a_dijkstra_algorithm_seq, Test_Source_Vertex_False) {
   std::vector<int> res(size, 0);
 
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-  taskDataSeq->inputs_count.emplace_back(matrix.size());
-  taskDataSeq->inputs_count.emplace_back(size);
-  taskDataSeq->inputs_count.emplace_back(st);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-  taskDataSeq->outputs_count.emplace_back(res.size());
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+  task_data_seq->inputs_count.emplace_back(matrix.size());
+  task_data_seq->inputs_count.emplace_back(size);
+  task_data_seq->inputs_count.emplace_back(st);
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+  task_data_seq->outputs_count.emplace_back(res.size());
 
   // Create Task
-  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential testTaskSequential(taskDataSeq);
-  ASSERT_FALSE(testTaskSequential.ValidationImpl());
+  shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential test_task_sequential(task_data_seq);
+  ASSERT_FALSE(test_task_sequential.ValidationImpl());
 }

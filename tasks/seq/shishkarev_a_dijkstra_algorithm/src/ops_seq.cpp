@@ -2,20 +2,38 @@
 #include "seq/shishkarev_a_dijkstra_algorithm/include/ops_seq.hpp"
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
-const int INF = std::numeric_limits<int>::max();
+void shishkarev_a_dijkstra_algorithm_seq::ConvertToCrs(const std::vector<int>& w, std::vector<int>& values,
+                                                       std::vector<int>& col_index, std::vector<int>& row_ptr, int n) {
+  row_ptr.resize(n + 1);
+  int nnz = 0;
+
+  for (int i = 0; i < n; i++) {
+    row_ptr[i] = nnz;
+    for (int j = 0; j < n; j++) {
+      int weight = w[(i * n) + j];
+      if (weight != 0) {
+        values.emplace_back(weight);
+        col_index.emplace_back(j);
+        nnz++;
+      }
+    }
+  }
+  row_ptr[n] = nnz;
+}
 
 bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::PreProcessingImpl() {
-  // Init value for input and output
-  size = task_data->inputs_count[1];
-  st = task_data->inputs_count[2];
 
-  input_ = std::vector<int>(size * size);
+  size_ = static_cast<int>(task_data->inputs_count[1]);
+  st_ = static_cast<int>(task_data->inputs_count[2]);
+
+  input_ = std::vector<int>(size_ * size_);
   auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
 
-  res_ = std::vector<int>(size, 0);
+  res_ = std::vector<int>(size_, 0);
   return true;
 }
 
@@ -45,66 +63,48 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::ValidationImpl() {
   return true;
 }
 
-void shishkarev_a_dijkstra_algorithm_seq::convertToCRS(const std::vector<int>& w, std::vector<int>& values,
-                                                       std::vector<int>& colIndex, std::vector<int>& rowPtr, int n) {
-  rowPtr.resize(n + 1);
-  int nnz = 0;
-
-  for (int i = 0; i < n; i++) {
-    rowPtr[i] = nnz;
-    for (int j = 0; j < n; j++) {
-      int weight = w[i * n + j];
-      if (weight != 0) {
-        values.emplace_back(weight);
-        colIndex.emplace_back(j);
-        nnz++;
-      }
-    }
-  }
-  rowPtr[n] = nnz;
-}
-
 bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::RunImpl() {
+  const int INF = std::numeric_limits<int>::max();
   std::vector<int> values;
-  std::vector<int> colIndex;
-  std::vector<int> rowPtr;
-  convertToCRS(input_, values, colIndex, rowPtr, size);
+  std::vector<int> col_index;
+  std::vector<int> row_ptr;
+  ConvertToCrs(input_, values, col_index, row_ptr, size_);
 
-  std::vector<bool> visited(size, false);
-  std::vector<int> D(size, INF);
-  D[st] = 0;
+  std::vector<bool> visited(size_, false);
+  std::vector<int> d(size_, INF);
+  d[st_] = 0;
 
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size_; i++) {
     int min = INF;
     int index = -1;
-    for (int j = 0; j < size; j++) {
-      if (!visited[j] && D[j] < min) {
-        min = D[j];
+    for (int j = 0; j < size_; j++) {
+      if (!visited[j] && d[j] < min) {
+        min = d[j];
         index = j;
       }
     }
 
-    if (index == -1) break;
+    if (index == -1) { break; }
 
     int u = index;
     visited[u] = true;
 
-    for (int j = rowPtr[u]; j < rowPtr[u + 1]; j++) {
-      int v = colIndex[j];
+    for (int j = row_ptr[u]; j < row_ptr[u + 1]; j++) {
+      int v = col_index[j];
       int weight = values[j];
 
-      if (!visited[v] && D[u] != INF && (D[u] + weight < D[v])) {
-        D[v] = D[u] + weight;
+      if (!visited[v] && d[u] != INF && (d[u] + weight < d[v])) {
+        d[v] = d[u] + weight;
       }
     }
   }
 
-  res_ = D;
+  res_ = d;
 
   return true;
 }
 
 bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::PostProcessingImpl() {
-  std::copy(res_.begin(), res_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
+  std::copy(res_.begin(), res_.end(), reinterpret_cast<int*>(task_data->outputs[0]));  // NOLINT
   return true;
 }

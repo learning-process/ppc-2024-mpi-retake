@@ -2,13 +2,16 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <iomanip>
+#include <cstdint>
 #include <random>
+#include <memory>
 #include <vector>
 
+#include "core/task/include/task.hpp"
 #include "mpi/shishkarev_a_dijkstra_algorithm/include/ops_mpi.hpp"
-void shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(std::vector<int> &w, int n, int min, int max) {
+
+namespace {
+void shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(std::vector<int> &w, int n, int min, int max) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(min, max);
@@ -17,9 +20,10 @@ void shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(std::vector<int> &w, in
     w[i] = val;
   }
   for (int i = 0; i < n; i++) {
-    w[i * n + i] = 0;
+    w[(i * n) + i] = 0;
   }
 }
+}  //namespace
 
 TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_5_vertex) {
   boost::mpi::communicator world;
@@ -29,44 +33,42 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_5_vertex) {
   int max = 10;
   std::vector<int> matrix(size * size, 0);
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(matrix, size, min, max);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.ValidationImpl(), true);
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel.ValidationImpl(), true);
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    // Create data
+
     std::vector<int> res_seq(size, 0);
 
-    // Create TaskData
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(matrix.size());
-    taskDataSeq->inputs_count.emplace_back(size);
-    taskDataSeq->inputs_count.emplace_back(st);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
-    taskDataSeq->outputs_count.emplace_back(res_seq.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_seq->inputs_count.emplace_back(matrix.size());
+    task_data_seq->inputs_count.emplace_back(size);
+    task_data_seq->inputs_count.emplace_back(st);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
+    task_data_seq->outputs_count.emplace_back(res_seq.size());
 
-    // Create Task
-    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.ValidationImpl(), true);
-    testMpiTaskSequential.PreProcessingImpl();
-    testMpiTaskSequential.RunImpl();
-    testMpiTaskSequential.PostProcessingImpl();
+    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential test_mpi_task_sequential(task_data_seq);
+    ASSERT_EQ(test_mpi_task_sequential.ValidationImpl(), true);
+    test_mpi_task_sequential.PreProcessingImpl();
+    test_mpi_task_sequential.RunImpl();
+    test_mpi_task_sequential.PostProcessingImpl();
 
     ASSERT_EQ(res_seq, res);
   }
@@ -80,44 +82,42 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_10_vertex) {
   int max = 50;
   std::vector<int> matrix(size * size, 0);
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(matrix, size, min, max);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.ValidationImpl(), true);
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel.ValidationImpl(), true);
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    // Create data
+
     std::vector<int> res_seq(size, 0);
 
-    // Create TaskData
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(matrix.size());
-    taskDataSeq->inputs_count.emplace_back(size);
-    taskDataSeq->inputs_count.emplace_back(st);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
-    taskDataSeq->outputs_count.emplace_back(res_seq.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_seq->inputs_count.emplace_back(matrix.size());
+    task_data_seq->inputs_count.emplace_back(size);
+    task_data_seq->inputs_count.emplace_back(st);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
+    task_data_seq->outputs_count.emplace_back(res_seq.size());
 
-    // Create Task
-    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.ValidationImpl(), true);
-    testMpiTaskSequential.PreProcessingImpl();
-    testMpiTaskSequential.RunImpl();
-    testMpiTaskSequential.PostProcessingImpl();
+    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential test_mpi_task_sequential(task_data_seq);
+    ASSERT_EQ(test_mpi_task_sequential.ValidationImpl(), true);
+    test_mpi_task_sequential.PreProcessingImpl();
+    test_mpi_task_sequential.RunImpl();
+    test_mpi_task_sequential.PostProcessingImpl();
 
     ASSERT_EQ(res_seq, res);
   }
@@ -131,44 +131,42 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_13_vertex) {
   int max = 20;
   std::vector<int> matrix(size * size, 0);
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(matrix, size, min, max);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.ValidationImpl(), true);
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel.ValidationImpl(), true);
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    // Create data
+
     std::vector<int> res_seq(size, 0);
 
-    // Create TaskData
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(matrix.size());
-    taskDataSeq->inputs_count.emplace_back(size);
-    taskDataSeq->inputs_count.emplace_back(st);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
-    taskDataSeq->outputs_count.emplace_back(res_seq.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_seq->inputs_count.emplace_back(matrix.size());
+    task_data_seq->inputs_count.emplace_back(size);
+    task_data_seq->inputs_count.emplace_back(st);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
+    task_data_seq->outputs_count.emplace_back(res_seq.size());
 
-    // Create Task
-    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.ValidationImpl(), true);
-    testMpiTaskSequential.PreProcessingImpl();
-    testMpiTaskSequential.RunImpl();
-    testMpiTaskSequential.PostProcessingImpl();
+    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential test_mpi_task_sequential(task_data_seq);
+    ASSERT_EQ(test_mpi_task_sequential.ValidationImpl(), true);
+    test_mpi_task_sequential.PreProcessingImpl();
+    test_mpi_task_sequential.RunImpl();
+    test_mpi_task_sequential.PostProcessingImpl();
 
     ASSERT_EQ(res_seq, res);
   }
@@ -182,44 +180,42 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_20_vertex) {
   int max = 40;
   std::vector<int> matrix(size * size, 0);
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(matrix, size, min, max);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.ValidationImpl(), true);
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel.ValidationImpl(), true);
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    // Create data
+
     std::vector<int> res_seq(size, 0);
 
-    // Create TaskData
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(matrix.size());
-    taskDataSeq->inputs_count.emplace_back(size);
-    taskDataSeq->inputs_count.emplace_back(st);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
-    taskDataSeq->outputs_count.emplace_back(res_seq.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_seq->inputs_count.emplace_back(matrix.size());
+    task_data_seq->inputs_count.emplace_back(size);
+    task_data_seq->inputs_count.emplace_back(st);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
+    task_data_seq->outputs_count.emplace_back(res_seq.size());
 
-    // Create Task
-    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.ValidationImpl(), true);
-    testMpiTaskSequential.PreProcessingImpl();
-    testMpiTaskSequential.RunImpl();
-    testMpiTaskSequential.PostProcessingImpl();
+    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential test_mpi_task_sequential(task_data_seq);
+    ASSERT_EQ(test_mpi_task_sequential.ValidationImpl(), true);
+    test_mpi_task_sequential.PreProcessingImpl();
+    test_mpi_task_sequential.RunImpl();
+    test_mpi_task_sequential.PostProcessingImpl();
 
     ASSERT_EQ(res_seq, res);
   }
@@ -233,22 +229,22 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Source_Vertex_False) {
   int max = 20;
   std::vector<int> matrix(size * size, 0);
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::generateMatrix(matrix, size, min, max);
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
   if (world.rank() == 0) {
-    ASSERT_FALSE(testMpiTaskParallel.ValidationImpl());
+    ASSERT_FALSE(test_mpi_task_parallel.ValidationImpl());
   }
 }
 
@@ -258,21 +254,21 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Negative_Value) {
   int st = 0;
   std::vector<int> matrix = {0, 2, 5, 4, 0, 2, 3, -1, 0};
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
   if (world.rank() == 0) {
-    ASSERT_FALSE(testMpiTaskParallel.ValidationImpl());
+    ASSERT_FALSE(test_mpi_task_parallel.ValidationImpl());
   }
 }
 
@@ -280,46 +276,44 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Spare_Graph_5x5) {
   boost::mpi::communicator world;
   int size = 5;
   int st = 0;
-  // Create data
+
   std::vector<int> matrix = {0, 5, 0, 3, 0, 0, 0, 4, 2, 2, 0, 0, 0, 3, 0, 0, 3, 0, 0, 2, 9, 0, 1, 0, 0};
   std::vector<int> res(size, 0);
-  // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataPar->inputs_count.emplace_back(matrix.size());
-    taskDataPar->inputs_count.emplace_back(size);
-    taskDataPar->inputs_count.emplace_back(st);
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
-    taskDataPar->outputs_count.emplace_back(res.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->inputs_count.emplace_back(size);
+    task_data_par->inputs_count.emplace_back(st);
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
+    task_data_par->outputs_count.emplace_back(res.size());
   }
 
-  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel testMpiTaskParallel(taskDataPar);
-  ASSERT_EQ(testMpiTaskParallel.ValidationImpl(), true);
-  testMpiTaskParallel.PreProcessingImpl();
-  testMpiTaskParallel.RunImpl();
-  testMpiTaskParallel.PostProcessingImpl();
+  shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel test_mpi_task_parallel(task_data_par);
+  ASSERT_EQ(test_mpi_task_parallel.ValidationImpl(), true);
+  test_mpi_task_parallel.PreProcessingImpl();
+  test_mpi_task_parallel.RunImpl();
+  test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    // Create data
+
     std::vector<int> res_seq(size, 0);
 
-    // Create TaskData
-    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
-    taskDataSeq->inputs_count.emplace_back(matrix.size());
-    taskDataSeq->inputs_count.emplace_back(size);
-    taskDataSeq->inputs_count.emplace_back(st);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
-    taskDataSeq->outputs_count.emplace_back(res_seq.size());
+    std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_seq->inputs_count.emplace_back(matrix.size());
+    task_data_seq->inputs_count.emplace_back(size);
+    task_data_seq->inputs_count.emplace_back(st);
+    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(res_seq.data()));
+    task_data_seq->outputs_count.emplace_back(res_seq.size());
 
-    // Create Task
-    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential testMpiTaskSequential(taskDataSeq);
-    ASSERT_EQ(testMpiTaskSequential.ValidationImpl(), true);
-    testMpiTaskSequential.PreProcessingImpl();
-    testMpiTaskSequential.RunImpl();
-    testMpiTaskSequential.PostProcessingImpl();
+    shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential test_mpi_task_sequential(task_data_seq);
+    ASSERT_EQ(test_mpi_task_sequential.ValidationImpl(), true);
+    test_mpi_task_sequential.PreProcessingImpl();
+    test_mpi_task_sequential.RunImpl();
+    test_mpi_task_sequential.PostProcessingImpl();
 
     ASSERT_EQ(res_seq, res);
   }

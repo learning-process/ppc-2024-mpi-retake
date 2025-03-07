@@ -1,18 +1,19 @@
 // Copyright 2023 Nesterov Alexander
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace shishkarev_a_dijkstra_algorithm_seq {
 
-void convertToCRS(const std::vector<int>& w, std::vector<int>& values, std::vector<int>& colIndex,
-                  std::vector<int>& rowPtr, int n);
+void ConvertToCrs(const std::vector<int>& w, std::vector<int>& values, std::vector<int>& col_index,
+                  std::vector<int>& row_ptr, int n);
 
 class TestTaskSequential : public ppc::core::Task {
  public:
-  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit TestTaskSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -21,8 +22,8 @@ class TestTaskSequential : public ppc::core::Task {
  private:
   std::vector<int> input_;
   std::vector<int> res_;
-  int st{};
-  int size{};
+  int st_{};
+  int size_{};
 };
 
 }  // namespace shishkarev_a_dijkstra_algorithm_seq

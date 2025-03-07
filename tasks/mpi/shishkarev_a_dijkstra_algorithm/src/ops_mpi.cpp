@@ -2,39 +2,42 @@
 #include "mpi/shishkarev_a_dijkstra_algorithm/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <functional>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/reduce.hpp>
+#include <climits>
+#include <limits>
+#include <utility>
 #include <vector>
 
-const int INF = std::numeric_limits<int>::max();
-
 void shishkarev_a_dijkstra_algorithm_mpi::convertToCRS(const std::vector<int>& w, std::vector<int>& values,
-                                                       std::vector<int>& colIndex, std::vector<int>& rowPtr, int n) {
-  rowPtr.resize(n + 1);
+                                                       std::vector<int>& col_index, std::vector<int>& row_ptr, int n) {
+  row_ptr.resize(n + 1);
   int nnz = 0;
   for (int i = 0; i < n; i++) {
-    rowPtr[i] = nnz;
+    row_ptr[i] = nnz;
     for (int j = 0; j < n; j++) {
-      int weight = w[i * n + j];
+      int weight = w[(i * n) + j];
       if (weight != 0) {
         values.emplace_back(weight);
-        colIndex.emplace_back(j);
+        col_index.emplace_back(j);
         nnz++;
       }
     }
   }
-  rowPtr[n] = nnz;
+  row_ptr[n] = nnz;
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::PreProcessingImpl() {
-  // Init vectors
-  size = task_data->inputs_count[1];
-  st = task_data->inputs_count[2];
 
-  input_ = std::vector<int>(size * size);
+  size_ = static_cast<int>(task_data->inputs_count[1]);
+  st_ = static_cast<int>(task_data->inputs_count[2]);
+
+
+  input_ = std::vector<int>(size_ * size_);
   auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
   input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
 
-  res_ = std::vector<int>(size, 0);
+  res_ = std::vector<int>(size_, 0);
   return true;
 }
 
@@ -64,69 +67,70 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::ValidationImpl(
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
+  const int INF = std::numeric_limits<int>::max();
   std::vector<int> values;
-  std::vector<int> colIndex;
-  std::vector<int> rowPtr;
-  convertToCRS(input_, values, colIndex, rowPtr, size);
+  std::vector<int> col_index_;
+  std::vector<int> row_ptr_;
+  convertToCRS(input_, values, col_index_, row_ptr_, size_);
 
-  std::vector<bool> visited(size, false);
-  std::vector<int> D(size, INF);
-  D[st] = 0;
+  std::vector<bool> visited(size_, false);
+  std::vector<int> d(size_, INF);
+  d[st_] = 0;
 
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size_; i++) {
     int min = INF;
     int index = -1;
-    for (int j = 0; j < size; j++) {
-      if (!visited[j] && D[j] < min) {
-        min = D[j];
+    for (int j = 0; j < size_; j++) {
+      if (!visited[j] && d[j] < min) {
+        min = d[j];
         index = j;
       }
     }
 
-    if (index == -1) break;
+    if (index == -1) { break; }
 
     int u = index;
     visited[u] = true;
 
-    for (int j = rowPtr[u]; j < rowPtr[u + 1]; j++) {
-      int v = colIndex[j];
+    for (int j = row_ptr_[u]; j < row_ptr_[u + 1]; j++) {
+      int v = col_index_[j];
       int weight = values[j];
 
-      if (!visited[v] && D[u] != INF && (D[u] + weight < D[v])) {
-        D[v] = D[u] + weight;
+      if (!visited[v] && d[u] != INF && (d[u] + weight < d[v])) {
+        d[v] = d[u] + weight;
       }
     }
   }
 
-  res_ = D;
+  res_ = d;
 
   return true;
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::PostProcessingImpl() {
-  std::copy(res_.begin(), res_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
+  std::copy(res_.begin(), res_.end(), reinterpret_cast<int*>(task_data->outputs[0]));  // NOLINT
   return true;
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::PreProcessingImpl() {
-  if (world.rank() == 0) {
-    size = task_data->inputs_count[1];
-    st = task_data->inputs_count[2];
+  if (world_.rank() == 0) {
+    size_ = static_cast<int>(task_data->inputs_count[1]);
+    st_ = static_cast<int>(task_data->inputs_count[2]);
   }
 
-  if (world.rank() == 0) {
-    input_ = std::vector<int>(size * size);
+  if (world_.rank() == 0) {
+    input_ = std::vector<int>(size_ * size_);
     auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
-    convertToCRS(input_, values, colIndex, rowPtr, size);
+    convertToCRS(input_, values, col_index_, row_ptr_, size_);
   } else {
-    input_ = std::vector<int>(size * size, 0);
+    input_ = std::vector<int>(size_ * size_, 0);
   }
   return true;
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::ValidationImpl() {
-  if (world.rank() == 0) {
+  if (world_.rank() == 0) {
     if (task_data->inputs.empty()) {
       return false;
     }
@@ -153,45 +157,45 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::ValidationImpl() 
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
-  boost::mpi::broadcast(world, size, 0);
-  boost::mpi::broadcast(world, st, 0);
+  const int INF = std::numeric_limits<int>::max();
+  boost::mpi::broadcast(world_, size_, 0);
+  boost::mpi::broadcast(world_, st_, 0);
 
-  // broadcast of CRS vectors
-  int values_size = values.size();
-  int rowPtr_size = rowPtr.size();
-  int colIndex_size = colIndex.size();
+  int values_size = static_cast<int>(values.size());
+  int row_ptr_size = static_cast<int>(row_ptr_.size());
+  int col_index_size = static_cast<int>(col_index_.size());
 
-  boost::mpi::broadcast(world, values_size, 0);
-  boost::mpi::broadcast(world, rowPtr_size, 0);
-  boost::mpi::broadcast(world, colIndex_size, 0);
+  boost::mpi::broadcast(world_, values_size, 0);
+  boost::mpi::broadcast(world_, row_ptr_size, 0);
+  boost::mpi::broadcast(world_, col_index_size, 0);
 
   values.resize(values_size);
-  rowPtr.resize(rowPtr_size);
-  colIndex.resize(colIndex_size);
+  row_ptr_.resize(row_ptr_size);
+  col_index_.resize(col_index_size);
 
-  boost::mpi::broadcast(world, values.data(), values.size(), 0);
-  boost::mpi::broadcast(world, rowPtr.data(), rowPtr.size(), 0);
-  boost::mpi::broadcast(world, colIndex.data(), colIndex.size(), 0);
+  boost::mpi::broadcast(world_, static_cast<int>(values.data()), static_cast<int>(values.size()), 0);
+  boost::mpi::broadcast(world_, static_cast<int>(row_ptr_.data()), static_cast<int>(row_ptr_.size()), 0);
+  boost::mpi::broadcast(world_, static_cast<int>(col_index_.data()), static_cast<int>(col_index_.size()), 0);
 
-  int delta = size / world.size();
-  int extra = size % world.size();
+  int delta = size_ / world_.size();
+  int extra = size_ % world_.size();
   if (extra != 0) {
     delta += 1;
   }
-  int start_index = world.rank() * delta;
-  int end_index = std::min(size, delta * (world.rank() + 1));
+  int start_index = world_.rank() * delta;
+  int end_index = std::min(size_, delta * (world_.rank() + 1));
 
-  res_.resize(size, INT_MAX);
-  std::vector<bool> visited(size, false);
-  std::vector<int> D(size, INF);
+  res_.resize(size_, INT_MAX);
+  std::vector<bool> visited(size_, false);
+  std::vector<int> d(size_, INF);
 
-  if (world.rank() == 0) {
-    res_[st] = 0;
+  if (world_.rank() == 0) {
+    res_[st_] = 0;
   }
 
-  boost::mpi::broadcast(world, res_.data(), size, 0);
+  boost::mpi::broadcast(world_, res_.data(), size_, 0);
 
-  for (int k = 0; k < size; k++) {
+  for (int k = 0; k < size_; k++) {
     int local_min = INF;
     int local_index = -1;
 
@@ -205,10 +209,10 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
     std::pair<int, int> local_pair = {local_min, local_index};
     std::pair<int, int> global_pair = {INF, -1};
 
-    boost::mpi::all_reduce(world, local_pair, global_pair,
+    boost::mpi::all_reduce(world_, local_pair, global_pair,
                            [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
-                             if (a.first < b.first) return a;
-                             if (a.first > b.first) return b;
+                             if (a.first < b.first) { return a; }
+                             if (a.first > b.first) { return b; }
                              return a;
                            });
 
@@ -218,8 +222,8 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
 
     visited[global_pair.second] = true;
 
-    for (int j = rowPtr[global_pair.second]; j < rowPtr[global_pair.second + 1]; j++) {
-      int v = colIndex[j];
+    for (int j = row_ptr_[global_pair.second]; j < row_ptr_[global_pair.second + 1]; j++) {
+      int v = col_index_[j];
       int w = values[j];
 
       if (!visited[v] && res_[global_pair.second] != INF && (res_[global_pair.second] + w < res_[v])) {
@@ -227,16 +231,16 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
       }
     }
 
-    boost::mpi::all_reduce(world, res_.data(), size, D.data(), boost::mpi::minimum<int>());
-    res_ = D;
+    boost::mpi::all_reduce(world_, res_.data(), size_, d.data(), boost::mpi::minimum<int>());
+    res_ = d;
   }
 
   return true;
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::PostProcessingImpl() {
-  if (world.rank() == 0) {
-    std::copy(res_.begin(), res_.end(), reinterpret_cast<int*>(task_data->outputs[0]));
+  if (world_.rank() == 0) {
+    std::copy(res_.begin(), res_.end(), reinterpret_cast<int*>(task_data->outputs[0]));  // NOLINT
   }
   return true;
 }

@@ -6,20 +6,19 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace shishkarev_a_dijkstra_algorithm_mpi {
 
-void generateMatrix(std::vector<int>& w, int n, int min, int max);
-
-void convertToCRS(const std::vector<int>& w, std::vector<int>& values, std::vector<int>& colIndex,
-                  std::vector<int>& rowPtr, int n);
+void ConvertToCrs(const std::vector<int>& w, std::vector<int>& values, std::vector<int>& col_index,
+                  std::vector<int>& row_ptr, int n);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:
-  explicit TestMPITaskSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit TestMPITaskSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -28,13 +27,13 @@ class TestMPITaskSequential : public ppc::core::Task {
  private:
   std::vector<int> input_;
   std::vector<int> res_;
-  int st{};
-  int size{};
+  int st_{};
+  int size_{};
 };
 
 class TestMPITaskParallel : public ppc::core::Task {
  public:
-  explicit TestMPITaskParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit TestMPITaskParallel(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -43,12 +42,12 @@ class TestMPITaskParallel : public ppc::core::Task {
  private:
   std::vector<int> input_;
   std::vector<int> res_;
-  std::vector<int> values;
-  std::vector<int> colIndex;
-  std::vector<int> rowPtr;
-  int st{};
-  int size{};
-  boost::mpi::communicator world;
+  std::vector<int> values_;
+  std::vector<int> col_index_;
+  std::vector<int> row_ptr_;
+  int st_{};
+  int size_{};
+  boost::mpi::communicator world_;
 };
 
 }  // namespace shishkarev_a_dijkstra_algorithm_mpi
