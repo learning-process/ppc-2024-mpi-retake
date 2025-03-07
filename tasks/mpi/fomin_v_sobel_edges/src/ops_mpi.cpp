@@ -34,21 +34,22 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   const int delta_height = height_ / num_procs;
   local_height_ = (world.rank() == num_procs - 1) ? height_ - delta_height * (num_procs - 1) : delta_height;
 
-  if (local_height_ <= 0 || width_ <= 0) {
+  if (local_height_ < 0 || width_ <= 0) {
     throw std::runtime_error("Invalid local partition");
   }
 
   local_input_image_.resize((local_height_ + 2) * width_, 0);
   local_output_image_.resize(local_height_ * width_, 0);
 
-  std::vector<int> send_counts(num_procs, delta_height * width_);
-  std::vector<int> displacements(num_procs, 0);
-
   if (world.rank() == 0) {
+    std::vector<int> send_counts(num_procs, delta_height * width_);
+    std::vector<int> displacements(num_procs, 0);
+
     send_counts.back() = local_height_ * width_;
     for (int i = 1; i < num_procs; ++i) {
       displacements[i] = displacements[i - 1] + send_counts[i - 1];
     }
+
     boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
                          local_height_ * width_, 0);
   } else {
@@ -70,10 +71,13 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
+  if (local_height_ <= 0) {
+    return true;
+  }
+
   const int Gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
   const int Gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
 
-  // Чередование send/recv для предотвращения deadlock
   if (world.rank() % 2 == 0) {
     if (world.rank() > 0) {
       world.send(world.rank() - 1, 0, &local_input_image_[width_], width_);
@@ -126,10 +130,11 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
   if (world.rank() == 0) {
     output_image_.resize(width_ * height_);
+    boost::mpi::gatherv(world, local_output_image_.data(), local_output_image_.size(), output_image_.data(),
+                        recv_counts, displs, 0);
+  } else {
+    boost::mpi::gatherv(world, local_output_image_.data(), local_output_image_.size(), 0);
   }
-
-  boost::mpi::gatherv(world, local_output_image_.data(), local_output_image_.size(), output_image_.data(), recv_counts,
-                      displs, 0);
 
   if (world.rank() == 0) {
     std::copy(output_image_.begin(), output_image_.end(), static_cast<unsigned char *>(task_data->outputs[0]));
