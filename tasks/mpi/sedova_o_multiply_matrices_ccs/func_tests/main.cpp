@@ -75,10 +75,17 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val,  //  NOLINT
                                                         exp_c_row_ind, exp_c_col_ptr);
   }
-
-  boost::mpi::broadcast(world, exp_c_val.size(), 0);      //  NOLINT
-  boost::mpi::broadcast(world, exp_c_row_ind.size(), 0);  //  NOLINT
-  boost::mpi::broadcast(world, exp_c_col_ptr.size(), 0);  //  NOLINT
+  int exp_c_val_size = 0;
+  int exp_c_row_ind_size = 0;
+  int exp_c_col_ptr_size = 0;
+  if (world.rank() == 0) {
+    exp_c_val_size = exp_c_val.size();
+    exp_c_row_ind_size = exp_c_row_ind.size();
+    exp_c_col_ptr_size = exp_c_col_ptr.size();
+  }
+  boost::mpi::broadcast(world, exp_c_val_size, 0);
+  boost::mpi::broadcast(world, exp_c_row_ind_size, 0);
+  boost::mpi::broadcast(world, exp_c_col_ptr_size, 0);
 
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
@@ -121,6 +128,12 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));  //  NOLINT
   }
 
+  else {
+    c_val.resize(exp_c_val_size);
+    c_row_ind.resize(exp_c_row_ind_size);
+    c_col_ptr.resize(exp_c_col_ptr_size);
+  }
+
   sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI task(task_data);  //  NOLINT
   bool validation_impl = task.ValidationImpl();                     //  NOLINT
   boost::mpi::broadcast(world, validation_impl, 0);                 //  NOLINT
@@ -128,7 +141,10 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     task.PreProcessingImpl();                                       //  NOLINT
     task.RunImpl();                                                 //  NOLINT
     task.PostProcessingImpl();                                      //  NOLINT
-    if (world.rank() == 0) {                                        //  NOLINT
+    if (world.rank() == 0) {
+      boost::mpi::broadcast(world, exp_c_val, 0);
+      boost::mpi::broadcast(world, exp_c_row_ind, 0);
+      boost::mpi::broadcast(world, exp_c_col_ptr, 0);
       ASSERT_EQ(exp_c_val, c_val);
       ASSERT_EQ(exp_c_row_ind, c_row_ind);
       ASSERT_EQ(exp_c_col_ptr, c_col_ptr);

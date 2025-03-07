@@ -92,10 +92,6 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
                                                         exp_c_row_ind, exp_c_col_ptr);
   }
 
-  boost::mpi::broadcast(world, exp_c_val.size(), 0);      //  NOLINT
-  boost::mpi::broadcast(world, exp_c_row_ind.size(), 0);  //  NOLINT
-  boost::mpi::broadcast(world, exp_c_col_ptr.size(), 0);  //  NOLINT
-
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
@@ -196,10 +192,6 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_task_run) {
     sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(exp_c, exp_c.size(), exp_c[0].size(), exp_c_val,  //  NOLINT
                                                         exp_c_row_ind, exp_c_col_ptr);
   }
-
-  boost::mpi::broadcast(world, exp_c_val.size(), 0);      //  NOLINT
-  boost::mpi::broadcast(world, exp_c_row_ind.size(), 0);  //  NOLINT
-  boost::mpi::broadcast(world, exp_c_col_ptr.size(), 0);  //  NOLINT
 
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
