@@ -13,17 +13,20 @@
 #include "mpi/chernova_n_topology_ring/include/ops_mpi.hpp"
 
 namespace {
-
+const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 std::vector<char> GenerateDataPerf(int k) {
-  const std::string words[] = {"one", "two", "three"};
-  const int word_array_size = sizeof(words) / sizeof(words[0]);
-
   std::string result;
-
-  for (int i = 0; i < k; ++i) {
-    result += words[i % word_array_size];
-    if (i < k - 1) {
+  size_t j = alphabet.size();
+  int tmp = 7;
+  int i = 0;
+  while (i < k) {
+    int r = rand() % (j + tmp) - tmp;
+    if (r < 0) {
       result += ' ';
+      i++;
+      continue;
+    } else {
+      result += alphabet[r];
     }
   }
 
@@ -76,7 +79,7 @@ TEST(chernova_n_topology_ring_mpi, test_pipeline_run) {
 
 TEST(chernova_n_topology_ring_mpi, test_task_run) {
   boost::mpi::communicator world;
-  const int k = 300000;
+  const int k = 1000000;
   std::vector<char> test_data_parallel = GenerateDataPerf(k);
   std::vector<char> in = test_data_parallel;
   const int n = static_cast<int>(in.size());
