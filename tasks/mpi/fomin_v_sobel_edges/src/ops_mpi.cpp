@@ -92,21 +92,21 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
 
   if (world.rank() % 2 == 0) {
     if (world.rank() > 0) {
-      world.send(world.rank()-1, 0, &local_input_image_[width_], width_);
-      world.recv(world.rank()-1, 0, &local_input_image_[0], width_);
+      world.send(world.rank() - 1, 0, &local_input_image_[width_], width_);
+      world.recv(world.rank() - 1, 0, &local_input_image_[0], width_);
     }
-    if (world.rank() < world.size()-1) {
-      world.send(world.rank()+1, 0, &local_input_image_[local_height_*width_], width_);
-      world.recv(world.rank()+1, 0, &local_input_image_[(local_height_+1)*width_], width_);
+    if (world.rank() < world.size() - 1) {
+      world.send(world.rank() + 1, 0, &local_input_image_[local_height_ * width_], width_);
+      world.recv(world.rank() + 1, 0, &local_input_image_[(local_height_ + 1) * width_], width_);
     }
   } else {
-    if (world.rank() < world.size()-1) {
-      world.recv(world.rank()+1, 0, &local_input_image_[(local_height_+1)*width_], width_);
-      world.send(world.rank()+1, 0, &local_input_image_[local_height_*width_], width_);
+    if (world.rank() < world.size() - 1) {
+      world.recv(world.rank() + 1, 0, &local_input_image_[(local_height_ + 1) * width_], width_);
+      world.send(world.rank() + 1, 0, &local_input_image_[local_height_ * width_], width_);
     }
     if (world.rank() > 0) {
-      world.recv(world.rank()-1, 0, &local_input_image_[0], width_);
-      world.send(world.rank()-1, 0, &local_input_image_[width_], width_);
+      world.recv(world.rank() - 1, 0, &local_input_image_[0], width_);
+      world.send(world.rank() - 1, 0, &local_input_image_[width_], width_);
     }
   }
 
