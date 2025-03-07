@@ -1,11 +1,13 @@
 // Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <cstdint>
 #include <memory>
 #include <numeric>
+#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"

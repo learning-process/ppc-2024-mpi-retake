@@ -1,7 +1,6 @@
 // Copyright 2023 Nesterov Alexander
 #include "mpi/shishkarev_a_sum_of_vector_elements/include/ops_mpi.hpp"
 
-#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/reduce.hpp>
@@ -10,7 +9,6 @@
 #include <cstring>
 #include <functional>
 #include <numeric>
-#include <random>
 #include <vector>
 
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumSequential::PreProcessingImpl() {
