@@ -37,7 +37,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_5_vertex) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    GenerateMatrix(matrix, size, min, max);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
     task_data_par->inputs_count.emplace_back(matrix.size());
     task_data_par->inputs_count.emplace_back(size);
@@ -85,7 +85,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_10_vertex) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    GenerateMatrix(matrix, size, min, max);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
     task_data_par->inputs_count.emplace_back(matrix.size());
     task_data_par->inputs_count.emplace_back(size);
@@ -133,7 +133,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_13_vertex) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    GenerateMatrix(matrix, size, min, max);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
     task_data_par->inputs_count.emplace_back(matrix.size());
     task_data_par->inputs_count.emplace_back(size);
@@ -181,7 +181,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_20_vertex) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    GenerateMatrix(matrix, size, min, max);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
     task_data_par->inputs_count.emplace_back(matrix.size());
     task_data_par->inputs_count.emplace_back(size);
@@ -229,7 +229,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Source_Vertex_False) {
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(matrix, size, min, max);
+    GenerateMatrix(matrix, size, min, max);
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
     task_data_par->inputs_count.emplace_back(matrix.size());
     task_data_par->inputs_count.emplace_back(size);
