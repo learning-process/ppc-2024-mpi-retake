@@ -33,7 +33,7 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::ValidationImpl() {
     return false;
   }
 
-  if (task_data->inputs_count[2] < 0 || task_data->inputs_count[2] >= task_data->inputs_count[1]) {
+  if (task_data->inputs_count[2] >= task_data->inputs_count[1]) {
     return false;
   }
 
