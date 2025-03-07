@@ -27,23 +27,31 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 
   const int num_procs = world.size();
   const int delta_height = height_ / num_procs;
-  local_height_ = (world.rank() == num_procs - 1) ? height_ - delta_height * (num_procs - 1) : delta_height;
+  const int remainder = height_ % num_procs;
 
-  if (local_height_ < 0) local_height_ = 0;
+  local_height_ = delta_height;
+  if (world.rank() < remainder) local_height_ += 1;
+
+  int start_row = 0;
+  if (world.rank() < remainder) {
+    start_row = world.rank() * (delta_height + 1);
+  } else {
+    start_row = remainder * (delta_height + 1) + (world.rank() - remainder) * delta_height;
+  }
 
   local_input_image_.resize((local_height_ + 2) * width_, 0);
   local_output_image_.resize(local_height_ * width_, 0);
 
   if (world.rank() == 0) {
-    std::vector<int> send_counts(num_procs, delta_height * width_);
-    send_counts[num_procs - 1] = local_height_ * width_;
-    std::vector<int> displacements(num_procs, 0);
-    for (int i = 1; i < num_procs; ++i) {
-      displacements[i] = displacements[i - 1] + send_counts[i - 1];
+    std::vector<int> send_counts(num_procs);
+    std::vector<int> displacements(num_procs);
+    for (int i = 0; i < num_procs; ++i) {
+      send_counts[i] = (i < remainder ? delta_height + 1 : delta_height) * width_;
+      displacements[i] = (i < remainder ? i * (delta_height + 1) : remainder + i * delta_height) * width_;
     }
     boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
                          local_height_ * width_, 0);
-  } else {
+  } else if (local_height_ > 0) {
     boost::mpi::scatterv(world, local_input_image_.data() + width_, local_height_ * width_, 0);
   }
   return true;
