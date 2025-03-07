@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-void shishkarev_a_dijkstra_algorithm_mpi::convertToCRS(const std::vector<int>& w, std::vector<int>& values,
+void shishkarev_a_dijkstra_algorithm_mpi::ConvertToCrs(const std::vector<int>& w, std::vector<int>& values,
                                                        std::vector<int>& col_index, std::vector<int>& row_ptr, int n) {
   row_ptr.resize(n + 1);
   int nnz = 0;
@@ -173,7 +173,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
   row_ptr_.resize(row_ptr_size);
   col_index_.resize(col_index_size);
 
-  boost::mpi::broadcast(world_, static_cast<int>(values_.data()), static_cast<int>(values_.size()), 0);
+  boost::mpi::broadcast(world_, values_.data(), values_.size(), 0);
   boost::mpi::broadcast(world_, row_ptr_.data(), row_ptr_.size(), 0);
   boost::mpi::broadcast(world_, col_index_.data(), col_index_.size(), 0);
 
