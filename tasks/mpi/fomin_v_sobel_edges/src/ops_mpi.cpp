@@ -15,20 +15,16 @@ using namespace std::chrono_literals;
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
-    uint8_t *input_data = task_data->inputs[0];
     width_ = task_data->inputs_count[0];
     height_ = task_data->inputs_count[1];
 
     input_image_.resize(width_ * height_);
-    std::memcpy(input_image_.data(), input_data, width_ * height_ * sizeof(unsigned char));
+    uint8_t *input_data = task_data->inputs[0];
+    std::copy(input_data, input_data + width_ * height_, input_image_.begin());
   }
 
   boost::mpi::broadcast(world, width_, 0);
   boost::mpi::broadcast(world, height_, 0);
-
-  if (width_ <= 0 || height_ <= 0) {
-    return true;
-  }
 
   const int delta_height = height_ / world.size();
   local_height_ = (world.rank() == world.size() - 1) ? height_ - delta_height * (world.size() - 1) : delta_height;
@@ -55,9 +51,14 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
   bool valid = true;
   if (world.rank() == 0) {
-    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 && width_ > 0 && height_ > 0 &&
-            !input_image_.empty() && task_data->inputs[0] != nullptr;
+    bool counts_valid = (task_data->inputs_count.size() == 2) && (task_data->outputs_count.size() == 2);
+    bool dimensions_valid = (task_data->inputs_count[0] > 0) && (task_data->inputs_count[1] > 0);
+    bool data_valid = (task_data->inputs[0] != nullptr) && (task_data->outputs[0] != nullptr);
+
+    valid = counts_valid && dimensions_valid && data_valid;
   }
+
+  // Синхронизируем результат валидации
   boost::mpi::broadcast(world, valid, 0);
   return valid;
 }
