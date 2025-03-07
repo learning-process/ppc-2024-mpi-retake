@@ -44,7 +44,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 
   if (world.rank() == 0) {
     std::vector<int> send_counts(num_procs, delta_height * width_);
-    send_counts.back() = local_height_ * width_;
+    send_counts[num_procs - 1] = local_height_ * width_;
     std::vector<int> displacements(num_procs, 0);
     for (int i = 1; i < num_procs; ++i) {
       displacements[i] = displacements[i - 1] + send_counts[i - 1];
