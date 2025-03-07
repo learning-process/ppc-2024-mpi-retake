@@ -8,7 +8,7 @@
 
 namespace ersoz_b_rectangular_method_integration_seq {
 
-TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_FROM_0_TO_1) { //test
+TEST(ersoz_b_rectangular_method_integration_seq, INTEGRAL_FROM_0_TO_1) {  // test
   double result = GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 0, 1, 10000);
   double reference_sum = GetIntegralRectangularMethodSequential([](double x) { return std::cos(x); }, 0, 1, 10000);
   ASSERT_LT(std::fabs(result - reference_sum), std::numeric_limits<double>::epsilon() * 1000);
