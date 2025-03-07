@@ -18,7 +18,6 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     width_ = task_data->inputs_count[0];
     height_ = task_data->inputs_count[1];
 
-    // Проверка перед созданием вектора
     if (width_ <= 0 || height_ <= 0) {
       throw std::runtime_error("Invalid image dimensions");
     }
@@ -31,41 +30,34 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   boost::mpi::broadcast(world, width_, 0);
   boost::mpi::broadcast(world, height_, 0);
 
-  // Защита от деления на ноль и отрицательных размеров
   const int num_procs = std::max(1, world.size());
-  int delta_height = height_ / num_procs;
-  local_height_ = delta_height;
+  const int delta_height = height_ / num_procs;
 
+  local_height_ = delta_height;
   if (world.rank() == num_procs - 1) {
     local_height_ = height_ - delta_height * (num_procs - 1);
   }
 
-  // Проверка корректности локальной высоты
   if (local_height_ < 0 || width_ <= 0) {
     throw std::runtime_error("Invalid local partition dimensions");
   }
 
-  // Вычисление с проверкой переполнения
-  const size_t buffer_size = static_cast<size_t>(local_height_ + 2) * width_;
-  if (buffer_size > local_input_image_.max_size()) {
+  const size_t input_buffer_size = static_cast<size_t>(local_height_ + 2) * width_;
+  const size_t output_buffer_size = static_cast<size_t>(local_height_) * width_;
+
+  if (input_buffer_size > local_input_image_.max_size() || output_buffer_size > local_output_image_.max_size()) {
     throw std::runtime_error("Buffer size exceeds maximum allowed");
   }
 
-  local_input_image_.resize(buffer_size, 0);
-  local_output_image_.resize(static_cast<size_t>(local_height_) * width_, 0);
+  local_input_image_.resize(input_buffer_size, 0);
+  local_output_image_.resize(output_buffer_size, 0);
 
-  int delta_height = height_ / world.size();
-  local_height_ = (world.rank() == world.size() - 1) ? height_ - delta_height * (world.size() - 1) : delta_height;
-
-  local_input_image_.resize((local_height_ + 2) * width_, 0);
-  local_output_image_.resize(local_height_ * width_, 0);
-
-  std::vector<int> send_counts(world.size(), delta_height * width_);
-  std::vector<int> displacements(world.size(), 0);
+  std::vector<int> send_counts(num_procs, delta_height * width_);
+  std::vector<int> displacements(num_procs, 0);
 
   if (world.rank() == 0) {
     send_counts.back() = local_height_ * width_;
-    for (int i = 1; i < world.size(); ++i) {
+    for (int i = 1; i < num_procs; ++i) {
       displacements[i] = displacements[i - 1] + send_counts[i - 1];
     }
   }
