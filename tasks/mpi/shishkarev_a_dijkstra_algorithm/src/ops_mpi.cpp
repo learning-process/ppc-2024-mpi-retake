@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
-#include <boost/mpi/reduce.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <climits>
 #include <limits>
 #include <utility>
