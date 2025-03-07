@@ -94,7 +94,7 @@ TEST(sedova_o_linear_topology_mpi, test_task_run) {
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
-  perf_attr->num_running = 100000;
+  perf_attr->num_running = 10000000;
   const boost::mpi::timer current_timer;
   perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
