@@ -1,117 +1,79 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
-#include <cstdint>
+#include <functional>
 #include <memory>
-#include <vector>
+#include <numbers>
 
 #include "core/task/include/task.hpp"
 #include "seq/prokhorov_n_global_search_algorithm_strongin/include/ops_seq.hpp"
 
-TEST(prokhorov_n_global_search_algorithm_strongin_seq, Test_Strongin_Algorithm_Quadratic_Function) {
-  std::vector<double> in_a = {-10.0};
-  std::vector<double> in_b = {10.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_seq, x_square) {
+  double a = 0;
+  double b = 10;
+  std::function<double(double)> f = [](double x) { return x * x; };
+  double answer = 0;
+  double eps = 0.0001;
 
-  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_seq->inputs_count.emplace_back(in_a.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_seq->inputs_count.emplace_back(in_b.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_seq->inputs_count.emplace_back(in_epsilon.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  auto quadratic_function = [](double x) { return x * x; };
-  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                            quadratic_function);
-  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
-  test_task_sequential.PreProcessingImpl();
-  test_task_sequential.RunImpl();
-  test_task_sequential.PostProcessingImpl();
+  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
 
-  EXPECT_NEAR(out[0], 0.0, 0.001);
+  EXPECT_NEAR(answer, result, eps);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_seq, Test_Strongin_Algorithm_Absolute_Function) {
-  std::vector<double> in_a = {-5.0};
-  std::vector<double> in_b = {5.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_seq, sin) {
+  double a = -std::numbers::pi;
+  double b = std::numbers::pi;
+  std::function<double(double)> f = [](double x) { return std::sin(x); };
+  double eps = 0.1;
+  double answer = -std::numbers::pi / 2;
 
-  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_seq->inputs_count.emplace_back(in_a.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_seq->inputs_count.emplace_back(in_b.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_seq->inputs_count.emplace_back(in_epsilon.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  auto absolute_function = [](double x) { return std::abs(x); };
-  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                            absolute_function);
-  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
-  test_task_sequential.PreProcessingImpl();
-  test_task_sequential.RunImpl();
-  test_task_sequential.PostProcessingImpl();
+  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
 
-  EXPECT_NEAR(out[0], 0.0, 0.001);
+  EXPECT_NEAR(answer, result, eps);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_seq, Test_Strongin_Algorithm_SquareRoot_Function) {
-  std::vector<double> in_a = {0.0};
-  std::vector<double> in_b = {10.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_seq, cos) {
+  double a = 0;
+  double b = 2 * std::numbers::pi;
+  std::function<double(double)> f = [](double x) { return std::cos(x); };
+  double eps = 0.1;
+  double answer = std::numbers::pi;
 
-  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_seq->inputs_count.emplace_back(in_a.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_seq->inputs_count.emplace_back(in_b.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_seq->inputs_count.emplace_back(in_epsilon.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  auto square_root_function = [](double x) { return std::sqrt(x); };
-  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                            square_root_function);
-  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
-  test_task_sequential.PreProcessingImpl();
-  test_task_sequential.RunImpl();
-  test_task_sequential.PostProcessingImpl();
+  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
 
-  EXPECT_NEAR(out[0], 0.0, 0.001);
+  EXPECT_NEAR(answer, result, eps);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_seq, Test_Strongin_Algorithm_Logarithmic_Function) {
-  std::vector<double> in_a = {0.1};
-  std::vector<double> in_b = {10.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_seq, exp) {
+  double a = -1;
+  double b = 1;
+  std::function<double(double)> f = [](double x) { return std::exp(x); };
+  double eps = 0.0001;
+  double answer = -1;
 
-  auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_seq->inputs_count.emplace_back(in_a.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_seq->inputs_count.emplace_back(in_b.size());
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_seq->inputs_count.emplace_back(in_epsilon.size());
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_seq->outputs_count.emplace_back(out.size());
+  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  auto logarithmic_function = [](double x) { return std::log(x); };
-  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential test_task_sequential(task_data_seq,
-                                                                                            logarithmic_function);
-  ASSERT_EQ(test_task_sequential.ValidationImpl(), true);
-  test_task_sequential.PreProcessingImpl();
-  test_task_sequential.RunImpl();
-  test_task_sequential.PostProcessingImpl();
+  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
 
-  EXPECT_NEAR(out[0], 0.1, 0.001);
+  EXPECT_NEAR(answer, result, eps);
+}
+
+TEST(prokhorov_n_global_search_algorithm_strongin_seq, absolute) {
+  double a = -10;
+  double b = 10;
+  std::function<double(double)> f = [](double x) { return std::abs(x); };
+  double eps = 0.0001;
+  double answer = 0;
+
+  prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
+
+  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
+
+  EXPECT_NEAR(answer, result, eps);
 }

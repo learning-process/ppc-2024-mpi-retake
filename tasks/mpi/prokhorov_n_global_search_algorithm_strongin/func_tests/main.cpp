@@ -1,93 +1,135 @@
-// Copyright 2023 Nesterov Alexander
 #include <gtest/gtest.h>
 
-#include <boost/mpi/communicator.hpp>
-#include <boost/mpi/environment.hpp>
-#include <cmath>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
+#include "core/util/include/util.hpp"
 #include "mpi/prokhorov_n_global_search_algorithm_strongin/include/ops_mpi.hpp"
 
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, Test_Strongin_Algorithm_Quadratic_Function) {
-  std::vector<double> in_a = {-10.0};
-  std::vector<double> in_b = {10.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_parallel_quadratic_function) {
+  double a = -10.0;
+  double b = 10.0;
+  double eps = 0.0001;
+  std::function<double(double*)> f = [](double* x) { return (*x) * (*x); };
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_mpi->inputs_count.emplace_back(in_a.size());
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_mpi->inputs_count.emplace_back(in_b.size());
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&a));
+  task_data->inputs_count.push_back(1);
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&b));
+  task_data->inputs_count.push_back(1);
+  task_data->outputs.push_back(reinterpret_cast<uint8_t*>(new double));
+  task_data->outputs_count.push_back(1);
 
-  auto quadratic_function = [](double x) { return x * x; };
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel test_task_mpi(task_data, f);
 
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_mpi, quadratic_function);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
 
-  EXPECT_NEAR(out[0], 0.0, 0.001);
+  double result = *reinterpret_cast<double*>(task_data->outputs[0]);
+  EXPECT_NEAR(result, 0.0, eps);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, Test_Strongin_Algorithm_Absolute_Function) {
-  std::vector<double> in_a = {-5.0};
-  std::vector<double> in_b = {5.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_parallel_cos_function) {
+  double a = 0.0;
+  double b = 3.14;
+  double eps = 0.0001;
+  std::function<double(double*)> f = [](double* x) { return std::cos(*x); };
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_mpi->inputs_count.emplace_back(in_a.size());
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_mpi->inputs_count.emplace_back(in_b.size());
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&a));
+  task_data->inputs_count.push_back(1);
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&b));
+  task_data->inputs_count.push_back(1);
+  task_data->outputs.push_back(reinterpret_cast<uint8_t*>(new double));
+  task_data->outputs_count.push_back(1);
 
-  auto absolute_function = [](double x) { return std::abs(x); };
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel test_task_mpi(task_data, f);
 
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_mpi, absolute_function);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
 
-  EXPECT_NEAR(out[0], 0.0, 0.001);
+  double result = *reinterpret_cast<double*>(task_data->outputs[0]);
+  EXPECT_NEAR(result, 3.14, eps);
 }
 
-TEST(prokhorov_n_global_search_algorithm_strongin_mpi, Test_Strongin_Algorithm_SquareRoot_Function) {
-  std::vector<double> in_a = {0.0};
-  std::vector<double> in_b = {10.0};
-  std::vector<double> in_epsilon = {0.001};
-  std::vector<double> out(1, 0.0);
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_parallel_sin_function) {
+  double a = 0.0;
+  double b = 3.14;
+  double eps = 0.0001;
+  std::function<double(double*)> f = [](double* x) { return std::sin(*x); };
 
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_a.data()));
-  task_data_mpi->inputs_count.emplace_back(in_a.size());
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_b.data()));
-  task_data_mpi->inputs_count.emplace_back(in_b.size());
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_epsilon.data()));
-  task_data_mpi->inputs_count.emplace_back(in_epsilon.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&a));
+  task_data->inputs_count.push_back(1);
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&b));
+  task_data->inputs_count.push_back(1);
+  task_data->outputs.push_back(reinterpret_cast<uint8_t*>(new double));
+  task_data->outputs_count.push_back(1);
 
-  auto square_root_function = [](double x) { return std::sqrt(x); };
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel test_task_mpi(task_data, f);
 
-  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskMPI test_task_mpi(task_data_mpi, square_root_function);
-  ASSERT_EQ(test_task_mpi.ValidationImpl(), true);
-  test_task_mpi.PreProcessingImpl();
-  test_task_mpi.RunImpl();
-  test_task_mpi.PostProcessingImpl();
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
 
-  EXPECT_NEAR(out[0], 0.0, 0.001);
+  double result = *reinterpret_cast<double*>(task_data->outputs[0]);
+  EXPECT_NEAR(result, 0.0, eps);
+}
+
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_parallel_abs_function) {
+  double a = -5.0;
+  double b = 5.0;
+  double eps = 0.0001;
+  std::function<double(double*)> f = [](double* x) { return std::abs(*x); };
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&a));
+  task_data->inputs_count.push_back(1);
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&b));
+  task_data->inputs_count.push_back(1);
+  task_data->outputs.push_back(reinterpret_cast<uint8_t*>(new double));
+  task_data->outputs_count.push_back(1);
+
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel test_task_mpi(task_data, f);
+
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  double result = *reinterpret_cast<double*>(task_data->outputs[0]);
+  EXPECT_NEAR(result, 0.0, eps);
+}
+
+TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_parallel_polynomial_function) {
+  double a = -2.0;
+  double b = 2.0;
+  double eps = 0.0001;
+  std::function<double(double*)> f = [](double* x) { return (*x) * (*x) * (*x) - 3 * (*x) * (*x) + 2; };
+
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&a));
+  task_data->inputs_count.push_back(1);
+  task_data->inputs.push_back(reinterpret_cast<uint8_t*>(&b));
+  task_data->inputs_count.push_back(1);
+  task_data->outputs.push_back(reinterpret_cast<uint8_t*>(new double));
+  task_data->outputs_count.push_back(1);
+
+  prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel test_task_mpi(task_data, f);
+
+  ASSERT_EQ(test_task_mpi.Validation(), true);
+  test_task_mpi.PreProcessing();
+  test_task_mpi.Run();
+  test_task_mpi.PostProcessing();
+
+  double result = *reinterpret_cast<double*>(task_data->outputs[0]);
+  EXPECT_NEAR(result, -2.0, eps);
 }

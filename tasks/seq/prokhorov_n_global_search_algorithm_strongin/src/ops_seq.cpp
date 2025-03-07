@@ -2,83 +2,70 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <vector>
 
-namespace prokhorov_n_global_search_algorithm_strongin_seq {
-
-bool TestTaskSequential::PreProcessingImpl() {
-  if (task_data->inputs_count[0] == 0 || task_data->inputs_count[1] == 0 || task_data->inputs_count[2] == 0) {
-    return false;
-  }
-
+bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PreProcessingImpl() {
+  result_ = 0;
   a_ = *reinterpret_cast<double*>(task_data->inputs[0]);
   b_ = *reinterpret_cast<double*>(task_data->inputs[1]);
-  epsilon_ = *reinterpret_cast<double*>(task_data->inputs[2]);
-
   return true;
 }
 
-bool TestTaskSequential::ValidationImpl() {
-  if (task_data->inputs_count[0] == 0 || task_data->inputs_count[1] == 0 || task_data->inputs_count[2] == 0) {
-    return false;
+bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::ValidationImpl() {
+  return task_data->inputs_count[0] == 2 && task_data->outputs_count[0] == 1 && task_data->inputs.size() == 2 &&
+         task_data->outputs.size() == 1;
+}
+
+bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::RunImpl() {
+  double eps = 0.0001;
+  double r = 2.0;
+  result_ = stronginAlgorithm(a_, b_, eps, r, f_);
+  return true;
+}
+double prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::stronginAlgorithm(
+    double a, double b, double eps, double r, const std::function<double(double)>& f) {
+  std::vector<double> points = {a, b};
+  double lipsh = 0.0;
+  int k = 2;
+
+  while (true) {
+    for (int i = 0; i < (k - 1); ++i) {
+      double f_left = f(points[i]);
+      double f_right = f(points[i + 1]);
+      lipsh = std::max(lipsh, std::abs((f_right - f_left) / (points[i + 1] - points[i])));
+    }
+
+    double m = lipsh != 0 ? r * lipsh : 1.0;
+
+    int s = 0;
+    double max_ch = (m * (points[1] - points[0])) +
+                    ((f(points[1]) - f(points[0])) * (f(points[1]) - f(points[0])) / (m * (points[1] - points[0]))) -
+                    (2 * (f(points[1]) + f(points[0])));
+
+    for (int i = 1; i < (k - 1); i++) {
+      double f_left = f(points[i]);
+      double f_right = f(points[i + 1]);
+      double ch = (m * (points[i + 1] - points[i])) +
+                  ((f_right - f_left) * (f_right - f_left) / (m * (points[i + 1] - points[i]))) -
+                  (2 * (f_right + f_left));
+      if (ch > max_ch) {
+        s = i;
+        max_ch = ch;
+      }
+    }
+
+    double new_x = ((points[s] + points[s + 1]) / 2) - ((f(points[s + 1]) - f(points[s])) / (2 * m));
+
+    if ((points[s + 1] - points[s]) <= eps) {
+      return *std::min_element(points.begin(), points.end(), [&f](double a, double b) { return f(a) < f(b); });
+    }
+
+    points.push_back(new_x);
+    std::ranges::sort(points);
+    k++;
   }
-
-  return (a_ < b_) && (epsilon_ > 0);
 }
-
-bool TestTaskSequential::RunImpl() {
-  result_ = StronginAlgorithm();
+bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PostProcessingImpl() {
+  *reinterpret_cast<double*>(task_data->outputs[0]) = result_;
   return true;
 }
-
-bool TestTaskSequential::PostProcessingImpl() {
-  reinterpret_cast<double*>(task_data->outputs[0])[0] = result_;
-  return true;
-}
-
-double TestTaskSequential::StronginAlgorithm() {
-  std::vector<double> y = {a_, b_};
-  std::vector<double> z = {f_(a_), f_(b_)};
-  int n = y.size() - 1;
-  double M, m, r = 2.0;
-  const int max_iterations = 1000;
-  int iteration = 0;
-
-  while (iteration < max_iterations) {
-    iteration++;
-
-    M = 0.0;
-    for (int i = 1; i <= n; ++i) {
-      double delta = std::abs((z[i] - z[i - 1]) / (y[i] - y[i - 1]));
-      if (delta > M) M = delta;
-    }
-    m = (M == 0) ? 1 : r * M;
-
-    std::vector<double> R(n);
-    for (int i = 1; i <= n; ++i) {
-      R[i - 1] = m * (y[i] - y[i - 1]) + std::pow(z[i] - z[i - 1], 2) / (m * (y[i] - y[i - 1])) - 2 * (z[i] + z[i - 1]);
-    }
-
-    auto max_R = std::max_element(R.begin(), R.end());
-    int s = std::distance(R.begin(), max_R);
-    double tau = (y[s + 1] + y[s]) / 2 - (z[s + 1] - z[s]) / (2 * m);
-    y.insert(y.begin() + s + 1, tau);
-    z.insert(z.begin() + s + 1, f_(tau));
-    n++;
-
-    double max_interval = 0.0;
-    for (int i = 1; i <= n; ++i) {
-      double interval = y[i] - y[i - 1];
-      if (interval > max_interval) max_interval = interval;
-    }
-    if (max_interval < epsilon_) {
-      auto min_z = std::min_element(z.begin(), z.end());
-      return y[std::distance(z.begin(), min_z)];
-    }
-  }
-
-  auto min_z = std::min_element(z.begin(), z.end());
-  return y[std::distance(z.begin(), min_z)];
-}
-}  // namespace prokhorov_n_global_search_algorithm_strongin_seq
