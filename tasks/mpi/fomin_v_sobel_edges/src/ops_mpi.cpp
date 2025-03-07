@@ -15,12 +15,12 @@ using namespace std::chrono_literals;
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
-    if (task_data->inputs.empty() || !task_data->inputs[0]) {
-      throw std::runtime_error("Input data is not initialized on root process");
-    }
-    input_image_ = *reinterpret_cast<std::vector<unsigned char> *>(task_data->inputs[0]);
+    uint8_t *input_data = task_data->inputs[0];
     width_ = task_data->inputs_count[0];
     height_ = task_data->inputs_count[1];
+
+    input_image_.resize(width_ * height_);
+    std::memcpy(input_image_.data(), input_data, width_ * height_ * sizeof(unsigned char));
   }
 
   boost::mpi::broadcast(world, width_, 0);
@@ -56,7 +56,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
   bool valid = true;
   if (world.rank() == 0) {
     valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 && width_ > 0 && height_ > 0 &&
-            !input_image_.empty();
+            !input_image_.empty() && task_data->inputs[0] != nullptr;
   }
   boost::mpi::broadcast(world, valid, 0);
   return valid;
