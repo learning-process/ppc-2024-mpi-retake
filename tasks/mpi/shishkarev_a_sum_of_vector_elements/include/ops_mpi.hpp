@@ -12,8 +12,6 @@
 
 namespace shishkarev_a_sum_of_vector_elements_mpi {
 
-std::vector<int> GetRandomVector(int vector_size);
-
 class MPIVectorSumSequential : public ppc::core::Task {
  public:
   explicit MPIVectorSumSequential(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}

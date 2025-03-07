@@ -13,14 +13,6 @@
 #include <random>
 #include <vector>
 
-std::vector<int> shishkarev_a_sum_of_vector_elements_mpi::GetRandomVector(int vector_size) {
-  std::mt19937 generator(std::random_device{}());
-  std::uniform_int_distribution<int> distribution(0, 99);
-  std::vector<int> random_vector(vector_size);
-  std::ranges::generate(random_vector, [&]() { return distribution(generator); });
-  return random_vector;
-}
-
 bool shishkarev_a_sum_of_vector_elements_mpi::MPIVectorSumSequential::PreProcessingImpl() {
   input_vector_ = std::vector<int>(task_data->inputs_count[0]);
   int* input_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
