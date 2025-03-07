@@ -66,10 +66,10 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::ValidationImpl(
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
   const int INF = std::numeric_limits<int>::max();
-  std::vector<int> values;
+  std::vector<int> values_;
   std::vector<int> col_index_;
   std::vector<int> row_ptr_;
-  convertToCRS(input_, values, col_index_, row_ptr_, size_);
+  convertToCRS(input_, values_, col_index_, row_ptr_, size_);
 
   std::vector<bool> visited(size_, false);
   std::vector<int> d(size_, INF);
@@ -94,7 +94,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
 
     for (int j = row_ptr_[u]; j < row_ptr_[u + 1]; j++) {
       int v = col_index_[j];
-      int weight = values[j];
+      int weight = values_[j];
 
       if (!visited[v] && d[u] != INF && (d[u] + weight < d[v])) {
         d[v] = d[u] + weight;
@@ -122,7 +122,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::PreProcessingImpl
     input_ = std::vector<int>(size_ * size_);
     auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
-    convertToCRS(input_, values, col_index_, row_ptr_, size_);
+    convertToCRS(input_, values_, col_index_, row_ptr_, size_);
   } else {
     input_ = std::vector<int>(size_ * size_, 0);
   }
@@ -161,7 +161,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
   boost::mpi::broadcast(world_, size_, 0);
   boost::mpi::broadcast(world_, st_, 0);
 
-  int values_size = static_cast<int>(values.size());
+  int values_size = static_cast<int>(values_.size());
   int row_ptr_size = static_cast<int>(row_ptr_.size());
   int col_index_size = static_cast<int>(col_index_.size());
 
@@ -169,13 +169,13 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
   boost::mpi::broadcast(world_, row_ptr_size, 0);
   boost::mpi::broadcast(world_, col_index_size, 0);
 
-  values.resize(values_size);
+  values_.resize(values_size);
   row_ptr_.resize(row_ptr_size);
   col_index_.resize(col_index_size);
 
-  boost::mpi::broadcast(world_, static_cast<int>(values.data()), static_cast<int>(values.size()), 0);
-  boost::mpi::broadcast(world_, static_cast<int>(row_ptr_.data()), static_cast<int>(row_ptr_.size()), 0);
-  boost::mpi::broadcast(world_, static_cast<int>(col_index_.data()), static_cast<int>(col_index_.size()), 0);
+  boost::mpi::broadcast(world_, static_cast<int>(values_.data()), static_cast<int>(values_.size()), 0);
+  boost::mpi::broadcast(world_, row_ptr_.data(), row_ptr_.size(), 0);
+  boost::mpi::broadcast(world_, col_index_.data(), col_index_.size(), 0);
 
   int delta = size_ / world_.size();
   int extra = size_ % world_.size();
@@ -228,7 +228,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
 
     for (int j = row_ptr_[global_pair.second]; j < row_ptr_[global_pair.second + 1]; j++) {
       int v = col_index_[j];
-      int w = values[j];
+      int w = values_[j];
 
       if (!visited[v] && res_[global_pair.second] != INF && (res_[global_pair.second] + w < res_[v])) {
         res_[v] = res_[global_pair.second] + w;
