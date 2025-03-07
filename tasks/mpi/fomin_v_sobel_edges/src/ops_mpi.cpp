@@ -53,7 +53,11 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
                          local_height_ * width_, 0);
   } else {
-    boost::mpi::scatterv(world, local_input_image_.data() + width_, local_height_ * width_, 0);
+    if (local_height_ > 0) {
+      boost::mpi::scatterv(world, local_input_image_.data() + width_, local_height_ * width_, 0);
+    } else {
+      boost::mpi::scatterv(world, static_cast<unsigned char *>(nullptr), 0, 0);
+    }
   }
 
   return true;
@@ -130,10 +134,17 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
   if (world.rank() == 0) {
     output_image_.resize(width_ * height_);
-    boost::mpi::gatherv(world, local_output_image_.data(), local_output_image_.size(), output_image_.data(),
-                        recv_counts, displs, 0);
+  }
+
+  // Исправление: используем временный буфер для процессов без данных
+  unsigned char dummy;
+  unsigned char *send_buffer = local_output_image_.empty() ? &dummy : local_output_image_.data();
+  size_t send_size = local_output_image_.size();
+
+  if (world.rank() == 0) {
+    boost::mpi::gatherv(world, send_buffer, send_size, output_image_.data(), recv_counts, displs, 0);
   } else {
-    boost::mpi::gatherv(world, local_output_image_.data(), local_output_image_.size(), 0);
+    boost::mpi::gatherv(world, send_buffer, send_size, 0);
   }
 
   if (world.rank() == 0) {
