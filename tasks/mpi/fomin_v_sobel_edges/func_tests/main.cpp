@@ -126,7 +126,6 @@ TEST(fomin_v_sobel_edges, Test_Sobel_Edge_Detection_Empty_Image) {
   boost::mpi::communicator world;
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
 
-  // Явная установка размеров для всех процессов
   task_data->inputs_count = {0, 0};
   task_data->outputs_count = {0, 0};
 
