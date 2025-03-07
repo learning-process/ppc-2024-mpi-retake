@@ -69,7 +69,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
   std::vector<int> values_;
   std::vector<int> col_index_;
   std::vector<int> row_ptr_;
-  convertToCRS(input_, values_, col_index_, row_ptr_, size_);
+  CconvertToCrs(input_, values_, col_index_, row_ptr_, size_);
 
   std::vector<bool> visited(size_, false);
   std::vector<int> d(size_, INF);
@@ -122,7 +122,7 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::PreProcessingImpl
     input_ = std::vector<int>(size_ * size_);
     auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
-    convertToCRS(input_, values_, col_index_, row_ptr_, size_);
+    CconvertToCrs(input_, values_, col_index_, row_ptr_, size_);
   } else {
     input_ = std::vector<int>(size_ * size_, 0);
   }
