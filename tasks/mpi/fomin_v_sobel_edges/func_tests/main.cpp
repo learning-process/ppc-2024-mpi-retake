@@ -13,23 +13,25 @@ TEST(fomin_v_sobel_edges, Test_Sobel_Edge_Detection) {
 
   const int width = 4;
   const int height = 4;
-  global_image = {100, 100, 100, 100, 100, 200, 200, 100, 100, 200, 200, 100, 100, 100, 100, 100};
+
+  if (world.rank() == 0) {
+    global_image = {100, 100, 100, 100, 100, 200, 200, 100, 100, 200, 200, 100, 100, 100, 100, 100};
+    global_output_image.resize(width * height, 0);
+  }
 
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  task_data->inputs_count = {width, height};
+  task_data->outputs_count = {width, height};
+
   if (world.rank() == 0) {
-    global_output_image.resize(width * height, 0);
     task_data->inputs.push_back(global_image.data());
-    task_data->inputs_count = {width, height};
     task_data->outputs.push_back(global_output_image.data());
-    task_data->outputs_count = {width, height};
   } else {
     task_data->inputs.push_back(nullptr);
     task_data->outputs.push_back(nullptr);
-    task_data->inputs_count = {width, height};
-    task_data->outputs_count = {width, height};
   }
 
-  // Создание и выполнение параллельной задачи
   fomin_v_sobel_edges::SobelEdgeDetectionMPI sobelEdgeDetectionMPI(task_data);
   ASSERT_EQ(sobelEdgeDetectionMPI.ValidationImpl(), true);
   sobelEdgeDetectionMPI.PreProcessingImpl();
@@ -122,21 +124,15 @@ TEST(fomin_v_sobel_edges, Test_Sobel_Edge_Detection_Large_Image) {
 
 TEST(fomin_v_sobel_edges, Test_Sobel_Edge_Detection_Empty_Image) {
   boost::mpi::communicator world;
-  std::vector<unsigned char> global_image;
-  std::vector<unsigned char> global_output_image;
-
-  const int width = 0;
-  const int height = 0;
-
   std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  // Явная установка размеров для всех процессов
+  task_data->inputs_count = {0, 0};
+  task_data->outputs_count = {0, 0};
+
   if (world.rank() == 0) {
-    global_output_image.resize(width * height, 0);
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_image.data()));
-    task_data->inputs_count.emplace_back(width);
-    task_data->inputs_count.emplace_back(height);
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_output_image.data()));
-    task_data->outputs_count.emplace_back(width);
-    task_data->outputs_count.emplace_back(height);
+    task_data->inputs.push_back(nullptr);
+    task_data->outputs.push_back(nullptr);
   }
 
   fomin_v_sobel_edges::SobelEdgeDetectionMPI sobelEdgeDetectionMPI(task_data);
