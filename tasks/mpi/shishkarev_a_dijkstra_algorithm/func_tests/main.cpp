@@ -11,7 +11,7 @@
 #include "mpi/shishkarev_a_dijkstra_algorithm/include/ops_mpi.hpp"
 
 namespace {
-void shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(std::vector<int> &w, int n, int min, int max) {
+void GenerateMatrix(std::vector<int> &w, int n, int min, int max) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> dist(min, max);
