@@ -7,13 +7,13 @@ double tarakanov_d_global_opt_two_dim_prob_seq::GetConstraintsSum(double x, doub
 }
 
 bool tarakanov_d_global_opt_two_dim_prob_seq::CheckConstraints(double x, double y, int constraint_num,
-                                                                            std::vector<double> constraints) {
-  return GetConstraintsSum(x, y, constraint_num, constraints) <= 0;
+                                                                            std::vector<double> constr) {
+  return GetConstraintsSum(x, y, constraint_num, constr) <= 0;
 }
 
-bool tarakanov_d_global_opt_two_dim_prob_seq::IsAcceptable (double x, double y, int constraint_num, std::vector<double> constraints) {
+bool tarakanov_d_global_opt_two_dim_prob_seq::IsAcceptable (double x, double y, int constraint_num, std::vector<double> constr) {
   for (int i = 0; i < constraint_num; ++i) {
-    if (false == CheckConstraints(x, y, i, constraints)) {
+    if (false == CheckConstraints(x, y, i, constr)) {
       return false;
     }
   }
@@ -38,18 +38,18 @@ bool tarakanov_d_global_opt_two_dim_prob_seq::GlobalOptSequential::PreProcessing
   bounds.push_back(reinterpret_cast<double*>(task_data->inputs[0])[2]);
   bounds.push_back(reinterpret_cast<double*>(task_data->inputs[0])[3]);
 
-  num_constraints = task_data->inputs_count[0];
-  constraints.resize(num_constraints * 3);
+  constr_num = task_data->inputs_count[0];
+  constr.resize(constr_num * 3);
   mode = task_data->inputs_count[1];
 
-  func_params.push_back(reinterpret_cast<double*>(task_data->inputs[1])[0]);
-  func_params.push_back(reinterpret_cast<double*>(task_data->inputs[1])[1]);
+  params.push_back(reinterpret_cast<double*>(task_data->inputs[1])[0]);
+  params.push_back(reinterpret_cast<double*>(task_data->inputs[1])[1]);
 
-  for (int i = 0; i < num_constraints * 3; i++) {
-    constraints[i] = (reinterpret_cast<double*>(task_data->inputs[2])[i]);
+  for (int i = 0; i < constr_num * 3; i++) {
+    constr[i] = (reinterpret_cast<double*>(task_data->inputs[2])[i]);
   }
 
-  step = *reinterpret_cast<double*>(task_data->inputs[3]);
+  delta = *reinterpret_cast<double*>(task_data->inputs[3]);
   
   return true;
 }
@@ -66,9 +66,9 @@ bool tarakanov_d_global_opt_two_dim_prob_seq::GlobalOptSequential::RunImpl() {
 
   double accuracy = 1e-6;
   double last_result = std::numeric_limits<double>::max();
-  auto factor = static_cast<int>(1.0 / step);
+  auto factor = static_cast<int>(1.0 / delta);
 
-  for (; step >= accuracy; step /= 2.0) {
+  for (; delta >= accuracy; delta /= 2.0) {
     double local_minX = bounds[0];
     double local_minY = bounds[2];
 
@@ -85,8 +85,8 @@ bool tarakanov_d_global_opt_two_dim_prob_seq::GlobalOptSequential::RunImpl() {
       while (y < int_maxY) {
         auto real_y = static_cast<double>(++y) / factor;         
         
-        if (true == IsAcceptable(real_x, real_y, num_constraints, constraints)) {
-          auto value = ComputeFunction(real_x, real_y, func_params);
+        if (true == IsAcceptable(real_x, real_y, constr_num, constr)) {
+          auto value = ComputeFunction(real_x, real_y, params);
           switch (mode) {
             case 0:
               if (value < result) {
@@ -113,10 +113,10 @@ bool tarakanov_d_global_opt_two_dim_prob_seq::GlobalOptSequential::RunImpl() {
       break;
     }
 
-    bounds[0] = std::max(local_minX - 2 * step, bounds[0]);
-    bounds[1] = std::min(local_minX + 2 * step, bounds[1]);
-    bounds[2] = std::max(local_minY - 2 * step, bounds[2]);
-    bounds[3] = std::min(local_minY + 2 * step, bounds[3]);
+    bounds[0] = std::max(local_minX - 2 * delta, bounds[0]);
+    bounds[1] = std::min(local_minX + 2 * delta, bounds[1]);
+    bounds[2] = std::max(local_minY - 2 * delta, bounds[2]);
+    bounds[3] = std::min(local_minY + 2 * delta, bounds[3]);
 
     last_result = result;
   }
