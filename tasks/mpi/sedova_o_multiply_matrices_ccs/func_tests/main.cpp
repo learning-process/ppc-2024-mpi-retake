@@ -87,6 +87,23 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
   boost::mpi::broadcast(world, exp_c_row_ind_size, 0);
   boost::mpi::broadcast(world, exp_c_col_ptr_size, 0);
 
+  exp_c_val.resize(exp_c_val_size);
+  exp_c_row_ind.resize(exp_c_row_ind_size);
+  exp_c_col_ptr.resize(exp_c_col_ptr_size);
+
+  if (world.rank() == 0) {
+  } else {
+    exp_c_val.clear();
+    exp_c_row_ind.clear();
+    exp_c_col_ptr.clear();
+    exp_c_val.resize(exp_c_val_size);
+    exp_c_row_ind.resize(exp_c_row_ind_size);
+    exp_c_col_ptr.resize(exp_c_col_ptr_size);
+  }
+  boost::mpi::broadcast(world, exp_c_val, 0);
+  boost::mpi::broadcast(world, exp_c_row_ind, 0);
+  boost::mpi::broadcast(world, exp_c_col_ptr, 0);
+
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
@@ -142,9 +159,6 @@ void FuncTestTemplate(const std::vector<std::vector<double>> &a, const std::vect
     task.RunImpl();                                                 //  NOLINT
     task.PostProcessingImpl();                                      //  NOLINT
     if (world.rank() == 0) {
-      boost::mpi::broadcast(world, exp_c_val, 0);
-      boost::mpi::broadcast(world, exp_c_row_ind, 0);
-      boost::mpi::broadcast(world, exp_c_col_ptr, 0);
       ASSERT_EQ(exp_c_val, c_val);
       ASSERT_EQ(exp_c_row_ind, c_row_ind);
       ASSERT_EQ(exp_c_col_ptr, c_col_ptr);
