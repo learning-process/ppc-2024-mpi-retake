@@ -17,40 +17,35 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   if (world.rank() == 0) {
     width_ = task_data->inputs_count[0];
     height_ = task_data->inputs_count[1];
-
     if (width_ <= 0 || height_ <= 0) throw std::runtime_error("Invalid image dimensions");
-
     input_image_.resize(width_ * height_);
     std::copy(static_cast<unsigned char *>(task_data->inputs[0]),
               static_cast<unsigned char *>(task_data->inputs[0]) + width_ * height_, input_image_.begin());
   }
-
   boost::mpi::broadcast(world, width_, 0);
   boost::mpi::broadcast(world, height_, 0);
 
-  const int num_procs = std::max(1, world.size());
+  const int num_procs = world.size();
   const int delta_height = height_ / num_procs;
   local_height_ = (world.rank() == num_procs - 1) ? height_ - delta_height * (num_procs - 1) : delta_height;
 
-  if (local_height_ < 0 || width_ <= 0) throw std::runtime_error("Invalid local partition");
+  if (local_height_ < 0) local_height_ = 0;
 
-  // Гарантируем минимальный размер буферов
-  local_input_image_.resize(std::max((local_height_ + 2) * width_, 1), 0);
-  local_output_image_.resize(std::max(local_height_ * width_, 1), 0);
+  local_input_image_.resize((local_height_ + 2) * width_, 0);
+  local_output_image_.resize(local_height_ * width_, 0);
 
   if (world.rank() == 0) {
     std::vector<int> send_counts(num_procs, delta_height * width_);
-    std::vector<int> displacements(num_procs, 0);
     send_counts.back() = local_height_ * width_;
-
-    for (int i = 1; i < num_procs; ++i) displacements[i] = displacements[i - 1] + send_counts[i - 1];
-
+    std::vector<int> displacements(num_procs, 0);
+    for (int i = 1; i < num_procs; ++i) {
+      displacements[i] = displacements[i - 1] + send_counts[i - 1];
+    }
     boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements, local_input_image_.data() + width_,
                          local_height_ * width_, 0);
-  } else if (local_height_ > 0) {
+  } else {
     boost::mpi::scatterv(world, local_input_image_.data() + width_, local_height_ * width_, 0);
   }
-
   return true;
 }
 
@@ -71,30 +66,28 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
   const int Gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
   const int Gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
 
-  // Обмен данными только если есть соседние процессы
   if (world.size() > 1) {
     if (world.rank() % 2 == 0) {
-      if (world.rank() > 0) {
+      if (world.rank() > 0 && local_height_ > 0) {
         world.send(world.rank() - 1, 0, local_input_image_.data() + width_, width_);
         world.recv(world.rank() - 1, 0, local_input_image_.data(), width_);
       }
-      if (world.rank() < world.size() - 1) {
+      if (world.rank() < world.size() - 1 && local_height_ > 0) {
         world.send(world.rank() + 1, 0, local_input_image_.data() + local_height_ * width_, width_);
         world.recv(world.rank() + 1, 0, local_input_image_.data() + (local_height_ + 1) * width_, width_);
       }
     } else {
-      if (world.rank() < world.size() - 1) {
+      if (world.rank() < world.size() - 1 && local_height_ > 0) {
         world.recv(world.rank() + 1, 0, local_input_image_.data() + (local_height_ + 1) * width_, width_);
         world.send(world.rank() + 1, 0, local_input_image_.data() + local_height_ * width_, width_);
       }
-      if (world.rank() > 0) {
+      if (world.rank() > 0 && local_height_ > 0) {
         world.recv(world.rank() - 1, 0, local_input_image_.data(), width_);
         world.send(world.rank() - 1, 0, local_input_image_.data() + width_, width_);
       }
     }
   }
 
-  // Вычисления только для валидной области
   for (int y = 1; y <= local_height_; ++y) {
     for (int x = 1; x < width_ - 1; ++x) {
       int sumX = 0, sumY = 0;
@@ -116,18 +109,18 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
   std::vector<int> recv_counts(world.size(), 0);
   const int delta = height_ / world.size();
-  for (int i = 0; i < world.size(); ++i)
+  for (int i = 0; i < world.size(); ++i) {
     recv_counts[i] = (i == world.size() - 1) ? (height_ - delta * i) * width_ : delta * width_;
-
+  }
   std::vector<int> displs(world.size(), 0);
-  for (int i = 1; i < world.size(); ++i) displs[i] = displs[i - 1] + recv_counts[i - 1];
+  for (int i = 1; i < world.size(); ++i) {
+    displs[i] = displs[i - 1] + recv_counts[i - 1];
+  }
 
   if (world.rank() == 0) output_image_.resize(width_ * height_);
 
-  unsigned char *send_buffer = local_output_image_.data();
+  unsigned char *send_buffer = (local_output_image_.size() > 0) ? local_output_image_.data() : nullptr;
   size_t send_size = local_output_image_.size();
-
-  if (send_size == 0) send_buffer = nullptr;
 
   if (world.rank() == 0) {
     boost::mpi::gatherv(world, send_buffer, send_size, output_image_.data(), recv_counts, displs, 0);
@@ -138,7 +131,6 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
   if (world.rank() == 0) {
     std::copy(output_image_.begin(), output_image_.end(), static_cast<unsigned char *>(task_data->outputs[0]));
   }
-
   return true;
 }
 
