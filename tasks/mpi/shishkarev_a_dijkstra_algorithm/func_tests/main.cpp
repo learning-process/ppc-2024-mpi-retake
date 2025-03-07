@@ -3,8 +3,8 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
-#include <random>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -23,7 +23,7 @@ void shishkarev_a_dijkstra_algorithm_mpi::GenerateMatrix(std::vector<int> &w, in
     w[(i * n) + i] = 0;
   }
 }
-}  //namespace
+}  // namespace
 
 TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_5_vertex) {
   boost::mpi::communicator world;
@@ -53,7 +53,6 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_5_vertex) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-
     std::vector<int> res_seq(size, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -102,7 +101,6 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_10_vertex) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-
     std::vector<int> res_seq(size, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -151,7 +149,6 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_13_vertex) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-
     std::vector<int> res_seq(size, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -200,7 +197,6 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Graph_20_vertex) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-
     std::vector<int> res_seq(size, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
@@ -298,7 +294,6 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, Test_Spare_Graph_5x5) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-
     std::vector<int> res_seq(size, 0);
 
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();

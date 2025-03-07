@@ -17,7 +17,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, test_PipelineRun) {
   int st = 0;
   std::vector<int> global_matrix(count_size_vector * count_size_vector, 3);
   std::vector<int32_t> global_path(count_size_vector, 3);
-  // Create TaskData
+
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     for (int i = 0; i < count_size_vector; i++) {
@@ -32,22 +32,20 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, test_PipelineRun) {
     task_data_par->outputs_count.emplace_back(global_path.size());
   }
 
-  auto test_mpi_task_parallel = std::make_shared<shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel>(task_data_par);
+  auto test_mpi_task_parallel =
+      std::make_shared<shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel>(task_data_par);
   ASSERT_EQ(test_mpi_task_parallel->ValidationImpl(), true);
   test_mpi_task_parallel->PreProcessingImpl();
   test_mpi_task_parallel->RunImpl();
   test_mpi_task_parallel->PostProcessingImpl();
 
-  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
   perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
-  // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
@@ -62,7 +60,7 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, test_task_run) {
   int st = 5;
   std::vector<int> global_matrix(count_size_vector * count_size_vector, 3);
   std::vector<int32_t> global_path(count_size_vector, 3);
-  // Create TaskData
+
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     for (int i = 0; i < count_size_vector; i++) {
@@ -77,22 +75,20 @@ TEST(shishkarev_a_dijkstra_algorithm_mpi, test_task_run) {
     task_data_par->outputs_count.emplace_back(global_path.size());
   }
 
-  auto test_mpi_task_parallel = std::make_shared<shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel>(task_data_par);
+  auto test_mpi_task_parallel =
+      std::make_shared<shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel>(task_data_par);
   ASSERT_EQ(test_mpi_task_parallel->ValidationImpl(), true);
   test_mpi_task_parallel->PreProcessingImpl();
   test_mpi_task_parallel->RunImpl();
   test_mpi_task_parallel->PostProcessingImpl();
 
-  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
   perf_attr->current_timer = [&] { return current_timer.elapsed(); };
 
-  // Create and init perf results
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  // Create Perf analyzer
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {

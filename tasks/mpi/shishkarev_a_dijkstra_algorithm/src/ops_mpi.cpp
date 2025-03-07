@@ -28,10 +28,8 @@ void shishkarev_a_dijkstra_algorithm_mpi::convertToCRS(const std::vector<int>& w
 }
 
 bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::PreProcessingImpl() {
-
   size_ = static_cast<int>(task_data->inputs_count[1]);
   st_ = static_cast<int>(task_data->inputs_count[2]);
-
 
   input_ = std::vector<int>(size_ * size_);
   auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
@@ -87,7 +85,9 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
       }
     }
 
-    if (index == -1) { break; }
+    if (index == -1) {
+      break;
+    }
 
     int u = index;
     visited[u] = true;
@@ -211,8 +211,12 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
 
     boost::mpi::all_reduce(world_, local_pair, global_pair,
                            [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
-                             if (a.first < b.first) { return a; }
-                             if (a.first > b.first) { return b; }
+                             if (a.first < b.first) {
+                               return a;
+                             }
+                             if (a.first > b.first) {
+                               return b;
+                             }
                              return a;
                            });
 

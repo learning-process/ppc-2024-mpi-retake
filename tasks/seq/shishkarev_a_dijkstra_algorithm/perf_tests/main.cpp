@@ -11,7 +11,6 @@
 #include "seq/shishkarev_a_dijkstra_algorithm/include/ops_seq.hpp"
 
 TEST(shishkarev_a_dijkstra_algorithm_seq, test_PipelineRun) {
-
   int count_size_vector = 5000;
   int st = 0;
   std::vector<int> global_matrix(count_size_vector * count_size_vector, 1);
@@ -50,7 +49,6 @@ TEST(shishkarev_a_dijkstra_algorithm_seq, test_PipelineRun) {
 }
 
 TEST(shishkarev_a_dijkstra_algorithm_seq, test_task_run) {
-
   int count_size_vector = 5000;
   int st = 0;
   std::vector<int> global_matrix(count_size_vector * count_size_vector, 1);

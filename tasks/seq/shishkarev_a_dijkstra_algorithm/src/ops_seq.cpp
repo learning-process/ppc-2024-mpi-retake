@@ -25,7 +25,6 @@ void shishkarev_a_dijkstra_algorithm_seq::ConvertToCrs(const std::vector<int>& w
 }
 
 bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::PreProcessingImpl() {
-
   size_ = static_cast<int>(task_data->inputs_count[1]);
   st_ = static_cast<int>(task_data->inputs_count[2]);
 
@@ -84,7 +83,9 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::RunImpl() {
       }
     }
 
-    if (index == -1) { break; }
+    if (index == -1) {
+      break;
+    }
 
     int u = index;
     visited[u] = true;
