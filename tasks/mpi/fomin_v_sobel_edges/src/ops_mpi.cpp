@@ -31,24 +31,22 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   const int num_procs = world.size();
   const int delta_height = height_ / num_procs;
   local_height_ = (world.rank() == num_procs - 1) ? height_ - delta_height * (num_procs - 1) : delta_height;
-
-  local_height_ = std::max(0, std::min(local_height_, height_));
+  local_height_ = std::max(0, local_height_);
 
   if (local_height_ > 0) {
     local_input_image_.resize((local_height_ + 2) * width_, 0);
     local_output_image_.resize(local_height_ * width_, 0);
-  } else {
-    local_input_image_.clear();
-    local_output_image_.clear();
   }
 
   if (world.rank() == 0) {
     std::vector<int> send_counts(num_procs, delta_height * width_);
-    send_counts[num_procs - 1] = local_height_ * width_;
     std::vector<int> displacements(num_procs, 0);
+    send_counts.back() = local_height_ * width_;
+
     for (int i = 1; i < num_procs; ++i) {
       displacements[i] = displacements[i - 1] + send_counts[i - 1];
     }
+
     boost::mpi::scatterv(world, input_image_.data(), send_counts, displacements,
                          local_height_ > 0 ? local_input_image_.data() + width_ : nullptr, local_height_ * width_, 0);
   } else if (local_height_ > 0) {
@@ -120,7 +118,8 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
     output_image_.resize(width_ * height_);
   }
 
-  const unsigned char *send_buffer = local_output_image_.empty() ? nullptr : local_output_image_.data();
+  unsigned char dummy;
+  unsigned char *send_buffer = local_output_image_.empty() ? &dummy : local_output_image_.data();
   size_t send_size = local_output_image_.size();
 
   if (world.rank() == 0) {
