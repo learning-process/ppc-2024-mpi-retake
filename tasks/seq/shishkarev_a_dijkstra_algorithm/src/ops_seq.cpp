@@ -46,7 +46,7 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::ValidationImpl() {
 }
 
 void shishkarev_a_dijkstra_algorithm_seq::convertToCRS(const std::vector<int>& w, std::vector<int>& values,
-                                          std::vector<int>& colIndex, std::vector<int>& rowPtr, int n) {
+                                                       std::vector<int>& colIndex, std::vector<int>& rowPtr, int n) {
   rowPtr.resize(n + 1);
   int nnz = 0;
 
