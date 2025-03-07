@@ -32,13 +32,6 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   local_height_ = delta_height;
   if (world.rank() < remainder) local_height_ += 1;
 
-  int start_row = 0;
-  if (world.rank() < remainder) {
-    start_row = world.rank() * (delta_height + 1);
-  } else {
-    start_row = remainder * (delta_height + 1) + (world.rank() - remainder) * delta_height;
-  }
-
   local_input_image_.resize((local_height_ + 2) * width_, 0);
   local_output_image_.resize(local_height_ * width_, 0);
 
