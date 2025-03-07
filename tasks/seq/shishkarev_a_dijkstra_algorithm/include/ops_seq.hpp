@@ -2,14 +2,20 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace shishkarev_a_dijkstra_algorithm_seq {
 
-void ConvertToCrs(const std::vector<int>& w, std::vector<int>& values, std::vector<int>& col_index,
-                  std::vector<int>& row_ptr, int n);
+struct Matrix {
+  std::vector<int> values;
+  std::vector<int> col_index;
+  std::vector<int> row_ptr;
+};
+
+void ConvertToCrs(const std::vector<int>& w, Matrix& matrix, int n);
 
 class TestTaskSequential : public ppc::core::Task {
  public:

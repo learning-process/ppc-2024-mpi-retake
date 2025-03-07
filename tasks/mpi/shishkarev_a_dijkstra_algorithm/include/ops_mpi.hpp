@@ -1,8 +1,6 @@
 // Copyright 2023 Nesterov Alexander
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
@@ -13,8 +11,13 @@
 
 namespace shishkarev_a_dijkstra_algorithm_mpi {
 
-void ConvertToCrs(const std::vector<int>& w, std::vector<int>& values, std::vector<int>& col_index,
-                  std::vector<int>& row_ptr, int n);
+struct Matrix {
+  std::vector<int> values;
+  std::vector<int> col_index;
+  std::vector<int> row_ptr;
+};
+
+void ConvertToCrs(const std::vector<int>& w, Matrix& matrix, int n);
 
 class TestMPITaskSequential : public ppc::core::Task {
  public:

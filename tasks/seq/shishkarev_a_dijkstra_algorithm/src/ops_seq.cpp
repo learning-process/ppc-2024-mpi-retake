@@ -5,23 +5,22 @@
 #include <limits>
 #include <vector>
 
-void shishkarev_a_dijkstra_algorithm_seq::ConvertToCrs(const std::vector<int>& w, std::vector<int>& values,
-                                                       std::vector<int>& col_index, std::vector<int>& row_ptr, int n) {
-  row_ptr.resize(n + 1);
+void shishkarev_a_dijkstra_algorithm_seq::ConvertToCrs(const std::vector<int>& w, Matrix& matrix, int n) {
+  matrix.row_ptr.resize(n + 1);
   int nnz = 0;
 
   for (int i = 0; i < n; i++) {
-    row_ptr[i] = nnz;
+    matrix.row_ptr[i] = nnz;
     for (int j = 0; j < n; j++) {
       int weight = w[(i * n) + j];
       if (weight != 0) {
-        values.emplace_back(weight);
-        col_index.emplace_back(j);
+        matrix.values.emplace_back(weight);
+        matrix.col_index.emplace_back(j);
         nnz++;
       }
     }
   }
-  row_ptr[n] = nnz;
+  matrix.row_ptr[n] = nnz;
 }
 
 bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::PreProcessingImpl() {
@@ -63,18 +62,16 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::RunImpl() {
-  const int INF = std::numeric_limits<int>::max();
-  std::vector<int> values;
-  std::vector<int> col_index;
-  std::vector<int> row_ptr;
-  ConvertToCrs(input_, values, col_index, row_ptr, size_);
+  const int inf = std::numeric_limits<int>::max();
+  Matrix matrix;
+  ConvertToCrs(input_, matrix, size_);
 
   std::vector<bool> visited(size_, false);
-  std::vector<int> d(size_, INF);
+  std::vector<int> d(size_, inf);
   d[st_] = 0;
 
   for (int i = 0; i < size_; i++) {
-    int min = INF;
+    int min = inf;
     int index = -1;
     for (int j = 0; j < size_; j++) {
       if (!visited[j] && d[j] < min) {
@@ -94,7 +91,7 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::RunImpl() {
       int v = col_index[j];
       int weight = values[j];
 
-      if (!visited[v] && d[u] != INF && (d[u] + weight < d[v])) {
+      if (!visited[v] && d[u] != inf && (d[u] + weight < d[v])) {
         d[v] = d[u] + weight;
       }
     }
