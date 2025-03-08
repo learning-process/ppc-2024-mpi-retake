@@ -23,8 +23,7 @@ TEST(fomin_v_sobel_edges, Test_Sobel_Edge_Detection) {
     global_output_image.resize(width * height, 0);
   }
 
-  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
-
+  auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs_count = {width, height};
   task_data->outputs_count = {width, height};
 
