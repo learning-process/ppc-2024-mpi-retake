@@ -24,13 +24,13 @@ class SobelEdgeDetectionMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<unsigned char> input_image_;
-  std::vector<unsigned char> output_image_;
   int height_;
   int width_;
-  int local_height_;
-  std::vector<unsigned char> local_input_image_;
-  std::vector<unsigned char> local_output_image_;
+  std::vector<unsigned char> input_image_;
+  std::vector<unsigned char> local_data;
+  std::vector<unsigned char> ghost_upper;
+  std::vector<unsigned char> ghost_lower;
+  std::vector<unsigned char> output_image_;
   boost::mpi::communicator world;
 };
 
