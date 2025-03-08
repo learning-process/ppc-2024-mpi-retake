@@ -136,12 +136,12 @@ void chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::BroadcastMatrixMetad
 
 void chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::InitializeNonRootMatrices() {
   if (world.rank() != 0) {
-    matrixA.values.resize(size_val_A, 0.0);
-    matrixB.values.resize(size_val_B, 0.0);
-    matrixA.col_indices.resize(size_col_A, 0);
-    matrixB.col_indices.resize(size_col_B, 0);
-    matrixA.row_ptr.resize(size_row_A, 0);
-    matrixB.row_ptr.resize(size_row_B, 0);
+    matrixA.values = std::vector<double>(size_val_A, 0.0);
+    matrixB.values = std::vector<double>(size_val_B, 0.0);
+    matrixA.col_indices = std::vector<int>(size_col_A, 0);
+    matrixB.col_indices = std::vector<int>(size_col_B, 0);
+    matrixA.row_ptr = std::vector<int>(size_row_A, 0);
+    matrixB.row_ptr = std::vector<int>(size_row_B, 0);
   } else {
     resultMatrix.values.clear();
     resultMatrix.col_indices.clear();

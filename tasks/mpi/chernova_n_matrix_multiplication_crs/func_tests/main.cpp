@@ -10,12 +10,10 @@
 #include "mpi/chernova_n_matrix_multiplication_crs/include/ops_mpi.hpp"
 
 namespace {
-chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateRandomCrs(int size, double density,
-                                                                                         int seed = 42) {
+chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateRandomCrs(int size, double density) {
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS matrix;
-  std::mt19937 gen(seed);
+  std::mt19937 gen(42);
   std::uniform_real_distribution<double> value_dist(1.0, 10.0);
-  std::uniform_int_distribution<int> col_dist(0, size - 1);
 
   matrix.row_ptr.push_back(0);
   int total_non_zero = 0;
@@ -74,7 +72,7 @@ void SetupOutData(std::vector<double>& values, std::vector<int>& columns, std::v
     task_data->outputs_count.emplace_back(values.size());
   }
 }
-void ExecuteTestPipeline(auto& test_task, const auto& world) {
+void Execution(auto& test_task, const auto& world) {
   if (world.rank() == 0) {
     ASSERT_TRUE(test_task.ValidationImpl());
   }
@@ -136,7 +134,7 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
 
-  ExecuteTestPipeline(test_task, world);
+  Execution(test_task, world);
 
   if (world.rank() == 0) {
     CompareCrs(expected_values, expected_col_indices, expected_row_ptr, task_data, world);
@@ -181,7 +179,7 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_14x14_parallel) {
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
 
-  ExecuteTestPipeline(test_task, world);
+  Execution(test_task, world);
 
   if (world.rank() == 0) {
     CompareCrs(expected_values, expected_col_indices, expected_row_ptr, task_data, world);
@@ -215,7 +213,7 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_10x10) {
   }
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
-  ExecuteTestPipeline(test_task, world);
+  Execution(test_task, world);
   if (world.rank() == 0) {
     CompareCrs(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
   }
