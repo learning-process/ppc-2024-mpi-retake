@@ -117,7 +117,6 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_pipeline_run) {
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
-  // boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
@@ -168,7 +167,6 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_task_run) {
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
-  // boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
