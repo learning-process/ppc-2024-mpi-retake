@@ -154,7 +154,6 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   c_row_ind.resize(exp_c_row_ind.size());
   c_col_ptr.resize(exp_c_col_ptr.size());
 
-
   if (world.rank() == 0) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
     task_data->outputs_count.emplace_back(c_val.size());
