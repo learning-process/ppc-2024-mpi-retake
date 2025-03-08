@@ -1,22 +1,20 @@
 
 #pragma once
 
+#include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/serialization/vector.hpp>  //NOLINT
 #include <cstdint>
 #include <limits>
-#include <memory>
 #include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-
 namespace vinyaikina_e_max_of_vector_elements {
-
-[[nodiscard]] std::vector<int32_t> MakeRandomVector(int32_t size, int32_t val_min, int32_t val_max);
 
 class VectorMaxSeq : public ppc::core::Task {
  public:
-  explicit VectorMaxSeq(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+  explicit VectorMaxSeq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool ValidationImpl() override;
   bool PreProcessingImpl() override;
   bool RunImpl() override;
@@ -29,7 +27,7 @@ class VectorMaxSeq : public ppc::core::Task {
 
 class VectorMaxPar : public ppc::core::Task {
  public:
-  explicit VectorMaxPar(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
+  explicit VectorMaxPar(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool ValidationImpl() override;
   bool PreProcessingImpl() override;
   bool RunImpl() override;

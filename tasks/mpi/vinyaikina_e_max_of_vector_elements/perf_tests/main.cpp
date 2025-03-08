@@ -1,7 +1,9 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/timer.hpp>
+#include <boost/serialization/vector.hpp>  //NOLINT
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -9,12 +11,13 @@
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
+#include "mpi/vinyaikina_e_max_of_vector_elements/include/ops_mpi.hpp"
 
 TEST(vinyaikina_e_max_of_vector_elements_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   std::vector<int32_t> input_vector;
   int32_t result_parallel = std::numeric_limits<int32_t>::min();
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
   int vector_size = 50000000;
 
   if (world.rank() == 0) {
@@ -26,7 +29,7 @@ TEST(vinyaikina_e_max_of_vector_elements_mpi, test_pipeline_run) {
     task_data_par->outputs_count.emplace_back(1);
   }
 
-  auto test_mpi_task_parallel = std::make_shared<vinyaikina_e_max_of_vector_elements_mpi::VectorMaxPar>(task_data_par);
+  auto test_mpi_task_parallel = std::make_shared<vinyaikina_e_max_of_vector_elements::VectorMaxPar>(task_data_par);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -35,10 +38,10 @@ TEST(vinyaikina_e_max_of_vector_elements_mpi, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
 
-  perf_analyzer->pipeline_run(perf_attr, perf_results);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perf_results);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(10, result_parallel);
   }
 }
@@ -47,7 +50,7 @@ TEST(vinyaikina_e_max_of_vector_elements_mpi, test_task_run) {
   boost::mpi::communicator world;
   std::vector<int32_t> input_vector;
   int32_t result_parallel = std::numeric_limits<int32_t>::min();
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
   int vector_size = 50000000;
 
   if (world.rank() == 0) {
@@ -59,7 +62,7 @@ TEST(vinyaikina_e_max_of_vector_elements_mpi, test_task_run) {
     task_data_par->outputs_count.emplace_back(1);
   }
 
-  auto test_mpi_task_parallel = std::make_shared<vinyaikina_e_max_of_vector_elements_mpi::VectorMaxPar>(task_data_par);
+  auto test_mpi_task_parallel = std::make_shared<vinyaikina_e_max_of_vector_elements::VectorMaxPar>(task_data_par);
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -68,10 +71,10 @@ TEST(vinyaikina_e_max_of_vector_elements_mpi, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi_task_parallel);
 
-  perf_analyzer->task_run(perf_attr, perf_results);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
 
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perf_results);
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
     ASSERT_EQ(1, result_parallel);
   }
 }
