@@ -1,6 +1,6 @@
-﻿#include <cstdio>
+﻿#include <cstdint>
+#include <cstdio>
 #include <cstdlib>
-#include <cstdint>
 #include <ctime>
 
 #include <memory>
@@ -13,6 +13,7 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/tarakanov_d_global_opt_by_characts_two_dim_prob/include/ops_mpi.hpp"
+
 
 struct TestParams {
   std::vector<double> area;
@@ -64,7 +65,7 @@ std::shared_ptr<ppc::core::TaskData> CreateTaskData(const TestParams& params, st
 }  // namespace
 
 TEST(OptimMPITest, TestOptimization_Case1) {
-  TestParams params{{-10, 10, -10, 10}, CreateFunc(-10, 10), CreateConstr(-10, 10, 36), 0.3, 0, 36};
+  TestParams params{.area={-10, 10, -10, 10}, .func=CreateFunc(-10, 10), .constraint=CreateConstr(-10, 10, 36), .step=0.3, .mode=0, .constraint_count=36};
   boost::mpi::communicator world;
   std::vector<double> out = {0};
   std::vector<double> out_s = {0};
@@ -94,7 +95,7 @@ TEST(OptimMPITest, TestOptimization_Case1) {
 }
 
 TEST(OptimMPITest, TestOptimization_Case2) {
-  TestParams params{{-17, 6, 13, 23}, CreateFunc(-10, 10), CreateConstr(-10, 10, 24), 0.3, 0, 24};
+  TestParams params{.area={-17, 6, 13, 23}, .func=CreateFunc(-10, 10), .constraint=CreateConstr(-10, 10, 24), .step=0.3, .mode=0, .constraint_count=24};
   boost::mpi::communicator world;
   std::vector<double> out = {0};
   std::vector<double> out_s = {0};
@@ -124,7 +125,7 @@ TEST(OptimMPITest, TestOptimization_Case2) {
 }
 
 TEST(OptimMPITest, TestOptimization_Case3) {
-  TestParams params{{-20, -10, -20, -10}, CreateFunc(-10, 10), CreateConstr(1, 3, 1), 0.3, 1, 1};
+  TestParams params{.area={-20, -10, -20, -10}, .func=CreateFunc(-10, 10), .constraint=CreateConstr(1, 3, 1), .step=0.3, .mode=1, .constraint_count=1};
   boost::mpi::communicator world;
   std::vector<double> out = {0};
   std::vector<double> out_s = {0};
@@ -154,7 +155,7 @@ TEST(OptimMPITest, TestOptimization_Case3) {
 }
 
 TEST(OptimMPITest, TestOptimization_Case4) {
-  TestParams params{{30, 40, 30, 40}, CreateFunc(-10, 10), CreateConstr(-10, -1, 36), 0.3, 0, 36};
+  TestParams params{.area={30, 40, 30, 40}, .func=CreateFunc(-10, 10), .constraint=CreateConstr(-10, -1, 36), .step=0.3, .mode=0, .constraint_count=36};
   boost::mpi::communicator world;
   std::vector<double> out = {0};
   std::vector<double> out_s = {0};
@@ -184,7 +185,7 @@ TEST(OptimMPITest, TestOptimization_Case4) {
 }
 
 TEST(OptimMPITest, TestOptimization_Case5) {
-  TestParams params{{0.0000001, 0.0000002, 0.0000001, 0.0000002}, CreateFunc(-10, 10), CreateConstr(-10, 10, 1), 0.3, 0, 1};
+  TestParams params{.area={0.0000001, 0.0000002, 0.0000001, 0.0000002}, .func=CreateFunc(-10, 10), .constraint=CreateConstr(-10, 10, 1), .step=0.3, .mode=0, .constraint_count=1};
   boost::mpi::communicator world;
   std::vector<double> out = {0};
   std::vector<double> out_s = {0};
