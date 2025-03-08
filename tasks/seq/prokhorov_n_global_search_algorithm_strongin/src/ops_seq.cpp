@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <vector>
 
 bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PreProcessingImpl() {
@@ -19,10 +20,11 @@ bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::Valid
 bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::RunImpl() {
   double eps = 0.0001;
   double r = 2.0;
-  result_ = stronginAlgorithm(a_, b_, eps, r, f_);
+  result_ = StronginAlgorithm(a_, b_, eps, r, f_);
   return true;
 }
-double prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::stronginAlgorithm(
+
+double prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm(
     double a, double b, double eps, double r, const std::function<double(double)>& f) {
   std::vector<double> points = {a, b};
   double lipsh = 0.0;
@@ -57,7 +59,7 @@ double prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::str
     double new_x = ((points[s] + points[s + 1]) / 2) - ((f(points[s + 1]) - f(points[s])) / (2 * m));
 
     if ((points[s + 1] - points[s]) <= eps) {
-      return *std::min_element(points.begin(), points.end(), [&f](double a, double b) { return f(a) < f(b); });
+      return *std::ranges::min_element(points, [&f](double a, double b) { return f(a) < f(b); });
     }
 
     points.push_back(new_x);
@@ -65,6 +67,7 @@ double prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::str
     k++;
   }
 }
+
 bool prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::PostProcessingImpl() {
   *reinterpret_cast<double*>(task_data->outputs[0]) = result_;
   return true;

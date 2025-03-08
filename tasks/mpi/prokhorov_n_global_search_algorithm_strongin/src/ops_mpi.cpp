@@ -5,7 +5,6 @@
 #include <boost/mpi/collectives/gather.hpp>
 #include <cmath>
 #include <functional>
-#include <utility>
 #include <vector>
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::PreProcessingImpl() {
@@ -23,31 +22,34 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::Valid
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::RunImpl() {
   double eps = 0.0001;
   double r = 2.0;
-  result_ = stronginAlgorithm(a_, b_, eps, r, f_);
+  result_ = StronginAlgorithm(a_, b_, eps, r, f_);
   return true;
 }
-double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::stronginAlgorithm(
-    double a, double b, double eps, double r, const std::function<double(double)>& f) {
+
+double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::StronginAlgorithm(
+    double a, double b, double eps, double r, const std::function<double(double*)>& f) {
   std::vector<double> points = {a, b};
   double lipsh = 0.0;
   int k = 2;
+
   while (true) {
     for (int i = 0; i < (k - 1); ++i) {
-      double f_left = f(points[i]);
-      double f_right = f(points[i + 1]);
+      double f_left = f(&points[i]);
+      double f_right = f(&points[i + 1]);
       lipsh = std::max(lipsh, std::abs((f_right - f_left) / (points[i + 1] - points[i])));
     }
 
     double m = lipsh != 0 ? r * lipsh : 1.0;
 
     int s = 0;
-    double max_ch = (m * (points[1] - points[0])) +
-                    ((f(points[1]) - f(points[0])) * (f(points[1]) - f(points[0])) / (m * (points[1] - points[0]))) -
-                    (2 * (f(points[1]) + f(points[0])));
+    double max_ch =
+        (m * (points[1] - points[0])) +
+        ((f(&points[1]) - f(&points[0])) * (f(&points[1]) - f(&points[0])) / (m * (points[1] - points[0]))) -
+        (2 * (f(&points[1]) + f(&points[0])));
 
     for (int i = 1; i < (k - 1); i++) {
-      double f_left = f(points[i]);
-      double f_right = f(points[i + 1]);
+      double f_left = f(&points[i]);
+      double f_right = f(&points[i + 1]);
       double ch = (m * (points[i + 1] - points[i])) +
                   ((f_right - f_left) * (f_right - f_left) / (m * (points[i + 1] - points[i]))) -
                   (2 * (f_right + f_left));
@@ -57,10 +59,10 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::str
       }
     }
 
-    double new_x = ((points[s] + points[s + 1]) / 2) - ((f(points[s + 1]) - f(points[s])) / (2 * m));
+    double new_x = ((points[s] + points[s + 1]) / 2) - ((f(&points[s + 1]) - f(&points[s])) / (2 * m));
 
     if ((points[s + 1] - points[s]) <= eps) {
-      return *std::min_element(points.begin(), points.end(), [&f](double a, double b) { return f(a) < f(b); });
+      return *std::ranges::min_element(points, [&f](double a, double b) { return f(&a) < f(&b); });
     }
 
     points.push_back(new_x);
@@ -68,11 +70,11 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::str
     k++;
   }
 }
+
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskSequential::PostProcessingImpl() {
   *reinterpret_cast<double*>(task_data->outputs[0]) = result_;
   return true;
 }
-
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
     result_ = 0;
@@ -91,7 +93,7 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::Validat
   return flag;
 }
 
-double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::stronginAlgorithmParalel(
+double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::StronginAlgorithmParallel(
     double a, double b, const std::function<double(double*)>& f, double eps) {
   std::vector<double> points = {a, b};
   double lipsh = 0.0;
@@ -139,7 +141,7 @@ double prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::stron
 
 bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::RunImpl() {
   if (world_.size() == 1) {
-    result_ = stronginAlgorithmParalel(a_, b_, f_, 0.0001);
+    result_ = StronginAlgorithmParallel(a_, b_, f_, 0.0001);
     return true;
   }
 
@@ -151,7 +153,7 @@ bool prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel::RunImpl
   double local_left = a_ + segment * world_.rank();
   double local_right = local_left + segment;
 
-  double local_result = stronginAlgorithmParalel(local_left, local_right, f_, 0.0001);
+  double local_result = StronginAlgorithmParallel(local_left, local_right, f_, 0.0001);
 
   std::vector<double> local_answer(world_.size());
   boost::mpi::gather(world_, local_result, local_answer, 0);
