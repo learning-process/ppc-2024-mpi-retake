@@ -63,12 +63,7 @@ bool chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::ValidationImpl() {
 
 bool chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::RunImpl() {
   BroadcastMatrixMetadata();
-  if (world.rank() != 0) {
-    InitializeNonRootMatrices();
-  } else {
-    resultMatrix.values.clear();
-    resultMatrix.col_indices.clear();
-  }
+  InitializeNonRootMatrices();
   BroadcastMatrixData();
 
   int number_of_rows = rowsRes / world.size();
@@ -140,12 +135,17 @@ void chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::BroadcastMatrixMetad
 }
 
 void chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::InitializeNonRootMatrices() {
-  matrixA.values.resize(size_val_A, 0.0);
-  matrixB.values.resize(size_val_B, 0.0);
-  matrixA.col_indices.resize(size_col_A, 0);
-  matrixB.col_indices.resize(size_col_B, 0);
-  matrixA.row_ptr.resize(size_row_A, 0);
-  matrixB.row_ptr.resize(size_row_B, 0);
+  if (world.rank() != 0) {
+    matrixA.values.resize(size_val_A, 0.0);
+    matrixB.values.resize(size_val_B, 0.0);
+    matrixA.col_indices.resize(size_col_A, 0);
+    matrixB.col_indices.resize(size_col_B, 0);
+    matrixA.row_ptr.resize(size_row_A, 0);
+    matrixB.row_ptr.resize(size_row_B, 0);
+  } else {
+    resultMatrix.values.clear();
+    resultMatrix.col_indices.clear();
+  }
 }
 
 void chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::BroadcastMatrixData() {
