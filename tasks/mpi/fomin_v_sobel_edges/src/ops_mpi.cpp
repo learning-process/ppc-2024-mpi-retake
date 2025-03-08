@@ -131,14 +131,11 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
   int send_count = output_image_.size();
 
-  if (rank == 0) {
-    output_image_.resize(width_ * height_);
-  }
-
   std::vector<int> recv_counts(size);
   std::vector<int> displs(size);
 
   if (rank == 0) {
+    output_image_.resize(width_ * height_);
     int chunk_size = height_ / size;
     int remainder = height_ % size;
 
@@ -151,8 +148,10 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
   MPI_Gatherv(output_image_.data(), send_count, MPI_UNSIGNED_CHAR, output_image_.data(), recv_counts.data(),
               displs.data(), MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+
   if (rank == 0) {
-    *reinterpret_cast<std::vector<unsigned char> *>(task_data->outputs[0]) = output_image_;
+    unsigned char *output_buffer = reinterpret_cast<unsigned char *>(task_data->outputs[0]);
+    std::copy(output_image_.begin(), output_image_.end(), output_buffer);
   }
 
   return true;
@@ -195,6 +194,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetection::RunImpl() {
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetection::PostProcessingImpl() {
-  *reinterpret_cast<std::vector<unsigned char> *>(task_data->outputs[0]) = output_image_;
+  unsigned char *output_buffer = reinterpret_cast<unsigned char *>(task_data->outputs[0]);
+  std::copy(output_image_.begin(), output_image_.end(), output_buffer);
   return true;
 }
