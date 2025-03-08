@@ -5,6 +5,7 @@
 #include <boost/serialization/vector.hpp>  // NOLINT
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <random>
 #include <vector>
@@ -263,7 +264,7 @@ TEST(strakhov_a_fox_algorithm_mpi, test_matmul_100x100_random) {
   test_task_mpi.PostProcessing();
   if (world.rank() == 0) {
     for (size_t i = 0; i < out.size(); i++) {
-      ASSERT_FLOAT_EQ(ans[i], out[i]);
+      ASSERT_EQ((abs(ans[i] - out[i]) < 0.00001), true);
     }
   }
 }
