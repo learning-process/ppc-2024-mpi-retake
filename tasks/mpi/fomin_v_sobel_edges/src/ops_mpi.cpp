@@ -57,12 +57,10 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
   bool valid = true;
   if (world.rank() == 0) {
-    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 &&
-            task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0 && task_data->inputs[0] != nullptr &&
-            task_data->outputs[0] != nullptr;
+    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2;
   }
   boost::mpi::broadcast(world, valid, 0);
-  return valid && (local_height_ >= 0);
+  return valid;
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
