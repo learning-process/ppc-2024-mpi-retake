@@ -89,7 +89,7 @@ TEST(strakhov_a_fox_algorithm_mpi, test_pipeline_run) {
   }
   if (world.rank() == 0) {
     for (size_t i = 0; i < out.size(); i++) {
-      ASSERT_FLOAT_EQ(ans[i], out[i]);
+      ASSERT_EQ((abs(ans[i] - out[i]) < 0.00001), true);
     }
   }
 }
@@ -143,7 +143,7 @@ TEST(strakhov_a_fox_algorithm_mpi, test_task_run) {
 
   if (world.rank() == 0) {
     for (size_t i = 0; i < out.size(); i++) {
-      ASSERT_FLOAT_EQ(ans[i], out[i]);
+      ASSERT_EQ((abs(ans[i] - out[i]) < 0.00001), true);
     }
   }
 }

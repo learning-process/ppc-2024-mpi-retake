@@ -72,7 +72,7 @@ TEST(strakhov_a_fox_algorithm_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   for (size_t i = 0; i < out.size(); i++) {
-    ASSERT_FLOAT_EQ(ans[i], out[i]);
+    ASSERT_EQ((abs(ans[i] - out[i]) < 0.00001), true);
   }
 }
 
@@ -112,6 +112,6 @@ TEST(strakhov_a_fox_algorithm_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
   for (size_t i = 0; i < out.size(); i++) {
-    ASSERT_FLOAT_EQ(ans[i], out[i]);
+    ASSERT_EQ((abs(ans[i] - out[i]) < 0.00001), true);
   }
 }

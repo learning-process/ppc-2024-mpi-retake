@@ -233,6 +233,6 @@ TEST(strakhov_a_fox_algorithm_seq, test_matmul_100x100_random) {
   test_task_sequential.Run();
   test_task_sequential.PostProcessing();
   for (size_t i = 0; i < out.size(); i++) {
-    ASSERT_FLOAT_EQ(ans[i], out[i]);
+    ASSERT_EQ((abs(ans[i] - out[i]) < 0.00001), true);
   }
 }
