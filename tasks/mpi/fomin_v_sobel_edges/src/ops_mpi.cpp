@@ -174,32 +174,27 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-
   int send_count = output_image_.size();
-
   std::vector<int> recv_counts(size);
   std::vector<int> displs(size);
-
   if (rank == 0) {
     output_image_.resize(width_ * height_);
     int chunk_size = height_ / size;
     int remainder = height_ % size;
-
+    int current_displ = 0; 
     for (int i = 0; i < size; ++i) {
       int rows = chunk_size + (i < remainder ? 1 : 0);
       recv_counts[i] = rows * width_;
-      displs[i] = (i < remainder ? i * (chunk_size + 1) : remainder + i * chunk_size) * width_;
+      displs[i] = current_displ;
+      current_displ += recv_counts[i];
     }
   }
-
   MPI_Gatherv(output_image_.data(), send_count, MPI_UNSIGNED_CHAR, output_image_.data(), recv_counts.data(),
               displs.data(), MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
-
   if (rank == 0) {
     unsigned char *output_buffer = reinterpret_cast<unsigned char *>(task_data->outputs[0]);
     std::copy(output_image_.begin(), output_image_.end(), output_buffer);
   }
-
   return true;
 }
 
