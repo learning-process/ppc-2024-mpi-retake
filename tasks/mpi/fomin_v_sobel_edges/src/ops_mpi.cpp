@@ -36,9 +36,14 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
       std::cerr << "Error [Rank 0]: No input data provided." << std::endl;
       MPI_Abort(MPI_COMM_WORLD, 1);
     }
-    input_image_ = *reinterpret_cast<std::vector<unsigned char> *>(task_data->inputs[0]);
     width_ = task_data->inputs_count[0];
     height_ = task_data->inputs_count[1];
+    unsigned char *input_data = reinterpret_cast<unsigned char *>(task_data->inputs[0]);
+    if (!input_data) {
+      std::cerr << "Error [Rank 0]: Input data pointer is null." << std::endl;
+      MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+    input_image_.assign(input_data, input_data + width_ * height_);
 
     if (input_image_.size() != static_cast<size_t>(width_ * height_)) {
       std::cerr << "Error [Rank 0]: Input image size does not match dimensions." << std::endl;
@@ -116,7 +121,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
   bool valid = true;
   if (world.rank() == 0) {
-    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 &&
+    valid = task_data->inputs_count.size() >= 2 && task_data->outputs_count.size() >= 2 &&
             task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0;
   }
   boost::mpi::broadcast(world, valid, 0);
