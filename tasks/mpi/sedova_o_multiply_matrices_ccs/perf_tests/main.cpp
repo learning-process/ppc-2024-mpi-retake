@@ -127,20 +127,47 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   task_data->inputs_count.emplace_back(1);
 
   if (world.rank() == 0) {
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
+    if (a_val.data() != nullptr) {
+      task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_val.data()));
+    } else {
+      throw std::runtime_error("a_val is null");
+    }
     task_data->inputs_count.emplace_back(a_val.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
+
+    if (a_row_ind.data() != nullptr) {
+      task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_row_ind.data()));
+    } else {
+      throw std::runtime_error("a_row_ind is null");
+    }
     task_data->inputs_count.emplace_back(a_row_ind.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
+
+    if (a_col_ptr.data() != nullptr) {
+      task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(a_col_ptr.data()));
+    } else {
+      throw std::runtime_error("a_col_ptr is null");
+    }
     task_data->inputs_count.emplace_back(a_col_ptr.size());
 
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
+    if (b_val.data() != nullptr) {
+      task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_val.data()));
+    } else {
+      throw std::runtime_error("b_val is null");
+    }
     task_data->inputs_count.emplace_back(b_val.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
-    task_data->inputs_count.emplace_back(b_row_ind.size());
-    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
-    task_data->inputs_count.emplace_back(b_col_ptr.size());
 
+    if (b_row_ind.data() != nullptr) {
+      task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_row_ind.data()));
+    } else {
+      throw std::runtime_error("b_row_ind is null");
+    }
+    task_data->inputs_count.emplace_back(b_row_ind.size());
+
+    if (b_col_ptr.data() != nullptr) {
+      task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
+    } else {
+      throw std::runtime_error("b_col_ptr is null");
+    }
+    task_data->inputs_count.emplace_back(b_col_ptr.size());
   } else {
     b_val.resize(b_val.size());
     b_row_ind.resize(b_row_ind.size());
@@ -155,11 +182,25 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   c_col_ptr.resize(exp_c_col_ptr.size());
 
   if (world.rank() == 0) {
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
+    if (c_val.data() != nullptr) {
+      task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
+    } else {
+      throw std::runtime_error("c_val is null");
+    }
     task_data->outputs_count.emplace_back(c_val.size());
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
+
+    if (c_row_ind.data() != nullptr) {
+      task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
+    } else {
+      throw std::runtime_error("c_row_ind is null");
+    }
     task_data->outputs_count.emplace_back(c_row_ind.size());
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
+
+    if (c_col_ptr.data() != nullptr) {
+      task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
+    } else {
+      throw std::runtime_error("c_col_ptr is null");
+    }
     task_data->outputs_count.emplace_back(c_col_ptr.size());
   }
 
