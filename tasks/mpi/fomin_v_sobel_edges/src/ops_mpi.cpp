@@ -24,17 +24,28 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     height_ = task_data->inputs_count[1];
   }
 
+  // Рассылаем размеры изображения всем процессам
   MPI_Bcast(&width_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&height_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  // Проверка на допустимые размеры
+  if (width_ <= 0 || height_ <= 0) {
+    if (rank == 0) {
+      std::cerr << "Invalid image dimensions" << std::endl;
+    }
+    return false;
+  }
 
   int chunk_size = height_ / size;
   int remainder = height_ % size;
 
   if (rank == 0) {
-    local_data.resize((chunk_size + (remainder > 0 ? 1 : 0)) * width_);
-    std::copy(input_image_.begin(), local_data.end(), local_data.begin());
+    int root_rows = chunk_size + (remainder > 0 ? 1 : 0);
+    local_data.resize(root_rows * width_);
+    std::copy(input_image_.begin(), input_image_.begin() + root_rows * width_, local_data.begin());
+
     for (int i = 1; i < size; ++i) {
-      int start_row = i * chunk_size + std::min(i, remainder);
+      int start_row = chunk_size * i + std::min(i, remainder);
       int send_rows = chunk_size + (i < remainder ? 1 : 0);
       MPI_Send(input_image_.data() + start_row * width_, send_rows * width_, MPI_UNSIGNED_CHAR, i, 0, MPI_COMM_WORLD);
     }
@@ -49,12 +60,14 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     ghost_lower.resize(width_);
 
     if (rank > 0) {
-      MPI_Sendrecv(local_data.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, ghost_upper.data(), width_,
-                   MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Send(local_data.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD);
+      MPI_Recv(ghost_upper.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
+
     if (rank < size - 1) {
-      MPI_Sendrecv(local_data.data() + (local_data.size() / width_ - 1) * width_, width_, MPI_UNSIGNED_CHAR, rank + 1,
-                   0, ghost_lower.data(), width_, MPI_UNSIGNED_CHAR, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Send(local_data.data() + (local_data.size() - width_), width_, MPI_UNSIGNED_CHAR, rank + 1, 0,
+               MPI_COMM_WORLD);
+      MPI_Recv(ghost_lower.data(), width_, MPI_UNSIGNED_CHAR, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
   }
 
@@ -110,7 +123,6 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
       output_image_[y * width_ + x] = std::min(gradient, 255);
     }
   }
-
   return true;
 }
 
@@ -118,6 +130,10 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  if (rank == 0) {
+    output_image_.resize(width_ * height_);
+  }
 
   std::vector<int> recv_counts(size);
   std::vector<int> displs(size);
@@ -127,9 +143,9 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
     int remainder = height_ % size;
 
     for (int i = 0; i < size; ++i) {
-      recv_counts[i] = (i < remainder) ? (chunk_size + 1) * width_ : chunk_size * width_;
-      displs[i] = (i < remainder) ? i * (chunk_size + 1) * width_
-                                  : (remainder * (chunk_size + 1) + (i - remainder) * chunk_size) * width_;
+      int rows = chunk_size + (i < remainder ? 1 : 0);
+      recv_counts[i] = rows * width_;
+      displs[i] = (i < remainder ? i * (chunk_size + 1) : remainder + i * chunk_size) * width_;
     }
   }
 
