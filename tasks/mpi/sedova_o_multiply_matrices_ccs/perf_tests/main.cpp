@@ -141,7 +141,7 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
     task_data->inputs_count.emplace_back(b_col_ptr.size());
 
-  } else{
+  } else {
     b_val.resize(b_val.size());
     b_row_ind.resize(b_row_ind.size());
     b_col_ptr.resize(b_col_ptr.size());
