@@ -17,7 +17,8 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, x_square) {
 
   prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
+  double result =
+      prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm(a, b, eps, 2.0, f);
 
   EXPECT_NEAR(answer, result, eps);
 }
@@ -31,7 +32,8 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, sin) {
 
   prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
+  double result =
+      prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm(a, b, eps, 2.0, f);
 
   EXPECT_NEAR(answer, result, eps);
 }
@@ -45,7 +47,8 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, cos) {
 
   prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
+  double result =
+      prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm(a, b, eps, 2.0, f);
 
   EXPECT_NEAR(answer, result, eps);
 }
@@ -59,7 +62,8 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, exp) {
 
   prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
+  double result =
+      prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm(a, b, eps, 2.0, f);
 
   EXPECT_NEAR(answer, result, eps);
 }
@@ -73,7 +77,8 @@ TEST(prokhorov_n_global_search_algorithm_strongin_seq, absolute) {
 
   prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential task(std::make_shared<ppc::core::TaskData>(), f);
 
-  double result = task.stronginAlgorithm(a, b, eps, 2.0, f);
+  double result =
+      prokhorov_n_global_search_algorithm_strongin_seq::TestTaskSequential::StronginAlgorithm(a, b, eps, 2.0, f);
 
   EXPECT_NEAR(answer, result, eps);
 }

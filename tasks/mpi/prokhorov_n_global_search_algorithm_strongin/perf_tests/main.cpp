@@ -2,7 +2,6 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
-#include <cmath>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -14,15 +13,15 @@
 TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
   double a = -1.0;
   double b = 4.0;
-  double res = 0;
-  std::function<double(double *)> f = [](const double *x) { return std::exp(*x) - 1.0; };
+  double result = 0;
+  std::function<double(double *)> f = [](const double *x) { return ((*x) * (*x)) + (2 * (*x)) + 1; };
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&a));
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&b));
   task_data_mpi->inputs_count.emplace_back(2);
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(&res));
-  task_data_mpi->outputs_count.emplace_back(2);
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
+  task_data_mpi->outputs_count.emplace_back(1);
 
   auto test_task_mpi =
       std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel>(task_data_mpi, f);
@@ -50,16 +49,15 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
 TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
   double a = -1.0;
   double b = 4.0;
-  double res = 0;
-
-  std::function<double(double *)> f = [](const double *x) { return std::exp(*x) - 1.0; };
+  double result = 0;
+  std::function<double(double *)> f = [](const double *x) { return ((*x) * (*x)) + (2 * (*x)) + 1; };
 
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&a));
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(&b));
   task_data_mpi->inputs_count.emplace_back(2);
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(&res));
-  task_data_mpi->outputs_count.emplace_back(2);
+  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(&result));
+  task_data_mpi->outputs_count.emplace_back(1);
 
   auto test_task_mpi =
       std::make_shared<prokhorov_n_global_search_algorithm_strongin_mpi::TestTaskParallel>(task_data_mpi, f);

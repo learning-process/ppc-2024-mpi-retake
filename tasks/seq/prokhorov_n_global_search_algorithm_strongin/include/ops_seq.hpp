@@ -18,7 +18,7 @@ class TestTaskSequential : public ppc::core::Task {
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-  double stronginAlgorithm(double a, double b, double eps, double r, const std::function<double(double)>& f);
+  static double StronginAlgorithm(double a, double b, double eps, double r, const std::function<double(double)>& f);
 
  private:
   double a_{};
