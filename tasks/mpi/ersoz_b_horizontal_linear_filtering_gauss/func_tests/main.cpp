@@ -10,16 +10,14 @@
 
 #include <cstdint>
 #include <memory>
-#include <utility>  // For std::move
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
-// Removed unused util.hpp include.
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
-// Suppress cognitive complexity warnings in this test.
-TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {  // NOLINT(readability-function-cognitive-complexity)
-  constexpr int kN = 16;                                   // Image is kN x kN
+TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
+  constexpr int kN = 16;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
@@ -33,9 +31,7 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {  // NOLINT(readability
     image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 
-  // A simple sequential filter (used to compute the expected result)
-  auto sequential_filter =
-      [&image](double sigma) -> std::vector<std::vector<char>> {  // NOLINT(readability-function-cognitive-complexity)
+  auto sequential_filter = [&image](double sigma) -> std::vector<std::vector<char>> {
     int y_dim = static_cast<int>(image.size());
     int x_dim = static_cast<int>(image[0].size());
     std::vector<std::vector<char>> res;

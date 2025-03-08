@@ -68,7 +68,6 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
   int local_size = scounts[rank] * (x_dim - 2);
   std::vector<char> pixels(local_size, 0);
 
-  // Compute the local portion of the filtered image.
   for (int y = displs[rank]; y < displs[rank] + scounts[rank]; y++) {
     for (int x = 1; x < x_dim - 1; x++) {
       pixels[((y - displs[rank]) * (x_dim - 2)) + (x - 1)] = ComputePixel(image, y, x, sigma);
@@ -106,7 +105,6 @@ std::vector<std::vector<char>> GaussianFilter(const std::vector<std::vector<char
 }  // namespace
 
 bool ersoz_b_test_task_mpi::TestTaskMPI::PreProcessingImpl() {
-  // Reconstruct the 2D image from the flat input buffer.
   unsigned int input_size = task_data->inputs_count[0];
   img_size_ = static_cast<int>(std::sqrt(input_size));
   uint8_t* in_ptr = task_data->inputs[0];
@@ -131,7 +129,7 @@ bool ersoz_b_test_task_mpi::TestTaskMPI::ValidationImpl() {
   if (task_data->outputs_count[0] != static_cast<unsigned int>((computed_size - 2) * (computed_size - 2))) {
     return false;
   }
-  img_size_ = computed_size;  // store for later use
+  img_size_ = computed_size;
   return true;
 }
 
