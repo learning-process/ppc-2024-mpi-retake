@@ -150,22 +150,18 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
   std::vector<double> c_val;
   std::vector<int> c_row_ind;
   std::vector<int> c_col_ptr;
+  c_val.resize(exp_c_val.size());
+  c_row_ind.resize(exp_c_row_ind.size());
+  c_col_ptr.resize(exp_c_col_ptr.size());
+
 
   if (world.rank() == 0) {
-    c_val.resize(exp_c_val.size());
-    c_row_ind.resize(exp_c_row_ind.size());
-    c_col_ptr.resize(exp_c_col_ptr.size());
-
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_val.data()));
     task_data->outputs_count.emplace_back(c_val.size());
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_row_ind.data()));
     task_data->outputs_count.emplace_back(c_row_ind.size());
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
     task_data->outputs_count.emplace_back(c_col_ptr.size());
-  } else {
-    c_val.resize(exp_c_val.size());
-    c_row_ind.resize(exp_c_row_ind.size());
-    c_col_ptr.resize(exp_c_col_ptr.size());
   }
 
   auto task = std::make_shared<sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI>(task_data);
