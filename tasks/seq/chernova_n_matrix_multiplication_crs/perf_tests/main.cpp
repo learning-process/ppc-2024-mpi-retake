@@ -80,10 +80,9 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
   SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data_seq);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS result;
-  result.values.resize(matrix_a.values.size());
-  result.col_indices.resize(matrix_a.col_indices.size());
-  result.row_ptr.resize(matrix_a.row_ptr.size());
-
+  result.values = std::vector<double>(matrix_a.values.size());
+  result.col_indices = std::vector<int>(matrix_a.col_indices.size());
+  result.row_ptr = std::vector<int>(matrix_a.row_ptr.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.values.data()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.col_indices.data()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.row_ptr.data()));
@@ -125,9 +124,9 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_task_run) {
   SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data_seq);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS result;
-  result.values.resize(matrix_a.values.size());
-  result.col_indices.resize(matrix_a.col_indices.size());
-  result.row_ptr.resize(matrix_a.row_ptr.size());
+  result.values = std::vector<double>(matrix_a.values.size());
+  result.col_indices = std::vector<int>(matrix_a.col_indices.size());
+  result.row_ptr = std::vector<int>(matrix_a.row_ptr.size());
 
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.values.data()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.col_indices.data()));

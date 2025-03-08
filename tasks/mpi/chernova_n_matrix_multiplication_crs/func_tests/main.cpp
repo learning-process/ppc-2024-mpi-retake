@@ -39,10 +39,9 @@ chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateI
   if (n <= 0) {
     return matrix;
   }
-
-  matrix.values.resize(n, 1.0);
-  matrix.col_indices.resize(n);
-  matrix.row_ptr.resize(n + 1);
+  matrix.values = std::vector<double>(n, 1.0);
+  matrix.col_indices = std::vector<int>(n);
+  matrix.row_ptr = std::vector<int>(n + 1);
 
   for (int i = 0; i < n; ++i) {
     matrix.col_indices[i] = i;

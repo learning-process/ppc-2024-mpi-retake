@@ -42,9 +42,9 @@ chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateI
     return matrix;
   }
 
-  matrix.values.resize(n, 1.0);
-  matrix.col_indices.resize(n);
-  matrix.row_ptr.resize(n + 1);
+  matrix.values = std::vector<double>(n, 1.0);
+  matrix.col_indices = std::vector<int>(n);
+  matrix.row_ptr = std::vector<int>(n + 1);
 
   for (int i = 0; i < n; ++i) {
     matrix.col_indices[i] = i;
@@ -92,9 +92,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_pipeline_run) {
     SetupTaskData(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
     SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data, world);
 
-    result.values.resize(matrix_a.values.size());
-    result.col_indices.resize(matrix_a.col_indices.size());
-    result.row_ptr.resize(matrix_a.row_ptr.size());
+    result.values = std::vector<double>(matrix_a.values.size());
+    result.col_indices = std::vector<int>(matrix_a.col_indices.size());
+    result.row_ptr = std::vector<int>(matrix_a.row_ptr.size());
 
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.values.data()));
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.col_indices.data()));
@@ -142,9 +142,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_task_run) {
     SetupTaskData(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
     SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data, world);
 
-    result.values.resize(matrix_a.values.size());
-    result.col_indices.resize(matrix_a.col_indices.size());
-    result.row_ptr.resize(matrix_a.row_ptr.size());
+    result.values = std::vector<double>(matrix_a.values.size());
+    result.col_indices = std::vector<int>(matrix_a.col_indices.size());
+    result.row_ptr = std::vector<int>(matrix_a.row_ptr.size());
 
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.values.data()));
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.col_indices.data()));
