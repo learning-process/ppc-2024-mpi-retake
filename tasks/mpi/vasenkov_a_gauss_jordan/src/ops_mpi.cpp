@@ -1,23 +1,23 @@
 
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <vector>
+
 
 #define EPSILON 1e-9
 
 namespace vasenkov_a_gauss_jordan_mpi {
 
 bool GaussJordanMethodParallelMPI::ValidationImpl() {
-  if (world.rank() != 0)
-    return true;
+  if (world.rank() != 0) return true;
 
   int n_val = *reinterpret_cast<int *>(task_data->inputs[1]);
   int matrix_size = task_data->inputs_count[0];
   auto *matrix_data = reinterpret_cast<double *>(task_data->inputs[0]);
 
-  if (n_val * (n_val + 1) != matrix_size)
-    return false;
+  if (n_val * (n_val + 1) != matrix_size) return false;
 
   std::vector<double> tempMatrix(n_val * n_val);
   for (int i = 0; i < n_val; ++i) {
@@ -35,8 +35,7 @@ bool GaussJordanMethodParallelMPI::ValidationImpl() {
         maxRow = i;
       }
     }
-    if (fabs(tempMatrix[maxRow * n_val + k]) < EPSILON)
-      return false;
+    if (fabs(tempMatrix[maxRow * n_val + k]) < EPSILON) return false;
 
     if (maxRow != k) {
       for (int j = 0; j < n_val; ++j) {
@@ -66,10 +65,8 @@ bool GaussJordanMethodParallelMPI::PreProcessingImpl() {
 }
 
 bool GaussJordanMethodParallelMPI::RunImpl() {
-
   for (int k = 0; k < n; ++k) {
     if (world.rank() == 0) {
-
       if (fabs(matrix[k * (n + 1) + k]) < EPSILON) {
         int swap_row = -1;
         for (int i = k + 1; i < n; ++i) {
@@ -83,8 +80,7 @@ bool GaussJordanMethodParallelMPI::RunImpl() {
           break;
         }
         for (int col = 0; col <= n; ++col) {
-          std::swap(matrix[k * (n + 1) + col],
-                    matrix[swap_row * (n + 1) + col]);
+          std::swap(matrix[k * (n + 1) + col], matrix[swap_row * (n + 1) + col]);
         }
       }
 
@@ -95,8 +91,7 @@ bool GaussJordanMethodParallelMPI::RunImpl() {
     }
 
     boost::mpi::broadcast(world, solve, 0);
-    if (!solve)
-      return false;
+    if (!solve) return false;
 
     if (world.rank() == 0) {
       for (int i = 0; i < n; ++i) {
@@ -115,8 +110,7 @@ bool GaussJordanMethodParallelMPI::RunImpl() {
 }
 
 bool GaussJordanMethodParallelMPI::PostProcessingImpl() {
-  if (!solve)
-    return false;
+  if (!solve) return false;
 
   if (world.rank() == 0) {
     auto *output_data = reinterpret_cast<double *>(task_data->outputs[0]);
@@ -149,12 +143,10 @@ bool GaussJordanMethodSequentialMPI::RunImpl() {
           break;
         }
       }
-      if (swap_row == -1)
-        return false;
+      if (swap_row == -1) return false;
 
       for (int col = 0; col <= n_size; ++col) {
-        std::swap(sys_matrix[k * (n_size + 1) + col],
-                  sys_matrix[swap_row * (n_size + 1) + col]);
+        std::swap(sys_matrix[k * (n_size + 1) + col], sys_matrix[swap_row * (n_size + 1) + col]);
       }
     }
 
@@ -167,8 +159,7 @@ bool GaussJordanMethodSequentialMPI::RunImpl() {
       if (i != k && sys_matrix[i * (n_size + 1) + k] != 0.0) {
         const double factor = sys_matrix[i * (n_size + 1) + k];
         for (int j = k; j <= n_size; ++j) {
-          sys_matrix[i * (n_size + 1) + j] -=
-              factor * sys_matrix[k * (n_size + 1) + j];
+          sys_matrix[i * (n_size + 1) + j] -= factor * sys_matrix[k * (n_size + 1) + j];
         }
         sys_matrix[i * (n_size + 1) + k] = 0.0;
       }
@@ -184,4 +175,4 @@ bool GaussJordanMethodSequentialMPI::PostProcessingImpl() {
   return true;
 }
 
-} // namespace vasenkov_a_gauss_jordan_mpi
+}  // namespace vasenkov_a_gauss_jordan_mpi

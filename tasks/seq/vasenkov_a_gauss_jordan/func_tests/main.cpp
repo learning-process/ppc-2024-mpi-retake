@@ -13,22 +13,18 @@ TEST(vasenkov_a_gauss_jordan_seq, three_simple_matrix) {
 
   std::vector<double> expected_result = {1, 0, 0, 5, 0, 1, 0, -3, 0, 0, 1, 2};
 
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq =
-      std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(const_cast<double *>(input_matrix.data())));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(input_matrix.data())));
   taskDataSeq->inputs_count.emplace_back(input_matrix.size());
 
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
   taskDataSeq->inputs_count.emplace_back(1);
 
-  taskDataSeq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_result.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_result.data()));
   taskDataSeq->outputs_count.emplace_back(output_result.size());
 
-  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential taskSequential(
-      taskDataSeq);
+  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential taskSequential(taskDataSeq);
   ASSERT_TRUE(taskSequential.ValidationImpl());
   taskSequential.PreProcessingImpl();
   taskSequential.RunImpl();
@@ -42,22 +38,18 @@ TEST(vasenkov_a_gauss_jordan_seq, zero_column) {
   int n = 3;
   std::vector<double> output_result(n * (n + 1));
 
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq =
-      std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
-  taskDataSeq->inputs.emplace_back(
-      reinterpret_cast<uint8_t *>(const_cast<double *>(input_matrix.data())));
+  taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(input_matrix.data())));
   taskDataSeq->inputs_count.emplace_back(input_matrix.size());
 
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
   taskDataSeq->inputs_count.emplace_back(1);
 
-  taskDataSeq->outputs.emplace_back(
-      reinterpret_cast<uint8_t *>(output_result.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_result.data()));
   taskDataSeq->outputs_count.emplace_back(output_result.size());
 
-  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential taskSequential(
-      taskDataSeq);
+  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential taskSequential(taskDataSeq);
   ASSERT_TRUE(taskSequential.ValidationImpl());
   taskSequential.PreProcessingImpl();
   EXPECT_FALSE(taskSequential.RunImpl());
