@@ -40,12 +40,13 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
-  int valid = 1;
+  bool valid = 1;
   if (rank == 0) {
-    valid = fomin_v_sobel_edges::SobelEdgeDetection::ValidationImpl() ? 1 : 0;
+    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 &&
+            task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0;
   }
   MPI_Bcast(&valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  return valid == 1;
+  return valid;
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
@@ -63,7 +64,10 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
 // Private methods
 void fomin_v_sobel_edges::SobelEdgeDetectionMPI::LoadImageData() {
-  fomin_v_sobel_edges::SobelEdgeDetection::PreProcessingImpl();
+  input_image_ = *reinterpret_cast<std::vector<unsigned char>*>(task_data->inputs[0]);
+  width_ = task_data->inputs_count[0];
+  height_ = task_data->inputs_count[1];
+  output_image_.resize(width_ * height_, 0);
   pixel_y.clear();
   pixel_x.clear();
   for (int y = 1; y < height_ - 1; ++y) {

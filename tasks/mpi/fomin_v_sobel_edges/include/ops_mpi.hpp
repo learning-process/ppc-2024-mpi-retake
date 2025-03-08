@@ -28,9 +28,9 @@ class SobelEdgeDetection : public ppc::core::Task {
   int width_;
 };
 
-class SobelEdgeDetectionMPI : public SobelEdgeDetection {
+class SobelEdgeDetectionMPI : public ppc::core::Task {
  public:
-  explicit SobelEdgeDetectionMPI(const std::shared_ptr<ppc::core::TaskData>& taskData);
+  explicit SobelEdgeDetectionMPI(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {};
 
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
@@ -55,6 +55,10 @@ class SobelEdgeDetectionMPI : public SobelEdgeDetection {
   std::vector<unsigned char> local_section;
   int local_count;
   int local_section_size;
+  std::vector<unsigned char> input_image_;
+  std::vector<unsigned char> output_image_;
+  int height_;
+  int width_;
 
   // Results handling
   std::vector<unsigned char> results;
