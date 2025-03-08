@@ -180,33 +180,38 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::ComputeEdgePixels() {
 }
 
 void fomin_v_sobel_edges::SobelEdgeDetectionMPI::CollectResults() {
-  std::vector<unsigned char> gathered_results;
-  std::vector<int> gathered_indices;
-  unsigned char* recv_results_ptr = nullptr;
-  int* recv_indices_ptr = nullptr;
-
   static unsigned char dummy_result;
   static int dummy_index;
 
+  // Handle send buffers
   unsigned char* send_results_ptr = results.empty() ? &dummy_result : results.data();
   int* send_indices_ptr = indices.empty() ? &dummy_index : indices.data();
 
+  // Handle receive buffers
+  unsigned char* recv_results_ptr = &dummy_result;
+  int* recv_indices_ptr = &dummy_index;
+  std::vector<unsigned char> gathered_results;
+  std::vector<int> gathered_indices;
+
   if (rank == 0) {
-    gathered_results.resize(pixel_y.size());
-    gathered_indices.resize(pixel_y.size());
-    recv_results_ptr = gathered_results.data();
-    recv_indices_ptr = gathered_indices.data();
-  } else {
-    recv_results_ptr = &dummy_result;
-    recv_indices_ptr = &dummy_index;
+    if (!pixel_y.empty()) {
+      gathered_results.resize(pixel_y.size());
+      gathered_indices.resize(pixel_y.size());
+      recv_results_ptr = gathered_results.data();
+      recv_indices_ptr = gathered_indices.data();
+    } else {
+      recv_results_ptr = &dummy_result;
+      recv_indices_ptr = &dummy_index;
+    }
   }
 
   MPI_Gatherv(send_results_ptr, local_count, MPI_UNSIGNED_CHAR, recv_results_ptr, counts.data(), displs.data(),
               MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+
   MPI_Gatherv(send_indices_ptr, local_count, MPI_INT, recv_indices_ptr, counts.data(), displs.data(), MPI_INT, 0,
               MPI_COMM_WORLD);
 
-  if (rank == 0) {
+  if (rank == 0 && !pixel_y.empty()) {
     for (size_t i = 0; i < gathered_indices.size(); ++i) {
       output_image_[gathered_indices[i]] = gathered_results[i];
     }
