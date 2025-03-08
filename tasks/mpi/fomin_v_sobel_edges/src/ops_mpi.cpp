@@ -28,13 +28,12 @@ using namespace std::chrono_literals;
   } while (0)
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
-  int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
     LoadImageData();
-    GenerateProcessingGrid();
   }
+  GenerateProcessingGrid();
   DistributeComputation();
   return true;
 }
@@ -45,7 +44,7 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
     valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 &&
             task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0;
   }
-  MPI_Bcast(&valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&valid, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
   return valid;
 }
 
@@ -76,24 +75,42 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::LoadImageData() {
       pixel_x.push_back(x);
     }
   }
+  global_indices.resize(pixel_y.size());
 }
 
 void fomin_v_sobel_edges::SobelEdgeDetectionMPI::GenerateProcessingGrid() {
-  int size;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  const int total_pixels = pixel_y.size();
-  counts.resize(size, total_pixels / size);
-  displs.resize(size);
+  if (rank == 0) {
+    const int total_pixels = pixel_y.size();
+    counts.resize(size, total_pixels / size);
+    displs.resize(size, 0);
 
-  int remainder = total_pixels % size;
-  for (int i = 0, offset = 0; i < size; ++i) {
-    if (i < remainder) counts[i]++;
-    displs[i] = offset;
-    offset += counts[i];
+    int remainder = total_pixels % size;
+    for (int i = 0, offset = 0; i < size; ++i) {
+      if (i < remainder) counts[i]++;
+      displs[i] = offset;
+      offset += counts[i];
+    }
+
+    CalculateImageSections();
+  } else {
+    counts.resize(size);
+    sections_sizes.resize(size);
+    sections_displs.resize(size);
   }
 
-  fomin_v_sobel_edges::SobelEdgeDetectionMPI::CalculateImageSections();
+  MPI_Bcast(counts.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sections_sizes.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sections_displs.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
+
+  local_count = counts[rank];
+  local_section_size = sections_sizes[rank];
+
+  local_y.resize(local_count);
+  local_x.resize(local_count);
+  local_section.resize(local_section_size);
 }
 
 void fomin_v_sobel_edges::SobelEdgeDetectionMPI::CalculateImageSections() {
@@ -103,15 +120,18 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::CalculateImageSections() {
   for (int i = 0; i < size; ++i) {
     if (counts[i] == 0) {
       sections_sizes[i] = 0;
+      sections_displs[i] = 0;
       continue;
     }
 
     int start = displs[i];
     int end = start + counts[i];
-    auto minmax = std::minmax_element(pixel_y.begin() + start, pixel_y.begin() + end);
+    auto minmax_y = std::minmax_element(pixel_y.begin() + start, pixel_y.begin() + end);
+    int y_min = *minmax_y.first;
+    int y_max = *minmax_y.second;
 
-    int y_start = std::max(*minmax.first - 1, 0);
-    int y_end = std::min(*minmax.second + 1, height_ - 1);
+    int y_start = std::max(y_min - 1, 0);
+    int y_end = std::min(y_max + 1, height_ - 1);
     sections_sizes[i] = (y_end - y_start + 1) * width_;
     sections_displs[i] = y_start * width_;
   }
@@ -121,14 +141,11 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::DistributeComputation() {
   MPI_Bcast(&width_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&height_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  // Scatter pixel coordinates
   MPI_Scatterv(pixel_y.data(), counts.data(), displs.data(), MPI_INT, local_y.data(), local_count, MPI_INT, 0,
                MPI_COMM_WORLD);
-
   MPI_Scatterv(pixel_x.data(), counts.data(), displs.data(), MPI_INT, local_x.data(), local_count, MPI_INT, 0,
                MPI_COMM_WORLD);
 
-  // Scatter image sections
   MPI_Scatterv(input_image_.data(), sections_sizes.data(), sections_displs.data(), MPI_UNSIGNED_CHAR,
                local_section.data(), local_section_size, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
 }
@@ -140,6 +157,8 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::ComputeEdgePixels() {
   results.resize(local_count);
   indices.resize(local_count);
 
+  int y_start = sections_displs[rank] / width_;
+
   for (int i = 0; i < local_count; ++i) {
     int y = local_y[i];
     int x = local_x[i];
@@ -147,27 +166,36 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::ComputeEdgePixels() {
 
     for (int dy = -1; dy <= 1; ++dy) {
       for (int dx = -1; dx <= 1; ++dx) {
-        int pos = (y + dy) * width_ + (x + dx) - sections_displs[rank];
-        sumX += local_section[pos] * Gx[dy + 1][dx + 1];
-        sumY += local_section[pos] * Gy[dy + 1][dx + 1];
+        int current_y = y + dy;
+        int current_x = x + dx;
+        int section_offset = (current_y - y_start) * width_ + current_x;
+        sumX += local_section[section_offset] * Gx[dy + 1][dx + 1];
+        sumY += local_section[section_offset] * Gy[dy + 1][dx + 1];
       }
     }
 
-    results[i] = static_cast<unsigned char>(std::min((int)std::hypot(sumX, sumY), 255));
+    results[i] = static_cast<unsigned char>(std::min(static_cast<int>(std::hypot(sumX, sumY)), 255));
     indices[i] = y * width_ + x;
   }
 }
 
 void fomin_v_sobel_edges::SobelEdgeDetectionMPI::CollectResults() {
-  MPI_Gatherv(results.data(), local_count, MPI_UNSIGNED_CHAR, output_image_.data(), counts.data(), displs.data(),
-              MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+  std::vector<unsigned char> gathered_results;
+  std::vector<int> gathered_indices;
 
-  MPI_Gatherv(indices.data(), local_count, MPI_INT, global_indices.data(), counts.data(), displs.data(), MPI_INT, 0,
+  if (rank == 0) {
+    gathered_results.resize(pixel_y.size());
+    gathered_indices.resize(pixel_y.size());
+  }
+
+  MPI_Gatherv(results.data(), local_count, MPI_UNSIGNED_CHAR, gathered_results.data(), counts.data(), displs.data(),
+              MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+  MPI_Gatherv(indices.data(), local_count, MPI_INT, gathered_indices.data(), counts.data(), displs.data(), MPI_INT, 0,
               MPI_COMM_WORLD);
 
   if (rank == 0) {
-    for (size_t i = 0; i < global_indices.size(); ++i) {
-      output_image_[global_indices[i]] = results[i];
+    for (size_t i = 0; i < gathered_indices.size(); ++i) {
+      output_image_[gathered_indices[i]] = gathered_results[i];
     }
   }
 }
