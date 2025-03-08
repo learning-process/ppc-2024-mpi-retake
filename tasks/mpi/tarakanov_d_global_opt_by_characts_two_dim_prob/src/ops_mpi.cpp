@@ -1,14 +1,12 @@
-﻿#include <algorithm>
-#include <cmath>
-#include <limits>
-#include <vector>
+﻿#include "mpi/tarakanov_d_global_opt_by_characts_two_dim_prob/include/ops_mpi.hpp"
 
+#include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
 #include <boost/mpi/communicator.hpp>
-
-#include "mpi/tarakanov_d_global_opt_by_characts_two_dim_prob/include/ops_mpi.hpp"
-
+#include <cmath>
+#include <limits>
+#include <vector>
 
 double tarakanov_d_global_opt_two_dim_prob_mpi::GetConstraintsSum(double x, double y, int num,
                                                                   std::vector<double> vec) {
@@ -115,7 +113,7 @@ void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptSequential::ProcessGridPo
     while (y < int_max_y) {
       double real_x = x++ / static_cast<double>(factor);
       double real_y = y++ / static_cast<double>(factor);
-      
+
       if (IsPointCorrect(real_x, real_y)) {
         double value = ComputeFunction(real_x, real_y, params_);
         if (mode_ == 0) {
@@ -145,7 +143,6 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptSequential::IsPointCorrec
   return true;
 }
 
-
 bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptSequential::PostProcessingImpl() {
   *reinterpret_cast<double*>(task_data->outputs[0]) = result_;
   task_data->outputs_count[0] = 1;
@@ -154,8 +151,12 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptSequential::PostProcessin
 
 bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ValidationImpl() {
   if (world_.rank() == 0) {
-    if (task_data->outputs_count[0] == 0) {return false;}
-    if ((task_data->inputs_count[1] != 1) && (task_data->inputs_count[1] != 0)) {return false;}
+    if (task_data->outputs_count[0] == 0) {
+      return false;
+    }
+    if ((task_data->inputs_count[1] != 1) && (task_data->inputs_count[1] != 0)) {
+      return false;
+    }
   }
   return true;
 }
@@ -183,8 +184,7 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::PreProcessingImpl() 
 }
 
 bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::RunImpl() {
-  if (world_.rank() == 0)
-  {
+  if (world_.rank() == 0) {
     switch (mode_) {
       case 1:
         result_ = std::numeric_limits<double>::min();
@@ -192,9 +192,9 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::RunImpl() {
       case 0:
         result_ = std::numeric_limits<double>::max();
         break;
-    default:
-      return false;
-      break;
+      default:
+        return false;
+        break;
     }
   }
   broadcast(world_, result_, 0);
@@ -245,7 +245,10 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::RunImpl() {
   return true;
 }
 
-void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::NewAreaProcess(double& last_result, std::vector<double>& loc_area, double local_min_x, double local_min_y, double& current_step, double accuracy) {
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::NewAreaProcess(double& last_result,
+                                                                           std::vector<double>& loc_area,
+                                                                           double local_min_x, double local_min_y,
+                                                                           double& current_step, double accuracy) {
   if (std::abs(last_result - result_) < accuracy) {
     current_step = -1;
   }
@@ -279,7 +282,8 @@ void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::DataDistribution() {
   }
 }
 
-int tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ApproveAllConstraints(double real_x, double real_y, int constr_sz) {
+int tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ApproveAllConstraints(double real_x, double real_y,
+                                                                                 int constr_sz) {
   for (int i = 0; i < constr_sz; i++) {
     if (!CheckConstraints(real_x, real_y, i, local_constr_)) {
       return 0;
@@ -288,7 +292,10 @@ int tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ApproveAllConstraints
   return 1;
 }
 
-void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ProccessGridPoint(int int_min_x, int int_min_y, int int_max_x, int int_max_y, int factor, double& local_min_x, double& local_min_y) {
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ProccessGridPoint(int int_min_x, int int_min_y,
+                                                                              int int_max_x, int int_max_y, int factor,
+                                                                              double& local_min_x,
+                                                                              double& local_min_y) {
   int x = int_min_x;
   while (x < int_max_x) {
     int y = int_min_y;
@@ -305,7 +312,7 @@ void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ProccessGridPoint(in
         bool flag = true;
         int sz = static_cast<int>(is_correct_.size());
         flag = CheckCorrect(sz);
-        
+
         if (flag) {
           double value = ComputeFunction(real_x, real_y, params_);
           SaveResult(real_x, real_y, value, local_min_x, local_min_y);
@@ -317,7 +324,8 @@ void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ProccessGridPoint(in
   }
 }
 
-void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::SaveResult(double real_x, double real_y, double value, double& local_min_x, double& local_min_y) {
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::SaveResult(double real_x, double real_y, double value,
+                                                                       double& local_min_x, double& local_min_y) {
   if (mode_ == 0) {
     if (value < result_) {
       result_ = value;
