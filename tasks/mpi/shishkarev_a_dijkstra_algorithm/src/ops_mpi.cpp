@@ -91,9 +91,9 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
     int u = index;
     visited[u] = true;
 
-    for (int j = matrix.row_ptr_[u]; j < matrix.row_ptr_[u + 1]; j++) {
-      int v = matrix.col_index_[j];
-      int weight = matrix.values_[j];
+    for (int j = matrix.row_ptr[u]; j < matrix.row_ptr[u + 1]; j++) {
+      int v = matrix.col_index[j];
+      int weight = matrix.values[j];
 
       if (!visited[v] && d[u] != inf && (d[u] + weight < d[v])) {
         d[v] = d[u] + weight;
