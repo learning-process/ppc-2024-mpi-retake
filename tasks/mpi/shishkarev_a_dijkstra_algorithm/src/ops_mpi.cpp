@@ -173,9 +173,9 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::RunImpl() {
   row_ptr_.resize(row_ptr_size);
   col_index_.resize(col_index_size);
 
-  boost::mpi::broadcast(world_, values_.data(), values_.size(), 0);
-  boost::mpi::broadcast(world_, row_ptr_.data(), row_ptr_.size(), 0);
-  boost::mpi::broadcast(world_, col_index_.data(), col_index_.size(), 0);
+  boost::mpi::broadcast(world_, values_.data(), static_cast<int>(values_.size()), 0);
+  boost::mpi::broadcast(world_, row_ptr_.data(), static_cast<int>(row_ptr_.size()), 0);
+  boost::mpi::broadcast(world_, col_index_.data(), static_cast<int>(col_index_.size()), 0);
 
   int delta = size_ / world_.size();
   int extra = size_ % world_.size();
