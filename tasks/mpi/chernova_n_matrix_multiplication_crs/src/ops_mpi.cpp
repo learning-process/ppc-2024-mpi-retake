@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gather.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/vector.hpp>  // NOLINT
 #include <cmath>
 #include <cstddef>
 #include <stdexcept>
