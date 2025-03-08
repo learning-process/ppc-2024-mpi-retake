@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
 
 TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
@@ -13,7 +12,7 @@ TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
   int n;
   std::vector<double> global_result;
 
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
     global_matrix = {1, 2, 1, 10, 4, 8, 3, 20, 2, 5, 9, 30};
@@ -21,18 +20,18 @@ TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
 
     global_result.resize(n * (n + 1));
 
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix.data()));
-    taskDataPar->inputs_count.emplace_back(global_matrix.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix.data()));
+    task_data_par->inputs_count.emplace_back(global_matrix.size());
 
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
-    taskDataPar->inputs_count.emplace_back(1);
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
+    task_data_par->inputs_count.emplace_back(1);
 
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
-    taskDataPar->outputs_count.emplace_back(global_result.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
+    task_data_par->outputs_count.emplace_back(global_result.size());
   }
 
-  auto task_parallel = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodParallelMPI>(taskDataPar);
-  ASSERT_TRUE(taskParallel->ValidationImpl());
+  auto task_parallel = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodParallelMPI>(task_data_par);
+  ASSERT_TRUE(task_parallel->ValidationImpl());
   task_parallel->PreProcessingImpl();
   bool par_run_res = task_parallel->RunImpl();
   task_parallel->PostProcessingImpl();

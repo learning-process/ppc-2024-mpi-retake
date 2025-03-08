@@ -1,4 +1,3 @@
-#include <gtest/gtest.h>
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
@@ -13,13 +12,13 @@ namespace vasenkov_a_gauss_jordan_mpi {
 
 class GaussJordanMethodParallelMPI : public ppc::core::Task {
  private:
-  std::vector<double> matrix;
-  bool solve = true;
-  int n;
-  boost::mpi::communicator world;
+  std::vector<double> sys_matrix_;
+  bool solve_ = true;
+  int n_size_;
+  boost::mpi::communicator world_;
 
  public:
-  explicit GaussJordanMethodParallelMPI(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
+  explicit GaussJordanMethodParallelMPI(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
@@ -28,8 +27,8 @@ class GaussJordanMethodParallelMPI : public ppc::core::Task {
 
 class GaussJordanMethodSequentialMPI : public ppc::core::Task {
  private:
-  int n_size;
-  std::vector<double> sys_matrix;
+  int n_size_;
+  std::vector<double> sys_matrix_;
 
  public:
   explicit GaussJordanMethodSequentialMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
