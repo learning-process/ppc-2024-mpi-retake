@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -13,10 +12,10 @@
 
 namespace {
 chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS GenerateRandomCrs(int size,
-                                                                                                double density,
-                                                                                                int seed) {
+                                                                                                double kDensity,
+                                                                                                int kSeed) {
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix;
-  std::mt19937 gen(seed);
+  std::mt19937 gen(kSeed);
   std::uniform_real_distribution<double> val_dist(1.0, 10.0);
 
   matrix.row_ptr.push_back(0);
@@ -25,7 +24,7 @@ chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS Ge
   for (int i = 0; i < size; ++i) {
     int nnz_in_row = 0;
     for (int j = 0; j < size; ++j) {
-      if (static_cast<double>(gen()) / std::mt19937::max() < density) {
+      if (static_cast<double>(gen()) / std::mt19937::max() < kDensity) {
         matrix.values.push_back(val_dist(gen));
         matrix.col_indices.push_back(j);
         nnz_in_row++;
@@ -63,23 +62,15 @@ void SetupTaskData(std::vector<double>& values, std::vector<int>& columns, std::
   task_data->inputs_count.emplace_back(columns.size());
   task_data->inputs_count.emplace_back(rows.size());
 }
-void SetupOutData(std::vector<double>& values, std::vector<int>& columns, std::vector<int>& rows,
-                  std::shared_ptr<ppc::core::TaskData>& task_data) {
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(values.data()));
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(columns.data()));
-  task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(rows.data()));
-  task_data->outputs_count.emplace_back(values.size());
-}
-
 }  // namespace
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
   constexpr int kSize = 2000;
-  constexpr double density = 0.1;
-  constexpr int seed = 42;
+  constexpr double kDensity = 0.1;
+  constexpr int kSeed = 42;
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
-      GenerateRandomCrs(kSize, density, seed);
+      GenerateRandomCrs(kSize, kDensity, kSeed);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b = GenerateIdentityCrs(kSize);
 
@@ -120,11 +111,11 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_task_run) {
   constexpr int kSize = 2000;
-  constexpr double density = 0.1;
-  constexpr int seed = 42;
+  constexpr double kDensity = 0.1;
+  constexpr int kSeed = 42;
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
-      GenerateRandomCrs(kSize, density, seed);
+      GenerateRandomCrs(kSize, kDensity, kSeed);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b = GenerateIdentityCrs(kSize);
 

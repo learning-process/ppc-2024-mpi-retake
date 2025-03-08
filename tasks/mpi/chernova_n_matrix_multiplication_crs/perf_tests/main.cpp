@@ -73,15 +73,6 @@ void SetupTaskData(std::vector<double>& values, std::vector<int>& columns, std::
     task_data->inputs_count.emplace_back(rows.size());
   }
 }
-void SetupOutData(std::vector<double>& values, std::vector<int>& columns, std::vector<int>& rows,
-                  std::shared_ptr<ppc::core::TaskData>& task_data, const boost::mpi::communicator& world) {
-  if (world.rank() == 0) {
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(values.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(columns.data()));
-    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(rows.data()));
-    task_data->outputs_count.emplace_back(values.size());
-  }
-}
 }  // namespace
 
 TEST(chernova_n_matrix_multiplication_crs_mpi, test_pipeline_run) {

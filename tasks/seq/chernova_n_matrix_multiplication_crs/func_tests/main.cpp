@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "core/task/include/task.hpp"
-#include "core/util/include/util.hpp"
 #include "seq/chernova_n_matrix_multiplication_crs/include/ops_seq.hpp"
 
 namespace {
@@ -37,7 +36,9 @@ chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS Ge
 }
 chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS GenerateIdentityCrs(int n) {
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix;
-  if (n <= 0) return matrix;
+  if (n <= 0) {
+    return matrix;
+  }
 
   matrix.values.resize(n, 1.0);
   matrix.col_indices.resize(n);
@@ -83,18 +84,18 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_3x3_seq) {
   std::vector<int> col_indices_b = {0, 1, 2};
   std::vector<int> row_ptr_b = {0, 1, 2, 3};
 
-  std::vector<double> expectedValues = {1.0, 2.0, 3.0};
-  std::vector<int> expectedColIndices = {0, 1, 2};
-  std::vector<int> expectedRowPtr = {0, 1, 2, 3};
+  std::vector<double> expected_values = {1.0, 2.0, 3.0};
+  std::vector<int> expected_col_indices = {0, 1, 2};
+  std::vector<int> expected_row_ptr = {0, 1, 2, 3};
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   SetupTaskData(values_a, col_indices_a, row_ptr_a, task_data_seq);
   SetupTaskData(values_b, col_indices_b, row_ptr_b, task_data_seq);
 
-  std::vector<double> result_values(expectedValues.size());
-  std::vector<int> result_col_indices(expectedColIndices.size());
-  std::vector<int> result_row_ptr(expectedRowPtr.size());
+  std::vector<double> result_values(expected_values.size());
+  std::vector<int> result_col_indices(expected_col_indices.size());
+  std::vector<int> result_row_ptr(expected_row_ptr.size());
 
   SetupOutData(result_values, result_col_indices, result_row_ptr, task_data_seq);
 
@@ -104,9 +105,9 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_3x3_seq) {
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  EXPECT_EQ(result_values, expectedValues);
-  EXPECT_EQ(result_col_indices, expectedColIndices);
-  EXPECT_EQ(result_row_ptr, expectedRowPtr);
+  EXPECT_EQ(result_values, expected_values);
+  EXPECT_EQ(result_col_indices, expected_col_indices);
+  EXPECT_EQ(result_row_ptr, expected_row_ptr);
 }
 TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_5x5_seq) {
   std::vector<double> values_a = {3.0, 2.0, 5.0, 1.0, 4.0};
@@ -117,18 +118,18 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_5x5_seq) {
   std::vector<int> col_indices_b = {1, 3, 0, 4, 2};
   std::vector<int> row_ptr_b = {0, 1, 2, 3, 4, 5};
 
-  std::vector<double> expectedValues = {15.0, 6.0, 20.0, 2.0, 4.0};
-  std::vector<int> expectedColIndices = {0, 3, 2, 1, 4};
-  std::vector<int> expectedRowPtr = {0, 1, 2, 3, 4, 5};
+  std::vector<double> expected_values = {15.0, 6.0, 20.0, 2.0, 4.0};
+  std::vector<int> expected_col_indices = {0, 3, 2, 1, 4};
+  std::vector<int> expected_row_ptr = {0, 1, 2, 3, 4, 5};
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   SetupTaskData(values_a, col_indices_a, row_ptr_a, task_data_seq);
   SetupTaskData(values_b, col_indices_b, row_ptr_b, task_data_seq);
 
-  std::vector<double> result_values(expectedValues.size());
-  std::vector<int> result_col_indices(expectedColIndices.size());
-  std::vector<int> result_row_ptr(expectedRowPtr.size());
+  std::vector<double> result_values(expected_values.size());
+  std::vector<int> result_col_indices(expected_col_indices.size());
+  std::vector<int> result_row_ptr(expected_row_ptr.size());
 
   SetupOutData(result_values, result_col_indices, result_row_ptr, task_data_seq);
 
@@ -138,9 +139,9 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_5x5_seq) {
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  EXPECT_EQ(result_values, expectedValues);
-  EXPECT_EQ(result_col_indices, expectedColIndices);
-  EXPECT_EQ(result_row_ptr, expectedRowPtr);
+  EXPECT_EQ(result_values, expected_values);
+  EXPECT_EQ(result_col_indices, expected_col_indices);
+  EXPECT_EQ(result_row_ptr, expected_row_ptr);
 }
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_10x10_seq) {
@@ -152,18 +153,18 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_10x10_seq) {
   std::vector<int> col_indices_b = {4, 7, 3, 9, 0, 2, 5, 1, 6, 8};
   std::vector<int> row_ptr_b = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-  std::vector<double> expectedValues = {3.0, 56.0, 4.0, 25.0, 36.0, 28.0, 18.0, 3.0, 32.0, 90.0};
-  std::vector<int> expectedColIndices = {3, 2, 8, 7, 0, 1, 4, 9, 5, 6};
-  std::vector<int> expectedRowPtr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  std::vector<double> expected_values = {3.0, 56.0, 4.0, 25.0, 36.0, 28.0, 18.0, 3.0, 32.0, 90.0};
+  std::vector<int> expected_col_indices = {3, 2, 8, 7, 0, 1, 4, 9, 5, 6};
+  std::vector<int> expected_row_ptr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   SetupTaskData(values_a, col_indices_a, row_ptr_a, task_data_seq);
   SetupTaskData(values_b, col_indices_b, row_ptr_b, task_data_seq);
 
-  std::vector<double> result_values(expectedValues.size());
-  std::vector<int> result_col_indices(expectedColIndices.size());
-  std::vector<int> result_row_ptr(expectedRowPtr.size());
+  std::vector<double> result_values(expected_values.size());
+  std::vector<int> result_col_indices(expected_col_indices.size());
+  std::vector<int> result_row_ptr(expected_row_ptr.size());
 
   SetupOutData(result_values, result_col_indices, result_row_ptr, task_data_seq);
 
@@ -173,9 +174,9 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_10x10_seq) {
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  EXPECT_EQ(result_values, expectedValues);
-  EXPECT_EQ(result_col_indices, expectedColIndices);
-  EXPECT_EQ(result_row_ptr, expectedRowPtr);
+  EXPECT_EQ(result_values, expected_values);
+  EXPECT_EQ(result_col_indices, expected_col_indices);
+  EXPECT_EQ(result_row_ptr, expected_row_ptr);
 }
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_15x15_seq) {
@@ -187,19 +188,19 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_15x15_seq) {
   std::vector<int> col_indices_b = {4, 7, 3, 9, 0, 2, 5, 1, 6, 8, 10, 12, 13, 14, 11};
   std::vector<int> row_ptr_b = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
-  std::vector<double> expectedValues = {3.0,  56.0, 4.0,  25.0, 36.0, 28.0, 18.0, 3.0,
-                                        32.0, 90.0, 25.0, 2.0,  16.0, 49.0, 18.0};
-  std::vector<int> expectedColIndices = {3, 2, 8, 7, 0, 1, 4, 9, 5, 6, 10, 13, 14, 11, 12};
-  std::vector<int> expectedRowPtr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  std::vector<double> expected_values = {3.0,  56.0, 4.0,  25.0, 36.0, 28.0, 18.0, 3.0,
+                                         32.0, 90.0, 25.0, 2.0,  16.0, 49.0, 18.0};
+  std::vector<int> expected_col_indices = {3, 2, 8, 7, 0, 1, 4, 9, 5, 6, 10, 13, 14, 11, 12};
+  std::vector<int> expected_row_ptr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   SetupTaskData(values_a, col_indices_a, row_ptr_a, task_data_seq);
   SetupTaskData(values_b, col_indices_b, row_ptr_b, task_data_seq);
 
-  std::vector<double> result_values(expectedValues.size());
-  std::vector<int> result_col_indices(expectedColIndices.size());
-  std::vector<int> result_row_ptr(expectedRowPtr.size());
+  std::vector<double> result_values(expected_values.size());
+  std::vector<int> result_col_indices(expected_col_indices.size());
+  std::vector<int> result_row_ptr(expected_row_ptr.size());
 
   SetupOutData(result_values, result_col_indices, result_row_ptr, task_data_seq);
 
@@ -209,30 +210,30 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_mul_15x15_seq) {
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  EXPECT_EQ(result_values, expectedValues);
-  EXPECT_EQ(result_col_indices, expectedColIndices);
-  EXPECT_EQ(result_row_ptr, expectedRowPtr);
+  EXPECT_EQ(result_values, expected_values);
+  EXPECT_EQ(result_col_indices, expected_col_indices);
+  EXPECT_EQ(result_row_ptr, expected_row_ptr);
 }
 
 TEST(chernova_n_matrix_multiplication_crs_seq, random_matrix_10) {
   const int matrix_size = 10;
   const double density = 0.1;
 
-  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrixA =
+  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
       GenerateRandomCrs(matrix_size, density);
 
-  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrixB =
+  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b =
       GenerateIdentityCrs(matrix_size);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-  SetupTaskData(matrixA.values, matrixA.col_indices, matrixA.row_ptr, task_data_seq);
-  SetupTaskData(matrixB.values, matrixB.col_indices, matrixB.row_ptr, task_data_seq);
+  SetupTaskData(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data_seq);
+  SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data_seq);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS result;
-  result.values.resize(matrixA.values.size());
-  result.col_indices.resize(matrixA.col_indices.size());
-  result.row_ptr.resize(matrixA.row_ptr.size());
+  result.values.resize(matrix_a.values.size());
+  result.col_indices.resize(matrix_a.col_indices.size());
+  result.row_ptr.resize(matrix_a.row_ptr.size());
 
   SetupOutData(result.values, result.col_indices, result.row_ptr, task_data_seq);
 
@@ -242,5 +243,5 @@ TEST(chernova_n_matrix_multiplication_crs_seq, random_matrix_10) {
   test_task_sequential.RunImpl();
   test_task_sequential.PostProcessingImpl();
 
-  EXPECT_TRUE(CompareCrs(matrixA, result));
+  EXPECT_TRUE(CompareCrs(matrix_a, result));
 }

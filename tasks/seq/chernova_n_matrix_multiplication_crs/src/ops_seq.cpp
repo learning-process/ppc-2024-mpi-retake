@@ -2,8 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
-#include <iostream>
+#include <stdexcept>
 #include <vector>
 
 bool chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::PreProcessingImpl() {
@@ -55,10 +54,10 @@ bool chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::RunImpl() {
 
   for (int i = 0; i < rowsA; ++i) {
     std::ranges::fill(temp, 0.0);
-    int startA = matrixA.row_ptr[i];
-    int endA = matrixA.row_ptr[i + 1];
+    int start_a = matrixA.row_ptr[i];
+    int end_a = matrixA.row_ptr[i + 1];
 
-    for (int index_a = startA; index_a < endA; ++index_a) {
+    for (int index_a = start_a; index_a < end_a; ++index_a) {
       double a_val = matrixA.values[index_a];
       int a_col = matrixA.col_indices[index_a];
       int start_b = matrixB.row_ptr[a_col];
@@ -87,9 +86,9 @@ bool chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::PostProcessin
   auto* output_col_indices = reinterpret_cast<int*>(task_data->outputs[1]);
   auto* output_row_ptr = reinterpret_cast<int*>(task_data->outputs[2]);
 
-  std::copy(resultMatrix.values.begin(), resultMatrix.values.end(), output_values);
-  std::copy(resultMatrix.col_indices.begin(), resultMatrix.col_indices.end(), output_col_indices);
-  std::copy(resultMatrix.row_ptr.begin(), resultMatrix.row_ptr.end(), output_row_ptr);
+  std::ranges::copy(resultMatrix.values, output_values);
+  std::ranges::copy(resultMatrix.col_indices, output_col_indices);
+  std::ranges::copy(resultMatrix.row_ptr, output_row_ptr);
 
   return true;
 }

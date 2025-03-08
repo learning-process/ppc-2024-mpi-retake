@@ -2,9 +2,9 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <cstddef>
 #include <utility>
 #include <vector>
-#include <cstddef>
 
 #include "core/task/include/task.hpp"
 
@@ -33,6 +33,6 @@ class TestTaskMPI : public ppc::core::Task {
   void BroadcastMatrixMetadata();
   void InitializeNonRootMatrices();
   void BroadcastMatrixData();
-  };
+};
 
 }  // namespace chernova_n_matrix_multiplication_crs_mpi
