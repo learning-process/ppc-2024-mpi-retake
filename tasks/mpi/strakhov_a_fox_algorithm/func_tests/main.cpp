@@ -5,6 +5,7 @@
 #include <boost/serialization/vector.hpp>  // NOLINT
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <random>
 #include <vector>
