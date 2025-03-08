@@ -92,9 +92,25 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
                                                         exp_c_row_ind, exp_c_col_ptr);
   }
 
-  std::vector<double> c_val;
-  std::vector<int> c_row_ind;
-  std::vector<int> c_col_ptr;
+  int exp_c_val_size = 0;
+  int exp_c_row_ind_size = 0;
+  int exp_c_col_ptr_size = 0;
+  if (world.rank() == 0) {
+    exp_c_val_size = exp_c_val.size();
+    exp_c_row_ind_size = exp_c_row_ind.size();
+    exp_c_col_ptr_size = exp_c_col_ptr.size();
+  }
+  boost::mpi::broadcast(world, exp_c_val_size, 0);
+  boost::mpi::broadcast(world, exp_c_row_ind_size, 0);
+  boost::mpi::broadcast(world, exp_c_col_ptr_size, 0);
+
+  exp_c_val.resize(exp_c_val_size);
+  exp_c_row_ind.resize(exp_c_row_ind_size);
+  exp_c_col_ptr.resize(exp_c_col_ptr_size);
+
+  boost::mpi::broadcast(world, exp_c_val, 0);
+  boost::mpi::broadcast(world, exp_c_row_ind, 0);
+  boost::mpi::broadcast(world, exp_c_col_ptr, 0);
 
   sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(a, rows_a, cols_a, a_val, a_row_ind, a_col_ptr);
   sedova_o_multiply_matrices_ccs_mpi::Convertirovanie(b, rows_b, cols_b, b_val, b_row_ind, b_col_ptr);
@@ -125,6 +141,17 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(b_col_ptr.data()));
     task_data->inputs_count.emplace_back(b_col_ptr.size());
 
+  } else{
+    b_val.resize(b_val.size());
+    b_row_ind.resize(b_row_ind.size());
+    b_col_ptr.resize(b_col_ptr.size());
+  }
+
+  std::vector<double> c_val;
+  std::vector<int> c_row_ind;
+  std::vector<int> c_col_ptr;
+
+  if (world.rank() == 0) {
     c_val.resize(exp_c_val.size());
     c_row_ind.resize(exp_c_row_ind.size());
     c_col_ptr.resize(exp_c_col_ptr.size());
@@ -135,6 +162,10 @@ TEST(sedova_o_multiply_matrices_ccs_mpi, test_pipeline_run) {
     task_data->outputs_count.emplace_back(c_row_ind.size());
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(c_col_ptr.data()));
     task_data->outputs_count.emplace_back(c_col_ptr.size());
+  } else {
+    c_val.resize(exp_c_val.size());
+    c_row_ind.resize(exp_c_row_ind.size());
+    c_col_ptr.resize(exp_c_col_ptr.size());
   }
 
   auto task = std::make_shared<sedova_o_multiply_matrices_ccs_mpi::TestTaskMPI>(task_data);
