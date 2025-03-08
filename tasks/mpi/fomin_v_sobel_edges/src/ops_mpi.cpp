@@ -27,7 +27,6 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
   MPI_Bcast(&width_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&height_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  int total_pixels = width_ * height_;
   int chunk_size = height_ / size;
   int remainder = height_ % size;
 
