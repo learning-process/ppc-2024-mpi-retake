@@ -1,10 +1,16 @@
-﻿#include <gtest/gtest.h>
-
-#include <boost/mpi/timer.hpp>
+﻿#include <cstdint>
+#include <memory>
 #include <vector>
 
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/timer.hpp>
+
+#include <gtest/gtest.h>
+
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/tarakanov_d_global_opt_by_characts_two_dim_prob/include/ops_mpi.hpp"
+
 
 #define RUN_PERF_TEST(testName, runMethod)                                                                    \
   TEST(tarakanov_d_global_opt_two_dim_prob_mpi, testName) {                                                   \

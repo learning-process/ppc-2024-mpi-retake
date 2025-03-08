@@ -1,9 +1,14 @@
-﻿#include "mpi/tarakanov_d_global_opt_by_characts_two_dim_prob/include/ops_mpi.hpp"
-
-#include <utility>
+﻿#include <algorithm>
+#include <cmath>
 #include <limits>
 #include <vector>
-#include <cmath>
+
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
+#include <boost/mpi/communicator.hpp>
+
+#include "mpi/tarakanov_d_global_opt_by_characts_two_dim_prob/include/ops_mpi.hpp"
+
 
 double tarakanov_d_global_opt_two_dim_prob_mpi::GetConstraintsSum(double x, double y, int num,
                                                                   std::vector<double> vec) {
@@ -149,8 +154,8 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptSequential::PostProcessin
 
 bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ValidationImpl() {
   if (world_.rank() == 0) {
-    if (task_data->outputs_count[0] == 0) return false;
-    if ((task_data->inputs_count[1] != 1) && (task_data->inputs_count[1] != 0)) return false;
+    if (task_data->outputs_count[0] == 0) {return false;}
+    if ((task_data->inputs_count[1] != 1) && (task_data->inputs_count[1] != 0)) {return false;}
   }
   return true;
 }
@@ -163,8 +168,8 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::PreProcessingImpl() 
       bounds_[i] = reinterpret_cast<double*>(task_data->inputs[0])[i];
     }
 
-    constr_num_ = task_data->inputs_count[0];
-    mode_ = task_data->inputs_count[1];
+    constr_num_ = static_cast<int>(task_data->inputs_count[0]);
+    mode_ = static_cast<int>(task_data->inputs_count[1]);
 
     for (int i = 0; i < 2; i++) {
       params_.push_back(reinterpret_cast<double*>(task_data->inputs[1])[i]);
@@ -178,14 +183,21 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::PreProcessingImpl() 
 }
 
 bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::RunImpl() {
-  switch (mode_) {
-    case 1:
-      result_ = std::numeric_limits<double>::min();
+  if (world_.rank() == 0)
+  {
+    switch (mode_) {
+      case 1:
+        result_ = std::numeric_limits<double>::min();
+        break;
+      case 0:
+        result_ = std::numeric_limits<double>::max();
+        break;
+    default:
+      return false;
       break;
-    case 0:
-      result_ = std::numeric_limits<double>::max();
-      break;
+    }
   }
+  broadcast(world_, result_, 0);
 
   if (world_.rank() == 0) {
     local_constr_size_ = std::max(1, (constr_num_ + world_.size() - 1) / world_.size());
@@ -198,26 +210,9 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::RunImpl() {
   if (world_.rank() != 0) {
     bounds_.resize(4);
   }
-  broadcast(world_, bounds_.data(), bounds_.size(), 0);
+  broadcast(world_, bounds_.data(), static_cast<int>(bounds_.size()), 0);
 
-  if (world_.rank() == 0) {
-    for (int pr = 1; pr < world_.size(); pr++) {
-      if (pr * local_constr_size_ < constr_num_) {
-        std::vector<double> send(3 * local_constr_size_, 0);
-        for (int i = 0; i < 3 * local_constr_size_; i++) {
-          send[i] = constr_[pr * local_constr_size_ * 3 + i];
-        }
-        world_.send(pr, 0, send.data(), send.size());
-      }
-    }
-    for (int i = 0; i < 3 * local_constr_size_; i++) {
-      local_constr_.push_back(constr_[i]);
-    }
-  } else if (world_.rank() < constr_num_) {
-    std::vector<double> buffer(local_constr_size_ * 3, 0);
-    world_.recv(0, 0, buffer.data(), buffer.size());
-    local_constr_.insert(local_constr_.end(), buffer.begin(), buffer.end());
-  }
+  DataDistribution();
 
   double current_step = delta_;
   double accuracy = 1e-6;
@@ -237,72 +232,113 @@ bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::RunImpl() {
     int int_min_y = static_cast<int>(loc_area[2] * factor);
     int int_max_y = static_cast<int>(loc_area[3] * factor);
 
-    int x = int_min_x;
-    while (x < int_max_x) {
-      int y = int_min_y;
-      while (y < int_max_y) {
-        double real_x = x / static_cast<double>(factor);
-        double real_y = y / static_cast<double>(factor);
-
-        int loc_flag = 1;
-        int constr_sz = local_constr_.size() / 3;
-        for (int i = 0; i < constr_sz; i++) {
-          if (!CheckConstraints(real_x, real_y, i, local_constr_)) {
-            loc_flag = 0;
-            break;
-          }
-        }
-
-        gather(world_, loc_flag, is_correct_, 0);
-
-        if (world_.rank() == 0) {
-          bool flag = true;
-          int sz = is_correct_.size();
-          for (int i = 0; i < sz; i++) {
-            if (is_correct_[i] == 0) {
-              flag = false;
-              break;
-            }
-          }
-          if (flag) {
-            double value = ComputeFunction(real_x, real_y, params_);
-            if (mode_ == 0) {
-              if (value < result_) {
-                result_ = value;
-                local_min_x = real_x;
-                local_min_y = real_y;
-              }
-            } else if (mode_ == 1) {
-              if (value > result_) {
-                result_ = value;
-                local_min_x = real_x;
-                local_min_y = real_y;
-              }
-            }
-          }
-        }
-        y++;
-      }
-      x++;
-    }
+    ProccessGridPoint(int_min_x, int_min_y, int_max_x, int_max_y, factor, local_min_x, local_min_y);
 
     if (world_.rank() == 0) {
-      if (std::abs(last_result - result_) < accuracy) {
-        current_step = -1;
-      }
-      std::vector<double> new_area = loc_area;
-      new_area[0] = std::max(local_min_x - 2 * current_step, bounds_[0]);
-      new_area[1] = std::min(local_min_x + 2 * current_step, bounds_[1]);
-      new_area[2] = std::max(local_min_y - 2 * current_step, bounds_[2]);
-      new_area[3] = std::min(local_min_y + 2 * current_step, bounds_[3]);
-      loc_area = new_area;
-      last_result = result_;
+      NewAreaProcess(last_result, loc_area, local_min_x, local_min_y, current_step, accuracy);
     }
 
-    broadcast(world_, loc_area.data(), bounds_.size(), 0);
+    broadcast(world_, loc_area.data(), static_cast<int>(bounds_.size()), 0);
     broadcast(world_, current_step, 0);
   }
 
+  return true;
+}
+
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::NewAreaProcess(double& last_result, std::vector<double>& loc_area, double local_min_x, double local_min_y, double& current_step, double accuracy) {
+  if (std::abs(last_result - result_) < accuracy) {
+    current_step = -1;
+  }
+  std::vector<double> new_area = loc_area;
+  new_area[0] = std::max(local_min_x - (2 * current_step), bounds_[0]);
+  new_area[1] = std::min(local_min_x + (2 * current_step), bounds_[1]);
+  new_area[2] = std::max(local_min_y - (2 * current_step), bounds_[2]);
+  new_area[3] = std::min(local_min_y + (2 * current_step), bounds_[3]);
+  loc_area = new_area;
+  last_result = result_;
+}
+
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::DataDistribution() {
+  if (world_.rank() == 0) {
+    for (int pr = 1; pr < world_.size(); pr++) {
+      if (pr * local_constr_size_ < constr_num_) {
+        std::vector<double> send(3 * local_constr_size_, 0);
+        for (int i = 0; i < 3 * local_constr_size_; i++) {
+          send[i] = constr_[(pr * local_constr_size_ * 3) + i];
+        }
+        world_.send(pr, 0, send.data(), static_cast<int>(send.size()));
+      }
+    }
+    for (int i = 0; i < 3 * local_constr_size_; i++) {
+      local_constr_.push_back(constr_[i]);
+    }
+  } else if (world_.rank() < constr_num_) {
+    std::vector<double> buffer(local_constr_size_ * 3, 0);
+    world_.recv(0, 0, buffer.data(), static_cast<int>(buffer.size()));
+    local_constr_.insert(local_constr_.end(), buffer.begin(), buffer.end());
+  }
+}
+
+int tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ApproveAllConstraints(double real_x, double real_y, int constr_sz) {
+  for (int i = 0; i < constr_sz; i++) {
+    if (!CheckConstraints(real_x, real_y, i, local_constr_)) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::ProccessGridPoint(int int_min_x, int int_min_y, int int_max_x, int int_max_y, int factor, double& local_min_x, double& local_min_y) {
+  int x = int_min_x;
+  while (x < int_max_x) {
+    int y = int_min_y;
+    while (y < int_max_y) {
+      double real_x = x / static_cast<double>(factor);
+      double real_y = y / static_cast<double>(factor);
+
+      int constr_sz = static_cast<int>(local_constr_.size()) / 3;
+      int loc_flag = ApproveAllConstraints(real_x, real_y, constr_sz);
+
+      gather(world_, loc_flag, is_correct_, 0);
+
+      if (world_.rank() == 0) {
+        bool flag = true;
+        int sz = static_cast<int>(is_correct_.size());
+        flag = CheckCorrect(sz);
+        
+        if (flag) {
+          double value = ComputeFunction(real_x, real_y, params_);
+          SaveResult(real_x, real_y, value, local_min_x, local_min_y);
+        }
+      }
+      y++;
+    }
+    x++;
+  }
+}
+
+void tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::SaveResult(double real_x, double real_y, double value, double& local_min_x, double& local_min_y) {
+  if (mode_ == 0) {
+    if (value < result_) {
+      result_ = value;
+      local_min_x = real_x;
+      local_min_y = real_y;
+    }
+  } else if (mode_ == 1) {
+    if (value > result_) {
+      result_ = value;
+      local_min_x = real_x;
+      local_min_y = real_y;
+    }
+  }
+}
+
+bool tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi::CheckCorrect(int sz) {
+  for (int i = 0; i < sz; i++) {
+    if (is_correct_[i] == 0) {
+      return false;
+    }
+  }
   return true;
 }
 
