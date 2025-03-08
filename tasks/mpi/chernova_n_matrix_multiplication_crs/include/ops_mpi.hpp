@@ -1,7 +1,8 @@
+/*
 #pragma once
 
-#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <utility>
 #include <vector>
 
@@ -10,7 +11,7 @@
 namespace chernova_n_matrix_multiplication_crs_mpi {
 
 class TestTaskMPI : public ppc::core::Task {
-  public:
+ public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
@@ -18,9 +19,9 @@ class TestTaskMPI : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
   struct SparseMatrixCRS {
-    std::vector<double> values; 
+    std::vector<double> values;
     std::vector<int> col_indices;
-    std::vector<int> row_ptr;    
+    std::vector<int> row_ptr;
   };
 
   SparseMatrixCRS matrixA, matrixB, resultMatrix;
@@ -30,6 +31,41 @@ class TestTaskMPI : public ppc::core::Task {
 
   boost::mpi::communicator world_;
   std::vector<int> local_rows_;
+};
+
+}  // namespace chernova_n_matrix_multiplication_crs_mpi
+  */
+#pragma once
+
+#include <boost/mpi.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
+#include <utility>
+#include <vector>
+
+#include "core/task/include/task.hpp"
+
+namespace chernova_n_matrix_multiplication_crs_mpi {
+
+class TestTaskMPI : public ppc::core::Task {
+ public:
+  explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
+  bool PreProcessingImpl() override;
+  bool ValidationImpl() override;
+  bool RunImpl() override;
+  bool PostProcessingImpl() override;
+
+  struct SparseMatrixCRS {
+    std::vector<double> values;
+    std::vector<int> col_indices;
+    std::vector<int> row_ptr;
+  };
+
+  SparseMatrixCRS matrixA, matrixB, resultMatrix;
+  int rowsA, colsA, rowsB, colsB, rowsRes, colsRes;
+  size_t size_val_A, size_val_B, size_col_A, size_col_B, size_row_A, size_row_B;
+
+  boost::mpi::communicator world;
 };
 
 }  // namespace chernova_n_matrix_multiplication_crs_mpi

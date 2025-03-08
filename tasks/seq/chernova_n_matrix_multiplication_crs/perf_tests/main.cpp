@@ -12,7 +12,7 @@
 #include "seq/chernova_n_matrix_multiplication_crs/include/ops_seq.hpp"
 
 namespace {
-chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS generateRandomCRS(int size,
+chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS GenerateRandomCrs(int size,
                                                                                                 double density,
                                                                                                 int seed) {
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix;
@@ -25,7 +25,7 @@ chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS ge
   for (int i = 0; i < size; ++i) {
     int nnz_in_row = 0;
     for (int j = 0; j < size; ++j) {
-      if (static_cast<double>(gen()) / gen.max() < density) {
+      if (static_cast<double>(gen()) / std::mt19937::max() < density) {
         matrix.values.push_back(val_dist(gen));
         matrix.col_indices.push_back(j);
         nnz_in_row++;
@@ -37,7 +37,7 @@ chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS ge
   return matrix;
 }
 
-chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS generateIdentityCRS(int n) {
+chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS GenerateIdentityCrs(int n) {
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix;
   matrix.values.resize(n, 1.0);
   matrix.col_indices.resize(n);
@@ -50,7 +50,7 @@ chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS ge
   matrix.row_ptr[n] = n;
   return matrix;
 }
-bool compareCRS(const chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS& a,
+bool CompareCrs(const chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS& a,
                 const chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS& b) {
   return a.values == b.values && a.col_indices == b.col_indices && a.row_ptr == b.row_ptr;
 }
@@ -78,20 +78,20 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
   constexpr double density = 0.1;
   constexpr int seed = 42;
 
-  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrixA =
-      generateRandomCRS(kSize, density, seed);
+  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
+      GenerateRandomCrs(kSize, density, seed);
 
-  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrixB = generateIdentityCRS(kSize);
+  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b = GenerateIdentityCrs(kSize);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-    SetupTaskData(matrixA.values, matrixA.col_indices, matrixA.row_ptr, task_data_seq);
-  SetupTaskData(matrixB.values, matrixB.col_indices, matrixB.row_ptr, task_data_seq);
+  SetupTaskData(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data_seq);
+  SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data_seq);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS result;
-  result.values.resize(matrixA.values.size());
-  result.col_indices.resize(matrixA.col_indices.size());
-  result.row_ptr.resize(matrixA.row_ptr.size());
+  result.values.resize(matrix_a.values.size());
+  result.col_indices.resize(matrix_a.col_indices.size());
+  result.row_ptr.resize(matrix_a.row_ptr.size());
 
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.values.data()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.col_indices.data()));
@@ -115,7 +115,7 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  EXPECT_TRUE(compareCRS(matrixA, result));
+  EXPECT_TRUE(CompareCrs(matrix_a, result));
 }
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_task_run) {
@@ -123,20 +123,20 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_task_run) {
   constexpr double density = 0.1;
   constexpr int seed = 42;
 
-  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrixA =
-      generateRandomCRS(kSize, density, seed);
+  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
+      GenerateRandomCrs(kSize, density, seed);
 
-  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrixB = generateIdentityCRS(kSize);
+  chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b = GenerateIdentityCrs(kSize);
 
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
-    SetupTaskData(matrixA.values, matrixA.col_indices, matrixA.row_ptr, task_data_seq);
-  SetupTaskData(matrixB.values, matrixB.col_indices, matrixB.row_ptr, task_data_seq);
+  SetupTaskData(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data_seq);
+  SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data_seq);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS result;
-  result.values.resize(matrixA.values.size());
-  result.col_indices.resize(matrixA.col_indices.size());
-  result.row_ptr.resize(matrixA.row_ptr.size());
+  result.values.resize(matrix_a.values.size());
+  result.col_indices.resize(matrix_a.col_indices.size());
+  result.row_ptr.resize(matrix_a.row_ptr.size());
 
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.values.data()));
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(result.col_indices.data()));
@@ -158,5 +158,5 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  EXPECT_TRUE(compareCRS(matrixA, result));
+  EXPECT_TRUE(CompareCrs(matrix_a, result));
 }
