@@ -5,6 +5,7 @@
 #include <boost/mpi/communicator.hpp>
 #include <chrono>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -29,6 +30,8 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
   task_data->outputs_count.push_back(out.size());
 
   auto task = std::make_shared<ersoz_b_test_task_mpi::TestTaskMPI>(task_data);
+  ASSERT_TRUE(task->Validation());
+
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 50;
   const auto t0 = std::chrono::high_resolution_clock::now();
@@ -40,13 +43,18 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
+
   boost::mpi::communicator world;
   if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results);
+    if (perf_results) {
+      ppc::core::Perf::PrintPerfStatistic(perf_results);
+    } else {
+      std::cerr << "Invalid performance results!" << std::endl;
+    }
   }
 }
 
-TEST(ersoz_b_test_task_mpi, test_task_run) {  // NOLINT(readability-function-cognitive-complexity)
+TEST(ersoz_b_test_task_mpi, test_task_run) {
   constexpr int kN = 512;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
@@ -63,6 +71,8 @@ TEST(ersoz_b_test_task_mpi, test_task_run) {  // NOLINT(readability-function-cog
   task_data->outputs_count.push_back(out.size());
 
   auto task = std::make_shared<ersoz_b_test_task_mpi::TestTaskMPI>(task_data);
+  ASSERT_TRUE(task->Validation());
+
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 50;
   const auto t0 = std::chrono::high_resolution_clock::now();
@@ -74,8 +84,13 @@ TEST(ersoz_b_test_task_mpi, test_task_run) {  // NOLINT(readability-function-cog
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
+
   boost::mpi::communicator world;
   if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results);
+    if (perf_results) {
+      ppc::core::Perf::PrintPerfStatistic(perf_results);
+    } else {
+      std::cerr << "Invalid performance results!" << std::endl;
+    }
   }
 }
