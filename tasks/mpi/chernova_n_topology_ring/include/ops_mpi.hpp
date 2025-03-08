@@ -25,4 +25,4 @@ class TestMPITaskParallel : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
-}  // namespace chernova_n_topology_ring_mpi 
+}  // namespace chernova_n_topology_ring_mpi
