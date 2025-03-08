@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -75,13 +75,39 @@ void SetupOutData(std::vector<double>& values, std::vector<int>& columns, std::v
     task_data->outputs_count.emplace_back(values.size());
   }
 }
+void ExecuteTestPipeline(auto& test_task, const auto& world) {
+  if (world.rank() == 0) {
+    ASSERT_TRUE(test_task.ValidationImpl());
+  }
+  test_task.PreProcessingImpl();
+  test_task.RunImpl();
+  test_task.PostProcessingImpl();
+}
+bool CompareCrs(std::vector<double>& values, std::vector<int>& columns, std::vector<int>& rows,
+                std::shared_ptr<ppc::core::TaskData>& task_data, const boost::mpi::communicator& world) {
+  auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
+  auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
+  auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
+
+  std::vector<double> actual_values(output_values, output_values + values.size());
+  std::vector<int> actual_cols(output_cols, output_cols + columns.size());
+  std::vector<int> actual_rows(output_rows, output_rows + rows.size());
+
+  EXPECT_EQ(actual_values, values);
+  EXPECT_EQ(actual_cols, columns);
+  EXPECT_EQ(actual_rows, rows);
+  return true;
+}
 }  // namespace
 TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
   boost::mpi::communicator world;
 
-  std::vector<double> values_a, values_b;
-  std::vector<int> col_indices_a, col_indices_b;
-  std::vector<int> row_ptr_a, row_ptr_b;
+  std::vector<double> values_a;
+  std::vector<int> col_indices_a;
+  std::vector<int> row_ptr_a;
+  std::vector<double> values_b;
+  std::vector<int> col_indices_b;
+  std::vector<int> row_ptr_b;
 
   if (world.rank() == 0) {
     values_a = {3.0, 7.0, 2.0, 5.0, 6.0, 4.0, 9.0, 1.0, 8.0, 10.0};
@@ -111,34 +137,22 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
 
-  if (world.rank() == 0) {
-    ASSERT_TRUE(test_task.ValidationImpl());
-  }
-  test_task.PreProcessingImpl();
-  test_task.RunImpl();
-  test_task.PostProcessingImpl();
+  ExecuteTestPipeline(test_task, world);
 
   if (world.rank() == 0) {
-    auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
-    auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
-    auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
-
-    std::vector<double> actual_values(output_values, output_values + expected_values.size());
-    std::vector<int> actual_cols(output_cols, output_cols + expected_col_indices.size());
-    std::vector<int> actual_rows(output_rows, output_rows + expected_row_ptr.size());
-
-    EXPECT_EQ(actual_values, expected_values);
-    EXPECT_EQ(actual_cols, expected_col_indices);
-    EXPECT_EQ(actual_rows, expected_row_ptr);
+    CompareCrs(expected_values, expected_col_indices, expected_row_ptr, task_data, world);
   }
 }
 
 TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_14x14_parallel) {
   boost::mpi::communicator world;
 
-  std::vector<double> values_a, values_b;
-  std::vector<int> col_indices_a, col_indices_b;
-  std::vector<int> row_ptr_a, row_ptr_b;
+  std::vector<double> values_a;
+  std::vector<int> col_indices_a;
+  std::vector<int> row_ptr_a;
+  std::vector<double> values_b;
+  std::vector<int> col_indices_b;
+  std::vector<int> row_ptr_b;
 
   if (world.rank() == 0) {
     values_a = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0};
@@ -168,25 +182,10 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_14x14_parallel) {
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
 
-  if (world.rank() == 0) {
-    ASSERT_TRUE(test_task.ValidationImpl());
-  }
-  test_task.PreProcessingImpl();
-  test_task.RunImpl();
-  test_task.PostProcessingImpl();
+  ExecuteTestPipeline(test_task, world);
 
   if (world.rank() == 0) {
-    auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
-    auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
-    auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
-
-    std::vector<double> actual_values(output_values, output_values + expected_values.size());
-    std::vector<int> actual_cols(output_cols, output_cols + expected_col_indices.size());
-    std::vector<int> actual_rows(output_rows, output_rows + expected_row_ptr.size());
-
-    EXPECT_EQ(actual_values, expected_values);
-    EXPECT_EQ(actual_cols, expected_col_indices);
-    EXPECT_EQ(actual_rows, expected_row_ptr);
+    CompareCrs(expected_values, expected_col_indices, expected_row_ptr, task_data, world);
   }
 }
 
@@ -217,26 +216,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_10x10) {
   }
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
-
+  ExecuteTestPipeline(test_task, world);
   if (world.rank() == 0) {
-    ASSERT_TRUE(test_task.ValidationImpl());
-  }
-  test_task.PreProcessingImpl();
-  test_task.RunImpl();
-  test_task.PostProcessingImpl();
-
-  if (world.rank() == 0) {
-    auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
-    auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
-    auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
-
-    std::vector<double> actual_values(output_values, output_values + matrix_a.values.size());
-    std::vector<int> actual_cols(output_cols, output_cols + matrix_a.col_indices.size());
-    std::vector<int> actual_rows(output_rows, output_rows + matrix_a.row_ptr.size());
-
-    EXPECT_EQ(actual_values, matrix_a.values);
-    EXPECT_EQ(actual_cols, matrix_a.col_indices);
-    EXPECT_EQ(actual_rows, matrix_a.row_ptr);
+    CompareCrs(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
   }
 }
 
@@ -268,25 +250,10 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_20x20) {
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
 
-  if (world.rank() == 0) {
-    ASSERT_TRUE(test_task.ValidationImpl());
-  }
-  test_task.PreProcessingImpl();
-  test_task.RunImpl();
-  test_task.PostProcessingImpl();
+  ExecuteTestPipeline(test_task, world);
 
   if (world.rank() == 0) {
-    auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
-    auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
-    auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
-
-    std::vector<double> actual_values(output_values, output_values + matrix_a.values.size());
-    std::vector<int> actual_cols(output_cols, output_cols + matrix_a.col_indices.size());
-    std::vector<int> actual_rows(output_rows, output_rows + matrix_a.row_ptr.size());
-
-    EXPECT_EQ(actual_values, matrix_a.values);
-    EXPECT_EQ(actual_cols, matrix_a.col_indices);
-    EXPECT_EQ(actual_rows, matrix_a.row_ptr);
+    CompareCrs(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
   }
 }
 
@@ -294,10 +261,6 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_1000x1000) {
   const int matrix_size = 1000;
   const double density = 0.1;
   boost::mpi::communicator world;
-
-  std::vector<double> values_a, values_b;
-  std::vector<int> col_indices_a, col_indices_b;
-  std::vector<int> row_ptr_a, row_ptr_b;
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS matrix_a;
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS matrix_b;
@@ -322,24 +285,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_1000x1000) {
 
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
 
-  if (world.rank() == 0) {
-    ASSERT_TRUE(test_task.ValidationImpl());
-  }
-  test_task.PreProcessingImpl();
-  test_task.RunImpl();
-  test_task.PostProcessingImpl();
+  ExecuteTestPipeline(test_task, world);
 
   if (world.rank() == 0) {
-    auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
-    auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
-    auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
-
-    std::vector<double> actual_values(output_values, output_values + matrix_a.values.size());
-    std::vector<int> actual_cols(output_cols, output_cols + matrix_a.col_indices.size());
-    std::vector<int> actual_rows(output_rows, output_rows + matrix_a.row_ptr.size());
-
-    EXPECT_EQ(actual_values, matrix_a.values);
-    EXPECT_EQ(actual_cols, matrix_a.col_indices);
-    EXPECT_EQ(actual_rows, matrix_a.row_ptr);
+    CompareCrs(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
   }
 }

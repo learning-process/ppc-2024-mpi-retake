@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <random>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"
