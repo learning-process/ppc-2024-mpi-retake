@@ -24,11 +24,9 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     height_ = task_data->inputs_count[1];
   }
 
-  // Рассылаем размеры изображения всем процессам
   MPI_Bcast(&width_, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&height_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  // Проверка на допустимые размеры
   if (width_ <= 0 || height_ <= 0) {
     if (rank == 0) {
       std::cerr << "Invalid image dimensions" << std::endl;
@@ -60,14 +58,13 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     ghost_lower.resize(width_);
 
     if (rank > 0) {
-      MPI_Send(local_data.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD);
-      MPI_Recv(ghost_upper.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Sendrecv(local_data.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, ghost_upper.data(), width_,
+                   MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
 
     if (rank < size - 1) {
-      MPI_Send(local_data.data() + (local_data.size() - width_), width_, MPI_UNSIGNED_CHAR, rank + 1, 0,
-               MPI_COMM_WORLD);
-      MPI_Recv(ghost_lower.data(), width_, MPI_UNSIGNED_CHAR, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Sendrecv(local_data.data() + (local_data.size() - width_), width_, MPI_UNSIGNED_CHAR, rank + 1, 0,
+                   ghost_lower.data(), width_, MPI_UNSIGNED_CHAR, rank + 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
   }
 
@@ -78,7 +75,8 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
   bool valid = true;
   if (world.rank() == 0) {
-    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2;
+    valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 &&
+            task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0;
   }
   boost::mpi::broadcast(world, valid, 0);
   return valid;
@@ -131,6 +129,8 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+  int send_count = output_image_.size();
+
   if (rank == 0) {
     output_image_.resize(width_ * height_);
   }
@@ -149,14 +149,8 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
     }
   }
 
-  MPI_Gatherv(output_image_.data(), output_image_.size(), MPI_UNSIGNED_CHAR, output_image_.data(), recv_counts.data(),
+  MPI_Gatherv(output_image_.data(), send_count, MPI_UNSIGNED_CHAR, output_image_.data(), recv_counts.data(),
               displs.data(), MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
-
-  if (rank == 0) {
-    *reinterpret_cast<std::vector<unsigned char> *>(task_data->outputs[0]) = output_image_;
-  }
-
-  return true;
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetection::PreProcessingImpl() {
