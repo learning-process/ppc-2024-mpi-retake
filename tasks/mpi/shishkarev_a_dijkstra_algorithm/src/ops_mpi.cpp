@@ -91,9 +91,9 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskSequential::RunImpl() {
     int u = index;
     visited[u] = true;
 
-    for (int j = row_ptr_[u]; j < row_ptr_[u + 1]; j++) {
-      int v = col_index_[j];
-      int weight = values_[j];
+    for (int j = matrix.row_ptr_[u]; j < matrix.row_ptr_[u + 1]; j++) {
+      int v = matrix.col_index_[j];
+      int weight = matrix.values_[j];
 
       if (!visited[v] && d[u] != inf && (d[u] + weight < d[v])) {
         d[v] = d[u] + weight;
@@ -121,7 +121,8 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::PreProcessingImpl
     input_ = std::vector<int>(size_ * size_);
     auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
-    ConvertToCrs(input_, {.values = values_, .col_index = col_index_, .row_ptr = row_ptr_}, size_);
+    Matrix temp_matrix = {.values = values_, .col_index = col_index_, .row_ptr = row_ptr_};
+    ConvertToCrs(input_, temp_matrix, size_);
   } else {
     input_ = std::vector<int>(size_ * size_, 0);
   }

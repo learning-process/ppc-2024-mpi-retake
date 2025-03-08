@@ -87,9 +87,9 @@ bool shishkarev_a_dijkstra_algorithm_seq::TestTaskSequential::RunImpl() {
     int u = index;
     visited[u] = true;
 
-    for (int j = row_ptr[u]; j < row_ptr[u + 1]; j++) {
-      int v = col_index[j];
-      int weight = values[j];
+    for (int j = matrix.row_ptr[u]; j < matrix.row_ptr[u + 1]; j++) {
+      int v = matrix.col_index[j];
+      int weight = matrix.values[j];
 
       if (!visited[v] && d[u] != inf && (d[u] + weight < d[v])) {
         d[v] = d[u] + weight;
