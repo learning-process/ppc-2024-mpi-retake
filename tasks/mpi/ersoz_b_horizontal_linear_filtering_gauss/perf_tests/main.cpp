@@ -46,10 +46,11 @@ TEST(ersoz_b_test_task_mpi, test_pipeline_run) {
 
   boost::mpi::communicator world;
   if (world.rank() == 0) {
+    // Validity check:
     if (perf_results) {
       ppc::core::Perf::PrintPerfStatistic(perf_results);
     } else {
-      std::cerr << "Invalid performance results!" << std::endl;
+      std::cerr << "Invalid performance results!" << "\n";
     }
   }
 }
@@ -90,7 +91,7 @@ TEST(ersoz_b_test_task_mpi, test_task_run) {
     if (perf_results) {
       ppc::core::Perf::PrintPerfStatistic(perf_results);
     } else {
-      std::cerr << "Invalid performance results!" << std::endl;
+      std::cerr << "Invalid performance results!" << "\n";
     }
   }
 }
