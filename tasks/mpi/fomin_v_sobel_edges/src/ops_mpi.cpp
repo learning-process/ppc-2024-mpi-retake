@@ -181,7 +181,8 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
     output_image_.resize(width_ * height_);
     int chunk_size = height_ / size;
     int remainder = height_ % size;
-    int current_displ = 0; 
+
+    int current_displ = 0;
     for (int i = 0; i < size; ++i) {
       int rows = chunk_size + (i < remainder ? 1 : 0);
       recv_counts[i] = rows * width_;
