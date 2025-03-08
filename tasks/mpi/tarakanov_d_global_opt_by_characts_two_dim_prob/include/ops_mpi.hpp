@@ -1,12 +1,13 @@
 ﻿#pragma once
 
-#include <boost/mpi/collectives.hpp>
-#include <boost/mpi/communicator.hpp>
-#include <utility>
 #include <memory>
+#include <utility>
 #include <vector>
 
+#include <boost/mpi/communicator.hpp>
+
 #include "core/task/include/task.hpp"
+
 
 namespace tarakanov_d_global_opt_two_dim_prob_mpi {
 
@@ -45,10 +46,17 @@ class GlobalOptMpi : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
+  void ProccessGridPoint(int int_min_x, int int_min_y, int int_max_x, int int_max_y, int factor, double& local_min_x, double& local_min_y);
+  void DataDistribution();
+  void NewAreaProcess(double& last_result, std::vector<double>& loc_area, double local_min_x, double local_min_y, double& current_step, double accuracy);
+  bool CheckCorrect(int sz);
+  int ApproveAllConstraints(double real_x, double real_y, int constr_sz);
+  void SaveResult(double real_x, double real_y, double value, double& local_min_x, double& local_min_y);
+
   friend bool CheckConstraints(double x, double y, int constraint_num, const std::vector<double>&);
   friend double ComputeFunction(double x, double y, std::vector<double> params);
   friend double GetConstraintsSum(double x, double y, int num, std::vector<double> vec);
-  friend bool IsAcceptable(double x, double y, int constraint_num, std::vector<double> constraints);
+  bool IsAcceptable(double x, double y, int constraint_num, const std::vector<double>& constraints);
   double result_;
   double delta_;
   std::vector<double> bounds_;
