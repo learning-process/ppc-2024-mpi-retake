@@ -183,11 +183,9 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::CollectResults() {
   static unsigned char dummy_result;
   static int dummy_index;
 
-  // Handle send buffers
   unsigned char* send_results_ptr = results.empty() ? &dummy_result : results.data();
   int* send_indices_ptr = indices.empty() ? &dummy_index : indices.data();
 
-  // Handle receive buffers
   unsigned char* recv_results_ptr = &dummy_result;
   int* recv_indices_ptr = &dummy_index;
   std::vector<unsigned char> gathered_results;
@@ -195,8 +193,8 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::CollectResults() {
 
   if (rank == 0) {
     if (!pixel_y.empty()) {
-      gathered_results.resize(pixel_y.size());
-      gathered_indices.resize(pixel_y.size());
+      gathered_results.resize(pixel_y.size(), 0);
+      gathered_indices.resize(pixel_y.size(), 0);
       recv_results_ptr = gathered_results.data();
       recv_indices_ptr = gathered_indices.data();
     } else {
