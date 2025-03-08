@@ -13,7 +13,6 @@
 
 #include "core/task/include/task.hpp"
 
-
 namespace fomin_v_sobel_edges {
 
 class SobelEdgeDetectionMPI : public ppc::core::Task {
