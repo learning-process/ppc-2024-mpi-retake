@@ -1,13 +1,14 @@
-#include "mpi/chernova_n_matrix_multiplication_crs/include/ops_mpi.hpp"
-
 #include <algorithm>
-#include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/gather.hpp>
-#include <boost/serialization/vector.hpp>
 #include <cmath>
 #include <cstddef>
 #include <stdexcept>
 #include <vector>
+
+#include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/gather.hpp>
+#include <boost/serialization/vector.hpp> // NOLINT
+
+#include "mpi/chernova_n_matrix_multiplication_crs/include/ops_mpi.hpp"
 
 bool chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::PreProcessingImpl() {
   if (world.rank() == 0) {

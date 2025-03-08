@@ -66,11 +66,11 @@ void SetupTaskData(std::vector<double>& values, std::vector<int>& columns, std::
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
   constexpr int kSize = 2000;
-  constexpr double k_density = 0.1;
-  constexpr int k_seed = 42;
+  constexpr double kDensity = 0.1;
+  constexpr int kSeed = 42;
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
-      GenerateRandomCrs(kSize, k_density, k_seed);
+      GenerateRandomCrs(kSize, kDensity, kSeed);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b = GenerateIdentityCrs(kSize);
 
@@ -111,11 +111,11 @@ TEST(chernova_n_matrix_multiplication_crs_seq, test_pipeline_run) {
 
 TEST(chernova_n_matrix_multiplication_crs_seq, test_task_run) {
   constexpr int kSize = 2000;
-  constexpr double k_density = 0.1;
-  constexpr int k_seed = 42;
+  constexpr double kDensity = 0.1;
+  constexpr int kSeed = 42;
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_a =
-      GenerateRandomCrs(kSize, k_density, k_seed);
+      GenerateRandomCrs(kSize, kDensity, kSeed);
 
   chernova_n_matrix_multiplication_crs_seq::TestTaskSequential::SparseMatrixCRS matrix_b = GenerateIdentityCrs(kSize);
 
