@@ -108,6 +108,11 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
     ghost_upper.resize(width_);
     ghost_lower.resize(width_);
 
+    if ((rank > 0 && ghost_upper.empty()) || (rank < size - 1 && ghost_lower.empty())) {
+      std::cerr << "Error [Rank " << rank << "]: Ghost buffers not initialized" << std::endl;
+      MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+
     if (rank > 0) {
       MPI_CHECK(MPI_Sendrecv(local_data.data(), width_, MPI_UNSIGNED_CHAR, rank - 1, 0, ghost_upper.data(), width_,
                              MPI_UNSIGNED_CHAR, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE));
@@ -167,6 +172,11 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
   int start_y = (rank == 0) ? 1 : 0;
   int end_y = (rank == size - 1) ? local_height - 1 : local_height;
 
+  if (local_data.empty() || output_image_.size() != local_data.size()) {
+    std::cerr << "Error [Rank " << rank << "]: Invalid local data buffers" << std::endl;
+    MPI_Abort(MPI_COMM_WORLD, 1);
+  }
+
   // Validate local dimensions
   if (local_height <= 0) {
     std::cerr << "Error [Rank " << rank << "]: Invalid local height: " << local_height << std::endl;
@@ -180,6 +190,12 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::RunImpl() {
   for (int y = start_y; y < end_y; ++y) {
     for (int x = 1; x < width_ - 1; ++x) {
       int sumX = 0, sumY = 0;
+
+      if (y < 0 || y >= local_height || x < 0 || x >= width_) {
+        std::cerr << "Error [Rank " << rank << "]: Invalid processing coordinates (" << x << "," << y << ")"
+                  << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, 1);
+      }
 
       // Boundary checks for output image
       if (y * width_ + x >= static_cast<int>(output_image_.size())) {
@@ -293,6 +309,13 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
   // Проверка буфера перед Gatherv
   if (rank == 0 && output_image_.size() < static_cast<size_t>(width_ * height_)) {
     std::cerr << "Error [Rank 0]: Output buffer too small for Gatherv" << std::endl;
+    MPI_Abort(MPI_COMM_WORLD, 1);
+  }
+
+  int total = std::accumulate(recv_counts.begin(), recv_counts.end(), 0);
+  if (total != width_ * height_) {
+    std::cerr << "Error [Rank 0]: Gatherv total mismatch. Expected: " << width_ * height_ << " Actual: " << total
+              << std::endl;
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
 
