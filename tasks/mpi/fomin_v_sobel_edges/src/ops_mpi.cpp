@@ -151,6 +151,11 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
   MPI_Gatherv(output_image_.data(), send_count, MPI_UNSIGNED_CHAR, output_image_.data(), recv_counts.data(),
               displs.data(), MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
+  if (rank == 0) {
+    *reinterpret_cast<std::vector<unsigned char> *>(task_data->outputs[0]) = output_image_;
+  }
+
+  return true;
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetection::PreProcessingImpl() {
