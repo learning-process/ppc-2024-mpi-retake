@@ -1,15 +1,18 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
+#include <memory>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
 
+
 TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
   boost::mpi::communicator world;
 
   std::vector<double> global_matrix;
-  int n;
+  int n = 0;
   std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
