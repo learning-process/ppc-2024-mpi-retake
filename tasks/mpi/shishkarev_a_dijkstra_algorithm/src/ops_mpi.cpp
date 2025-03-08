@@ -121,8 +121,11 @@ bool shishkarev_a_dijkstra_algorithm_mpi::TestMPITaskParallel::PreProcessingImpl
     input_ = std::vector<int>(size_ * size_);
     auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
     input_.assign(tmp_ptr, tmp_ptr + task_data->inputs_count[0]);
-    Matrix temp_matrix = {.values = values_, .col_index = col_index_, .row_ptr = row_ptr_};
+    Matrix temp_matrix;
     ConvertToCrs(input_, temp_matrix, size_);
+    values_ = std::move(temp_matrix.values);
+    col_index_ = std::move(temp_matrix.col_index);
+    row_ptr_ = std::move(temp_matrix.row_ptr);
   } else {
     input_ = std::vector<int>(size_ * size_, 0);
   }
