@@ -6,6 +6,7 @@
 #include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
+#include <vector>
 
 template <typename T>
 struct Minimum {
