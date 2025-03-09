@@ -41,6 +41,10 @@ void SimpleMult(std::vector<double> &in1, std::vector<double> &in2, std::vector<
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
   boost::mpi::communicator world;
+  int root = (int)sqrt(world.size());
+  if (root * root != world.size()) {
+    GTEST_SKIP();
+  }
 
   int matrix_size = 4;
   std::vector<double> in1;
@@ -78,6 +82,10 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, big_matrix) {
   boost::mpi::communicator world;
+  int root = (int)sqrt(world.size());
+  if (root * root != world.size()) {
+    GTEST_SKIP();
+  }
 
   int matrix_size = 72;
   std::vector<double> in1;
