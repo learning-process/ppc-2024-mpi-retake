@@ -10,7 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
-namespace shkurinskaya_e_fox_mat_mul_mpi {
+namespace {
 std::vector<double> GetRandomMatrix(int rows, int cols) {
   std::vector<double> result(rows * cols);
 
@@ -37,7 +37,7 @@ void SimpleMult(std::vector<double> &in1, std::vector<double> &in2, std::vector<
   }
 }
 
-}  // namespace shkurinskaya_e_fox_mat_mul_mpi
+}  // namespace
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
   boost::mpi::communicator world;
@@ -50,12 +50,12 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
   auto test_info = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    in1 = shkurinskaya_e_fox_mat_mul_mpi::GetRandomMatrix(matrix_size, matrix_size);
-    in2 = shkurinskaya_e_fox_mat_mul_mpi::GetRandomMatrix(matrix_size, matrix_size);
+    in1 = GetRandomMatrix(matrix_size, matrix_size);
+    in2 = GetRandomMatrix(matrix_size, matrix_size);
     out.resize(matrix_size * matrix_size);
     ans.resize(matrix_size * matrix_size);
 
-    shkurinskaya_e_fox_mat_mul_mpi::SimpleMult(in1, in2, ans, matrix_size);
+    SimpleMult(in1, in2, ans, matrix_size);
     // create task data
     test_info->inputs.emplace_back(reinterpret_cast<uint8_t *>(in1.data()));
     test_info->inputs.emplace_back(reinterpret_cast<uint8_t *>(in2.data()));
@@ -87,12 +87,12 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, big_matrix) {
   auto test_info = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    in1 = shkurinskaya_e_fox_mat_mul_mpi::GetRandomMatrix(matrix_size, matrix_size);
-    in2 = shkurinskaya_e_fox_mat_mul_mpi::GetRandomMatrix(matrix_size, matrix_size);
+    in1 = GetRandomMatrix(matrix_size, matrix_size);
+    in2 = GetRandomMatrix(matrix_size, matrix_size);
     out.resize(matrix_size * matrix_size);
     ans.resize(matrix_size * matrix_size);
 
-    shkurinskaya_e_fox_mat_mul_mpi::SimpleMult(in1, in2, ans, matrix_size);
+    SimpleMult(in1, in2, ans, matrix_size);
 
     // create task data
     test_info->inputs.emplace_back(reinterpret_cast<uint8_t *>(in1.data()));
