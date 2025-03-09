@@ -251,7 +251,7 @@ bool MultiplMatrixMpi::PostProcessingImpl() {
     for (unsigned int i = 0; i < task_data->outputs_count[0]; i++) {
       reinterpret_cast<double*>(task_data->outputs[0])[i] = result_[i];
     }
-}
+  }
 
   return true;
 }
