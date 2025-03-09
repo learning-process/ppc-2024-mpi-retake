@@ -48,6 +48,12 @@ TEST(sedova_o_linear_topology_mpi, test_1000) {
   sedova_o_linear_topology_mpi::TestTaskMPI test_task_parallel(task_data_par);
   ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
   test_task_parallel.PreProcessingImpl();
+  if (world.rank() == 0) {
+    int* input_ptr = reinterpret_cast<int*>(task_data_par->inputs[0]);
+    for (size_t i = 0; i < input.size(); ++i) {
+      ASSERT_EQ(input_ptr[i], input[i]) << "Data verification failed at index " << i;
+    }
+  }
   test_task_parallel.RunImpl();
   test_task_parallel.PostProcessingImpl();
 
@@ -77,6 +83,12 @@ TEST(sedova_o_linear_topology_mpi, test_10000) {
   sedova_o_linear_topology_mpi::TestTaskMPI test_task_parallel(task_data_par);
   ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
   test_task_parallel.PreProcessingImpl();
+  if (world.rank() == 0) {
+    int* input_ptr = reinterpret_cast<int*>(task_data_par->inputs[0]);
+    for (size_t i = 0; i < input.size(); ++i) {
+      ASSERT_EQ(input_ptr[i], input[i]) << "Data verification failed at index " << i;
+    }
+  }
   test_task_parallel.RunImpl();
   test_task_parallel.PostProcessingImpl();
 
@@ -106,6 +118,12 @@ TEST(sedova_o_linear_topology_mpi, test_1) {
   sedova_o_linear_topology_mpi::TestTaskMPI test_task_parallel(task_data_par);
   ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
   test_task_parallel.PreProcessingImpl();
+  if (world.rank() == 0) {
+    int* input_ptr = reinterpret_cast<int*>(task_data_par->inputs[0]);
+    for (size_t i = 0; i < input.size(); ++i) {
+      ASSERT_EQ(input_ptr[i], input[i]) << "Data verification failed at index " << i;
+    }
+  }
   test_task_parallel.RunImpl();
   test_task_parallel.PostProcessingImpl();
 
