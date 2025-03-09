@@ -35,7 +35,7 @@ bool dudchenko_o_shtrassen_algorithm_mpi::StrassenAlgoriphmSequential::RunImpl()
 
 bool dudchenko_o_shtrassen_algorithm_mpi::StrassenAlgoriphmSequential::PostProcessingImpl() {
   auto* outputs = reinterpret_cast<double*>(task_data->outputs[0]);
-  std::copy(result_.begin(), result_.end(), outputs);  // NOLINT
+  std::ranges::copy(result_, outputs);
   return true;
 }
 
@@ -69,7 +69,7 @@ bool dudchenko_o_shtrassen_algorithm_mpi::StrassenAlgoriphmParallel::RunImpl() {
 bool dudchenko_o_shtrassen_algorithm_mpi::StrassenAlgoriphmParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto* outputs = reinterpret_cast<double*>(task_data->outputs[0]);
-    std::copy(result_.begin(), result_.end(), outputs);  // NOLINT
+    std::ranges::copy(result_, outputs);
   }
   return true;
 }
@@ -77,14 +77,14 @@ bool dudchenko_o_shtrassen_algorithm_mpi::StrassenAlgoriphmParallel::PostProcess
 std::vector<double> dudchenko_o_shtrassen_algorithm_mpi::Add(const std::vector<double>& a, const std::vector<double>& b,
                                                              size_t n) {
   std::vector<double> result(n * n);
-  std::transform(a.begin(), a.end(), b.begin(), result.begin(), std::plus<double>());  // NOLINT
+  std::ranges::transform(a, b, result.begin(), std::plus<>());
   return result;
 }
 
 std::vector<double> dudchenko_o_shtrassen_algorithm_mpi::Subtract(const std::vector<double>& a,
                                                                   const std::vector<double>& b, size_t n) {
   std::vector<double> result(n * n);
-  std::transform(a.begin(), a.end(), b.begin(), result.begin(), std::minus<double>());  // NOLINT
+  std::ranges::transform(a, b, result.begin(), std::minus<>());
   return result;
 }
 
@@ -229,8 +229,8 @@ std::vector<double> dudchenko_o_shtrassen_algorithm_mpi::StrassenAlgoriphmParall
     }
   }
 
-  boost::mpi::broadcast(active_comm, a_ext, 0);
-  boost::mpi::broadcast(active_comm, b_ext, 0);
+  boost::mpi::broadcast(active_comm, a_ext.data(), (static_cast<int>(new_size * new_size)), 0);
+  boost::mpi::broadcast(active_comm, b_ext.data(), (static_cast<int>(new_size * new_size)), 0);
 
   size_t half = new_size / 2;
   size_t half_squared = half * half;

@@ -2,6 +2,7 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -20,15 +21,22 @@ struct Value {
 
 std::vector<double> GenerateRandomSquareMatrix(int n, Value value) {
   std::vector<double> matrix(n * n);
-
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<double> dis(value.min_value, value.max_value);
-
   for (int i = 0; i < n * n; ++i) {
     matrix[i] = dis(gen);
   }
   return matrix;
+}
+
+bool VerifyResult(const std::vector<double> &computed, const std::vector<double> &expected, double tolerance) {
+  for (size_t i = 0; i < computed.size(); ++i) {
+    if (std::abs(computed[i] - expected[i]) > tolerance) {
+      return false;
+    }
+  }
+  return true;
 }
 }  // namespace
 
@@ -39,6 +47,7 @@ TEST(dudchenko_o_shtrassen_algorithm_mpi, test_pipeline_run) {
   std::vector<double> a = GenerateRandomSquareMatrix(n, {.min_value = -50, .max_value = 50});
   std::vector<double> b = GenerateRandomSquareMatrix(n, {.min_value = -50, .max_value = 50});
   std::vector<double> out(n * n, 0.0);
+  std::vector<double> expected = dudchenko_o_shtrassen_algorithm_mpi::StrassenSeq(a, b, n);
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
@@ -56,6 +65,7 @@ TEST(dudchenko_o_shtrassen_algorithm_mpi, test_pipeline_run) {
   ASSERT_TRUE(test_task_parallel->PreProcessingImpl());
   ASSERT_TRUE(test_task_parallel->RunImpl());
   ASSERT_TRUE(test_task_parallel->PostProcessingImpl());
+  ASSERT_TRUE(VerifyResult(out, expected, 1e-6));
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 2;
@@ -77,6 +87,7 @@ TEST(dudchenko_o_shtrassen_algorithm_mpi, test_task_run) {
   std::vector<double> a = GenerateRandomSquareMatrix(n, {.min_value = -50, .max_value = 50});
   std::vector<double> b = GenerateRandomSquareMatrix(n, {.min_value = -50, .max_value = 50});
   std::vector<double> out(n * n, 0.0);
+  std::vector<double> expected = dudchenko_o_shtrassen_algorithm_mpi::StrassenSeq(a, b, n);
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
@@ -94,6 +105,7 @@ TEST(dudchenko_o_shtrassen_algorithm_mpi, test_task_run) {
   ASSERT_TRUE(test_task_parallel->PreProcessingImpl());
   ASSERT_TRUE(test_task_parallel->RunImpl());
   ASSERT_TRUE(test_task_parallel->PostProcessingImpl());
+  ASSERT_TRUE(VerifyResult(out, expected, 1e-6));
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 2;
