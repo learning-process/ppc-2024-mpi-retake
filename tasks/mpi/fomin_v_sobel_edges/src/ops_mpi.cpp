@@ -63,9 +63,10 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PostProcessingImpl() {
 
 // Private methods
 void fomin_v_sobel_edges::SobelEdgeDetectionMPI::LoadImageData() {
-  input_image_ = *reinterpret_cast<std::vector<unsigned char>*>(task_data->inputs[0]);
+  unsigned char* input_data = reinterpret_cast<unsigned char*>(task_data->inputs[0]);
   width_ = task_data->inputs_count[0];
   height_ = task_data->inputs_count[1];
+  input_image_.assign(input_data, input_data + (width_ * height_));
   output_image_.resize(width_ * height_, 0);
   pixel_y.clear();
   pixel_x.clear();
@@ -222,9 +223,10 @@ void fomin_v_sobel_edges::SobelEdgeDetectionMPI::ExportProcessedImage() {
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetection::PreProcessingImpl() {
-  input_image_ = *reinterpret_cast<std::vector<unsigned char>*>(task_data->inputs[0]);
+  unsigned char* input_data = reinterpret_cast<unsigned char*>(task_data->inputs[0]);
   width_ = task_data->inputs_count[0];
   height_ = task_data->inputs_count[1];
+  input_image_.assign(input_data, input_data + (width_ * height_));
   output_image_.resize(width_ * height_, 0);
   return true;
 }
