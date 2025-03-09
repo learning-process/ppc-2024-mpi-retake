@@ -7,26 +7,6 @@
 
 #include "mpi/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
-namespace shkurinskaya_e_fox_mat_mul_mpi {
-static std::vector<double> GetRandomMatrix(int rows, int cols);
-}
-
-std::vector<double> shkurinskaya_e_fox_mat_mul_mpi::GetRandomMatrix(int rows, int cols) {
-  std::vector<double> result(rows * cols);
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<> dis(-50.0, 50.0);
-
-  for (int i = 0; i < rows; ++i) {
-    for (int j = 0; j < cols; ++j) {
-      result[(i * cols) + j] = dis(gen);
-    }
-  }
-
-  return result;
-}
-
 bool shkurinskaya_e_fox_mat_mul_mpi::FoxMatMulMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
     matrix_size_ = (int)(task_data->inputs_count[0]);
