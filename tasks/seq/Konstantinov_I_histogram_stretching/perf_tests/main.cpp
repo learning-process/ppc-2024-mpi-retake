@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -101,7 +102,7 @@ TEST(Konstantinov_i_linear_histogram_stretch_seq, test_task_run) {
 
   std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
   auto testTaskSequential =
-      std::make_shared<konstantinov_i_linear_histogram_stretch_seq::LinearHistogramStretchSeq > (task_data_seq);
+      std::make_shared<konstantinov_i_linear_histogram_stretch_seq::LinearHistogramStretchSeq>(task_data_seq);
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_vec.data()));
   task_data_seq->inputs_count.emplace_back(in_vec.size());
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out_vec.data()));

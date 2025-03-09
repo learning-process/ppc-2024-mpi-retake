@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <vector>
 
 #include "seq/Konstantinov_I_histogram_stretching/include/ops_seq.hpp"

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <boost/mpi/timer.hpp>
 #include <functional>
 #include <random>
@@ -55,9 +56,9 @@ TEST(Konstantinov_i_linear_histogram_stretch_mpi, test_pipeline_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi);
-  perf_analyzer->PipelineRun(perf_attr, perf_results );
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results );
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
 
     std::vector<int> out_vec_seq(count_size_vector, 0);
 
@@ -111,9 +112,9 @@ TEST(Konstantinov_i_linear_histogram_stretch_mpi, test_task_run) {
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi);
-  perf_analyzer->TaskRun(perf_attr, perf_results );
+  perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results );
+    ppc::core::Perf::PrintPerfStatistic(perf_results);
 
     std::vector<int> out_vec_seq(count_size_vector, 0);
 

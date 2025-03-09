@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <algorithm>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
@@ -21,7 +22,6 @@ std::vector<int> GetRandomImage(int sz) {
 }
 }  // namespace
 }  // namespace konstantinov_i_linear_histogram_stretch_mpi
-
 
 TEST(Konstantinov_i_linear_histogram_stretch_mpi, test_image_imin_imax) {
   boost::mpi::communicator world;

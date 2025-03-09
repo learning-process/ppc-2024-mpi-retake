@@ -1,4 +1,5 @@
 #include "mpi/Konstantinov_I_histogram_stretching/include/ops_mpi.hpp"
+
 #include <string>
 #include <thread>
 #include <vector>

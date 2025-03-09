@@ -14,7 +14,6 @@ std::vector<int> konstantinov_i_linear_histogram_stretch_seq::GetRandomImage(int
 }
 
 bool konstantinov_i_linear_histogram_stretch_seq::LinearHistogramStretchSeq::PreProcessingImpl() {
-
   int size = task_data->inputs_count[0];
   image_input = std::vector<int>(size);
   auto* tmp_ptr = reinterpret_cast<int*>(task_data->inputs[0]);
@@ -52,7 +51,6 @@ bool konstantinov_i_linear_histogram_stretch_seq::LinearHistogramStretchSeq::Val
 }
 
 bool konstantinov_i_linear_histogram_stretch_seq::LinearHistogramStretchSeq::RunImpl() {
-
   int size = image_input.size();
   image_output.resize(size);
   int Imin = 255;
