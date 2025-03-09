@@ -2,9 +2,8 @@
 #include "mpi/makhov_m_monte_carlo_method/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/mpi/collectives.hpp>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
@@ -22,9 +21,10 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PreProcessingImpl() {
     funcStr_ = *reinterpret_cast<std::string*>(task_data->inputs[0]);
     numSamples_ = *reinterpret_cast<int*>(task_data->inputs[1]);
 
-    auto* limits_ptr = reinterpret_cast<std::pair<double, double>*>(task_data->inputs[2]);
-    std::uint32_t dimension = task_data->inputs_count[2];
-    limits_.assign(limits_ptr, limits_ptr + dimension);
+    double* limits_ptr = reinterpret_cast<double*>(task_data->inputs[2]);
+    dimension_ = task_data->inputs_count[2];
+    limits_[0] = limits_ptr[0];
+    limits_[1] = limits_ptr[1];
   }
   return true;
 }
@@ -38,11 +38,10 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
-  std::pair<int, int> dummy_pair = {1, 1};
-  std::vector<int> dummy_vector = {12};
   boost::mpi::broadcast(world_, numSamples_, 0);
   boost::mpi::broadcast(world_, limits_, 0);
   boost::mpi::broadcast(world_, funcStr_, 0);
+  boost::mpi::broadcast(world_, dimension_, 0);
 
   std::regex var_regex("[a-z]");  // Regular expression for variables (a-z)
   std::smatch matches;
@@ -69,7 +68,7 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
 
   std::random_device rd;
   std::mt19937 gen(rd() + world_.rank());  // Unique seed for each process
-  std::uniform_real_distribution<> dis(limits_[0].first, limits_[0].second);
+  std::uniform_real_distribution<> dis(limits_[0], limits_[1]);
 
   // Calculating the number of points for each process
   int local_samples = numSamples_ / world_.size();
@@ -104,10 +103,8 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
   }
 
   if (world_.rank() == 0) {
-    double volume = 1.0;
-    for (const auto& limit : limits_) {
-      volume *= (limit.second - limit.first);
-    }
+    double volume = pow(limits_[1] - limits_[0], dimension_);
+
     answer_ = volume * (globalSum_ / numSamples_);
     answerDataPtr_ = new uint8_t[sizeof(double)];
     std::memcpy(answerDataPtr_, &answer_, sizeof(double));

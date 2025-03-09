@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "core/task/include/task.hpp"
 
@@ -23,11 +22,12 @@ class TestMPITaskParallel : public ppc::core::Task {
 
  private:
   std::string funcStr_;
-  std::vector<std::pair<double, double>> limits_;
+  double limits_[2]{};
   int numSamples_{};
   double globalSum_{};
   double answer_{};
   uint8_t* answerDataPtr_{};
+  uint32_t dimension_{};
   boost::mpi::communicator world_;
 };
 
