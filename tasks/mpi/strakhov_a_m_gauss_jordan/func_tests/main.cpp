@@ -296,7 +296,7 @@ TEST(strakhov_a_m_gauss_jordan_mpi, test_mat_7_random) {
     task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t*>(out.data()));
     task_data_mpi->outputs_count.emplace_back(out.size());
   }
-  
+
   // Create Task
   strakhov_a_m_gauss_jordan_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
   ASSERT_EQ(test_task_mpi.Validation(), true);
