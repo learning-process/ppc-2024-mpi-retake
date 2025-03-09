@@ -1,6 +1,7 @@
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
 
 #include <algorithm>
+#include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <vector>
 
@@ -9,10 +10,12 @@
 namespace vasenkov_a_gauss_jordan_mpi {
 
 bool GaussJordanMethodParallelMPI::ValidationImpl() {
-  if (world_.rank() != 0) return true;
+  if (world_.rank() != 0) {
+    return true;
+  }
 
   int n_val = *reinterpret_cast<int *>(task_data->inputs[1]);
-  int matrix_size = task_data->inputs_count[0];
+  int matrix_size = static_cast<int>(task_data->inputs_count[0]);
   auto *matrix_data = reinterpret_cast<double *>(task_data->inputs[0]);
 
   if (n_val * (n_val + 1) != matrix_size) {
@@ -27,21 +30,21 @@ bool GaussJordanMethodParallelMPI::ValidationImpl() {
   }
 
   for (int k = 0; k < n_val; ++k) {
-    double max = fabs(temp_matrix[k * n_val + k]);
-    int maxRow = k;
+    double max = fabs(temp_matrix[(k * n_val) + k]);
+    int max_row = k;
     for (int i = k + 1; i < n_val; ++i) {
       if (fabs(temp_matrix[(i * n_val) + k]) > max) {
         max = fabs(temp_matrix[(i * n_val) + k]);
-        maxRow = i;
+        max_row = i;
       }
     }
-    if (fabs(temp_matrix[(maxRow * n_val) + k]) < EPSILON) {
+    if (fabs(temp_matrix[(max_row * n_val) + k]) < EPSILON) {
       return false;
     }
 
-    if (maxRow != k) {
+    if (max_row != k) {
       for (int j = 0; j < n_val; ++j) {
-        std::swap(temp_matrix[(k * n_val) + j], temp_matrix[(maxRow * n_val) + j]);
+        std::swap(temp_matrix[(k * n_val) + j], temp_matrix[(max_row * n_val) + j]);
       }
     }
 
@@ -58,7 +61,7 @@ bool GaussJordanMethodParallelMPI::ValidationImpl() {
 bool GaussJordanMethodParallelMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
     auto *matrix_data = reinterpret_cast<double *>(task_data->inputs[0]);
-    int matrix_size = task_data->inputs_count[0];
+    int matrix_size = static_cast<int>(task_data->inputs_count[0]);
     n_size_ = *reinterpret_cast<int *>(task_data->inputs[1]);
     sys_matrix_.assign(matrix_data, matrix_data + matrix_size);
   }
@@ -86,14 +89,16 @@ bool GaussJordanMethodParallelMPI::RunImpl() {
         }
       }
 
-      double pivot = sys_matrix_[k * (n_size_ + 1) + k];
+      double pivot = sys_matrix_[(k * (n_size_ + 1)) + k];
       for (int j = k; j <= n_size_; ++j) {
         sys_matrix_[(k * (n_size_ + 1)) + j] /= pivot;
       }
     }
 
     boost::mpi::broadcast(world_, solve_, 0);
-    if (!solve_) return false;
+    if (!solve_) {
+      return false;
+    }
 
     if (world_.rank() == 0) {
       for (int i = 0; i < n_size_; ++i) {
@@ -116,20 +121,20 @@ bool GaussJordanMethodParallelMPI::PostProcessingImpl() {
 
   if (world_.rank() == 0) {
     auto *output_data = reinterpret_cast<double *>(task_data->outputs[0]);
-    std::copy(sys_matrix_.begin(), sys_matrix_.end(), output_data);
+    std::ranges::copy(sys_matrix_, output_data);
   }
   return true;
 }
 
 bool GaussJordanMethodSequentialMPI::ValidationImpl() {
   int n_val = *reinterpret_cast<int *>(task_data->inputs[1]);
-  int matrix_size = task_data->inputs_count[0];
+  int matrix_size = static_cast<int>(task_data->inputs_count[0]);
   return n_val * (n_val + 1) == matrix_size;
 }
 
 bool GaussJordanMethodSequentialMPI::PreProcessingImpl() {
   auto *matrix_data = reinterpret_cast<double *>(task_data->inputs[0]);
-  int matrix_size = task_data->inputs_count[0];
+  int matrix_size = static_cast<int>(task_data->inputs_count[0]);
   n_size_ = *reinterpret_cast<int *>(task_data->inputs[1]);
   sys_matrix_.assign(matrix_data, matrix_data + matrix_size);
   return true;
@@ -175,7 +180,7 @@ bool GaussJordanMethodSequentialMPI::RunImpl() {
 
 bool GaussJordanMethodSequentialMPI::PostProcessingImpl() {
   auto *output_data = reinterpret_cast<double *>(task_data->outputs[0]);
-  std::copy(sys_matrix_.begin(), sys_matrix_.end(), output_data);
+  std::ranges::copy(sys_matrix_, output_data);
   return true;
 }
 

@@ -25,11 +25,11 @@ TEST(vasenkov_a_gauss_jordan_seq, three_simple_matrix) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_result.data()));
   task_data_seq->outputs_count.emplace_back(output_result.size());
 
-  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential taskSequential(task_data_seq);
-  ASSERT_TRUE(taskSequential.ValidationImpl());
-  taskSequential.PreProcessingImpl();
-  taskSequential.RunImpl();
-  taskSequential.PostProcessingImpl();
+  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential task_sequential(task_data_seq);
+  ASSERT_TRUE(task_sequential.ValidationImpl());
+  task_sequential.PreProcessingImpl();
+  task_sequential.RunImpl();
+  task_sequential.PostProcessingImpl();
 
   ASSERT_EQ(output_result, expected_result);
 }
@@ -50,9 +50,9 @@ TEST(vasenkov_a_gauss_jordan_seq, zero_column) {
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_result.data()));
   task_data_seq->outputs_count.emplace_back(output_result.size());
 
-  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential taskSequential(task_data_seq);
-  ASSERT_TRUE(taskSequential.ValidationImpl());
-  taskSequential.PreProcessingImpl();
-  EXPECT_FALSE(taskSequential.RunImpl());
-  taskSequential.PostProcessingImpl();
+  vasenkov_a_gauss_jordan_seq::GaussJordanMethodSequential task_sequential(task_data_seq);
+  ASSERT_TRUE(task_sequential.ValidationImpl());
+  task_sequential.PreProcessingImpl();
+  EXPECT_FALSE(task_sequential.RunImpl());
+  task_sequential.PostProcessingImpl();
 }

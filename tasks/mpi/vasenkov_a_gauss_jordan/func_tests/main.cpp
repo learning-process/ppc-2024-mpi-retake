@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stdint.h>
 
 #include <boost/mpi/communicator.hpp>
 #include <memory>
@@ -6,7 +7,6 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
-
 
 TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
   boost::mpi::communicator world;
