@@ -211,4 +211,3 @@ TEST(vasenkov_a_word_count_mpi, test_2_space_middle) {
     EXPECT_EQ(out, expect);
   }
 }
-/*
