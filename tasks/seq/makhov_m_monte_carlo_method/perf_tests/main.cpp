@@ -1,9 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
+#include <cmath>
 #include <cstdint>
+#include <cstring>
+#include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
@@ -15,20 +18,20 @@ TEST(makhov_m_monte_carlo_method_seq, test_pipeline_run) {
   std::function<double(const std::vector<double> &)> f = [](const std::vector<double> &x) {
     return (x[0] * x[0]) + (x[1] * x[1]);
   };
-  int numSamples = 1000000;
+  int num_samples = 1000000;
   std::vector<std::pair<double, double>> limits = {{0.0, 1.0}, {0.0, 1.0}};
-  double *answerPtr = nullptr;
+  double *answer_ptr = nullptr;
   double reference = 0.67;
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(&f));
-  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(&numSamples));
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(&num_samples));
   task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(limits.data()));
   task_data_seq->inputs_count.emplace_back(1);
   task_data_seq->inputs_count.emplace_back(1);
-  task_data_seq->inputs_count.emplace_back(2);  // Информация о размерности интеграла
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(answerPtr));
+  task_data_seq->inputs_count.emplace_back(2);  // Integral dimension info
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(answer_ptr));
   task_data_seq->outputs_count.emplace_back(1);
 
   // Create Task
@@ -51,11 +54,11 @@ TEST(makhov_m_monte_carlo_method_seq, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  uint8_t *answerData = task_data_seq->outputs[0];
-  double retrievedValue;
-  std::memcpy(&retrievedValue, answerData, sizeof(double));
-  double truncatedValue = std::round(retrievedValue * 100) / 100;
-  ASSERT_EQ(reference, truncatedValue);
+  uint8_t *answer_data = task_data_seq->outputs[0];
+  double retrieved_value = NAN;
+  std::memcpy(&retrieved_value, answer_data, sizeof(double));
+  double truncated_value = std::round(retrieved_value * 100) / 100;
+  ASSERT_EQ(reference, truncated_value);
 }
 
 TEST(makhov_m_monte_carlo_method_seq, test_task_run) {
@@ -63,20 +66,20 @@ TEST(makhov_m_monte_carlo_method_seq, test_task_run) {
   std::function<double(const std::vector<double> &)> f = [](const std::vector<double> &x) {
     return (x[0] * x[0]) + (x[1] * x[1]);
   };
-  int numSamples = 1000000;
+  int num_samples = 1000000;
   std::vector<std::pair<double, double>> limits = {{0.0, 1.0}, {0.0, 1.0}};
-  double *answerPtr = nullptr;
+  double *answer_ptr = nullptr;
   double reference = 0.67;
 
   // Create task_data
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
   task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(&f));
-  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(&numSamples));
+  task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(&num_samples));
   task_data_seq->inputs.push_back(reinterpret_cast<uint8_t *>(limits.data()));
   task_data_seq->inputs_count.emplace_back(1);
   task_data_seq->inputs_count.emplace_back(1);
-  task_data_seq->inputs_count.emplace_back(2);  // Информация о размерности интеграла
-  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(answerPtr));
+  task_data_seq->inputs_count.emplace_back(2);  // Integral dimension info
+  task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(answer_ptr));
   task_data_seq->outputs_count.emplace_back(1);
 
   // Create Task
@@ -99,9 +102,9 @@ TEST(makhov_m_monte_carlo_method_seq, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_sequential);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-  uint8_t *answerData = task_data_seq->outputs[0];
-  double retrievedValue;
-  std::memcpy(&retrievedValue, answerData, sizeof(double));
-  double truncatedValue = std::round(retrievedValue * 100) / 100;
-  ASSERT_EQ(reference, truncatedValue);
+  uint8_t *answer_data = task_data_seq->outputs[0];
+  double retrieved_value = NAN;
+  std::memcpy(&retrieved_value, answer_data, sizeof(double));
+  double truncated_value = std::round(retrieved_value * 100) / 100;
+  ASSERT_EQ(reference, truncated_value);
 }

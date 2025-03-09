@@ -1,27 +1,29 @@
-// Copyright 2023 Nesterov Alexander
+п»ї// Copyright 2023 Nesterov Alexander
 #include "mpi/makhov_m_monte_carlo_method/include/ops_mpi.hpp"
 
-//#include <algorithm>
+#include <algorithm>
+#include <boost/mpi.hpp>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
-#include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <map>
 #include <random>
 #include <regex>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "simple_parser.hpp"
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PreProcessingImpl() {
   if (world_.rank() == 0) {
-    funcStr = *reinterpret_cast<std::string*>(task_data->inputs[0]);
-    numSamples = *reinterpret_cast<int*>(task_data->inputs[1]);
+    funcStr_ = *reinterpret_cast<std::string*>(task_data->inputs[0]);
+    numSamples_ = *reinterpret_cast<int*>(task_data->inputs[1]);
 
-    auto limitsPtr = reinterpret_cast<std::pair<double, double>*>(task_data->inputs[2]);
+    auto* limits_ptr = reinterpret_cast<std::pair<double, double>*>(task_data->inputs[2]);
     std::uint32_t dimension = task_data->inputs_count[2];
-    limits.assign(limitsPtr, limitsPtr + dimension);
+    limits_.assign(limits_ptr, limits_ptr + dimension);
   }
   return true;
 }
@@ -35,76 +37,77 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
-  boost::mpi::broadcast(world_, numSamples, 0);
-  boost::mpi::broadcast(world_, limits, 0);
-  boost::mpi::broadcast(world_, funcStr, 0);
+  boost::mpi::broadcast(world_, numSamples_, 0);
+  boost::mpi::broadcast(world_, limits_, 0);
+  boost::mpi::broadcast(world_, funcStr_, 0);
 
-  std::regex varRegex("[a-z]");  // Регулярное выражение для переменных (a-z)
+  std::regex var_regex("[a-z]");  // Regular expression for variables (a-z)
   std::smatch matches;
-  std::string::const_iterator searchStart(funcStr.cbegin());
+  std::string::const_iterator search_start(funcStr_.cbegin());
   std::vector<std::string> variables;
 
-  while (std::regex_search(searchStart, funcStr.cend(), matches, varRegex)) {
+  while (std::regex_search(search_start, funcStr_.cend(), matches, var_regex)) {
     variables.push_back(matches.str(0));
-    searchStart = matches.suffix().first;
+    search_start = matches.suffix().first;
   }
 
-  // Удаляем дубликаты
-  std::sort(variables.begin(), variables.end());
-  variables.erase(std::unique(variables.begin(), variables.end()), variables.end());
+  // Removing duplicates
+  std::ranges::sort(variables);
+  auto [new_end, end] = std::ranges::unique(variables);
+  variables.erase(new_end, variables.end());
 
-  // Контейнер для хранения переменных и их значений
-  std::map<std::string, double> varValues;
+  // A container for storing variables and their values
+  std::map<std::string, double> var_values;
 
-  // Добавляем переменные в таблицу символов
+  // Adding variables to the symbol table
   for (const auto& var : variables) {
-    varValues[var] = 0.0;  // Инициализация переменных нулями
+    var_values[var] = 0.0;  // Initializing variables to zeros
   }
 
   std::random_device rd;
-  std::mt19937 gen(rd() + world_.rank());  // Уникальный seed для каждого процесса
-  std::uniform_real_distribution<> dis(limits[0].first, limits[0].second);
+  std::mt19937 gen(rd() + world_.rank());  // Unique seed for each process
+  std::uniform_real_distribution<> dis(limits_[0].first, limits_[0].second);
 
-  // Вычисление количества точек для каждого процесса
-  int localSamples = numSamples / world_.size();
+  // Calculating the number of points for each process
+  int local_samples = numSamples_ / world_.size();
   if (world_.rank() == world_.size() - 1) {
-    localSamples += numSamples % world_.size();
+    local_samples += numSamples_ % world_.size();
   }
 
-  double localSum = 0.0;
-  for (int i = 0; i < localSamples; ++i) {  // Генерация случайной точки
-    // Генерация случайных значений для переменных
-    for (auto& var : varValues) {
-      var.second = dis(gen);  // Случайное значение переменной
+  double local_sum = 0.0;
+  for (int i = 0; i < local_samples; ++i) {  // Generate random point
+    // Generating random values вЂ‹вЂ‹for variables
+    for (auto& var : var_values) {
+      var.second = dis(gen);  // Random value of variable
     }
 
-    // Вычисление функции
-    SimpleParser parser(funcStr, varValues);
-    localSum += parser.parse();
+    // Calculating a function
+    SimpleParser parser(funcStr_, var_values);
+    local_sum += parser.Parse();
   }
 
   if (world_.rank() == 0) {
-    globalSum = localSum;
+    globalSum_ = local_sum;
 
-    // Принимаем данные от всех остальных процессов
+    // Accept data from all other processes
     for (int i = 1; i < world_.size(); ++i) {
-      double receivedSum;
-      world_.recv(i, 0, receivedSum);  // Принимаем данные от процесса i
-      globalSum += receivedSum;        // Суммируем
+      double received_sum = NAN;
+      world_.recv(i, 0, received_sum);  // Receive data from process i
+      globalSum_ += received_sum;       // Summation
     }
   } else {
-    // Остальные процессы отправляют свои локальные суммы на корневой процесс
-    world_.send(0, 0, localSum);  // Отправляем данные на процесс 0
+    // The other processes send their local sums to the root process.
+    world_.send(0, 0, local_sum);  // Sending data to process 0
   }
 
   if (world_.rank() == 0) {
     double volume = 1.0;
-    for (const auto& limit : limits) {
+    for (const auto& limit : limits_) {
       volume *= (limit.second - limit.first);
     }
-    answer = volume * (globalSum / numSamples);
-    answerDataPtr = new uint8_t[sizeof(double)];
-    std::memcpy(answerDataPtr, &answer, sizeof(double));
+    answer_ = volume * (globalSum_ / numSamples_);
+    answerDataPtr_ = new uint8_t[sizeof(double)];
+    std::memcpy(answerDataPtr_, &answer_, sizeof(double));
   }
   world_.barrier();
   return true;
@@ -113,8 +116,8 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PostProcessingImpl() {
   if (world_.rank() == 0) {
     task_data->outputs_count = task_data->inputs_count;
-    task_data->outputs[0] = answerDataPtr;
-    delete[] answerDataPtr;
+    task_data->outputs[0] = answerDataPtr_;
+    delete[] answerDataPtr_;
   }
   return true;
 }

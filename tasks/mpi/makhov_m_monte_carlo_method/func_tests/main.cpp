@@ -2,10 +2,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
-#include <cstddef>
+#include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <memory>
-#include <random>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "core/task/include/task.hpp"
@@ -15,21 +17,21 @@ TEST(makhov_m_monte_carlo_method, func_is_x_pow2) {
   // Create data
   boost::mpi::communicator world;
   std::string f = "x*x";
-  int numSamples = 1000000;
+  int num_samples = 1000000;
   std::vector<std::pair<double, double>> limits = {{0.0, 1.0}};
-  double *answerPtr = nullptr;
+  double *answer_ptr = nullptr;
   double reference = 0.33;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&f));
-    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&numSamples));
+    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&num_samples));
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(limits.data()));
     task_data_par->inputs_count.emplace_back(1);
     task_data_par->inputs_count.emplace_back(1);
-    task_data_par->inputs_count.emplace_back(1);  // Информация о размерности интеграла
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answerPtr));
+    task_data_par->inputs_count.emplace_back(1);  // Integral dimension info
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answer_ptr));
     task_data_par->outputs_count.emplace_back(1);
   }
 
@@ -41,11 +43,11 @@ TEST(makhov_m_monte_carlo_method, func_is_x_pow2) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    uint8_t *answerData = task_data_par->outputs[0];
-    double retrievedValue;
-    std::memcpy(&retrievedValue, answerData, sizeof(double));
-    double truncatedValue = std::round(retrievedValue * 100) / 100;
-    EXPECT_EQ(reference, truncatedValue);
+    uint8_t *answer_data = task_data_par->outputs[0];
+    double retrieved_value = NAN;
+    std::memcpy(&retrieved_value, answer_data, sizeof(double));
+    double truncated_value = std::round(retrieved_value * 100) / 100;
+    EXPECT_EQ(reference, truncated_value);
   }
 }
 
@@ -53,21 +55,21 @@ TEST(makhov_m_monte_carlo_method, func_is_x_plus_y) {
   // Create data
   boost::mpi::communicator world;
   std::string f = "x+y";
-  int numSamples = 1000000;
+  int num_samples = 1000000;
   std::vector<std::pair<double, double>> limits = {{0.0, 1.0}, {0.0, 1.0}};
-  double *answerPtr = nullptr;
+  double *answer_ptr = nullptr;
   double reference = 1.0;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&f));
-    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&numSamples));
+    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&num_samples));
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(limits.data()));
     task_data_par->inputs_count.emplace_back(1);
     task_data_par->inputs_count.emplace_back(1);
-    task_data_par->inputs_count.emplace_back(2);  // Информация о размерности интеграла
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answerPtr));
+    task_data_par->inputs_count.emplace_back(2);  // Integral dimension info
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answer_ptr));
     task_data_par->outputs_count.emplace_back(1);
   }
 
@@ -79,11 +81,11 @@ TEST(makhov_m_monte_carlo_method, func_is_x_plus_y) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    uint8_t *answerData = task_data_par->outputs[0];
-    double retrievedValue;
-    std::memcpy(&retrievedValue, answerData, sizeof(double));
-    double truncatedValue = std::round(retrievedValue * 100) / 100;
-    EXPECT_EQ(reference, truncatedValue);
+    uint8_t *answer_data = task_data_par->outputs[0];
+    double retrieved_value = NAN;
+    std::memcpy(&retrieved_value, answer_data, sizeof(double));
+    double truncated_value = std::round(retrieved_value * 100) / 100;
+    EXPECT_EQ(reference, truncated_value);
   }
 }
 
@@ -91,21 +93,21 @@ TEST(makhov_m_monte_carlo_method, func_is_xx_plus_yy) {
   // Create data
   boost::mpi::communicator world;
   std::string f = "x*x+y*y";
-  int numSamples = 1000000;
+  int num_samples = 1000000;
   std::vector<std::pair<double, double>> limits = {{0.0, 1.0}, {0.0, 1.0}};
-  double *answerPtr = nullptr;
+  double *answer_ptr = nullptr;
   double reference = 0.67;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&f));
-    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&numSamples));
+    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&num_samples));
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(limits.data()));
     task_data_par->inputs_count.emplace_back(1);
     task_data_par->inputs_count.emplace_back(1);
-    task_data_par->inputs_count.emplace_back(2);  // Информация о размерности интеграла
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answerPtr));
+    task_data_par->inputs_count.emplace_back(2);  // Integral dimension info
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answer_ptr));
     task_data_par->outputs_count.emplace_back(1);
   }
 
@@ -117,11 +119,11 @@ TEST(makhov_m_monte_carlo_method, func_is_xx_plus_yy) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    uint8_t *answerData = task_data_par->outputs[0];
-    double retrievedValue;
-    std::memcpy(&retrievedValue, answerData, sizeof(double));
-    double truncatedValue = std::round(retrievedValue * 100) / 100;
-    EXPECT_EQ(reference, truncatedValue);
+    uint8_t *answer_data = task_data_par->outputs[0];
+    double retrieved_value = NAN;
+    std::memcpy(&retrieved_value, answer_data, sizeof(double));
+    double truncated_value = std::round(retrieved_value * 100) / 100;
+    EXPECT_EQ(reference, truncated_value);
   }
 }
 
@@ -129,21 +131,21 @@ TEST(makhov_m_monte_carlo_method, func_is_xx_plus_yy_plus_zz) {
   // Create data
   boost::mpi::communicator world;
   std::string f = "x*x+y*y+z*z";
-  int numSamples = 1000000;
+  int num_samples = 1000000;
   std::vector<std::pair<double, double>> limits = {{0.0, 1.0}, {0.0, 1.0}, {0.0, 1.0}};
-  double *answerPtr = nullptr;
+  double *answer_ptr = nullptr;
   double reference = 1.0;
 
   // Create TaskData
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&f));
-    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&numSamples));
+    task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(&num_samples));
     task_data_par->inputs.push_back(reinterpret_cast<uint8_t *>(limits.data()));
     task_data_par->inputs_count.emplace_back(1);
     task_data_par->inputs_count.emplace_back(1);
-    task_data_par->inputs_count.emplace_back(3);  // Информация о размерности интеграла
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answerPtr));
+    task_data_par->inputs_count.emplace_back(3);  // Integral dimension info
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(answer_ptr));
     task_data_par->outputs_count.emplace_back(1);
   }
 
@@ -155,10 +157,10 @@ TEST(makhov_m_monte_carlo_method, func_is_xx_plus_yy_plus_zz) {
   test_mpi_task_parallel.PostProcessingImpl();
 
   if (world.rank() == 0) {
-    uint8_t *answerData = task_data_par->outputs[0];
-    double retrievedValue;
-    std::memcpy(&retrievedValue, answerData, sizeof(double));
-    double truncatedValue = std::round(retrievedValue * 100) / 100;
-    EXPECT_EQ(reference, truncatedValue);
+    uint8_t *answer_data = task_data_par->outputs[0];
+    double retrieved_value = NAN;
+    std::memcpy(&retrieved_value, answer_data, sizeof(double));
+    double truncated_value = std::round(retrieved_value * 100) / 100;
+    EXPECT_EQ(reference, truncated_value);
   }
 }

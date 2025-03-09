@@ -2,21 +2,20 @@
 
 #include <cmath>
 #include <cstddef>
-#include <memory>
+#include <cstdint>
+#include <cstring>
+#include <functional>
 #include <random>
+#include <utility>
 #include <vector>
 
 bool makhov_m_monte_carlo_method_seq::TestTaskSequential::PreProcessingImpl() {
-  func = *reinterpret_cast<std::function<double(const std::vector<double>&)>*>(task_data->inputs[0]);
-  numSamples = *reinterpret_cast<int*>(task_data->inputs[1]);
+  func_ = *reinterpret_cast<std::function<double(const std::vector<double>&)>*>(task_data->inputs[0]);
+  numSamples_ = *reinterpret_cast<int*>(task_data->inputs[1]);
 
-  if (task_data->inputs[2] == nullptr) {
-    throw std::runtime_error("task_data->inputs[2] is null");
-  }
-
-  auto limits_ptr = reinterpret_cast<std::pair<double, double>*>(task_data->inputs[2]);
+  auto* limits_ptr = reinterpret_cast<std::pair<double, double>*>(task_data->inputs[2]);
   std::uint32_t dimension = task_data->inputs_count[2];
-  limits.assign(limits_ptr, limits_ptr + dimension);
+  limits_.assign(limits_ptr, limits_ptr + dimension);
   return true;
 }
 
@@ -29,38 +28,38 @@ bool makhov_m_monte_carlo_method_seq::TestTaskSequential::RunImpl() {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  // Вектор распределений для каждой переменной
+  // Vector of distributions for each variable
   std::vector<std::uniform_real_distribution<>> distributions;
-  for (const auto& limit : limits) {
+  for (const auto& limit : limits_) {
     distributions.emplace_back(limit.first, limit.second);
   }
   double sum = 0.0;
 
-  // Генерация случайных точек и вычисление суммы значений функции
-  for (int i = 0; i < numSamples; ++i) {
+  // Generating random points and calculating the sum of function values
+  for (int i = 0; i < numSamples_; ++i) {
     std::vector<double> point;
-    for (size_t j = 0; j < limits.size(); ++j) {
-      point.push_back(distributions[j](gen));  // Генерация случайной точки
+    for (size_t j = 0; j < limits_.size(); ++j) {
+      point.push_back(distributions[j](gen));  // Generate random point
     }
-    sum += func(point);  // Добавляем значение функции в сумму
+    sum += func_(point);  // Add the function value to the sum
   }
 
-  // Вычисление объема области интегрирования
+  // Calculating the volume of the integration region
   double volume = 1.0;
-  for (const auto& limit : limits) {
-    volume *= (limit.second - limit.first);  // Объем = произведение длин интервалов
+  for (const auto& limit : limits_) {
+    volume *= (limit.second - limit.first);  // Volume = product of interval lengths
   }
 
-  // Оценка интеграла
-  answer = volume * (sum / numSamples);  // Интеграл = объем * среднее значение
-  answerDataPtr = new uint8_t[sizeof(double)];
-  std::memcpy(answerDataPtr, &answer, sizeof(double));
+  // Estimation of the integral
+  answer_ = volume * (sum / numSamples_);  // Integral = volume * mean
+  answerDataPtr_ = new uint8_t[sizeof(double)];
+  std::memcpy(answerDataPtr_, &answer_, sizeof(double));
   return true;
 }
 
 bool makhov_m_monte_carlo_method_seq::TestTaskSequential::PostProcessingImpl() {
   task_data->outputs_count = task_data->inputs_count;
-  task_data->outputs[0] = answerDataPtr;
-  delete[] answerDataPtr;
+  task_data->outputs[0] = answerDataPtr_;
+  delete[] answerDataPtr_;
   return true;
 }

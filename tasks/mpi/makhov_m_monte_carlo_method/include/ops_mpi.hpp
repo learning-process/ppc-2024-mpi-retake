@@ -3,7 +3,6 @@
 
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -23,12 +22,12 @@ class TestMPITaskParallel : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::string funcStr;
-  std::vector<std::pair<double, double>> limits;
-  int numSamples{};
-  double globalSum{};
-  double answer{};
-  uint8_t* answerDataPtr{};
+  std::string funcStr_;
+  std::vector<std::pair<double, double>> limits_;
+  int numSamples_{};
+  double globalSum_{};
+  double answer_{};
+  uint8_t* answerDataPtr_{};
   boost::mpi::communicator world_;
 };
 

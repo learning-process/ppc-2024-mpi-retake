@@ -1,9 +1,9 @@
 #pragma once
 
-#include <utility>
-#include <vector>
 #include <cstdint>
 #include <functional>
+#include <utility>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 
@@ -18,11 +18,11 @@ class TestTaskSequential : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::function<double(const std::vector<double>&)> func;
-  std::vector<std::pair<double, double>> limits;
-  int numSamples{};
-  double answer{};
-  uint8_t* answerDataPtr{};
+  std::function<double(const std::vector<double>&)> func_;
+  std::vector<std::pair<double, double>> limits_;
+  int numSamples_{};
+  double answer_{};
+  uint8_t* answerDataPtr_{};
 };
 
 }  // namespace makhov_m_monte_carlo_method_seq
