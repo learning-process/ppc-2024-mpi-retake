@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 #include "core/task/include/task.hpp"
 #include "seq/vasenkov_a_word_count/include/ops_seq.hpp"
+
 
 TEST(vasenkov_a_word_count_seq, test_0_word) {
   std::string input;
