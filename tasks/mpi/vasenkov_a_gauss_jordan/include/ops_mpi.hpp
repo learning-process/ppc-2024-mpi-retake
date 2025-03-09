@@ -15,6 +15,11 @@ class GaussJordanMethodParallelMPI : public ppc::core::Task {
   bool solve_ = true;
   int n_size_;
   boost::mpi::communicator world_;
+  void EliminateColumn(int k);
+  void NormalizeRow(int k);
+  void SwapRows(int row1, int row2);
+  int FindSwapRow(int k);
+  bool EnsureNonZeroPivot(int k);
 
  public:
   explicit GaussJordanMethodParallelMPI(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}

@@ -2,14 +2,13 @@
 
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cmath>
 #include <vector>
 
-#define EPSILON 1e-9
-
 namespace vasenkov_a_gauss_jordan_mpi {
-
+#define EPSILON 1e-9
 bool GaussJordanMethodParallelMPI::ValidationImpl() {
   if (world_.rank() != 0) {
     return true;
@@ -69,31 +68,14 @@ bool GaussJordanMethodParallelMPI::PreProcessingImpl() {
   boost::mpi::broadcast(world_, n_size_, 0);
   return true;
 }
-
 bool GaussJordanMethodParallelMPI::RunImpl() {
   for (int k = 0; k < n_size_; ++k) {
     if (world_.rank() == 0) {
-      if (fabs(sys_matrix_[(k * (n_size_ + 1)) + k]) < EPSILON) {
-        int swap_row = -1;
-        for (int i = k + 1; i < n_size_; ++i) {
-          if (fabs(sys_matrix_[(i * (n_size_ + 1)) + k]) > EPSILON) {
-            swap_row = i;
-            break;
-          }
-        }
-        if (swap_row == -1) {
-          solve_ = false;
-          break;
-        }
-        for (int col = 0; col <= n_size_; ++col) {
-          std::swap(sys_matrix_[(k * (n_size_ + 1)) + col], sys_matrix_[(swap_row * (n_size_ + 1)) + col]);
-        }
+      if (!EnsureNonZeroPivot(k)) {
+        solve_ = false;
+        break;
       }
-
-      double pivot = sys_matrix_[(k * (n_size_ + 1)) + k];
-      for (int j = k; j <= n_size_; ++j) {
-        sys_matrix_[(k * (n_size_ + 1)) + j] /= pivot;
-      }
+      NormalizeRow(k);
     }
 
     boost::mpi::broadcast(world_, solve_, 0);
@@ -102,19 +84,56 @@ bool GaussJordanMethodParallelMPI::RunImpl() {
     }
 
     if (world_.rank() == 0) {
-      for (int i = 0; i < n_size_; ++i) {
-        if (i != k) {
-          double factor = sys_matrix_[(i * (n_size_ + 1)) + k];
-          for (int j = k; j <= n_size_; ++j) {
-            sys_matrix_[(i * (n_size_ + 1)) + j] -= factor * sys_matrix_[(k * (n_size_ + 1)) + j];
-          }
-          sys_matrix_[(i * (n_size_ + 1)) + k] = 0.0;
-        }
-      }
+      EliminateColumn(k);
     }
   }
 
   return true;
+}
+
+bool GaussJordanMethodParallelMPI::EnsureNonZeroPivot(int k) {
+  if (fabs(sys_matrix_[(k * (n_size_ + 1)) + k]) < EPSILON) {
+    int swap_row = FindSwapRow(k);
+    if (swap_row == -1) {
+      return false;
+    }
+    SwapRows(k, swap_row);
+  }
+  return true;
+}
+
+int GaussJordanMethodParallelMPI::FindSwapRow(int k) {
+  for (int i = k + 1; i < n_size_; ++i) {
+    if (fabs(sys_matrix_[(i * (n_size_ + 1)) + k]) > EPSILON) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+void GaussJordanMethodParallelMPI::SwapRows(int row1, int row2) {
+  for (int col = 0; col <= n_size_; ++col) {
+    std::swap(sys_matrix_[(row1 * (n_size_ + 1)) + col], sys_matrix_[(row2 * (n_size_ + 1)) + col]);
+  }
+}
+
+void GaussJordanMethodParallelMPI::NormalizeRow(int k) {
+  double pivot = sys_matrix_[(k * (n_size_ + 1)) + k];
+  for (int j = k; j <= n_size_; ++j) {
+    sys_matrix_[(k * (n_size_ + 1)) + j] /= pivot;
+  }
+}
+
+void GaussJordanMethodParallelMPI::EliminateColumn(int k) {
+  for (int i = 0; i < n_size_; ++i) {
+    if (i != k) {
+      double factor = sys_matrix_[(i * (n_size_ + 1)) + k];
+      for (int j = k; j <= n_size_; ++j) {
+        sys_matrix_[(i * (n_size_ + 1)) + j] -= factor * sys_matrix_[(k * (n_size_ + 1)) + j];
+      }
+      sys_matrix_[(i * (n_size_ + 1)) + k] = 0.0;
+    }
+  }
 }
 
 bool GaussJordanMethodParallelMPI::PostProcessingImpl() {
