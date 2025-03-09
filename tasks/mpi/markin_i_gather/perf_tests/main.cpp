@@ -3,26 +3,15 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <new>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/markin_i_gather/include/ops_mpi.hpp"
-
 namespace markin_i_gather {
-
-template <typename T>
-void GenerateTestData(int size, std::vector<T>& data) {
-  data.resize(size);
-  for (int i = 0; i < size; ++i) {
-    data[i] = static_cast<T>(i);
-  }
-}
-
-}  // namespace markin_i_gather
 
 TEST(markin_i_gather, test_pipeline_run) {
   boost::mpi::environment env;
@@ -34,7 +23,7 @@ TEST(markin_i_gather, test_pipeline_run) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   std::vector<int> send_data;
-  markin_i_gather::GenerateTestData(data_size, send_data);
+  GenerateTestData(data_size, send_data);
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(send_data.data()));
   task_data_mpi->inputs_count.emplace_back(send_data.size());
 
@@ -69,7 +58,7 @@ TEST(markin_i_gather, test_task_run) {
   auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
 
   std::vector<int> send_data;
-  markin_i_gather::GenerateTestData(data_size, send_data);
+  GenerateTestData(data_size, send_data);
   task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t*>(send_data.data()));
   task_data_mpi->inputs_count.emplace_back(send_data.size());
 
@@ -93,3 +82,4 @@ TEST(markin_i_gather, test_task_run) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
   }
 }
+}  // namespace markin_i_gather

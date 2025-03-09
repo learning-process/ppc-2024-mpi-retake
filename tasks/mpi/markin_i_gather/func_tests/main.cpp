@@ -5,18 +5,7 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/markin_i_gather/include/ops_mpi.hpp"
-
 namespace markin_i_gather {
-
-template <typename T>
-void GenerateTestData(int size, std::vector<T>& data) {
-  data.resize(size);
-  for (int i = 0; i < size; ++i) {
-    data[i] = static_cast<T>(i);
-  }
-}
-
-}  // namespace markin_i_gather
 
 TEST(markin_i_gather, test_gather_int_root_0) {
   boost::mpi::environment env;
@@ -36,12 +25,12 @@ TEST(markin_i_gather, test_gather_int_root_0) {
   task->PostProcessing();
 
   if (rank == root) {
-    markin_i_gather::MyGatherMpiTask* gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
+    auto gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
     ASSERT_NE(gather_task, nullptr);
 
     std::vector<int> expected_data(size);
     for (int i = 0; i < size; ++i) {
-      expected_data[i] = static_cast<int>(i);
+      expected_data[i] = i;
     }
 
     std::vector<int> gathered_data = gather_task->GetIntRecvData();
@@ -70,12 +59,12 @@ TEST(markin_i_gather, test_gather_float_root_0) {
   task->PostProcessing();
 
   if (rank == root) {
-    markin_i_gather::MyGatherMpiTask* gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
+    auto gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
     ASSERT_NE(gather_task, nullptr);
 
     std::vector<float> expected_data(size);
     for (int i = 0; i < size; ++i) {
-      expected_data[i] = static_cast<float>(i * 1.1f);
+      expected_data[i] = i * 1.1F;
     }
 
     std::vector<float> gathered_data = gather_task->GetFloatRecvData();
@@ -104,7 +93,7 @@ TEST(markin_i_gather, test_gather_double_root_0) {
   task->PostProcessing();
 
   if (rank == root) {
-    markin_i_gather::MyGatherMpiTask* gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
+    auto gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
     ASSERT_NE(gather_task, nullptr);
 
     std::vector<double> expected_data(size);
@@ -143,7 +132,7 @@ TEST(markin_i_gather, test_gather_int_root_1) {
 
     std::vector<int> expected_data(size);
     for (int i = 0; i < size; ++i) {
-      expected_data[i] = static_cast<int>(i);
+      expected_data[i] = i;
     }
 
     std::vector<int> gathered_data = gather_task->GetIntRecvData();
@@ -177,7 +166,7 @@ TEST(markin_i_gather, test_gather_float_root_1) {
 
     std::vector<float> expected_data(size);
     for (int i = 0; i < size; ++i) {
-      expected_data[i] = static_cast<float>(i * 1.1f);
+      expected_data[i] = i * 1.1F;
     }
 
     std::vector<float> gathered_data = gather_task->GetFloatRecvData();
@@ -206,7 +195,7 @@ TEST(markin_i_gather, test_gather_double_root_1) {
   task->PostProcessing();
 
   if (rank == root) {
-    markin_i_gather::MyGatherMpiTask* gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
+    auto gather_task = dynamic_cast<markin_i_gather::MyGatherMpiTask*>(task.get());
     ASSERT_NE(gather_task, nullptr);
 
     std::vector<double> expected_data(size);
@@ -221,3 +210,4 @@ TEST(markin_i_gather, test_gather_double_root_1) {
   }
   world.barrier();
 }
+}  // namespace markin_i_gather

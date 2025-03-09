@@ -28,7 +28,21 @@ class MyGatherMpiTask : public ppc::core::Task {
 
  private:
   template <typename T>
-  int MyGather(const T& sendbuf, int sendcount, int root, std::vector<T>& recvbuf);
+  int MyGather(const T& sendbuf, int sendcount, int root, std::vector<T>& recvbuf) {
+    if (world_rank_ == root) {
+      recvbuf.resize(world_size_);
+      recvbuf[root] = sendbuf;
+
+      for (int i = 0; i < world_size_; ++i) {
+        if (i != root) {
+          world_.recv(i, 0, recvbuf[i]);
+        }
+      }
+    } else {
+      world_.send(root, 0, sendbuf);
+    }
+    return 0;
+  }
 
   boost::mpi::communicator world_;
   int world_rank_;
@@ -42,5 +56,13 @@ class MyGatherMpiTask : public ppc::core::Task {
   float float_send_data_;
   double double_send_data_;
 };
+
+template <typename T>
+void GenerateTestData(int size, std::vector<T>& data) {  // Убрали static
+  data.resize(size);
+  for (int i = 0; i < size; ++i) {
+    data[i] = static_cast<T>(i);
+  }
+}
 
 }  // namespace markin_i_gather
