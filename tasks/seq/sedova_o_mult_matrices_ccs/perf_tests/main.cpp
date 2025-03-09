@@ -8,7 +8,7 @@
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
-#include "seq/example/include/ops_seq.hpp"
+#include "seq/sedova_o_mult_matrices_ccs/include/ops_seq.hpp"
 
 TEST(sedova_o_test_task_seq, test_pipeline_run) {
   std::vector<std::vector<double>> matrix_A = {{0, 2, 0}, {1, 0, 3}, {0, 4, 0}};
