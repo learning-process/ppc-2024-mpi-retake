@@ -10,14 +10,14 @@ class SimpleParser {
   SimpleParser(std::string expr_ession, const std::map<std::string, double>& variables)
       : expr_(std::move(expr_ession)), vars_(variables) {}
 
-  double Parse() { return Parse_expression(); }
+  double Parse() { return ParseExpression(); }
 
  private:
   std::string expr_;
   std::map<std::string, double> vars_;
   size_t pos_{0};
 
-  double Parse_expression() {
+  double ParseExpression() {
     double result = ParseTerm();
     while (pos_ < expr_.length()) {
       if (expr_[pos_] == '+') {
@@ -52,7 +52,7 @@ class SimpleParser {
   double ParseFactor() {
     if (expr_[pos_] == '(') {
       pos_++;
-      double result = Parse_expression();
+      double result = ParseExpression();
       if (expr_[pos_] != ')') {
         throw std::runtime_error("Expected ')'");
       }
@@ -79,10 +79,10 @@ class SimpleParser {
   }
 
   double ParseNumber() {
-    size_t start_pos_ = pos_;
+    size_t start_pos = pos_;
     while (pos_ < expr_.length() && (isdigit(expr_[pos_]) != 0 || expr_[pos_] == '.')) {
       pos_++;
     }
-    return std::stod(expr_.substr(start_pos_, pos_ - start_pos_));
+    return std::stod(expr_.substr(start_pos, pos_ - start_pos));
   }
 };

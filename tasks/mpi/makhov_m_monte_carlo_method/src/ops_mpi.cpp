@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "boost/mpi/collectives/broadcast.hpp"
 #include "simple_parser.hpp"
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PreProcessingImpl() {
@@ -21,7 +22,7 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PreProcessingImpl() {
     funcStr_ = *reinterpret_cast<std::string*>(task_data->inputs[0]);
     numSamples_ = *reinterpret_cast<int*>(task_data->inputs[1]);
 
-    double* limits_ptr = reinterpret_cast<double*>(task_data->inputs[2]);
+    auto* limits_ptr = reinterpret_cast<double*>(task_data->inputs[2]);
     dimension_ = task_data->inputs_count[2];
     limits_[0] = limits_ptr[0];
     limits_[1] = limits_ptr[1];
