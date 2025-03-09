@@ -1,75 +1,58 @@
 #include <gtest/gtest.h>
 
-#include <cstddef>
-#include <cstdint>
-#include <fstream>
-#include <memory>
-#include <string>
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/environment.hpp>
+#include <cstdlib>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "core/util/include/util.hpp"
-#include "mpi/example/include/ops_mpi.hpp"
+#include "mpi/sedova_o_mult_matrices_ccs/include/ops_mpi.hpp"
 
-TEST(nesterov_a_test_task_mpi, test_matmul_50) {
-  constexpr size_t kCount = 50;
-
-  // Create data
-  std::vector<int> in(kCount * kCount, 0);
-  std::vector<int> out(kCount * kCount, 0);
-
-  for (size_t i = 0; i < kCount; i++) {
-    in[(i * kCount) + i] = 1;
+TEST(sedova_o_test_task_mpi, Test_1) {
+  boost::mpi::communicator world;
+  std::vector<std::vector<double>> matrix_A = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+  std::vector<std::vector<double>> matrix_B = {{2, 0}, {0, 3}, {10, 4}};
+  std::vector<double> A;
+  std::vector<int> row_ind_A;
+  std::vector<int> col_ind_A;
+  sedova_o_test_task_mpi::ConvertToCCS(matrix_A, A, row_ind_A, col_ind_A);
+  std::vector<double> B;
+  std::vector<int> row_ind_B;
+  std::vector<int> col_ind_B;
+  sedova_o_test_task_mpi::ConvertToCCS(matrix_B, B, row_ind_B, col_ind_B);
+  // Create TaskData
+  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
+  std::vector<std::vector<double>> out_par(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
+  std::vector<std::vector<double>> out_seq(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
+  if (world.rank() == 0) {
+    sedova_o_test_task_mpi::FillData(task_data_par, matrix_A.size(), matrix_A[0].size(), matrix_B.size(),
+                                           matrix_B[0].size(), A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out_par);
+    sedova_o_test_task_mpi::FillData(task_data_seq, matrix_A.size(), matrix_A[0].size(), matrix_B.size(),
+                                           matrix_B[0].size(), A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out_seq);
   }
-
-  // Create task_data
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
-
-  // Create Task
-  nesterov_a_test_task_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-
-  EXPECT_EQ(in, out);
-}
-
-TEST(nesterov_a_test_task_mpi, test_matmul_100_from_file) {
-  std::string line;
-  std::ifstream test_file(ppc::util::GetAbsolutePath("mpi/example/data/test.txt"));
-  if (test_file.is_open()) {
-    getline(test_file, line);
+  sedova_o_test_task_mpi::TestTaskMPI TestMpiTaskParallel(task_data_par);
+  ASSERT_EQ(TestMpiTaskParallel.ValidationImpl(), true);
+  TestMpiTaskParallel.PreProcessingImpl();
+  TestMpiTaskParallel.RunImpl();
+  TestMpiTaskParallel.PostProcessingImpl();
+  if (world.rank() == 0) {
+    std::vector<std::vector<double>> ans_par(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
+    std::vector<std::vector<double>> ans_seq(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
+    for (size_t i = 0; i < out_par.size(); ++i) {
+      auto *ptr = reinterpret_cast<double *>(task_data_par->outputs[i]);
+      ans_par[i] = std::vector(ptr, ptr + matrix_B[0].size());
+    }
+    sedova_o_test_task_mpi::TestTaskSequential TestMpiTaskSequential(task_data_seq);
+    ASSERT_EQ(TestMpiTaskSequential.ValidationImpl(), true);
+    TestMpiTaskSequential.PreProcessingImpl();
+    TestMpiTaskSequential.RunImpl();
+    TestMpiTaskSequential.PostProcessingImpl();
+    for (size_t i = 0; i < out_seq.size(); ++i) {
+      auto *ptr = reinterpret_cast<double *>(task_data_seq->outputs[i]);
+      ans_seq[i] = std::vector(ptr, ptr + matrix_B[0].size());
+    }
+    ASSERT_EQ(ans_seq, ans_par);
   }
-  test_file.close();
-
-  const size_t count = std::stoi(line);
-
-  // Create data
-  std::vector<int> in(count * count, 0);
-  std::vector<int> out(count * count, 0);
-
-  for (size_t i = 0; i < count; i++) {
-    in[(i * count) + i] = 1;
-  }
-
-  // Create task_data
-  auto task_data_mpi = std::make_shared<ppc::core::TaskData>();
-  task_data_mpi->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-  task_data_mpi->inputs_count.emplace_back(in.size());
-  task_data_mpi->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-  task_data_mpi->outputs_count.emplace_back(out.size());
-
-  // Create Task
-  nesterov_a_test_task_mpi::TestTaskMPI test_task_mpi(task_data_mpi);
-  ASSERT_EQ(test_task_mpi.Validation(), true);
-  test_task_mpi.PreProcessing();
-  test_task_mpi.Run();
-  test_task_mpi.PostProcessing();
-
-  EXPECT_EQ(in, out);
 }
