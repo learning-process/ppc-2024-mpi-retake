@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -7,6 +8,7 @@
 
 #include "core/task/include/task.hpp"
 #include "mpi/vasenkov_a_word_count/include/ops_mpi.hpp"
+
 
 TEST(vasenkov_a_word_count_mpi, test_0_word) {
   boost::mpi::communicator world;
