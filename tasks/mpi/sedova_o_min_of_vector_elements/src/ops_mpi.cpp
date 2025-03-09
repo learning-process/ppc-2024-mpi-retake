@@ -54,10 +54,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
-  if (world_.rank() == 0) {
-    return (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) && (task_data->outputs_count[0] == 1);
-  }
-  return true;
+  return (task_data->inputs_count[0] > 0) && (task_data->outputs_count[0] == 1);
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
