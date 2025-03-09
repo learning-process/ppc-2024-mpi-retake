@@ -21,7 +21,7 @@ std::vector<int> RandomGenerateImg(int height_img, int width_img) {
   std::ranges::generate(img.begin(), img.end(), [&]() { return ras(gen); });
   return img;
 }
-}  // namespace makadrai_a_sobel_mpi
+}  // namespace
 
 TEST(makadrai_a_sobel_mpi, test_2_2) {
   boost::mpi::communicator world;
