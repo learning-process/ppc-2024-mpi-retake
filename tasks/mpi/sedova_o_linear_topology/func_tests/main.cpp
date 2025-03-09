@@ -114,7 +114,7 @@ TEST(sedova_o_linear_topology_mpi, test_1) {
   }
 }
 
-TEST(sedova_o_linear_topology_mpi, test_10000) {
+TEST(sedova_o_linear_topology_mpi, test_0) {
   boost::mpi::communicator world;
   std::vector<int> input;
   bool result = false;
