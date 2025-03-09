@@ -76,7 +76,7 @@ void SetupTaskData(std::vector<double>& values, std::vector<int>& columns, std::
 }  // namespace
 
 TEST(chernova_n_matrix_multiplication_crs_mpi, test_pipeline_run) {
-  const int matrix_size = 20;
+  const int matrix_size = 2000;
   const double density = 0.1;
   boost::mpi::communicator world;
 
@@ -125,7 +125,7 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_pipeline_run) {
 }
 
 TEST(chernova_n_matrix_multiplication_crs_mpi, test_task_run) {
-  const int matrix_size = 20;
+  const int matrix_size = 2000;
   const double density = 0.1;
   const int root_rank = 0;
   boost::mpi::communicator world;
