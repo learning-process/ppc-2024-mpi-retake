@@ -10,10 +10,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/makadrai_a_sobel/include/ops_mpi.hpp"
 
-namespace makadrai_a_sobel_mpi {
-
-std::vector<int> RandomGenerateImg(int height_img, int width_img);
-
+namespace {
 std::vector<int> RandomGenerateImg(int height_img, int width_img) {
   std::vector<int> img(height_img * width_img);
 
@@ -238,7 +235,7 @@ TEST(makadrai_a_sobel_mpi, test_random_100_100) {
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    img = makadrai_a_sobel_mpi::RandomGenerateImg(height_img, width_img);
+    img = RandomGenerateImg(height_img, width_img);
     res.resize(height_img * width_img);
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(img.data()));
@@ -269,11 +266,11 @@ TEST(makadrai_a_sobel_mpi, test_random_100_100) {
     task_data_seq->outputs_count.emplace_back(width_img);
     task_data_seq->outputs_count.emplace_back(height_img);
 
-    makadrai_a_sobel_mpi::SobelSeq sobelSeq(task_data_seq);
-    ASSERT_TRUE(sobelSeq.Validation());
-    sobelSeq.PreProcessing();
-    sobelSeq.Run();
-    sobelSeq.PostProcessing();
+    makadrai_a_sobel_mpi::SobelSeq sobel_seq(task_data_seq);
+    ASSERT_TRUE(sobel_seq.Validation());
+    sobel_seq.PreProcessing();
+    sobel_seq.Run();
+    sobel_seq.PostProcessing();
 
     EXPECT_EQ(ans, res);
   }
@@ -290,7 +287,7 @@ TEST(makadrai_a_sobel_mpi, test_random_100_50) {
   auto task_data = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    img = makadrai_a_sobel_mpi::RandomGenerateImg(height_img, width_img);
+    img = RandomGenerateImg(height_img, width_img);
     res.resize(height_img * width_img);
 
     task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(img.data()));
@@ -321,11 +318,11 @@ TEST(makadrai_a_sobel_mpi, test_random_100_50) {
     task_data_seq->outputs_count.emplace_back(width_img);
     task_data_seq->outputs_count.emplace_back(height_img);
 
-    makadrai_a_sobel_mpi::SobelSeq sobelSeq(task_data_seq);
-    ASSERT_TRUE(sobelSeq.Validation());
-    sobelSeq.PreProcessing();
-    sobelSeq.Run();
-    sobelSeq.PostProcessing();
+    makadrai_a_sobel_mpi::SobelSeq sobel_seq(task_data_seq);
+    ASSERT_TRUE(sobel_seq.Validation());
+    sobel_seq.PreProcessing();
+    sobel_seq.Run();
+    sobel_seq.PostProcessing();
 
     EXPECT_EQ(ans, res);
   }
