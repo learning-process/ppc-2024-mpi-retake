@@ -11,6 +11,9 @@
 #include "mpi/makadrai_a_sobel/include/ops_mpi.hpp"
 
 namespace makadrai_a_sobel_mpi {
+
+std::vector<int> RandomGenerateImg(int height_img, int width_img);
+
 std::vector<int> RandomGenerateImg(int height_img, int width_img) {
   std::vector<int> img(height_img * width_img);
 
