@@ -92,21 +92,6 @@ void Execution(auto& test_task, const auto& world) {
   test_task.RunImpl();
   test_task.PostProcessingImpl();
 }
-bool CompareCrs(std::vector<double>& values, std::vector<int>& columns, std::vector<int>& rows,
-                std::shared_ptr<ppc::core::TaskData>& task_data, const boost::mpi::communicator& world) {
-  auto* output_values = reinterpret_cast<double*>(task_data->outputs[0]);
-  auto* output_cols = reinterpret_cast<int*>(task_data->outputs[1]);
-  auto* output_rows = reinterpret_cast<int*>(task_data->outputs[2]);
-
-  std::vector<double> actual_values(output_values, output_values + values.size());
-  std::vector<int> actual_cols(output_cols, output_cols + columns.size());
-  std::vector<int> actual_rows(output_rows, output_rows + rows.size());
-
-  EXPECT_EQ(actual_values, values);
-  EXPECT_EQ(actual_cols, columns);
-  EXPECT_EQ(actual_rows, rows);
-  return true;
-}
 }  // namespace
 TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
   boost::mpi::communicator world;
@@ -152,9 +137,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
   Execution(test_task, world);
 
   if (world.rank() == 0) {
-    EXPECT_EQ(result_values, expected_values);
-    EXPECT_EQ(result_col_indices, expected_col_indices);
-    EXPECT_EQ(result_row_ptr, expected_row_ptr);
+      EXPECT_EQ(result_values, expected_values);
+      EXPECT_EQ(result_col_indices, expected_col_indices);
+      EXPECT_EQ(result_row_ptr, expected_row_ptr);
   }
 }
 
