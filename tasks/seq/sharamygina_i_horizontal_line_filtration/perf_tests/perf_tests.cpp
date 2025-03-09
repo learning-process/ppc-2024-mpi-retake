@@ -17,7 +17,7 @@ std::vector<unsigned int> GetImage(int k_rows, int k_cols) {
   std::vector<unsigned int> temporary_im(k_rows * k_cols);
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, std::numeric_limits<unsigned int>::max());
+  std::uniform_int_distribution<unsigned int> dist(0, std::numeric_limits<unsigned int>::max());
 
   for (int i = 0; i < k_rows; i++) {
     for (int j = 0; j < k_cols; j++) {
