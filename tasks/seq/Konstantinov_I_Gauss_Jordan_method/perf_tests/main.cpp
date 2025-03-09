@@ -27,7 +27,7 @@ std::vector<double> GetRandomMatrix(int rows, int cols) {
 }  // namespace konstantinov_i_gauss_jordan_method_seq
 
 TEST(Konstantinov_i_gauss_jordan_method_seq, task_run) {
-  int n = 300;
+  int n = 500;
   std::vector<double> global_matrix = konstantinov_i_gauss_jordan_method_seq::GetRandomMatrix(n, n + 1);
   std::vector<double> global_result(n * (n + 1));
 
@@ -65,7 +65,7 @@ TEST(Konstantinov_i_gauss_jordan_method_seq, task_run) {
 }
 
 TEST(Konstantinov_i_gauss_jordan_method_seq, pipeline_run) {
-  int n = 300;
+  int n = 500;
   std::vector<double> global_matrix = konstantinov_i_gauss_jordan_method_seq::GetRandomMatrix(n, n + 1);
   std::vector<double> global_result(n * (n + 1));
 
