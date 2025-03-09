@@ -139,12 +139,11 @@ bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::RunImpl() {
       output_[i] = output_local[i];
     }
   }
+  broadcast(world_, output_.data(), static_cast<int>(col_size_), 0);
   return true;
 }
 
 bool strakhov_a_m_gauss_jordan_mpi::TestTaskMPI::PostProcessingImpl() {
-  broadcast(world_, output_.data(), static_cast<int>(col_size_), 0);
-
   if (world_.rank() == 0) {
     for (size_t i = 0; i < output_.size(); i++) {
       reinterpret_cast<double*>(task_data->outputs[0])[i] = output_[i];
