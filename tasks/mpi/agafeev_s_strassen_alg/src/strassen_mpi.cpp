@@ -155,6 +155,8 @@ std::vector<double> MultiplMatrixMpi::StrassenMultiplyMpi(const std::vector<doub
       case 6:
         p[6] = StrassenMultiplySeq(SubtractMatrices(a12, a22, half), AddMatrices(b21, b22, half), half);
         break;
+      default:
+        break;
     }
   }
 
@@ -193,7 +195,7 @@ bool MultiplMatrixSequental::PreProcessingImpl() {
   auto* temp_ptr2 = reinterpret_cast<double*>(task_data->inputs[1]);
   second_input_.insert(second_input_.begin(), temp_ptr2,
                        temp_ptr2 + (task_data->inputs_count[2] * task_data->inputs_count[3]));
-  size_ = task_data->inputs_count[0];
+  size_ = static_cast<int>(task_data->inputs_count[0]);
 
   return true;
 }
@@ -227,7 +229,7 @@ bool MultiplMatrixMpi::PreProcessingImpl() {
     auto* temp_ptr2 = reinterpret_cast<double*>(task_data->inputs[1]);
     second_input_.insert(second_input_.begin(), temp_ptr2,
                          temp_ptr2 + (task_data->inputs_count[2] * task_data->inputs_count[3]));
-    size_ = task_data->inputs_count[0];
+    size_ = static_cast<int>(task_data->inputs_count[0]);
   }
   boost::mpi::broadcast(world_, size_, 0);
   return true;
