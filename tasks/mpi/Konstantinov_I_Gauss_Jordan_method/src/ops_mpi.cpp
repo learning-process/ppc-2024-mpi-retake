@@ -142,6 +142,9 @@ void konstantinov_i_gauss_jordan_method_mpi::UpdateMatrix(int n, int k, std::vec
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::SwapRowsIfZero(int n, int k, std::vector<double>& matrix, bool& solve) {
+  if (matrix.empty()) {
+    throw std::runtime_error("Matrix is empty");
+  }
   if (matrix[(k * (n + 1)) + k] != 0) {
     return true;
   }
@@ -180,6 +183,9 @@ bool konstantinov_i_gauss_jordan_method_mpi::BroadcastSolve(boost::mpi::communic
 
 void konstantinov_i_gauss_jordan_method_mpi::BroadcastData(boost::mpi::communicator& world, std::vector<int>& sizes,
                                                            std::vector<double>& iter_matrix) {
+  if (iter_matrix.empty()) {
+    throw std::runtime_error("iter_matrix is empty");
+  }
   boost::mpi::broadcast(world, sizes, 0);
   boost::mpi::broadcast(world, iter_matrix, 0);
 }
@@ -217,17 +223,22 @@ void konstantinov_i_gauss_jordan_method_mpi::GatherResults(boost::mpi::communica
                                                            std::vector<double>& local_result,
                                                            std::vector<double>& iter_result, std::vector<int>& sizes,
                                                            std::vector<int>& displs) {
-  if (world.rank() == 0) {
-    boost::mpi::gatherv(world, local_result.data(), static_cast<int>(local_result.size()), iter_result.data(), sizes,
-                        displs, 0);
-  } else {
-    boost::mpi::gatherv(world, local_result.data(), static_cast<int>(local_result.size()), 0);
+  if (!local_result.empty()) {
+    if (world.rank() == 0) {
+      boost::mpi::gatherv(world, local_result.data(), static_cast<int>(local_result.size()), iter_result.data(), sizes,
+                          displs, 0);
+    } else {
+      boost::mpi::gatherv(world, local_result.data(), static_cast<int>(local_result.size()), 0);
+    }
   }
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::ValidationImpl() {
   if (world_.rank() != 0) {
     return true;
+  }
+  if (task_data->inputs[0] == nullptr || task_data->inputs[1] == nullptr) {
+    throw std::runtime_error("Null pointer in task_data->inputs");
   }
   int n_val = *reinterpret_cast<int*>(task_data->inputs[1]);
   int matrix_size = static_cast<int>(task_data->inputs_count[0]);
@@ -243,14 +254,15 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::ValidationImp
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI::PreProcessingImpl() {
   if (world_.rank() == 0) {
+    if (task_data->inputs[0] == nullptr || task_data->inputs[1] == nullptr) {
+      throw std::runtime_error("Null pointer in task_data->inputs");
+    }
     auto* matrix_data = reinterpret_cast<double*>(task_data->inputs[0]);
     int matrix_size = static_cast<int>(task_data->inputs_count[0]);
 
     n_ = *reinterpret_cast<int*>(task_data->inputs[1]);
-
     matrix_.assign(matrix_data, matrix_data + matrix_size);
   }
-
   return true;
 }
 
