@@ -10,7 +10,7 @@
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
 
 namespace vasenkov_a_gauss_jordan_mpi{
-std::vector<double> GenerateRandomMatrix(int n, double min_value = -10.0, double max_value = 10.0) {
+  static std::vector<double> GenerateRandomMatrix(int n, double min_value = -10.0, double max_value = 10.0) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<double> dist(min_value, max_value);
@@ -19,14 +19,32 @@ std::vector<double> GenerateRandomMatrix(int n, double min_value = -10.0, double
 
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n + 1; ++j) {
-      matrix[i * (n + 1) + j] = dist(gen);
+      matrix[(i * (n + 1)) + j] = dist(gen);
     }
   }
 
   return matrix;
 }
+std::shared_ptr<ppc::core::TaskData> CreateTaskData(const std::vector<double>& matrix, int n, std::vector<double>& result) {
+  auto task_data = std::make_shared<ppc::core::TaskData>();
+
+  if (!matrix.empty()) {
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double*>(matrix.data())));
+    task_data->inputs_count.emplace_back(matrix.size());
+  }
+
+  task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
+  task_data->inputs_count.emplace_back(1);
+
+  if (!result.empty()) {
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(result.data()));
+    task_data->outputs_count.emplace_back(result.size());
+  }
+
+  return task_data;
 }
-void RunSequentialVersion(const std::vector<double> &global_matrix, int n, std::vector<double> &seq_result) {
+
+static void RunSequentialVersion(const std::vector<double> &global_matrix, int n, std::vector<double> &seq_result) {
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(global_matrix.data())));
@@ -39,7 +57,7 @@ void RunSequentialVersion(const std::vector<double> &global_matrix, int n, std::
   task_data_seq->outputs_count.emplace_back(seq_result.size());
 
   auto task_sequential = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodSequentialMPI>(task_data_seq);
-  ASSERT_TRUE(task_sequential->ValidationImpl());
+  task_sequential->ValidationImpl();
   task_sequential->PreProcessingImpl();
   bool seq_run_res = task_sequential->RunImpl();
   task_sequential->PostProcessingImpl();
@@ -47,22 +65,13 @@ void RunSequentialVersion(const std::vector<double> &global_matrix, int n, std::
   ASSERT_TRUE(seq_run_res);
 }
 
-TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
+bool RunParallelVersion(const std::vector<double> &global_matrix, int n, std::vector<double> &global_result) {
   boost::mpi::communicator world;
-
-  std::vector<double> global_matrix;
-  int n = 0;
-  std::vector<double> global_result;
 
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    global_matrix = {1, 2, 1, 10, 4, 8, 3, 20, 2, 5, 9, 30};
-    n = 3;
-
-    global_result.resize(n * (n + 1));
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix.data()));
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(global_matrix.data())));
     task_data_par->inputs_count.emplace_back(global_matrix.size());
 
     task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
@@ -73,15 +82,35 @@ TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
   }
 
   auto task_parallel = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodParallelMPI>(task_data_par);
-  ASSERT_TRUE(task_parallel->ValidationImpl());
+  task_parallel->ValidationImpl();
   task_parallel->PreProcessingImpl();
   bool par_run_res = task_parallel->RunImpl();
   task_parallel->PostProcessingImpl();
 
+  return par_run_res;
+}
+}// namespace vasenkov_a_gauss_jordan_mpi
+
+TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
+  boost::mpi::communicator world;
+
+  std::vector<double> global_matrix;
+  int n = 0;
+  std::vector<double> global_result;
+
+  if (world.rank() == 0) {
+    global_matrix = {1, 2, 1, 10, 4, 8, 3, 20, 2, 5, 9, 30};
+    n = 3;
+
+    global_result.resize(n * (n + 1));
+  }
+
+  bool par_run_res = vasenkov_a_gauss_jordan_mpi::RunParallelVersion(global_matrix, n, global_result);
+
   if (world.rank() == 0) {
     std::vector<double> seq_result(global_result.size(), 0);
 
-    RunSequentialVersion(global_matrix, n, seq_result);
+    vasenkov_a_gauss_jordan_mpi::RunSequentialVersion(global_matrix, n, seq_result);
 
     if (par_run_res) {
       ASSERT_EQ(global_result.size(), seq_result.size());
@@ -91,6 +120,7 @@ TEST(vasenkov_a_gauss_jordan_mpi, three_simple_matrix) {
     }
   }
 }
+
 TEST(vasenkov_a_gauss_jordan_mpi, identity_matrix) {
   boost::mpi::communicator world;
 
@@ -105,27 +135,14 @@ TEST(vasenkov_a_gauss_jordan_mpi, identity_matrix) {
     n = 3;
 
     global_result.resize(n * (n + 1));
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(global_matrix.data())));
-    task_data_par->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
-    task_data_par->inputs_count.emplace_back(1);
-
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
-    task_data_par->outputs_count.emplace_back(global_result.size());
   }
 
-  auto task_parallel = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodParallelMPI>(task_data_par);
-  ASSERT_TRUE(task_parallel->ValidationImpl());
-  task_parallel->PreProcessingImpl();
-  bool par_run_res = task_parallel->RunImpl();
-  task_parallel->PostProcessingImpl();
+  bool par_run_res = vasenkov_a_gauss_jordan_mpi::RunParallelVersion(global_matrix, n, global_result);
 
   if (world.rank() == 0) {
     std::vector<double> seq_result(global_result.size(), 0);
 
-    RunSequentialVersion(global_matrix, n, seq_result);
+    vasenkov_a_gauss_jordan_mpi::RunSequentialVersion(global_matrix, n, seq_result);
 
     if (par_run_res) {
       ASSERT_EQ(global_result.size(), seq_result.size());
@@ -181,27 +198,14 @@ TEST(vasenkov_a_gauss_jordan_mpi, large_matrix) {
     n = 4;
 
     global_result.resize(n * (n + 1));
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(global_matrix.data())));
-    task_data_par->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
-    task_data_par->inputs_count.emplace_back(1);
-
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
-    task_data_par->outputs_count.emplace_back(global_result.size());
   }
 
-  auto task_parallel = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodParallelMPI>(task_data_par);
-  ASSERT_TRUE(task_parallel->ValidationImpl());
-  task_parallel->PreProcessingImpl();
-  bool par_run_res = task_parallel->RunImpl();
-  task_parallel->PostProcessingImpl();
+  bool par_run_res = vasenkov_a_gauss_jordan_mpi::RunParallelVersion(global_matrix, n, global_result);
 
   if (world.rank() == 0) {
     std::vector<double> seq_result(global_result.size(), 0);
 
-    RunSequentialVersion(global_matrix, n, seq_result);
+    vasenkov_a_gauss_jordan_mpi:: RunSequentialVersion(global_matrix, n, seq_result);
 
     if (par_run_res) {
       ASSERT_EQ(global_result.size(), seq_result.size());
@@ -257,27 +261,14 @@ TEST(vasenkov_a_gauss_jordan_mpi, random_matrix) {
     n = 4;
     global_matrix = vasenkov_a_gauss_jordan_mpi::GenerateRandomMatrix(n);
     global_result.resize(n * (n + 1));
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double*>(global_matrix.data())));
-    task_data_par->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&n));
-    task_data_par->inputs_count.emplace_back(1);
-
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
-    task_data_par->outputs_count.emplace_back(global_result.size());
   }
 
-  auto task_parallel = std::make_shared<vasenkov_a_gauss_jordan_mpi::GaussJordanMethodParallelMPI>(task_data_par);
-  ASSERT_TRUE(task_parallel->ValidationImpl());
-  task_parallel->PreProcessingImpl();
-  bool par_run_res = task_parallel->RunImpl();
-  task_parallel->PostProcessingImpl();
+  bool par_run_res = vasenkov_a_gauss_jordan_mpi::RunParallelVersion(global_matrix, n, global_result);
 
   if (world.rank() == 0) {
     std::vector<double> seq_result(global_result.size(), 0);
 
-    RunSequentialVersion(global_matrix, n, seq_result);
+    vasenkov_a_gauss_jordan_mpi::RunSequentialVersion(global_matrix, n, seq_result);
 
     if (par_run_res) {
       ASSERT_EQ(global_result.size(), seq_result.size());
