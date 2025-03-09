@@ -188,10 +188,12 @@ std::vector<std::pair<int, int>> konstantinov_i_gauss_jordan_method_mpi::Scatter
     boost::mpi::communicator& world, std::vector<std::pair<int, int>>& indicies, std::vector<int>& sizes,
     std::vector<int>& displs, int local_size) {
   std::vector<std::pair<int, int>> local_indicies(local_size);
-  if (world.rank() == 0) {
-    boost::mpi::scatterv(world, indicies.data(), sizes, displs, local_indicies.data(), local_size, 0);
-  } else {
-    boost::mpi::scatterv(world, local_indicies.data(), local_size, 0);
+  if (local_size > 0) {
+    if (world.rank() == 0) {
+      boost::mpi::scatterv(world, indicies.data(), sizes, displs, local_indicies.data(), local_size, 0);
+    } else {
+      boost::mpi::scatterv(world, local_indicies.data(), local_size, 0);
+    }
   }
   return local_indicies;
 }
