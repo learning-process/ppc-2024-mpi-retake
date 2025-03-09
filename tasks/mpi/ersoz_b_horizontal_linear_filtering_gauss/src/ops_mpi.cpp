@@ -13,13 +13,10 @@
 
 namespace {
 
-// Computes the Gaussian function for given offsets.
 inline double GaussianFunction(int i, int j, double sigma) {
   return 1.0 / (2.0 * M_PI * sigma * sigma) * exp(-((i * i) + (j * j)) / (2.0 * sigma * sigma));
 }
 
-// Computes the filtered brightness for a given pixel location.
-// (Renamed from "compute_pixel" to "ComputePixel" per naming conventions.)
 inline char ComputePixel(const std::vector<std::vector<char>>& image, int y, int x, double sigma) {
   double brightness = 0.0;
   for (int i = -1; i <= 1; i++) {
@@ -30,8 +27,6 @@ inline char ComputePixel(const std::vector<std::vector<char>>& image, int y, int
   return static_cast<char>(brightness);
 }
 
-// Helper function to compute displacements and counts for splitting work among MPI processes.
-// Renamed from "computeDisplsAndScounts" to "ComputeDisplsAndScounts" per naming convention.
 void ComputeDisplsAndScounts(int line_blocks, int procs, int& rem, int& line_blocks_per_proc, std::vector<int>& displs,
                              std::vector<int>& scounts) {
   rem = line_blocks % procs;

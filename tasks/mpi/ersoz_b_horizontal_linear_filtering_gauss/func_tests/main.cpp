@@ -16,8 +16,33 @@
 #include "core/task/include/task.hpp"
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
+namespace {
+std::vector<std::vector<char>> ComputeSequentialFilter(const std::vector<std::vector<char>>& image, double sigma) {
+  int y_dim = static_cast<int>(image.size());
+  int x_dim = static_cast<int>(image[0].size());
+  std::vector<std::vector<char>> res;
+  res.reserve(y_dim - 2);
+  for (int y = 1; y < y_dim - 1; y++) {
+    std::vector<char> line;
+    line.reserve(x_dim - 2);
+    for (int x = 1; x < x_dim - 1; x++) {
+      double brightness = 0.0;
+      for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+          brightness += (1.0 / (2.0 * M_PI * sigma * sigma)) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma)) *
+                        static_cast<int>(image[y + i][x + j]);
+        }
+      }
+      line.push_back(static_cast<char>(brightness));
+    }
+    res.push_back(std::move(line));
+  }
+  return res;
+}
+}  // namespace
+
 TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
-  constexpr int kN = 16;
+  constexpr int kN = 16;  // Image is kN x kN
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
     for (int j = 0; j < kN; j++) {
@@ -31,29 +56,7 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
     image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 
-  auto sequential_filter = [&image](double sigma) -> std::vector<std::vector<char>> {
-    int y_dim = static_cast<int>(image.size());
-    int x_dim = static_cast<int>(image[0].size());
-    std::vector<std::vector<char>> res;
-    res.reserve(y_dim - 2);
-    for (int y = 1; y < y_dim - 1; y++) {
-      std::vector<char> line;
-      line.reserve(x_dim - 2);
-      for (int x = 1; x < x_dim - 1; x++) {
-        double brightness = 0.0;
-        for (int i = -1; i <= 1; i++) {
-          for (int j = -1; j <= 1; j++) {
-            brightness += (1.0 / (2.0 * M_PI * sigma * sigma)) * exp(-(((i * i)) + ((j * j))) / (2.0 * sigma * sigma)) *
-                          static_cast<int>(image[y + i][x + j]);
-          }
-        }
-        line.emplace_back(static_cast<char>(brightness));
-      }
-      res.emplace_back(std::move(line));
-    }
-    return res;
-  };
-  auto expected = sequential_filter(0.5);
+  auto expected = ComputeSequentialFilter(image, 0.5);
 
   std::vector<char> out((kN - 2) * (kN - 2), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
