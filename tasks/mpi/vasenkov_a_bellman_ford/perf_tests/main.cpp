@@ -12,7 +12,6 @@
 #include "mpi/vasenkov_a_bellman_ford/include/ops_mpi.hpp"
 
 TEST(vasenkov_a_bellman_ford_mpi, test_pipeline_run) {
-
   // Create data
   std::vector<int> row_ptr = {0, 2, 4, 5, 5};
   std::vector<int> col_ind = {1, 2, 2, 3, 3};
@@ -24,7 +23,7 @@ TEST(vasenkov_a_bellman_ford_mpi, test_pipeline_run) {
   std::vector<int> global_result(num_vertices);
 
   // Create task_data
-  
+
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(row_ptr.data())));
   task_data_par->inputs_count.emplace_back(row_ptr.size());
@@ -71,7 +70,7 @@ TEST(vasenkov_a_bellman_ford_mpi, test_pipeline_run) {
 }
 
 TEST(vasenkov_a_bellman_ford_mpi, test_task_run) {
-    // Create data
+  // Create data
   std::vector<int> row_ptr = {0, 2, 4, 5, 5};
   std::vector<int> col_ind = {1, 2, 2, 3, 3};
   std::vector<int> weights = {4, 5, -3, 2, 1};
@@ -82,7 +81,7 @@ TEST(vasenkov_a_bellman_ford_mpi, test_task_run) {
   std::vector<int> global_result(num_vertices);
 
   // Create task_data
-  
+
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(row_ptr.data())));
   task_data_par->inputs_count.emplace_back(row_ptr.size());

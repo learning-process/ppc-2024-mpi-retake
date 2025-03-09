@@ -123,7 +123,6 @@ TEST(vasenkov_a_bellman_ford_mpi, simple_graph0) {
   }
 }
 
-
 TEST(vasenkov_a_bellman_ford_mpi, simple_graph1) {
   boost::mpi::communicator world;
 
