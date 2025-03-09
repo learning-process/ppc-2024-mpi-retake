@@ -246,7 +246,6 @@ TEST(makadrai_a_sobel_mpi, test_random_100_100) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
     task_data->outputs_count.emplace_back(width_img);
     task_data->outputs_count.emplace_back(height_img);
-
   }
 
   makadrai_a_sobel_mpi::Sobel sobel(task_data);
