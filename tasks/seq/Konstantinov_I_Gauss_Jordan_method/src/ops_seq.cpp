@@ -7,7 +7,7 @@
 bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::PreProcessingImpl() {
   n_ = *reinterpret_cast<int*>(task_data->inputs[0]);
   matrix_ = std::vector<double>(reinterpret_cast<double*>(task_data->inputs[1]),
-                               reinterpret_cast<double*>(task_data->inputs[1]) + (n_ * (n_ + 1)));
+                                reinterpret_cast<double*>(task_data->inputs[1]) + (n_ * (n_ + 1)));
   solution_ = std::vector<double>(n_, 0.0);
   return true;
 }
