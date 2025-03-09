@@ -6,10 +6,6 @@
 #include <boost/mpi/collectives/reduce.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <climits>
-#include <cmath>
-#include <vector>
-
-using namespace std::chrono_literals;
 
 template <typename T>
 struct Minimum {
@@ -52,6 +48,18 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PostProcessingImpl
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
+  res_ = INT_MAX;
+  return true;
+}
+
+bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
+  if (world_.rank() == 0) {
+    return (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) && (task_data->outputs_count[0] == 1);
+  }
+  return true;
+}
+
+bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   int delta = 0;
   if (world_.rank() == 0) {
     delta = static_cast<int>(task_data->inputs_count[0] * task_data->inputs_count[1] / world_.size());
@@ -77,18 +85,6 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
   } else {
     world_.recv(0, 0, output_.data(), delta);
   }
-  res_ = INT_MAX;
-  return true;
-}
-
-bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
-  if (world_.rank() == 0) {
-    return (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) && (task_data->outputs_count[0] == 1);
-  }
-  return true;
-}
-
-bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   int local_res = *std::ranges::min_element(output_.begin(), output_.end());
   boost::mpi::reduce(world_, local_res, res_, Minimum<int>(), 0);
   return true;
