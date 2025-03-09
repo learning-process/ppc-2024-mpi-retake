@@ -4,17 +4,16 @@
 #include <limits>
 #include <vector>
 
-
 bool vasenkov_a_bellman_ford_seq::BellmanFordSequential::PreProcessingImpl() {
-  auto *in_row_ptr_ = reinterpret_cast<int *>(task_data->inputs[0]);
-  auto *in_col_ind_ = reinterpret_cast<int *>(task_data->inputs[1]);
-  auto *in_weights_ = reinterpret_cast<int *>(task_data->inputs[2]);
+  auto *in_row_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+  auto *in_col_ind = reinterpret_cast<int *>(task_data->inputs[1]);
+  auto *in_weights = reinterpret_cast<int *>(task_data->inputs[2]);
   num_vertices_ = *reinterpret_cast<int *>(task_data->inputs[3]);
   source_vertex_ = *reinterpret_cast<int *>(task_data->inputs[4]);
 
-  row_ptr_ = std::vector<int>(in_row_ptr_, in_row_ptr_ + num_vertices_ + 1);
-  col_ind_ = std::vector<int>(in_col_ind_, in_col_ind_ + row_ptr_[num_vertices_]);
-  weights_ = std::vector<int>(in_weights_, in_weights_ + row_ptr_[num_vertices_]);
+  row_ptr_ = std::vector<int>(in_row_ptr, in_row_ptr + num_vertices_ + 1);
+  col_ind_ = std::vector<int>(in_col_ind, in_col_ind + row_ptr_[num_vertices_]);
+  weights_ = std::vector<int>(in_weights, in_weights + row_ptr_[num_vertices_]);
 
   distances_ = std::vector<int>(num_vertices_, std::numeric_limits<int>::max());
   distances_[source_vertex_] = 0;
@@ -52,9 +51,9 @@ bool vasenkov_a_bellman_ford_seq::BellmanFordSequential::RunImpl() {
 }
 
 bool vasenkov_a_bellman_ford_seq::BellmanFordSequential::PostProcessingImpl() {
-  auto *out_distances_ = reinterpret_cast<int *>(task_data->outputs[0]);
+  auto *out_distances = reinterpret_cast<int *>(task_data->outputs[0]);
   for (int i = 0; i < num_vertices_; ++i) {
-    out_distances_[i] = distances_[i];
+    out_distances[i] = distances_[i];
   }
   return true;
 }

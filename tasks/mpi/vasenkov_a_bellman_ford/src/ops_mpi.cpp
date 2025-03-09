@@ -1,26 +1,26 @@
-#pragma once
-
 #include "mpi/vasenkov_a_bellman_ford/include/ops_mpi.hpp"
 
+#include <algorithm>
+#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
+#include <boost/mpi/collectives/all_reduce.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <iostream>
+#include <boost/mpi/operations.hpp>
+#include <functional>
 #include <limits>
-#include <utility>
 #include <vector>
 
-#include "core/task/include/task.hpp"
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::PreProcessingImpl() {
-  auto *in_row_ptr_ = reinterpret_cast<int *>(task_data->inputs[0]);
-  auto *in_col_ind_ = reinterpret_cast<int *>(task_data->inputs[1]);
-  auto *in_weights_ = reinterpret_cast<int *>(task_data->inputs[2]);
+  auto *in_row_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+  auto *in_col_ind = reinterpret_cast<int *>(task_data->inputs[1]);
+  auto *in_weights = reinterpret_cast<int *>(task_data->inputs[2]);
   num_vertices_ = *reinterpret_cast<int *>(task_data->inputs[3]);
   source_vertex_ = *reinterpret_cast<int *>(task_data->inputs[4]);
 
-  row_ptr_ = std::vector<int>(in_row_ptr_, in_row_ptr_ + num_vertices_ + 1);
-  col_ind_ = std::vector<int>(in_col_ind_, in_col_ind_ + row_ptr_[num_vertices_]);
-  weights_ = std::vector<int>(in_weights_, in_weights_ + row_ptr_[num_vertices_]);
+  row_ptr_ = std::vector<int>(in_row_ptr, in_row_ptr + num_vertices_ + 1);
+  col_ind_ = std::vector<int>(in_col_ind, in_col_ind + row_ptr_[num_vertices_]);
+  weights_ = std::vector<int>(in_weights, in_weights + row_ptr_[num_vertices_]);
 
   distances_ = std::vector<int>(num_vertices_, std::numeric_limits<int>::max());
   distances_[source_vertex_] = 0;
@@ -40,7 +40,7 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   int vertices_per_process = num_vertices_ / active_processes;
   int remainder = num_vertices_ % active_processes;
 
-  int start_vertex = rank * vertices_per_process + std::min(rank, remainder);
+  int start_vertex = (rank * vertices_per_process) + std::min(rank, remainder);
   int end_vertex = start_vertex + vertices_per_process + (rank < remainder ? 1 : 0);
 
   bool is_active = rank < active_processes;
@@ -48,7 +48,7 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   std::vector<int> temp_distances(num_vertices_);
 
   for (int i = 0; i < num_vertices_ - 1; ++i) {
-    std::copy(distances_.begin(), distances_.end(), temp_distances.begin());
+    std::ranges::copy(distances_, temp_distances.begin());
 
     if (is_active) {
       for (int u = start_vertex; u < end_vertex; ++u) {
@@ -79,34 +79,30 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   }
 
   bool global_has_negative_cycle = false;
-  boost::mpi::all_reduce(world_, has_negative_cycle, global_has_negative_cycle, std::logical_or<bool>());
+  boost::mpi::all_reduce(world_, has_negative_cycle, global_has_negative_cycle, std::logical_or<>());
 
-  if (global_has_negative_cycle) {
-    return false;
-  }
-
-  return true;
+  return !global_has_negative_cycle;
 }
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
-    auto *out_distances_ = reinterpret_cast<int *>(task_data->outputs[0]);
+    auto *out_distances = reinterpret_cast<int *>(task_data->outputs[0]);
     for (int i = 0; i < num_vertices_; ++i) {
-      out_distances_[i] = distances_[i];
+      out_distances[i] = distances_[i];
     }
   }
   return true;
 }
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordSequentialMPI::PreProcessingImpl() {
-  auto *in_row_ptr_ = reinterpret_cast<int *>(task_data->inputs[0]);
-  auto *in_col_ind_ = reinterpret_cast<int *>(task_data->inputs[1]);
-  auto *in_weights_ = reinterpret_cast<int *>(task_data->inputs[2]);
+  auto *in_row_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
+  auto *in_col_ind = reinterpret_cast<int *>(task_data->inputs[1]);
+  auto *in_weights = reinterpret_cast<int *>(task_data->inputs[2]);
   num_vertices_ = *reinterpret_cast<int *>(task_data->inputs[3]);
   source_vertex_ = *reinterpret_cast<int *>(task_data->inputs[4]);
 
-  row_ptr_ = std::vector<int>(in_row_ptr_, in_row_ptr_ + num_vertices_ + 1);
-  col_ind_ = std::vector<int>(in_col_ind_, in_col_ind_ + row_ptr_[num_vertices_]);
-  weights_ = std::vector<int>(in_weights_, in_weights_ + row_ptr_[num_vertices_]);
+  row_ptr_ = std::vector<int>(in_row_ptr, in_row_ptr + num_vertices_ + 1);
+  col_ind_ = std::vector<int>(in_col_ind, in_col_ind + row_ptr_[num_vertices_]);
+  weights_ = std::vector<int>(in_weights, in_weights + row_ptr_[num_vertices_]);
 
   distances_ = std::vector<int>(num_vertices_, std::numeric_limits<int>::max());
   distances_[source_vertex_] = 0;
@@ -147,9 +143,9 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordSequentialMPI::RunImpl() {
 }
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordSequentialMPI::PostProcessingImpl() {
-  auto *out_distances_ = reinterpret_cast<int *>(task_data->outputs[0]);
+  auto *out_distances = reinterpret_cast<int *>(task_data->outputs[0]);
   for (int i = 0; i < num_vertices_; ++i) {
-    out_distances_[i] = distances_[i];
+    out_distances[i] = distances_[i];
   }
 
   return true;

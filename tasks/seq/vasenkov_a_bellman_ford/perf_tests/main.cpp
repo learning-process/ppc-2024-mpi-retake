@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -33,10 +32,10 @@ TEST(vasenkov_a_bellman_ford_seq, test_pipeline_run) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(weights.data())));
   task_data_par->inputs_count.emplace_back(weights.size());
 
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&num_vertices)));
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&num_vertices));
   task_data_par->inputs_count.emplace_back(1);
 
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&source_vertex)));
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&source_vertex));
   task_data_par->inputs_count.emplace_back(1);
 
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
@@ -88,10 +87,10 @@ TEST(vasenkov_a_bellman_ford_seq, test_task_run) {
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(weights.data())));
   task_data_par->inputs_count.emplace_back(weights.size());
 
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&num_vertices)));
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&num_vertices));
   task_data_par->inputs_count.emplace_back(1);
 
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&source_vertex)));
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&source_vertex));
   task_data_par->inputs_count.emplace_back(1);
 
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));

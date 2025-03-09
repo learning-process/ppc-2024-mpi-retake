@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
 #include <memory>
@@ -30,6 +32,7 @@ void GenerateRandomGraph(int num_vertices, int edges_per_vertex, std::vector<int
         weights.push_back(weight_dist(gen));
       }
     }
+    row_ptr.push_back(static_cast<uint8_t>(col_ind.size()));
     row_ptr.push_back(col_ind.size());
   }
 }
@@ -48,10 +51,10 @@ void RunSequentialVersion(const std::vector<int> &row_ptr, const std::vector<int
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(weights.data())));
   task_data_seq->inputs_count.emplace_back(weights.size());
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&num_vertices)));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&num_vertices));
   task_data_seq->inputs_count.emplace_back(1);
 
-  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&source_vertex)));
+  task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&source_vertex));
   task_data_seq->inputs_count.emplace_back(1);
 
   task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(seq_result.data()));
@@ -81,10 +84,10 @@ bool RunParallelVersion(const std::vector<int> &row_ptr, const std::vector<int> 
   task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(weights.data())));
   task_data_par->inputs_count.emplace_back(weights.size());
 
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&num_vertices)));
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&num_vertices));
   task_data_par->inputs_count.emplace_back(1);
 
-  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<int *>(&source_vertex)));
+  task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&source_vertex));
   task_data_par->inputs_count.emplace_back(1);
 
   task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(global_result.data()));
@@ -188,8 +191,13 @@ TEST(vasenkov_a_bellman_ford_mpi, negative_weights) {
 
 TEST(vasenkov_a_bellman_ford_mpi, random_graph) {
   boost::mpi::communicator world;
+  std::vector<int> row_ptr;
+  std::vector<int> col_ind;
+  std::vector<int> weights;
+  int row_ptr_size = 0;
+  int col_ind_size = 0;
+  int weights_size = 0;
 
-  std::vector<int> row_ptr, col_ind, weights;
   int num_vertices = 10;
   int source_vertex = 0;
   std::vector<int> global_result(num_vertices);
@@ -198,11 +206,12 @@ TEST(vasenkov_a_bellman_ford_mpi, random_graph) {
     GenerateRandomGraph(num_vertices, 3, row_ptr, col_ind, weights);
   }
 
-  int row_ptr_size, col_ind_size, weights_size;
+
+
   if (world.rank() == 0) {
-    row_ptr_size = row_ptr.size();
-    col_ind_size = col_ind.size();
-    weights_size = weights.size();
+    row_ptr_size = static_cast<int>(row_ptr.size());
+    col_ind_size = static_cast<int>(col_ind.size());
+    weights_size = static_cast<int>(weights.size());
   }
 
   boost::mpi::broadcast(world, row_ptr_size, 0);
