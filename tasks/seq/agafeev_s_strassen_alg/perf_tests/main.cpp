@@ -12,7 +12,8 @@
 #include "core/task/include/task.hpp"
 #include "seq/agafeev_s_strassen_alg/include/strassen_seq.hpp"
 
-static std::vector<double> MatrixMultiply(const std::vector<double>& a, const std::vector<double>& b,
+namespace{
+  std::vector<double> MatrixMultiply(const std::vector<double>& a, const std::vector<double>& b,
                                           int row_col_size) {
   std::vector<double> c(row_col_size * row_col_size, 0);
 
@@ -27,7 +28,7 @@ static std::vector<double> MatrixMultiply(const std::vector<double>& a, const st
   return c;
 }
 
-static std::vector<double> CreateRandomMatrix(int row_size, int column_size) {
+std::vector<double> CreateRandomMatrix(int row_size, int column_size) {
   auto rand_gen = std::mt19937(time(nullptr));
   std::uniform_real_distribution<double> dist(-100.0, 100.0);
   std::vector<double> matrix(row_size * column_size);
@@ -37,7 +38,7 @@ static std::vector<double> CreateRandomMatrix(int row_size, int column_size) {
 
   return matrix;
 }
-
+}
 TEST(agafeev_s_strassen_alg_seq, test_pipeline_run) {
   const int n = 128;
   const int m = 128;

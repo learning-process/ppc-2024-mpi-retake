@@ -2,7 +2,9 @@
 
 #include <vector>
 
-static bool IsPowerOfTwo(int n) { return (n != 0) && ((n & (n - 1)) == 0); }
+namespace {
+    bool IsPowerOfTwo(unsigned int n) { return (n != 0) && ((n & (n - 1)) == 0); }
+}
 
 namespace agafeev_s_strassen_alg_seq {
 
@@ -57,24 +59,24 @@ std::vector<double> StrassenMultiply(const std::vector<double>& a, const std::ve
 
   int half = n / 2;
 
-  std::vector<double> A11(half * half);
-  std::vector<double> A12(half * half);
-  std::vector<double> A21(half * half);
-  std::vector<double> A22(half * half);
-  std::vector<double> B11(half * half);
-  std::vector<double> B12(half * half);
-  std::vector<double> B21(half * half);
-  std::vector<double> B22(half * half);
-  SplitMatrix(a, A11, A12, A21, A22, n);
-  SplitMatrix(b, B11, B12, B21, B22, n);
+  std::vector<double> a11(half * half);
+  std::vector<double> a12(half * half);
+  std::vector<double> a21(half * half);
+  std::vector<double> a22(half * half);
+  std::vector<double> b11(half * half);
+  std::vector<double> b12(half * half);
+  std::vector<double> b21(half * half);
+  std::vector<double> b22(half * half);
+  SplitMatrix(a, a11, a12, a21, a22, n);
+  SplitMatrix(b, b11, b12, b21, b22, n);
 
-  auto p1 = StrassenMultiply(AddMatrices(A11, A22, half), AddMatrices(B11, B22, half), half);
-  auto p2 = StrassenMultiply(AddMatrices(A21, A22, half), B11, half);
-  auto p3 = StrassenMultiply(A11, SubtractMatrices(B12, B22, half), half);
-  auto p4 = StrassenMultiply(A22, SubtractMatrices(B21, B11, half), half);
-  auto p5 = StrassenMultiply(AddMatrices(A11, A12, half), B22, half);
-  auto p6 = StrassenMultiply(SubtractMatrices(A21, A11, half), AddMatrices(B11, B12, half), half);
-  auto p7 = StrassenMultiply(SubtractMatrices(A12, A22, half), AddMatrices(B21, B22, half), half);
+  auto p1 = StrassenMultiply(AddMatrices(a11, a22, half), AddMatrices(b11, b22, half), half);
+  auto p2 = StrassenMultiply(AddMatrices(a21, a22, half), b11, half);
+  auto p3 = StrassenMultiply(a11, SubtractMatrices(b12, b22, half), half);
+  auto p4 = StrassenMultiply(a22, SubtractMatrices(b21, b11, half), half);
+  auto p5 = StrassenMultiply(AddMatrices(a11, a12, half), b22, half);
+  auto p6 = StrassenMultiply(SubtractMatrices(a21, a11, half), AddMatrices(b11, b12, half), half);
+  auto p7 = StrassenMultiply(SubtractMatrices(a12, a22, half), AddMatrices(b21, b22, half), half);
 
   auto c11 = AddMatrices(SubtractMatrices(AddMatrices(p1, p4, half), p5, half), p7, half);
   auto c12 = AddMatrices(p3, p5, half);
