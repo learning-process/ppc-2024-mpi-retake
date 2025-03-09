@@ -8,7 +8,6 @@
 #include "core/task/include/task.hpp"
 
 namespace shkurinskaya_e_fox_mat_mul_mpi {
-std::vector<double> GetRandomMatrix(int rows, int cols);
 void SimpleMult(std::vector<double> &in1, std::vector<double> &in2, std::vector<double> &ans, int matrix_size);
 void ShareData(boost::mpi::communicator &, int, int, int, std::vector<double> &, std::vector<double> &,
                std::vector<double> &, std::vector<double> &);
