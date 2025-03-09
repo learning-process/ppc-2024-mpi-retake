@@ -30,18 +30,6 @@ chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateR
     total_non_zero += non_zero_in_row;
     matrix.row_ptr.push_back(total_non_zero);
   }
-  std::cout << std::endl << " Values" << std::endl;
-  for (int i = 0; i < matrix.values.size(); i++) {
-    std::cout << matrix.values[i] << " ";
-  }
-  std::cout << std::endl << " col" << std::endl;
-  for (int i = 0; i < matrix.col_indices.size(); i++) {
-    std::cout << matrix.col_indices[i] << " ";
-  }
-  std::cout << std::endl << " row" << std::endl;
-  for (int i = 0; i < matrix.row_ptr.size(); i++) {
-    std::cout << matrix.row_ptr[i] << " ";
-  }
   return matrix;
 }
 chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateIdentityCrs(int n) {
@@ -137,9 +125,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
   Execution(test_task, world);
 
   if (world.rank() == 0) {
-      EXPECT_EQ(result_values, expected_values);
-      EXPECT_EQ(result_col_indices, expected_col_indices);
-      EXPECT_EQ(result_row_ptr, expected_row_ptr);
+    EXPECT_EQ(result_values, expected_values);
+    EXPECT_EQ(result_col_indices, expected_col_indices);
+    EXPECT_EQ(result_row_ptr, expected_row_ptr);
   }
 }
 
