@@ -2,7 +2,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <cmath>
-#include <random>
 #include <vector>
 
 #include "mpi/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
