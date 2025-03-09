@@ -9,7 +9,6 @@
 #include "core/task/include/task.hpp"
 #include "mpi/vasenkov_a_word_count/include/ops_mpi.hpp"
 
-
 TEST(vasenkov_a_word_count_mpi, test_0_word) {
   boost::mpi::communicator world;
   std::string input;
@@ -211,27 +210,5 @@ TEST(vasenkov_a_word_count_mpi, test_2_space_middle) {
   if (world.rank() == 0) {
     EXPECT_EQ(out, expect);
   }
-} /*
- TEST(vasenkov_a_word_count_mpi, test_more_space_middle) {
-   std::string input = "Hello.        world!";
-   boost::mpi::communicator world;
-
-   std::vector<uint8_t> in(input.begin(), input.end());
-   std::vector<int> out(1, 0);
-   std::vector<int> expect = {2};
-   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-   if (world.rank() == 0) {
-     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(in.data()));
-     task_data_seq->inputs_count.emplace_back(in.size());
-     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
-     task_data_seq->outputs_count.emplace_back(out.size());
-   }
-   vasenkov_a_word_count_mpi::WordCountMPI test_task_sequential(task_data_seq);
-   ASSERT_EQ(test_task_sequential.Validation(), true);
-   test_task_sequential.PreProcessing();
-   test_task_sequential.Run();
-   test_task_sequential.PostProcessing();
-   if (world.rank() == 0) {
-     EXPECT_EQ(out, expect);
-   }
- }*/
+}
+/*
