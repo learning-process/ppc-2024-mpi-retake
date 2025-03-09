@@ -43,6 +43,10 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+
+    double expected_result = -1.0;
+    double tolerance = 1e-6;
+    EXPECT_NEAR(result, expected_result, tolerance);
   }
 }
 
@@ -79,5 +83,9 @@ TEST(prokhorov_n_global_search_algorithm_strongin_mpi, test_task_run) {
   boost::mpi::communicator world;
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
+
+    double expected_result = -1.0;
+    double tolerance = 1e-6;
+    EXPECT_NEAR(result, expected_result, tolerance);
   }
 }
