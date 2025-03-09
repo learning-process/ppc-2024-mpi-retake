@@ -1,9 +1,10 @@
 #pragma once
 
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "core/task/include/task.hpp"
+
 
 namespace vasenkov_a_word_count_seq {
 

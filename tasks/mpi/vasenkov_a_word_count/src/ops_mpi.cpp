@@ -1,7 +1,7 @@
 #include "mpi/vasenkov_a_word_count/include/ops_mpi.hpp"
 
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
+#include <boost/mpi/collectives/reduce.hpp>
 #include <cctype>
 #include <functional>
 

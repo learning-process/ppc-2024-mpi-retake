@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "core/task/include/task.hpp"
 #include "seq/vasenkov_a_word_count/include/ops_seq.hpp"
