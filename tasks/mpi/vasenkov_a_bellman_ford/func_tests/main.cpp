@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <cstdint>
@@ -33,7 +32,7 @@ void GenerateRandomGraph(int num_vertices, int edges_per_vertex, std::vector<int
       }
     }
     row_ptr.push_back(static_cast<uint8_t>(col_ind.size()));
-    row_ptr.push_back(col_ind.size());
+    row_ptr.push_back(static_cast<int>(col_ind.size()));
   }
 }
 
@@ -205,8 +204,6 @@ TEST(vasenkov_a_bellman_ford_mpi, random_graph) {
   if (world.rank() == 0) {
     GenerateRandomGraph(num_vertices, 3, row_ptr, col_ind, weights);
   }
-
-
 
   if (world.rank() == 0) {
     row_ptr_size = static_cast<int>(row_ptr.size());

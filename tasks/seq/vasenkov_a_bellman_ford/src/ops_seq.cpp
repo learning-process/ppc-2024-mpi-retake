@@ -1,6 +1,5 @@
 #include "seq/vasenkov_a_bellman_ford/include/ops_seq.hpp"
 
-#include <iostream>
 #include <limits>
 #include <vector>
 

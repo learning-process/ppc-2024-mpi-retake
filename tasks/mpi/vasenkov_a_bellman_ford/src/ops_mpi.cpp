@@ -1,7 +1,6 @@
 #include "mpi/vasenkov_a_bellman_ford/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/collectives/all_reduce.hpp>
 #include <boost/mpi/communicator.hpp>
@@ -9,7 +8,6 @@
 #include <functional>
 #include <limits>
 #include <vector>
-
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::PreProcessingImpl() {
   auto *in_row_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
@@ -36,13 +34,11 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   int size = world_.size();
 
   int active_processes = std::min(size, num_vertices_);
-
   int vertices_per_process = num_vertices_ / active_processes;
   int remainder = num_vertices_ % active_processes;
 
-  int start_vertex = (rank * vertices_per_process) + std::min(rank, remainder);
+  int start_vertex = rank * vertices_per_process + std::min(rank, remainder);
   int end_vertex = start_vertex + vertices_per_process + (rank < remainder ? 1 : 0);
-
   bool is_active = rank < active_processes;
 
   std::vector<int> temp_distances(num_vertices_);
@@ -73,8 +69,10 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
         int weight = weights_[j];
         if (distances_[u] != std::numeric_limits<int>::max() && distances_[u] + weight < distances_[v]) {
           has_negative_cycle = true;
+          break;
         }
       }
+      if (has_negative_cycle) break;
     }
   }
 
@@ -83,6 +81,7 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
 
   return !global_has_negative_cycle;
 }
+
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
     auto *out_distances = reinterpret_cast<int *>(task_data->outputs[0]);

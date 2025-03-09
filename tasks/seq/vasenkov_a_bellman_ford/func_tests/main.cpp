@@ -209,7 +209,7 @@ TEST(vasenkov_a_bellman_ford_seq, negative_weights_no_negative_cycle) {
   int num_vertices = 4;
   int source_vertex = 0;
 
-  std::vector<int> expected_distances = {0, 4, -1};
+  std::vector<int> expected_distances = {0, 4, 1, 2};
 
   std::vector<int> output_distances(num_vertices, std::numeric_limits<int>::max());
 
