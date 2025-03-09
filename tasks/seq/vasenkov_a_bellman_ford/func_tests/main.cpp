@@ -202,10 +202,10 @@ TEST(vasenkov_a_bellman_ford_seq, single_edge) {
   ASSERT_EQ(output_distances, expected_distances);
 }
 TEST(vasenkov_a_bellman_ford_seq, negative_weights_no_negative_cycle) {
-  std::vector<int> row_ptr = {0, 2, 3, 4};
-  std::vector<int> col_ind = {1, 2, 2, 0};
-  std::vector<int> weights = {4, -1, -2, 3};
-  int num_vertices = 3;
+  std::vector<int> row_ptr = {0, 2, 4, 5, 5};
+  std::vector<int> col_ind = {1, 2, 2, 3, 3};
+  std::vector<int> weights = {4, 5, -3, 2, 1};
+  int num_vertices = 4;
   int source_vertex = 0;
 
   std::vector<int> expected_distances = {0, 4, -1};
