@@ -39,11 +39,15 @@ bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::PreProcessingImpl() {
 }
 
 bool fomin_v_sobel_edges::SobelEdgeDetectionMPI::ValidationImpl() {
+  int current_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &current_rank);
   int valid = 1;
-  if (rank == 0) {
+
+  if (current_rank == 0) {
     valid = task_data->inputs_count.size() == 2 && task_data->outputs_count.size() == 2 &&
             task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0;
   }
+
   MPI_Bcast(&valid, 1, MPI_INT, 0, MPI_COMM_WORLD);
   return static_cast<bool>(valid);
 }
