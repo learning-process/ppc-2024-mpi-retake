@@ -18,20 +18,20 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
   std::vector<double> matrix(size * (size + 1));
   std::random_device rd;
   std::mt19937 gen(rd());
-  double lowerLimit = -100.0;
-  double upperLimit = 100.0;
-  std::uniform_real_distribution<> dist(lowerLimit, upperLimit);
+  double lower_limit = -100.0;
+  double upper_limit = 100.0;
+  std::uniform_real_distribution<> dist(lower_limit, upper_limit);
 
   for (int i = 0; i < size; ++i) {
     double row_sum = 0.0;
-    double diag = (i * (size + 1) + i);
+    double diag = ((i * (size + 1)) + i);
     for (int j = 0; j < size + 1; ++j) {
       if (i != j) {
-        matrix[i * (size + 1) + j] = dist(gen);
-        row_sum += std::abs(matrix[i * (size + 1) + j]);
+        matrix[(i * (size + 1)) + j] = dist(gen);
+        row_sum += std::abs(matrix[(i * (size + 1)) + j]);
       }
     }
-    matrix[diag] = row_sum + 1;
+    matrix[diag] = static_cast<size_t>(row_sum + 1);
   }
 
   return matrix;
@@ -41,7 +41,7 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
 
 TEST(Konstantinov_i_gauss_jordan_method_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  size_t size = 500;
+  int size = 500;
   std::vector<double> matrix = konstantinov_i_gauss_jordan_method_mpi::GenerateInvertibleMatrix(size);
   std::vector<double> output_data(size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
@@ -79,7 +79,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, test_pipeline_run) {
 
 TEST(Konstantinov_i_gauss_jordan_method_mpi, test_task_run) {
   boost::mpi::communicator world;
-  size_t size = 500;
+  int size = 500;
   std::vector<double> matrix = konstantinov_i_gauss_jordan_method_mpi::GenerateInvertibleMatrix(size);
   std::vector<double> output_data(size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();

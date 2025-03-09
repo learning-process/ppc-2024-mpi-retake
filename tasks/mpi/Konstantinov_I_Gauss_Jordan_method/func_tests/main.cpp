@@ -16,20 +16,20 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
   std::vector<double> matrix(size * (size + 1));
   std::random_device rd;
   std::mt19937 gen(rd());
-  double lowerLimit = -100.0;
-  double upperLimit = 100.0;
-  std::uniform_real_distribution<> dist(lowerLimit, upperLimit);
+  double lower_limit = -100.0;
+  double upper_limit = 100.0;
+  std::uniform_real_distribution<> dist(lower_limit, upper_limit);
 
   for (int i = 0; i < size; ++i) {
     double row_sum = 0.0;
     double diag = (i * (size + 1) + i);
     for (int j = 0; j < size + 1; ++j) {
       if (i != j) {
-        matrix[i * (size + 1) + j] = dist(gen);
-        row_sum += std::abs(matrix[i * (size + 1) + j]);
+        matrix[(i * (size + 1)) + j] = dist(gen);
+        row_sum += std::abs(matrix[(i * (size + 1)) + j]);
       }
     }
-    matrix[diag] = row_sum + 1;
+    matrix[diag] = static_cast<size_t>(row_sum + 1);
   }
 
   return matrix;
@@ -190,9 +190,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, Test_invalid_data) {
   }
 
   if (world.rank() == 0) {
-    // Create data
     std::vector<double> reference_data(size, 0.0);
-    // Create TaskData
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
@@ -201,7 +199,6 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, Test_invalid_data) {
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_data.data()));
     task_data_seq->outputs_count.emplace_back(reference_data.size());
 
-    // Create Task
     konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq test_seq_mpi(task_data_seq);
     ASSERT_FALSE(test_seq_mpi.ValidationImpl());
   }
@@ -231,9 +228,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, Test_not_enough_data) {
   }
 
   if (world.rank() == 0) {
-    // Create data
     std::vector<double> reference_data(size, 0.0);
-    // Create TaskData
     std::shared_ptr<ppc::core::TaskData> task_data_seq = std::make_shared<ppc::core::TaskData>();
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
     task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
@@ -242,7 +237,6 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, Test_not_enough_data) {
     task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t *>(reference_data.data()));
     task_data_seq->outputs_count.emplace_back(reference_data.size());
 
-    // Create Task
     konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq test_seq_mpi(task_data_seq);
     ASSERT_FALSE(test_seq_mpi.ValidationImpl());
   }

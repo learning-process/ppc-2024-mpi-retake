@@ -16,9 +16,9 @@ class GaussJordanMethodSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  int n = 0;
-  std::vector<double> matrix;
-  std::vector<double> solution;
+  int n_ = 0;
+  std::vector<double> matrix_;
+  std::vector<double> solution_;
 };
 
 }  // namespace konstantinov_i_gauss_jordan_method_seq
