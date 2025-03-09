@@ -28,14 +28,14 @@ class Sobel : public ppc::core::Task {
 };
 
 class SobelSeq : public ppc::core::Task {
-public:
+ public:
   explicit SobelSeq(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
   bool PreProcessingImpl() override;
   bool ValidationImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
 
-private:
+ private:
   int height_img_;
   int width_img_;
   int peding_ = 2;

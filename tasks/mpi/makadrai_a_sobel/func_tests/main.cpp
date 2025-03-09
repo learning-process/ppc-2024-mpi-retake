@@ -11,16 +11,16 @@
 #include "mpi/makadrai_a_sobel/include/ops_mpi.hpp"
 
 namespace makadrai_a_sobel_mpi {
-  std::vector<int> RandomGenerateImg(int height_img, int width_img) {
-    std::vector<int> img(height_img * width_img);
+std::vector<int> RandomGenerateImg(int height_img, int width_img) {
+  std::vector<int> img(height_img * width_img);
 
-    std::random_device rd;
-    std::mt19937 gen(static_cast<int>(rd()));
-    std::uniform_int_distribution<> ras(0, 255);
-  
-    std::ranges::generate(img.begin(), img.end(), [&]() { return ras(gen); });
-    return img;
-  }
+  std::random_device rd;
+  std::mt19937 gen(static_cast<int>(rd()));
+  std::uniform_int_distribution<> ras(0, 255);
+
+  std::ranges::generate(img.begin(), img.end(), [&]() { return ras(gen); });
+  return img;
+}
 }  // namespace makadrai_a_sobel_mpi
 
 TEST(makadrai_a_sobel_mpi, test_2_2) {
@@ -273,7 +273,6 @@ TEST(makadrai_a_sobel_mpi, test_random_100_100) {
     sobelSeq.Run();
     sobelSeq.PostProcessing();
 
-
     EXPECT_EQ(ans, res);
   }
 }
@@ -300,7 +299,6 @@ TEST(makadrai_a_sobel_mpi, test_random_100_50) {
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(res.data()));
     task_data->outputs_count.emplace_back(width_img);
     task_data->outputs_count.emplace_back(height_img);
-
   }
 
   makadrai_a_sobel_mpi::Sobel sobel(task_data);
@@ -326,7 +324,6 @@ TEST(makadrai_a_sobel_mpi, test_random_100_50) {
     sobelSeq.PreProcessing();
     sobelSeq.Run();
     sobelSeq.PostProcessing();
-
 
     EXPECT_EQ(ans, res);
   }
