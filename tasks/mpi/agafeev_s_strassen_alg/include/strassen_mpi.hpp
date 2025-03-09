@@ -4,9 +4,9 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/serialization/vector.hpp>  //NOLINT
 #include <ctime>
-#include <vector>
 #include <memory> 
 #include <utility>
+#include <vector>
 
 #include "core/task/include/task.hpp"
 
