@@ -196,7 +196,6 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_100x50) {
   }
 }
 
-
 TEST(sedova_o_min_of_vector_elements_mpi, test_0x0) {
   size_t rows = 0;
   size_t columns = 0;
