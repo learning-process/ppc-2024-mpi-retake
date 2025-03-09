@@ -87,8 +87,6 @@ bool sedova_o_linear_topology_mpi::TestTaskMPI::RunImpl() {
   }
   return true;
 }
-     
-  
 
 bool sedova_o_linear_topology_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
