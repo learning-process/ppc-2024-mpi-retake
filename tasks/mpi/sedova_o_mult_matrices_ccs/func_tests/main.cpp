@@ -28,9 +28,9 @@ TEST(sedova_o_test_task_mpi, Test_1) {
   std::vector<std::vector<double>> out_seq(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
   if (world.rank() == 0) {
     sedova_o_test_task_mpi::FillData(task_data_par, matrix_A.size(), matrix_A[0].size(), matrix_B.size(),
-                                           matrix_B[0].size(), A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out_par);
+                                     matrix_B[0].size(), A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out_par);
     sedova_o_test_task_mpi::FillData(task_data_seq, matrix_A.size(), matrix_A[0].size(), matrix_B.size(),
-                                           matrix_B[0].size(), A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out_seq);
+                                     matrix_B[0].size(), A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out_seq);
   }
   sedova_o_test_task_mpi::TestTaskMPI TestMpiTaskParallel(task_data_par);
   ASSERT_EQ(TestMpiTaskParallel.ValidationImpl(), true);

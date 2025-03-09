@@ -50,4 +50,4 @@ class TestTaskMPI : public ppc::core::Task {
   boost::mpi::communicator world_;
 };
 
-}  // namespace nesterov_a_test_task_mpi
+}  // namespace sedova_o_test_task_mpi

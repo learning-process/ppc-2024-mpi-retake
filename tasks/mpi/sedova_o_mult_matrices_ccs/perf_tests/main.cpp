@@ -16,7 +16,7 @@ std::vector<std::vector<double>> GenerateRandomMatrix(int rows, int columns) {
   }
   return result;
 }
-} // namespace sedova_o_test_task_mpi
+}  // namespace sedova_o_test_task_mpi
 
 TEST(sedova_o_test_task_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
