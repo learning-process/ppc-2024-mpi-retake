@@ -7,6 +7,7 @@
 #include <boost/serialization/vector.hpp>  // NOLINT
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <vector>
 
 bool sedova_o_linear_topology_mpi::TestTaskMPI::PreProcessingImpl() {
@@ -34,34 +35,69 @@ bool sedova_o_linear_topology_mpi::TestTaskMPI::RunImpl() {
     return true;
   }
   unsigned int input_size = 0;
+  std::vector<int> vec_;
   if (world_.rank() == 0) {
     input_size = task_data->inputs_count[0];
   }
   boost::mpi::broadcast(world_, input_size, 0);
+  if (world_.rank() == world_.size() - 1) {
+    vec_.resize(input_size);
+  }
   input_.resize(input_size);
   if (world_.rank() == 0) {
-    int *tmp_ptr = reinterpret_cast<int *>(task_data->inputs[0]);
-    std::copy(tmp_ptr, tmp_ptr + input_size, input_.begin());
-  }
-  boost::mpi::broadcast(world_, input_, 0);
-  std::vector<int> all_ranks(world_.size());
-  boost::mpi::all_gather(world_, world_.rank(), all_ranks);
-  bool res = true;
-  for (size_t i = 0; i < all_ranks.size(); ++i) {
-    if (all_ranks[i] != static_cast<int>(i)) {
-      res = false;
-      break;
+    output_.push_back(0);
+    world_.send(1, 0, input_);
+    world_.send(1, 1, output_);
+    world_.send(world_.size() - 1, 2, input_);
+  } else {
+    world_.recv(world_.rank() - 1, 0, input_);
+    world_.recv(world_.rank() - 1, 1, output_);
+
+    if (world_.rank() == world_.size() - 1) {
+      world_.recv(0, 2, vec_);
+    }
+
+    output_.push_back(static_cast<size_t>(world_.rank()));
+
+    if (world_.rank() != world_.size() - 1) {
+      world_.send(world_.rank() + 1, 0, input_);
+      world_.send(world_.rank() + 1, 1, output_);
     }
   }
-  rec_ = res;
-  boost::mpi::broadcast(world_, rec_, 0);
+  if (world_.rank() == world_.size() - 1) {
+    bool output1_ = true;
+    for (size_t i = 0; i < output_.size(); i++) {
+      if (output_[i] != i) {
+        output1_ = false;
+        break;
+      }
+    }
+    if (output_.size() != static_cast<size_t>(world_.size())) {
+      output1_ = false;
+    }
+
+    if (input_ == vec_ && output1_) {
+      world_.send(0, 3, true);
+    } else {
+      world_.send(0, 3, false);
+    }
+  }
+  if (world_.rank() == 0) {
+    world_.recv(world_.size() - 1, 3, rec_);
+  }
   return true;
 }
+     
+  
 
 bool sedova_o_linear_topology_mpi::TestTaskMPI::PostProcessingImpl() {
   if (world_.rank() == 0) {
     bool *output = reinterpret_cast<bool *>(task_data->outputs[0]);
-    output[0] = world_.size() == 1 ? true : rec_;
+    if (world_.size() == 1) {
+      output[0] = true;
+    } else {
+      output[0] = rec_;
+    }
   }
   return true;
 }
