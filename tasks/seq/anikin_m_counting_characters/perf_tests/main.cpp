@@ -4,19 +4,32 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "seq/anikin_m_counting_characters/include/ops_seq.hpp"
 
+namespace {
+void CreateRanddataVector(std::vector<char> *invec, int count) {
+  for (int i = 0; i < count; i++) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis('A', 'Z');
+    char random_har_ar = static_cast<char>(dis(gen));
+    invec->push_back(random_har_ar);
+  }
+}
+}  // namespace
+
 TEST(anikin_m_counting_characters_seq, test_pipeline_run) {
   constexpr int kCount = 20000000;
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_seq::CreateRanddataVector(&in1, kCount);
+  CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
-  anikin_m_counting_characters_seq::CreateRanddataVector(&in2, kCount);
+  CreateRanddataVector(&in2, kCount);
   int res_out = 0;
 
   // Create task_data
@@ -53,9 +66,9 @@ TEST(anikin_m_counting_characters_seq, test_task_run) {
   constexpr int kCount = 20000000;
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_seq::CreateRanddataVector(&in1, kCount);
+  CreateRanddataVector(&in1, kCount);
   std::vector<char> in2;
-  anikin_m_counting_characters_seq::CreateRanddataVector(&in2, kCount);
+  CreateRanddataVector(&in2, kCount);
   int res_out = 0;
 
   // Create task_data

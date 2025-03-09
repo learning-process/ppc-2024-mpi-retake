@@ -8,12 +8,20 @@
 #include "core/task/include/task.hpp"
 #include "mpi/anikin_m_counting_characters/include/ops_mpi.hpp"
 
+namespace {
+void CreateDataVector(std::vector<char> *invec, const std::string &str) {
+  for (auto a : str) {
+    invec->push_back(a);
+  }
+}
+}  // namespace
+
 TEST(anikin_m_counting_characters_seq, one_char_dif) {
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::CreateDataVector(&in1, "aboba");
+  CreateDataVector(&in1, "aboba");
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::CreateDataVector(&in2, "ababa");
+  CreateDataVector(&in2, "ababa");
   int res_out = 0;
 
   // Create task_data
@@ -36,9 +44,9 @@ TEST(anikin_m_counting_characters_seq, one_char_dif) {
 TEST(anikin_m_counting_characters_seq, first_larger) {
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::CreateDataVector(&in1, "abobaa");
+  CreateDataVector(&in1, "abobaa");
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::CreateDataVector(&in2, "ababa");
+  CreateDataVector(&in2, "ababa");
   int res_out = 0;
 
   // Create task_data
@@ -61,9 +69,9 @@ TEST(anikin_m_counting_characters_seq, first_larger) {
 TEST(anikin_m_counting_characters_seq, second_larger) {
   // Create data
   std::vector<char> in1;
-  anikin_m_counting_characters_mpi::CreateDataVector(&in1, "aboba");
+  CreateDataVector(&in1, "aboba");
   std::vector<char> in2;
-  anikin_m_counting_characters_mpi::CreateDataVector(&in2, "ababaa");
+  CreateDataVector(&in2, "ababaa");
   int res_out = 0;
 
   // Create task_data

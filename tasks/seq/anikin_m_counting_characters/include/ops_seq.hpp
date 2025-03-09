@@ -9,9 +9,6 @@
 
 namespace anikin_m_counting_characters_seq {
 
-void CreateDataVector(std::vector<char>* invec, const std::string& str);
-void CreateRanddataVector(std::vector<char>* invec, int count);
-
 class TestTaskSequential : public ppc::core::Task {
  public:
   explicit TestTaskSequential(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}

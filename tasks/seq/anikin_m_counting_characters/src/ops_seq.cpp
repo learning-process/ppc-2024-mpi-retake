@@ -2,24 +2,8 @@
 #include "seq/anikin_m_counting_characters/include/ops_seq.hpp"
 
 #include <cmath>
-#include <random>
 #include <string>
 #include <vector>
-
-void anikin_m_counting_characters_seq::CreateDataVector(std::vector<char> *invec, const std::string &str) {
-  for (auto a : str) {
-    invec->push_back(a);
-  }
-}
-void anikin_m_counting_characters_seq::CreateRanddataVector(std::vector<char> *invec, int count) {
-  for (int i = 0; i < count; i++) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis('A', 'Z');
-    char random_har_ar = static_cast<char>(dis(gen));
-    invec->push_back(random_har_ar);
-  }
-}
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::ValidationImpl() {
   return (task_data->inputs.size() == 2) && (task_data->inputs_count.size() == 2) && (task_data->outputs.size() == 1);

@@ -11,9 +11,6 @@
 
 namespace anikin_m_counting_characters_mpi {
 
-void CreateDataVector(std::vector<char>* invec, const std::string& str);
-void CreateRanddataVector(std::vector<char>* invec, int count);
-
 class TestTaskMPI : public ppc::core::Task {
  public:
   explicit TestTaskMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
