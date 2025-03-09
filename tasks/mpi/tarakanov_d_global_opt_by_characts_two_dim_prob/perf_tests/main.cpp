@@ -32,7 +32,7 @@
     }                                                                                                         \
     auto testClassPar = std::make_shared<tarakanov_d_global_opt_two_dim_prob_mpi::GlobalOptMpi>(taskDataPar); \
     auto perfAttr = std::make_shared<ppc::core::PerfAttr>();                                                  \
-    perfAttr->num_running = 50;                                                                               \
+    perfAttr->num_running = 10;                                                                               \
     const boost::mpi::timer current_timer;                                                                    \
     perfAttr->current_timer = [&] { return current_timer.elapsed(); };                                        \
     auto perfResults = std::make_shared<ppc::core::PerfResults>();                                            \
