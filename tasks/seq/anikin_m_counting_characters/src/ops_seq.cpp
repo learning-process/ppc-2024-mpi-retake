@@ -2,7 +2,6 @@
 #include "seq/anikin_m_counting_characters/include/ops_seq.hpp"
 
 #include <cmath>
-#include <string>
 #include <vector>
 
 bool anikin_m_counting_characters_seq::TestTaskSequential::ValidationImpl() {
