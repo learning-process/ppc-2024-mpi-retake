@@ -16,11 +16,11 @@ std::vector<std::vector<double>> GenerateRandomMatrix(int rows, int columns) {
   }
   return result;
 }
-} 
+} // namespace sedova_o_test_task_mpi
 
 TEST(sedova_o_test_task_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  std::vector<std::vector<double>> matrix_A = sedova_o_test_task_mpi::GenerateRandomMatrix(50,100);
+  std::vector<std::vector<double>> matrix_A = sedova_o_test_task_mpi::GenerateRandomMatrix(50, 100);
   std::vector<std::vector<double>> matrix_B = sedova_o_test_task_mpi::GenerateRandomMatrix(100, 50);
   std::vector<double> A;
   std::vector<int> row_ind_A;

@@ -32,4 +32,4 @@ class TestTaskSequential : public ppc::core::Task {
   std::vector<int> row_ind_A, row_ind_B, col_ind_A, col_ind_B;
   int rows_A, rows_B, cols_A, cols_B, size_A, size_B, row_ind_size_A, row_ind_size_B, col_ind_size_A, col_ind_size_B;
 };
-}  // namespace nesterov_a_test_task_seq
+}  // namespace sedova_o_test_task_seq

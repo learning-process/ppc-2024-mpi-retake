@@ -26,7 +26,7 @@ TEST(sedova_o_test_task_seq, test_pipeline_run) {
 
   std::vector<std::vector<double>> out(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
   sedova_o_test_task_seq::FillData(task_data, matrix_A.size(), matrix_A[0].size(), matrix_B.size(), matrix_B[0].size(),
-                                         A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out);
+                                   A, row_ind_A, col_ind_A, B, row_ind_B, col_ind_B, out);
   // Create Task
   auto TestTaskSequential = std::make_shared<sedova_o_test_task_seq::TestTaskSequential>(task_data);
 

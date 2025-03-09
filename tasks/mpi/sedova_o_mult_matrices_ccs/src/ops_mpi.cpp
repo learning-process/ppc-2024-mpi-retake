@@ -235,7 +235,7 @@ bool sedova_o_test_task_mpi::TestTaskMPI::ValidationImpl() {
     int cols_Ans = task_data->outputs_count[1];
     return c_A == r_B && cols_Ans == c_B && rows_Ans == r_A;
   }
-  return true; 
+  return true;
 }
 
 bool sedova_o_test_task_mpi::TestTaskMPI::RunImpl() {
