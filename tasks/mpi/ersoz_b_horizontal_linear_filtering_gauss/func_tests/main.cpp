@@ -16,26 +16,29 @@
 
 namespace {
 
-std::vector<char> GenerateTestInput(int kN) {
-  std::vector<char> in(kN * kN, 0);
-  for (int i = 0; i < kN; i++) {
-    for (int j = 0; j < kN; j++) {
+std::vector<char> GenerateTestInput(int k_n) {
+  std::vector<char> in(k_n * k_n, 0);
+  for (int i = 0; i < k_n; i++) {
+    for (int j = 0; j < k_n; j++) {
       // Parentheses clarify the order of operations.
-      in[(i * kN) + j] = static_cast<char>((i + j) % 256);
+      in[(i * k_n) + j] = static_cast<char>((i + j) % 256);
     }
   }
   return in;
 }
 
-std::vector<std::vector<char>> ConvertToImage(const std::vector<char>& flat, int kN) {
+// Convert the flat vector to a 2D image.
+std::vector<std::vector<char>> ConvertToImage(const std::vector<char>& flat, int k_n) {
   std::vector<std::vector<char>> image;
-  image.reserve(kN);
-  for (int i = 0; i < kN; i++) {
-    image.emplace_back(flat.begin() + (i * kN), flat.begin() + ((i + 1) * kN));
+  image.reserve(k_n);
+  for (int i = 0; i < k_n; i++) {
+    // Parentheses clarify the arithmetic.
+    image.emplace_back(flat.begin() + (i * k_n), flat.begin() + ((i + 1) * k_n));
   }
   return image;
 }
 
+// Compute a sequential Gaussian filter on the image.
 std::vector<std::vector<char>> ComputeSequentialFilter(const std::vector<std::vector<char>>& image, double sigma) {
   int y_dim = static_cast<int>(image.size());
   int x_dim = static_cast<int>(image[0].size());
@@ -59,11 +62,12 @@ std::vector<std::vector<char>> ComputeSequentialFilter(const std::vector<std::ve
   return res;
 }
 
-std::vector<std::vector<char>> ConvertOutputToImage(const std::vector<char>& out, int kN) {
+// Convert the flat output vector back to a 2D image.
+std::vector<std::vector<char>> ConvertOutputToImage(const std::vector<char>& out, int k_n) {
   std::vector<std::vector<char>> result;
-  result.reserve(kN - 2);
-  for (int i = 0; i < kN - 2; i++) {
-    result.emplace_back(out.begin() + (i * (kN - 2)), out.begin() + ((i + 1) * (kN - 2)));
+  result.reserve(k_n - 2);
+  for (int i = 0; i < k_n - 2; i++) {
+    result.emplace_back(out.begin() + (i * (k_n - 2)), out.begin() + ((i + 1) * (k_n - 2)));
   }
   return result;
 }
@@ -71,12 +75,12 @@ std::vector<std::vector<char>> ConvertOutputToImage(const std::vector<char>& out
 }  // namespace
 
 TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
-  constexpr int kN = 16;
-  auto in = GenerateTestInput(kN);
-  auto image = ConvertToImage(in, kN);
+  constexpr int k_n = 16;
+  auto in = GenerateTestInput(k_n);
+  auto image = ConvertToImage(in, k_n);
   auto expected = ComputeSequentialFilter(image, 0.5);
 
-  std::vector<char> out((kN - 2) * (kN - 2), 0);
+  std::vector<char> out((k_n - 2) * (k_n - 2), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data->inputs_count.push_back(in.size());
@@ -89,7 +93,7 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   task.Run();
   task.PostProcessing();
 
-  auto result = ConvertOutputToImage(out, kN);
+  auto result = ConvertOutputToImage(out, k_n);
 
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
