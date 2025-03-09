@@ -4,6 +4,7 @@
 #include <map>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 class SimpleParser {
  public:
