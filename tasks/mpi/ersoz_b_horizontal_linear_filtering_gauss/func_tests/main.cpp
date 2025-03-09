@@ -75,12 +75,12 @@ std::vector<std::vector<char>> ConvertOutputToImage(const std::vector<char>& out
 }  // namespace
 
 TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
-  constexpr int k_n = 16;
-  auto in = GenerateTestInput(k_n);
-  auto image = ConvertToImage(in, k_n);
+  constexpr int kN = 16;
+  auto in = GenerateTestInput(kN);
+  auto image = ConvertToImage(in, kN);
   auto expected = ComputeSequentialFilter(image, 0.5);
 
-  std::vector<char> out((k_n - 2) * (k_n - 2), 0);
+  std::vector<char> out((kN - 2) * (kN - 2), 0);
   auto task_data = std::make_shared<ppc::core::TaskData>();
   task_data->inputs.push_back(reinterpret_cast<uint8_t*>(in.data()));
   task_data->inputs_count.push_back(in.size());
@@ -93,7 +93,7 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   task.Run();
   task.PostProcessing();
 
-  auto result = ConvertOutputToImage(out, k_n);
+  auto result = ConvertOutputToImage(out, kN);
 
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
