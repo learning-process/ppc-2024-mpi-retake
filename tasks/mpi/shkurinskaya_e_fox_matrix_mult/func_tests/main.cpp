@@ -4,12 +4,29 @@
 #include <cmath>
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include "core/task/include/task.hpp"
 #include "mpi/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
 namespace shkurinskaya_e_fox_mat_mul_mpi {
+std::vector<double> GetRandomMatrix(int rows, int cols) {
+  std::vector<double> result(rows * cols);
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(-50.0, 50.0);
+
+  for (int i = 0; i < rows; ++i) {
+    for (int j = 0; j < cols; ++j) {
+      result[(i * cols) + j] = dis(gen);
+    }
+  }
+
+  return result;
+}
+
 void SimpleMult(std::vector<double> &in1, std::vector<double> &in2, std::vector<double> &ans, int matrix_size) {
   for (int i = 0; i < matrix_size; ++i) {
     for (int j = 0; j < matrix_size; ++j) {
@@ -24,10 +41,6 @@ void SimpleMult(std::vector<double> &in1, std::vector<double> &in2, std::vector<
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
   boost::mpi::communicator world;
-  int root = (int)sqrt(world.size());
-  if (root * root != world.size()) {
-    GTEST_SKIP();
-  }
 
   int matrix_size = 4;
   std::vector<double> in1;
@@ -65,10 +78,6 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, small_matrix) {
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, big_matrix) {
   boost::mpi::communicator world;
-  int root = (int)sqrt(world.size());
-  if (root * root != world.size()) {
-    GTEST_SKIP();
-  }
 
   int matrix_size = 72;
   std::vector<double> in1;
