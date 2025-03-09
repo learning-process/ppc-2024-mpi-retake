@@ -11,10 +11,6 @@
 #include "mpi/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
 namespace shkurinskaya_e_fox_mat_mul_mpi {
-static std::vector<double> GetRandomMatrix(int rows, int cols);
-}
-
-namespace shkurinskaya_e_fox_mat_mul_mpi {
 std::vector<double> GetRandomMatrix(int rows, int cols) {
   std::vector<double> result(rows * cols);
 
