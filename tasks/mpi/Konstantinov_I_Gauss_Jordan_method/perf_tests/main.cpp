@@ -55,8 +55,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, test_pipeline_run) {
     task_data_par->outputs_count.emplace_back(output_data.size());
   }
 
-  auto test_mpi =
-      std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi>(task_data_par);
+  auto test_mpi = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi>(task_data_par);
 
   ASSERT_EQ(test_mpi->ValidationImpl(), true);
   test_mpi->PreProcessingImpl();
@@ -94,8 +93,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, test_task_run) {
     task_data_par->outputs_count.emplace_back(output_data.size());
   }
 
-  auto test_mpi =
-      std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi>(task_data_par);
+  auto test_mpi = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi>(task_data_par);
 
   ASSERT_EQ(test_mpi->ValidationImpl(), true);
   test_mpi->PreProcessingImpl();

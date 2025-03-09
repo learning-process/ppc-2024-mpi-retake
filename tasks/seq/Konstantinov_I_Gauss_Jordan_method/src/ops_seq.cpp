@@ -16,19 +16,16 @@ bool konstantinov_i_gauss_jordan_method_seq::GaussJordanMethodSeq::ValidationImp
   int numRows = task_data->inputs_count[0];
   int numCols = (task_data->inputs_count[0] > 0) ? (numRows + 1) : 0;
   if (numRows <= 0 || numCols <= 0) {
-    //std::cout << "Validation failed: invalid dimensions (rows or columns cannot be zero or negative)!" << std::endl;
     return false;
   }
   auto expectedSize = static_cast<size_t>(numRows * numCols);
   if (task_data->inputs_count[1] != expectedSize) {
-    //std::cout << "Validation failed: matrix size mismatch!" << std::endl;
     return false;
   }
   auto* matrixData = reinterpret_cast<double*>(task_data->inputs[1]);
   for (int i = 0; i < numRows; ++i) {
     auto value = matrixData[i * numCols + i];
     if (value == 0.0) {
-      //std::cout << "Warning: Zero diagonal element at index " << i << std::endl;
       return false;
     }
   }

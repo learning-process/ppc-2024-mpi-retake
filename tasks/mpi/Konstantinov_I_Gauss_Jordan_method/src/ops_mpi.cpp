@@ -24,19 +24,16 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::ValidationImp
   int numRows = task_data->inputs_count[0];
   int numCols = (task_data->inputs_count[0] > 0) ? (numRows + 1) : 0;
   if (numRows <= 0 || numCols <= 0) {
-    // std::cout << "Validation failed: invalid dimensions (rows or columns cannot be zero or negative)!" << std::endl;
     return false;
   }
   auto expectedSize = static_cast<size_t>(numRows * numCols);
   if (task_data->inputs_count[1] != expectedSize) {
-    // std::cout << "Validation failed: matrix size mismatch!" << std::endl;
     return false;
   }
   auto* matrixData = reinterpret_cast<double*>(task_data->inputs[1]);
   for (int i = 0; i < numRows; ++i) {
     auto value = matrixData[i * numCols + i];
     if (value == 0.0) {
-      // std::cout << "Warning: Zero diagonal element at index " << i << std::endl;
       return false;
     }
   }
@@ -110,21 +107,16 @@ bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi::ValidationImp
     int numRows = task_data->inputs_count[0];
     int numCols = (task_data->inputs_count[0] > 0) ? (numRows + 1) : 0;
     if (numRows <= 0 || numCols <= 0) {
-      //std::cout << "Validation failed: invalid dimensions (rows or columns cannot be zero or negative)!" << std::endl;
       return false;
     }
     auto expectedSize = static_cast<size_t>(numRows * numCols);
     if (task_data->inputs_count[1] != expectedSize) {
-      //std::cout << "Validation failed: matrix size mismatch! Expected " << expectedSize << " elements, but found "
-      //          << task_data->inputs_count[1] << " elements." << std::endl;
       return false;
     }
     auto* matrixData = reinterpret_cast<double*>(task_data->inputs[1]);
     for (int i = 0; i < numRows; ++i) {
       double diagElement = matrixData[i * (numCols) + i];
       if (std::abs(diagElement) < 1e-9) {
-        //std::cout << "Validation failed: Zero or near-zero diagonal element at row " << i << ", value: " << diagElement
-        //          << std::endl;
         return false;
       }
     }
