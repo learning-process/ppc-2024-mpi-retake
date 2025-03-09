@@ -10,7 +10,7 @@
 #include "mpi/vasenkov_a_gauss_jordan/include/ops_mpi.hpp"
 
 namespace {
-static std::vector<double> GenerateRandomMatrix(int n, double min_value = -10.0, double max_value = 10.0) {
+std::vector<double> GenerateRandomMatrix(int n, double min_value = -10.0, double max_value = 10.0) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<double> dist(min_value, max_value);
@@ -26,7 +26,7 @@ static std::vector<double> GenerateRandomMatrix(int n, double min_value = -10.0,
   return matrix;
 }
 
-static void RunSequentialVersion(const std::vector<double> &global_matrix, int n, std::vector<double> &seq_result) {
+void RunSequentialVersion(const std::vector<double> &global_matrix, int n, std::vector<double> &seq_result) {
   auto task_data_seq = std::make_shared<ppc::core::TaskData>();
 
   task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t *>(const_cast<double *>(global_matrix.data())));
