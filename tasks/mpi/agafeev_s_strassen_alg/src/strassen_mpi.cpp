@@ -8,6 +8,7 @@
 namespace {
   bool IsPowerOfTwo(unsigned int n) { return (n != 0) && ((n & (n - 1)) == 0); }
 } // namespace
+
 namespace agafeev_s_strassen_alg_mpi {
 
 std::vector<double> AddMatrices(const std::vector<double>& a, const std::vector<double>& b, int n) {

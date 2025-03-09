@@ -4,7 +4,7 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/serialization/vector.hpp>  //NOLINT
 #include <ctime>
-#include <memory> 
+#include <memory>
 #include <utility>
 #include <vector>
 
