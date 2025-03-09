@@ -30,6 +30,18 @@ chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateR
     total_non_zero += non_zero_in_row;
     matrix.row_ptr.push_back(total_non_zero);
   }
+  std::cout << std::endl << " Values" << std::endl;
+  for (int i = 0; i < matrix.values.size(); i++) {
+    std::cout << matrix.values[i] << " ";
+  }
+  std::cout << std::endl << " col" << std::endl;
+  for (int i = 0; i < matrix.col_indices.size(); i++) {
+    std::cout << matrix.col_indices[i] << " ";
+  }
+  std::cout << std::endl << " row" << std::endl;
+  for (int i = 0; i < matrix.row_ptr.size(); i++) {
+    std::cout << matrix.row_ptr[i] << " ";
+  }
   return matrix;
 }
 chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS GenerateIdentityCrs(int n) {
@@ -105,6 +117,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
   std::vector<double> values_b;
   std::vector<int> col_indices_b;
   std::vector<int> row_ptr_b;
+  std::vector<double> result_values;
+  std::vector<int> result_col_indices;
+  std::vector<int> result_row_ptr;
 
   if (world.rank() == 0) {
     values_a = {3.0, 7.0, 2.0, 5.0, 6.0, 4.0, 9.0, 1.0, 8.0, 10.0};
@@ -125,9 +140,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
     SetupTaskData(values_a, col_indices_a, row_ptr_a, task_data, world);
     SetupTaskData(values_b, col_indices_b, row_ptr_b, task_data, world);
 
-    std::vector<double> result_values(expected_values.size());
-    std::vector<int> result_col_indices(expected_col_indices.size());
-    std::vector<int> result_row_ptr(expected_row_ptr.size());
+    result_values = std::vector<double>(expected_values.size());
+    result_col_indices = std::vector<int>(expected_col_indices.size());
+    result_row_ptr = std::vector<int>(expected_row_ptr.size());
 
     SetupOutData(result_values, result_col_indices, result_row_ptr, task_data, world);
   }
@@ -137,7 +152,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_10x10_parallel) {
   Execution(test_task, world);
 
   if (world.rank() == 0) {
-    CompareCrs(expected_values, expected_col_indices, expected_row_ptr, task_data, world);
+    EXPECT_EQ(result_values, expected_values);
+    EXPECT_EQ(result_col_indices, expected_col_indices);
+    EXPECT_EQ(result_row_ptr, expected_row_ptr);
   }
 }
 
@@ -150,6 +167,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_14x14_parallel) {
   std::vector<double> values_b;
   std::vector<int> col_indices_b;
   std::vector<int> row_ptr_b;
+  std::vector<double> result_values;
+  std::vector<int> result_col_indices;
+  std::vector<int> result_row_ptr;
 
   if (world.rank() == 0) {
     values_a = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0};
@@ -170,9 +190,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_14x14_parallel) {
     SetupTaskData(values_a, col_indices_a, row_ptr_a, task_data, world);
     SetupTaskData(values_b, col_indices_b, row_ptr_b, task_data, world);
 
-    std::vector<double> result_values(expected_values.size());
-    std::vector<int> result_col_indices(expected_col_indices.size());
-    std::vector<int> result_row_ptr(expected_row_ptr.size());
+    result_values = std::vector<double>(expected_values.size());
+    result_col_indices = std::vector<int>(expected_col_indices.size());
+    result_row_ptr = std::vector<int>(expected_row_ptr.size());
 
     SetupOutData(result_values, result_col_indices, result_row_ptr, task_data, world);
   }
@@ -182,7 +202,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, test_sparse_14x14_parallel) {
   Execution(test_task, world);
 
   if (world.rank() == 0) {
-    CompareCrs(expected_values, expected_col_indices, expected_row_ptr, task_data, world);
+    EXPECT_EQ(result_values, expected_values);
+    EXPECT_EQ(result_col_indices, expected_col_indices);
+    EXPECT_EQ(result_row_ptr, expected_row_ptr);
   }
 }
 
@@ -194,6 +216,10 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_10x10) {
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS matrix_a;
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI::SparseMatrixCRS matrix_b;
 
+  std::vector<double> result_values;
+  std::vector<int> result_col_indices;
+  std::vector<int> result_row_ptr;
+
   auto task_data = std::make_shared<ppc::core::TaskData>();
   if (world.rank() == 0) {
     matrix_a = GenerateRandomCrs(matrix_size, density);
@@ -202,9 +228,9 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_10x10) {
     SetupTaskData(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
     SetupTaskData(matrix_b.values, matrix_b.col_indices, matrix_b.row_ptr, task_data, world);
 
-    std::vector<double> result_values(matrix_a.values.size());
-    std::vector<int> result_col_indices(matrix_a.col_indices.size());
-    std::vector<int> result_row_ptr(matrix_a.row_ptr.size());
+    result_values = std::vector<double>(matrix_a.values.size());
+    result_col_indices = std::vector<int>(matrix_a.col_indices.size());
+    result_row_ptr = std::vector<int>(matrix_a.row_ptr.size());
 
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_values.data()));
     task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(result_col_indices.data()));
@@ -215,6 +241,8 @@ TEST(chernova_n_matrix_multiplication_crs_mpi, random_10x10) {
   chernova_n_matrix_multiplication_crs_mpi::TestTaskMPI test_task(task_data);
   Execution(test_task, world);
   if (world.rank() == 0) {
-    CompareCrs(matrix_a.values, matrix_a.col_indices, matrix_a.row_ptr, task_data, world);
+    EXPECT_EQ(result_values, matrix_a.values);
+    EXPECT_EQ(result_col_indices, matrix_a.col_indices);
+    EXPECT_EQ(result_row_ptr, matrix_a.row_ptr);
   }
 }
