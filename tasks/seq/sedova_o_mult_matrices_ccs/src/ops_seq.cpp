@@ -144,14 +144,6 @@ bool sedova_o_test_task_seq::TestTaskSequential::PreProcessingImpl() {
     int* col_in_B_ptr = reinterpret_cast<int*>(task_data->inputs[5]);
     col_in_B[i] = col_in_B_ptr[i];
   }
-  auto pairMatrix = sedova_o_test_task_seq::Convertirovanie(A, row_in_A, col_in_A, B, row_in_B, col_in_B,
-                                                                        rows_A, cols_A, rows_B, cols_B);
-  ans.resize(rows_A, std::vector<double>(cols_B, 0));
-  for (int i = 0; i < rows_A; ++i) {
-    for (int j = 0; j < cols_B; ++j) {
-      ans[i][j] = sedova_o_test_task_seq::MultVectors(pairMatrix.first[i], pairMatrix.second[j]);
-    }
-  }
   return true;
 }
 
@@ -166,7 +158,14 @@ bool sedova_o_test_task_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool sedova_o_test_task_seq::TestTaskSequential::RunImpl() {
-  Convertirovanie(A, row_in_A, col_in_A, B, row_in_B, col_in_B, rows_A, cols_A, rows_B, cols_B);
+  auto pairMatrix = sedova_o_test_task_seq::Convertirovanie(A, row_in_A, col_in_A, B, row_in_B, col_in_B, rows_A,
+                                                            cols_A, rows_B, cols_B);
+  ans.resize(rows_A, std::vector<double>(cols_B, 0));
+  for (int i = 0; i < rows_A; ++i) {
+    for (int j = 0; j < cols_B; ++j) {
+      ans[i][j] = sedova_o_test_task_seq::MultVectors(pairMatrix.first[i], pairMatrix.second[j]);
+    }
+  }
   return true;
 }
 
