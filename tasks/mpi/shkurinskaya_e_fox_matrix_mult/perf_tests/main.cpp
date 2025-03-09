@@ -1,4 +1,4 @@
-﻿#include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 #include <chrono>
 #include <cmath>
@@ -13,10 +13,6 @@
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-  int root = (int)sqrt(world.size());
-  if (world.size() != (int)pow(root, 2)) {
-    GTEST_SKIP();
-  }
 
   int matrix_size = 576;
   std::vector<double> in1(matrix_size * matrix_size, 0.0);
@@ -66,10 +62,6 @@ TEST(shkurinskaya_e_fox_mat_mul_mpi, test_pipeline_run) {
 
 TEST(shkurinskaya_e_fox_mat_mul_mpi, test_task_run) {
   boost::mpi::communicator world;
-  int root = (int)sqrt(world.size());
-  if (world.size() != (int)pow(root, 2)) {
-    GTEST_SKIP();
-  }
 
   int matrix_size = 576;
   std::vector<double> in1(matrix_size * matrix_size, 0.0);
