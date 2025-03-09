@@ -78,6 +78,11 @@ void InitializeTaskData(std::shared_ptr<ppc::core::TaskData>& task_data, std::ve
   task_data->outputs_count.emplace_back(received_image.size());
   task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
 }
+void CheckResults(const std::vector<unsigned int>& received_image, const std::vector<unsigned int>& expected_image) {
+  for (unsigned int i = 0; i < received_image.size(); i++) {
+    ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
+  }
+}
 }  // namespace
 }  // namespace sharamygina_i_horizontal_line_filtration_mpi
 
@@ -106,9 +111,7 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SampleImageTest) {
   ASSERT_TRUE(test_task.PostProcessingImpl());
 
   if (world.rank() == 0) {
-    for (unsigned int i = 0; i < received_image.size(); i++) {
-      ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
-    }
+    sharamygina_i_horizontal_line_filtration_mpi::CheckResults(received_image, expected_image);
   }
 }
 
@@ -136,9 +139,7 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, BigImageTest) {
   ASSERT_TRUE(test_task.PostProcessingImpl());
 
   if (world.rank() == 0) {
-    for (unsigned int i = 0; i < received_image.size(); i++) {
-      ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
-    }
+    sharamygina_i_horizontal_line_filtration_mpi::CheckResults(received_image, expected_image);
   }
 }
 
@@ -167,9 +168,7 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SmallImageTest) {
   ASSERT_TRUE(test_task.PostProcessingImpl());
 
   if (world.rank() == 0) {
-    for (unsigned int i = 0; i < received_image.size(); i++) {
-      ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
-    }
+    sharamygina_i_horizontal_line_filtration_mpi::CheckResults(received_image, expected_image);
   }
 }
 
@@ -198,9 +197,7 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SquareImageTest) {
   ASSERT_TRUE(test_task.PostProcessingImpl());
 
   if (world.rank() == 0) {
-    for (unsigned int i = 0; i < received_image.size(); i++) {
-      ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
-    }
+    sharamygina_i_horizontal_line_filtration_mpi::CheckResults(received_image, expected_image);
   }
 }
 
@@ -229,9 +226,7 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, HorizontalImageTest) {
   ASSERT_TRUE(test_task.PostProcessingImpl());
 
   if (world.rank() == 0) {
-    for (unsigned int i = 0; i < received_image.size(); i++) {
-      ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
-    }
+    sharamygina_i_horizontal_line_filtration_mpi::CheckResults(received_image, expected_image);
   }
 }
 
@@ -260,8 +255,6 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, VerticalImageTest) {
   ASSERT_TRUE(test_task.PostProcessingImpl());
 
   if (world.rank() == 0) {
-    for (unsigned int i = 0; i < received_image.size(); i++) {
-      ASSERT_EQ(received_image[i], expected_image[i]) << "Difference at i=" << i;
-    }
+    sharamygina_i_horizontal_line_filtration_mpi::CheckResults(received_image, expected_image);
   }
 }

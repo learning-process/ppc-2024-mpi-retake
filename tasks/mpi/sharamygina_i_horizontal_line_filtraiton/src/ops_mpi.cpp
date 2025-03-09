@@ -57,7 +57,7 @@ void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
   int block_on_proc = rows_ / count_of_proc;
   int remainder = rows_ % count_of_proc;
 
-  if (myrank == 0) {
+  if (myrank == 0 && count_of_proc != 1) {
     temporary_image.resize((block_on_proc + remainder + 1) * cols_);
     for (int i = 0; i < (block_on_proc + remainder + 1) * cols_; i++) {
       temporary_image[i] = original_data_[i];
@@ -93,36 +93,50 @@ void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::
     std::vector<unsigned int>& local_data) {
   int block_on_proc = rows_ / count_of_proc;
   int remainder = rows_ % count_of_proc;
-
   local_data.resize(block_on_proc * cols_);
 
   if (myrank == count_of_proc - 1 && count_of_proc != 1) {
-    for (int i = 1; i < block_on_proc; i++) {
+    ProcessLastRank(myrank, block_on_proc, temporary_image, local_data);
+  } else if (myrank == 0) {
+    ProcessFirstRank(count_of_proc, block_on_proc, remainder, temporary_image);
+  } else {
+    ProcessMiddleRanks(myrank, block_on_proc, temporary_image, local_data);
+  }
+}
+
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::ProcessLastRank(
+    int myrank, int block_on_proc, const std::vector<unsigned int>& temporary_image,
+    std::vector<unsigned int>& local_data) {
+  for (int i = 1; i < block_on_proc; i++) {
+    for (int j = 0; j < cols_; j++) {
+      local_data[((i - 1) * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
+    }
+  }
+}
+
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::ProcessFirstRank(
+    int count_of_proc, int block_on_proc, int remainder, const std::vector<unsigned int>& temporary_image) {
+  if (count_of_proc != 1) {
+    for (int i = 0; i < block_on_proc + remainder; i++) {
       for (int j = 0; j < cols_; j++) {
-        local_data[((i - 1) * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
+        result_data_[(i * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
       }
     }
   } else {
-    if (myrank != 0) {
-      for (int i = 1; i < block_on_proc + 1; i++) {
-        for (int j = 0; j < cols_; j++) {
-          local_data[((i - 1) * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
-        }
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < cols_; j++) {
+        result_data_[(i * cols_) + j] = InputAnotherPixel(original_data_, i, j, rows_, cols_);
       }
-    } else {
-      if (count_of_proc != 1) {
-        for (int i = 0; i < block_on_proc + remainder; i++) {
-          for (int j = 0; j < cols_; j++) {
-            result_data_[(i * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
-          }
-        }
-      } else {
-        for (int i = 0; i < rows_; i++) {
-          for (int j = 0; j < cols_; j++) {
-            result_data_[(i * cols_) + j] = InputAnotherPixel(original_data_, i, j, rows_, cols_);
-          }
-        }
-      }
+    }
+  }
+}
+
+void sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi::ProcessMiddleRanks(
+    int myrank, int block_on_proc, const std::vector<unsigned int>& temporary_image,
+    std::vector<unsigned int>& local_data) {
+  for (int i = 1; i < block_on_proc + 1; i++) {
+    for (int j = 0; j < cols_; j++) {
+      local_data[((i - 1) * cols_) + j] = InputAnotherPixel(temporary_image, i, j, block_on_proc + 2, cols_);
     }
   }
 }
@@ -157,8 +171,8 @@ unsigned int sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrat
     return 0;
   }
   unsigned int sum = 0;
-  for (unsigned int i = 0; i < 3; i++) {
-    for (unsigned int j = 0; j < 3; j++) {
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
       int t_x = x + i - 1;
       int t_y = y + j - 1;
       if (t_x < 0 || t_x > rows - 1) {

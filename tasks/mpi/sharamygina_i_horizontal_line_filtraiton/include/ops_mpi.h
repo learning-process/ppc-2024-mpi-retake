@@ -27,6 +27,12 @@ class HorizontalLineFiltrationMpi : public ppc::core::Task {
   void SendData(int myrank, int count_of_proc, const std::vector<unsigned int>& local_data);
   void ProcessLocalData(int myrank, int count_of_proc, const std::vector<unsigned int>& temporary_image,
                         std::vector<unsigned int>& local_data);
+  void ProcessLastRank(int myrank, int block_on_proc, const std::vector<unsigned int>& temporary_image,
+                       std::vector<unsigned int>& local_data);
+  void ProcessFirstRank(int count_of_proc, int block_on_proc, int remainder,
+                        const std::vector<unsigned int>& temporary_image);
+  void ProcessMiddleRanks(int myrank, int block_on_proc, const std::vector<unsigned int>& temporary_image,
+                          std::vector<unsigned int>& local_data);
   void ReceiveData(int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image);
   void PrepareTemporaryImage(int myrank, int count_of_proc, std::vector<unsigned int>& temporary_image);
   boost::mpi::communicator world_;
