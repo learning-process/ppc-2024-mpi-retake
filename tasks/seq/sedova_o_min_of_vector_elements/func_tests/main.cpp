@@ -140,7 +140,6 @@ TEST(sedova_o_min_of_vector_elements_seq, test_0x0) {
   ASSERT_EQ(test_task_sequential.ValidationImpl(), false);
 }
 
-
 TEST(sedova_o_min_of_vector_elements_seq, test_1x1) {
   std::random_device dev;
   std::mt19937 gen(dev());
