@@ -21,7 +21,7 @@ bool vasenkov_a_bellman_ford_seq::BellmanFordSequential::PreProcessingImpl() {
 }
 
 bool vasenkov_a_bellman_ford_seq::BellmanFordSequential::ValidationImpl() {
-  return task_data->inputs_count[0] > 0 && task_data->inputs_count[1] >= 0;
+  return task_data->inputs_count[0] > 0 && static_cast<int>(task_data->inputs_count[1]) >= 0;
 }
 
 bool vasenkov_a_bellman_ford_seq::BellmanFordSequential::RunImpl() {

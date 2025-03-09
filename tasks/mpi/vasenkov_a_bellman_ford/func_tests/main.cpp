@@ -112,10 +112,6 @@ TEST(vasenkov_a_bellman_ford_mpi, simple_graph0) {
   int source_vertex = 0;
   std::vector<int> global_result(num_vertices);
 
-  ASSERT_EQ(row_ptr.size(), num_vertices + 1);
-  ASSERT_EQ(col_ind.size(), row_ptr[num_vertices]);
-  ASSERT_EQ(weights.size(), row_ptr[num_vertices]);
-
   RunParallelVersion(row_ptr, col_ind, weights, num_vertices, source_vertex, global_result);
 
   if (world.rank() == 0) {
@@ -135,10 +131,6 @@ TEST(vasenkov_a_bellman_ford_mpi, simple_graph1) {
   int source_vertex = 0;
   std::vector<int> global_result(num_vertices);
 
-  ASSERT_EQ(row_ptr.size(), num_vertices + 1);
-  ASSERT_EQ(col_ind.size(), row_ptr[num_vertices]);
-  ASSERT_EQ(weights.size(), row_ptr[num_vertices]);
-
   RunParallelVersion(row_ptr, col_ind, weights, num_vertices, source_vertex, global_result);
 
   if (world.rank() == 0) {
@@ -157,10 +149,6 @@ TEST(vasenkov_a_bellman_ford_mpi, simple_graph2) {
   int num_vertices = 3;
   int source_vertex = 0;
   std::vector<int> global_result(num_vertices);
-
-  ASSERT_EQ(row_ptr.size(), num_vertices + 1);
-  ASSERT_EQ(col_ind.size(), row_ptr[num_vertices]);
-  ASSERT_EQ(weights.size(), row_ptr[num_vertices]);
 
   RunParallelVersion(row_ptr, col_ind, weights, num_vertices, source_vertex, global_result);
 

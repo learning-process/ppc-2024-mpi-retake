@@ -27,7 +27,7 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::PreProcessingImpl() {
 }
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::ValidationImpl() {
-  return task_data->inputs_count[0] > 0 && task_data->inputs_count[1] >= 0;
+  return task_data->inputs_count[0] > 0 && static_cast<int>(task_data->inputs_count[1]) >= 0;
 }
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   int rank = world_.rank();
@@ -123,7 +123,7 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordSequentialMPI::PreProcessingImpl() 
 }
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordSequentialMPI::ValidationImpl() {
-  bool result = task_data->inputs_count[0] > 0 && task_data->inputs_count[1] >= 0;
+  bool result = task_data->inputs_count[0] > 0 && static_cast<int>(task_data->inputs_count[1]) >= 0;
 
   return result;
 }
