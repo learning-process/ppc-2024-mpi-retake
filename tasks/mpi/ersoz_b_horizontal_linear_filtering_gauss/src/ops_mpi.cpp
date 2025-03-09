@@ -1,3 +1,5 @@
+#define OMPI_SKIP_MPICXX
+
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
 #include <mpi.h>

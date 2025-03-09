@@ -1,3 +1,5 @@
+#define OMPI_SKIP_MPICXX
+
 #include <gtest/gtest.h>
 
 #include <cmath>

@@ -1,5 +1,3 @@
-#define OMPI_SKIP_MPICXX
-
 #include <gtest/gtest.h>
 
 #include <boost/mpi/communicator.hpp>
