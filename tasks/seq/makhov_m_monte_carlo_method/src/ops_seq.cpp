@@ -30,6 +30,7 @@ bool makhov_m_monte_carlo_method_seq::TestTaskSequential::RunImpl() {
 
   // Vector of distributions for each variable
   std::vector<std::uniform_real_distribution<>> distributions;
+  distributions.reserve(limits_.size());
   for (const auto& limit : limits_) {
     distributions.emplace_back(limit.first, limit.second);
   }
@@ -38,6 +39,7 @@ bool makhov_m_monte_carlo_method_seq::TestTaskSequential::RunImpl() {
   // Generating random points and calculating the sum of function values
   for (int i = 0; i < numSamples_; ++i) {
     std::vector<double> point;
+    point.reserve(limits_.size());
     for (size_t j = 0; j < limits_.size(); ++j) {
       point.push_back(distributions[j](gen));  // Generate random point
     }

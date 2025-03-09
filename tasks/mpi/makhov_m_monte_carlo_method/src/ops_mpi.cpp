@@ -5,6 +5,7 @@
 #include <boost/mpi.hpp>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <map>
@@ -37,6 +38,8 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
+  std::pair<int, int> dummy_pair = {1, 1};
+  std::vector<int> dummy_vector = {12};
   boost::mpi::broadcast(world_, numSamples_, 0);
   boost::mpi::broadcast(world_, limits_, 0);
   boost::mpi::broadcast(world_, funcStr_, 0);

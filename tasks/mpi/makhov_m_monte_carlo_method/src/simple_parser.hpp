@@ -7,23 +7,23 @@
 
 class SimpleParser {
  public:
-  SimpleParser(std::string expression, const std::map<std::string, double>& variables)
-      : expr(std::move(expression)), vars_(variables), pos(0) {}
+  SimpleParser(std::string expr_ession, const std::map<std::string, double>& variables)
+      : expr_(std::move(expr_ession)), vars_(variables) {}
 
-  double Parse() { return ParseExpression(); }
+  double Parse() { return Parseexpr_ession(); }
 
  private:
-  std::string expr;
+  std::string expr_;
   std::map<std::string, double> vars_;
   size_t pos{0};
 
-  double ParseExpression() {
+  double Parseexpr_ession() {
     double result = ParseTerm();
-    while (pos < expr.length()) {
-      if (expr[pos] == '+') {
+    while (pos < expr_.length()) {
+      if (expr_[pos] == '+') {
         pos++;
         result += ParseTerm();
-      } else if (expr[pos] == '-') {
+      } else if (expr_[pos] == '-') {
         pos++;
         result -= ParseTerm();
       } else {
@@ -35,11 +35,11 @@ class SimpleParser {
 
   double ParseTerm() {
     double result = ParseFactor();
-    while (pos < expr.length()) {
-      if (expr[pos] == '*') {
+    while (pos < expr_.length()) {
+      if (expr_[pos] == '*') {
         pos++;
         result *= ParseFactor();
-      } else if (expr[pos] == '/') {
+      } else if (expr_[pos] == '/') {
         pos++;
         result /= ParseFactor();
       } else {
@@ -50,24 +50,26 @@ class SimpleParser {
   }
 
   double ParseFactor() {
-    if (expr[pos] == '(') {
+    if (expr_[pos] == '(') {
       pos++;
-      double result = ParseExpression();
-      if (expr[pos] != ')') {
+      double result = Parseexpr_ession();
+      if (expr_[pos] != ')') {
         throw std::runtime_error("Expected ')'");
       }
       pos++;
       return result;
     }
-    if (isalpha(expr[pos])) return parseVariable();
+    if (isalpha(expr_[pos]) != 0) {
+      return ParseVariable();
+    }
 
-    return parseNumber();
+    return ParseVariable();
   }
 
-  double parseVariable() {
+  double ParseVariable() {
     std::string var;
-    while (pos < expr.length() && isalpha(expr[pos] != 0)) {
-      var += expr[pos];
+    while (pos < expr_.length() && isalpha(expr_[pos]) != 0) {
+      var += expr_[pos];
       pos++;
     }
     if (vars_.find(var) == vars_.end()) {
@@ -76,11 +78,11 @@ class SimpleParser {
     return vars_[var];
   }
 
-  double parseNumber() {
+  double ParseNumber() {
     size_t start_pos = pos;
-    while (pos < expr.length() && (isdigit(expr[pos]) != 0 || expr[pos] == '.')) {
+    while (pos < expr_.length() && (isdigit(expr_[pos]) != 0 || expr_[pos] == '.')) {
       pos++;
     }
-    return std::stod(expr.substr(start_pos, pos - start_pos));
+    return std::stod(expr_.substr(start_pos, pos - start_pos));
   }
 };
