@@ -24,6 +24,8 @@ class BellmanFordMPI : public ppc::core::Task {
   int num_vertices_;
   int source_vertex_;
   boost::mpi::communicator world_;
+  bool CheckForNegativeCycles(int start_vertex, int end_vertex, bool is_active);
+  void UpdateDistances(int start_vertex, int end_vertex, std::vector<int>& temp_distances);
 };
 
 class BellmanFordSequentialMPI : public ppc::core::Task {

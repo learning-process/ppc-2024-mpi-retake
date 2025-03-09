@@ -37,7 +37,7 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   int vertices_per_process = num_vertices_ / active_processes;
   int remainder = num_vertices_ % active_processes;
 
-  int start_vertex = rank * vertices_per_process + std::min(rank, remainder);
+  int start_vertex = (rank * vertices_per_process) + std::min(rank, remainder);
   int end_vertex = start_vertex + vertices_per_process + (rank < remainder ? 1 : 0);
   bool is_active = rank < active_processes;
 
@@ -47,20 +47,33 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
     std::ranges::copy(distances_, temp_distances.begin());
 
     if (is_active) {
-      for (int u = start_vertex; u < end_vertex; ++u) {
-        for (int j = row_ptr_[u]; j < row_ptr_[u + 1]; ++j) {
-          int v = col_ind_[j];
-          int weight = weights_[j];
-          if (distances_[u] != std::numeric_limits<int>::max() && distances_[u] + weight < temp_distances[v]) {
-            temp_distances[v] = distances_[u] + weight;
-          }
-        }
-      }
+      UpdateDistances(start_vertex, end_vertex, temp_distances);
     }
 
     boost::mpi::all_reduce(world_, temp_distances.data(), num_vertices_, distances_.data(), boost::mpi::minimum<int>());
   }
 
+  bool has_negative_cycle = CheckForNegativeCycles(start_vertex, end_vertex, is_active);
+
+  bool global_has_negative_cycle = false;
+  boost::mpi::all_reduce(world_, has_negative_cycle, global_has_negative_cycle, std::logical_or<>());
+
+  return !global_has_negative_cycle;
+}
+
+void vasenkov_a_bellman_ford_mpi::BellmanFordMPI::UpdateDistances(int start_vertex, int end_vertex, std::vector<int>& temp_distances) {
+  for (int u = start_vertex; u < end_vertex; ++u) {
+    for (int j = row_ptr_[u]; j < row_ptr_[u + 1]; ++j) {
+      int v = col_ind_[j];
+      int weight = weights_[j];
+      if (distances_[u] != std::numeric_limits<int>::max() && distances_[u] + weight < temp_distances[v]) {
+        temp_distances[v] = distances_[u] + weight;
+      }
+    }
+  }
+}
+
+bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::CheckForNegativeCycles(int start_vertex, int end_vertex, bool is_active) {
   bool has_negative_cycle = false;
   if (is_active) {
     for (int u = start_vertex; u < end_vertex; ++u) {
@@ -72,14 +85,12 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
           break;
         }
       }
-      if (has_negative_cycle) break;
+      if (has_negative_cycle) {
+        break;
+      }
     }
   }
-
-  bool global_has_negative_cycle = false;
-  boost::mpi::all_reduce(world_, has_negative_cycle, global_has_negative_cycle, std::logical_or<>());
-
-  return !global_has_negative_cycle;
+  return has_negative_cycle;
 }
 
 bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::PostProcessingImpl() {
