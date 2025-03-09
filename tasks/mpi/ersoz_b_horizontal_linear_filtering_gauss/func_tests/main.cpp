@@ -16,7 +16,7 @@
 #include "core/task/include/task.hpp"
 #include "mpi/ersoz_b_horizontal_linear_filtering_gauss/include/ops_mpi.hpp"
 
-TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {  // NOLINT(readability-function-cognitive-complexity)
+TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {
   constexpr int kN = 16;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
@@ -31,8 +31,7 @@ TEST(ersoz_b_test_task_mpi, test_gaussian_filter_small) {  // NOLINT(readability
     image.emplace_back(in.begin() + (i * kN), in.begin() + ((i + 1) * kN));
   }
 
-  auto sequential_filter =
-      [&image](double sigma) -> std::vector<std::vector<char>> {  // NOLINT(readability-function-cognitive-complexity)
+  auto sequential_filter = [&image](double sigma) -> std::vector<std::vector<char>> {
     int y_dim = static_cast<int>(image.size());
     int x_dim = static_cast<int>(image[0].size());
     std::vector<std::vector<char>> res;

@@ -9,7 +9,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/ersoz_b_horizontal_linear_filtering_gauss/include/ops_seq.hpp"
 
-TEST(ersoz_b_test_task_seq, test_pipeline_run) {  // NOLINT(readability-function-cognitive-complexity)
+TEST(ersoz_b_test_task_seq, test_pipeline_run) {
   constexpr int kN = 128;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
@@ -41,7 +41,7 @@ TEST(ersoz_b_test_task_seq, test_pipeline_run) {  // NOLINT(readability-function
   task->PostProcessing();
 }
 
-TEST(ersoz_b_test_task_seq, test_task_run) {  // NOLINT(readability-function-cognitive-complexity)
+TEST(ersoz_b_test_task_seq, test_task_run) {
   constexpr int kN = 128;
   std::vector<char> in(kN * kN, 0);
   for (int i = 0; i < kN; i++) {
