@@ -28,6 +28,11 @@ class GaussJordanMethodSequentialMPI : public ppc::core::Task {
  private:
   int n_size_;
   std::vector<double> sys_matrix_;
+  void EliminateColumn(int k);
+  void NormalizeRow(int k);
+  void SwapRows(int row1, int row2);
+  int FindSwapRow(int k);
+  bool EnsureNonZeroPivot(int k);
 
  public:
   explicit GaussJordanMethodSequentialMPI(ppc::core::TaskDataPtr task_data) : Task(std::move(task_data)) {}
