@@ -8,7 +8,7 @@
 #include "mpi/shkurinskaya_e_fox_matrix_mult/include/ops_sec.hpp"
 
 namespace shkurinskaya_e_fox_mat_mul_mpi {
-std::vector<double> GetRandomMatrix(int rows, int cols);
+static std::vector<double> GetRandomMatrix(int rows, int cols);
 }
 
 std::vector<double> shkurinskaya_e_fox_mat_mul_mpi::GetRandomMatrix(int rows, int cols) {
