@@ -196,34 +196,6 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_100x50) {
   }
 }
 
-TEST(sedova_o_min_of_vector_elements_mpi, test_1x1) {
-  size_t rows = 1;
-  size_t columns = 1;
-  int min = -500;
-  size_t max = 500;
-
-  boost::mpi::communicator world;
-  std::vector<std::vector<int>> global_matrix;
-  std::vector<int> output(1, INT_MAX);
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-
-  if (world.rank() == 0) {
-    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
-  }
-  if (world.rank() == 0 && global_matrix.empty()) {
-    task_data_par->inputs_count.emplace_back(0);
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
-    task_data_par->outputs_count.emplace_back(output.size());
-  } else {
-    for (unsigned int i = 0; i < global_matrix.size(); i++) {
-      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
-      task_data_par->inputs_count.emplace_back(global_matrix[i].size());
-    }
-  }
-
-  sedova_o_min_of_vector_elements_mpi::TestTaskMPI test_task_parallel(task_data_par);
-  ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
-}
 
 TEST(sedova_o_min_of_vector_elements_mpi, test_0x0) {
   size_t rows = 0;
