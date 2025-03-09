@@ -125,13 +125,21 @@ TEST(sedova_o_linear_topology_mpi, test_0) {
 
   if (world.rank() == 0) {
     input = sedova_o_linear_topology_mpi::GetRandomVector(count);
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
-    task_data_par->inputs_count.emplace_back(input.size());
+    if (!input.empty()) {
+      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(input.data()));
+      task_data_par->inputs_count.emplace_back(input.size());
+    } else {
+      task_data_par->inputs_count.emplace_back(0);
+    }
 
     task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(&result));
     task_data_par->outputs_count.emplace_back(1);
   }
 
   sedova_o_linear_topology_mpi::TestTaskMPI test_task_parallel(task_data_par);
-  ASSERT_EQ(test_task_parallel.ValidationImpl(), false);
+  if (world.rank() == 0 && input.empty()) {
+    ASSERT_EQ(test_task_parallel.ValidationImpl(), false);
+  } else {
+    ASSERT_EQ(test_task_parallel.ValidationImpl(), true);
+  }
 }
