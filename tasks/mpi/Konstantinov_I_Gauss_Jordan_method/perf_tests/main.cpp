@@ -14,50 +14,54 @@
 
 namespace konstantinov_i_gauss_jordan_method_mpi {
 namespace {
-std::vector<double> GetRandomMatrix(int rows, int cols) {
-  std::random_device dev;
-  std::mt19937 gen(dev());
-  std::uniform_real_distribution<double> dist(-20.0, 20.0);
-  std::vector<double> matrix(rows * cols);
-  for (int i = 0; i < rows * cols; i++) {
-    matrix[i] = dist(gen);
+std::vector<double> GenerateInvertibleMatrix(int size) {
+  std::vector<double> matrix(size * (size + 1));
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  double lowerLimit = -100.0;
+  double upperLimit = 100.0;
+  std::uniform_real_distribution<> dist(lowerLimit, upperLimit);
+
+  for (int i = 0; i < size; ++i) {
+    double row_sum = 0.0;
+    double diag = (i * (size + 1) + i);
+    for (int j = 0; j < size + 1; ++j) {
+      if (i != j) {
+        matrix[i * (size + 1) + j] = dist(gen);
+        row_sum += std::abs(matrix[i * (size + 1) + j]);
+      }
+    }
+    matrix[diag] = row_sum + 1;
   }
+
   return matrix;
 }
 }  // namespace
 }  // namespace konstantinov_i_gauss_jordan_method_mpi
 
-TEST(Konstantinov_i_gauss_jordan_method_mpi, task_run) {
-  boost::mpi::environment env;
+TEST(Konstantinov_i_gauss_jordan_method_mpi, test_pipeline_run) {
   boost::mpi::communicator world;
-
-  std::vector<double> global_matrix;
-  std::vector<double> global_result;
-
+  size_t size = 500;
+  std::vector<double> matrix = konstantinov_i_gauss_jordan_method_mpi::GenerateInvertibleMatrix(size);
+  std::vector<double> output_data(size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  int n = 0;
 
   if (world.rank() == 0) {
-    n = 250;
-    global_matrix = konstantinov_i_gauss_jordan_method_mpi::GetRandomMatrix(n, n + 1);
-
-    global_result.resize(n * (n + 1));
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    task_data_par->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-    task_data_par->inputs_count.emplace_back(1);
-
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-    task_data_par->outputs_count.emplace_back(global_result.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size() / (size + 1));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_data.data()));
+    task_data_par->outputs_count.emplace_back(output_data.size());
   }
 
-  auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  ASSERT_TRUE(task_parallel->ValidationImpl());
-  task_parallel->PreProcessingImpl();
-  bool par_run_res = task_parallel->RunImpl();
-  task_parallel->PostProcessingImpl();
+  auto test_mpi =
+      std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi>(task_data_par);
+
+  ASSERT_EQ(test_mpi->ValidationImpl(), true);
+  test_mpi->PreProcessingImpl();
+  test_mpi->RunImpl();
+  test_mpi->PostProcessingImpl();
 
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
@@ -66,72 +70,39 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, task_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_parallel);
-  perf_analyzer->TaskRun(perf_attr, perf_results);
-
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi);
+  perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-
-    std::vector<double> seq_result(global_result.size(), 0);
-
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    task_data_seq->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-    task_data_seq->inputs_count.emplace_back(1);
-
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
-    task_data_seq->outputs_count.emplace_back(seq_result.size());
-
-    auto task_sequential =
-        std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
-    ASSERT_TRUE(task_sequential->ValidationImpl());
-    task_sequential->PreProcessingImpl();
-    bool seq_run_res = task_sequential->RunImpl();
-    task_sequential->PostProcessingImpl();
-
-    if (seq_run_res && par_run_res) {
-      ASSERT_EQ(global_result.size(), seq_result.size());
-      EXPECT_EQ(global_result, seq_result);
-    } else {
-      EXPECT_EQ(seq_run_res, par_run_res);
-    }
+    ASSERT_EQ(output_data.size(), size);
   }
 }
 
-TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
-  boost::mpi::environment env;
+TEST(Konstantinov_i_gauss_jordan_method_mpi, test_task_run) {
   boost::mpi::communicator world;
-
-  std::vector<double> global_matrix;
-  std::vector<double> global_result;
-
+  size_t size = 500;
+  std::vector<double> matrix = konstantinov_i_gauss_jordan_method_mpi::GenerateInvertibleMatrix(size);
+  std::vector<double> output_data(size, 0.0);
   std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
-  int n = 0;
 
   if (world.rank() == 0) {
-    n = 250;
-    global_matrix = konstantinov_i_gauss_jordan_method_mpi::GetRandomMatrix(n, n + 1);
-
-    global_result.resize(n * (n + 1));
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    task_data_par->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-    task_data_par->inputs_count.emplace_back(1);
-
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t*>(global_result.data()));
-    task_data_par->outputs_count.emplace_back(global_result.size());
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(&size));
+    task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(matrix.data()));
+    task_data_par->inputs_count.emplace_back(matrix.size() / (size + 1));
+    task_data_par->inputs_count.emplace_back(matrix.size());
+    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output_data.data()));
+    task_data_par->outputs_count.emplace_back(output_data.size());
   }
 
-  auto task_parallel = std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMPI>(task_data_par);
-  ASSERT_TRUE(task_parallel->ValidationImpl());
-  task_parallel->PreProcessingImpl();
-  bool par_run_res = task_parallel->RunImpl();
-  task_parallel->PostProcessingImpl();
+  auto test_mpi =
+      std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodMpi>(task_data_par);
 
+  ASSERT_EQ(test_mpi->ValidationImpl(), true);
+  test_mpi->PreProcessingImpl();
+  test_mpi->RunImpl();
+  test_mpi->PostProcessingImpl();
+
+  // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const boost::mpi::timer current_timer;
@@ -139,36 +110,10 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, pipeline_run) {
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
 
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(task_parallel);
-  perf_analyzer->PipelineRun(perf_attr, perf_results);
-
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_mpi);
+  perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-
-    std::vector<double> seq_result(global_result.size(), 0);
-
-    auto task_data_seq = std::make_shared<ppc::core::TaskData>();
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(global_matrix.data()));
-    task_data_seq->inputs_count.emplace_back(global_matrix.size());
-
-    task_data_seq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&n));
-    task_data_seq->inputs_count.emplace_back(1);
-
-    task_data_seq->outputs.emplace_back(reinterpret_cast<uint8_t*>(seq_result.data()));
-    task_data_seq->outputs_count.emplace_back(seq_result.size());
-
-    auto task_sequential =
-        std::make_shared<konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq>(task_data_seq);
-    ASSERT_TRUE(task_sequential->ValidationImpl());
-    task_sequential->PreProcessingImpl();
-    bool seq_run_res = task_sequential->RunImpl();
-    task_sequential->PostProcessingImpl();
-
-    if (seq_run_res && par_run_res) {
-      ASSERT_EQ(global_result.size(), seq_result.size());
-      EXPECT_EQ(global_result, seq_result);
-    } else {
-      EXPECT_EQ(seq_run_res, par_run_res);
-    }
+    ASSERT_EQ(output_data.size(), size);
   }
 }

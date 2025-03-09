@@ -7,9 +7,6 @@
 
 namespace konstantinov_i_gauss_jordan_method_seq {
 
-std::vector<double> ProcessMatrix(int n, int k, const std::vector<double>& matrix);
-void UpdateMatrix(int n, int k, std::vector<double>& matrix, const std::vector<double>& iter_result);
-
 class GaussJordanMethodSeq : public ppc::core::Task {
  public:
   explicit GaussJordanMethodSeq(std::shared_ptr<ppc::core::TaskData> task_data) : Task(std::move(task_data)) {}
@@ -19,8 +16,9 @@ class GaussJordanMethodSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<double> matrix_;
-  int n_;
+  int n = 0;
+  std::vector<double> matrix;
+  std::vector<double> solution;
 };
 
 }  // namespace konstantinov_i_gauss_jordan_method_seq
