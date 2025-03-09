@@ -61,7 +61,8 @@ bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::RunImpl() {
   return !global_has_negative_cycle;
 }
 
-void vasenkov_a_bellman_ford_mpi::BellmanFordMPI::UpdateDistances(int start_vertex, int end_vertex, std::vector<int>& temp_distances) {
+void vasenkov_a_bellman_ford_mpi::BellmanFordMPI::UpdateDistances(int start_vertex, int end_vertex,
+                                                                  std::vector<int> &temp_distances) {
   for (int u = start_vertex; u < end_vertex; ++u) {
     for (int j = row_ptr_[u]; j < row_ptr_[u + 1]; ++j) {
       int v = col_ind_[j];
@@ -73,7 +74,8 @@ void vasenkov_a_bellman_ford_mpi::BellmanFordMPI::UpdateDistances(int start_vert
   }
 }
 
-bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::CheckForNegativeCycles(int start_vertex, int end_vertex, bool is_active) {
+bool vasenkov_a_bellman_ford_mpi::BellmanFordMPI::CheckForNegativeCycles(int start_vertex, int end_vertex,
+                                                                         bool is_active) {
   bool has_negative_cycle = false;
   if (is_active) {
     for (int u = start_vertex; u < end_vertex; ++u) {
