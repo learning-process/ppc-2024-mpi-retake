@@ -5,7 +5,6 @@
 
 #include "core/task/include/task.hpp"
 
-
 namespace vasenkov_a_word_count_seq {
 
 class WordCountSequential : public ppc::core::Task {
