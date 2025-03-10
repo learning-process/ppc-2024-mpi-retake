@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <vector>
 
+#include "boost/mpi/communicator.hpp"
 #include "core/perf/include/perf.hpp"
 #include "core/task/include/task.hpp"
 #include "mpi/sedova_o_mult_matrices_ccs/include/ops_mpi.hpp"

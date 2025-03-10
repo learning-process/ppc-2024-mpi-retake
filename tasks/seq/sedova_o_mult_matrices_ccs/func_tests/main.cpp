@@ -34,7 +34,7 @@ TEST(sedova_o_mult_matrices_ccs, Test_1) {
   testTaskSequential.PostProcessingImpl();
   std::vector<std::vector<double>> ans(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
   for (size_t i = 0; i < out.size(); ++i) {
-    auto *ptr = reinterpret_cast<double *>(taskData->outputs[i]);
+    auto *ptr = reinterpret_cast<double *>(task_data->outputs[i]);
     ans[i] = std::vector(ptr, ptr + matrix_B.size());
   }
   std::vector<std::vector<double>> check_result = {{2, 0, 6}, {0, 14, 0}, {4, 0, 12}};
