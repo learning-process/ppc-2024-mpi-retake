@@ -132,7 +132,6 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PostProcessingImpl() 
   if (world_.rank() == 0) {
     task_data->outputs_count = task_data->inputs_count;
     task_data->outputs[0] = answerDataPtr_;
-    delete[] answerDataPtr_;
   }
   return true;
 }
