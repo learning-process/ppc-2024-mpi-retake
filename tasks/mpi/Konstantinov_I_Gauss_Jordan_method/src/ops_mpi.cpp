@@ -4,6 +4,8 @@
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/operations.hpp>
 #include <cmath>
