@@ -2,7 +2,7 @@
 
 #include <thread>
 
-void sedova_o_test_task_seq::ConvertToCCS(const std::vector<std::vector<double>>& matrix, std::vector<double>& values, 
+void sedova_o_test_task_seq::ConvertToCCS(const std::vector<std::vector<double>>& matrix, std::vector<double>& values,
                                           std::vector<int>& row_indices, std::vector<int>& col_pointers) {
   int num_rows = matrix.size();
   int num_cols = num_rows > 0 ? matrix[0].size() : 0;
@@ -45,9 +45,9 @@ T sedova_o_test_task_seq::MultVectors(const std::vector<T>& vector_A, const std:
 }
 
 std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> sedova_o_test_task_seq::Convertirovanie(
-    const std::vector<double>& A, const std::vector<int>& row_ind_A, const std::vector<int>& col_ind_A, 
-    const std::vector<double>& B, const std::vector<int>& row_ind_B, const std::vector<int>& col_ind_B,
-    int rows_A, int cols_A, int rows_B, int cols_B) {
+    const std::vector<double>& A, const std::vector<int>& row_ind_A, const std::vector<int>& col_ind_A,
+    const std::vector<double>& B, const std::vector<int>& row_ind_B, const std::vector<int>& col_ind_B, int rows_A,
+    int cols_A, int rows_B, int cols_B) {
   std::vector<std::vector<double>> matrix_A(rows_A, std::vector<double>(cols_A, 0));
   for (int i = 0; i < rows_A; ++i) {
     std::vector<double> v(col_ind_A.size() - 1, 0);
