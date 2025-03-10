@@ -22,6 +22,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PreProcessingImpl(
     auto *tmp_ptr = reinterpret_cast<int *>(task_data->inputs[i]);
     std::copy(tmp_ptr, tmp_ptr + task_data->inputs_count[1], input_[i].begin());
   }
+
   res_ = INT_MAX;
   return true;
 }
