@@ -29,7 +29,11 @@ bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::RunImpl() {
     local_res[i] = *std::ranges::min_element(input_[i].begin(), input_[i].end());
   }
 
-  res_ = *std::ranges::min_element(local_res.begin(), local_res.end());
+  if (!local_res.empty()) {
+    res_ = *std::ranges::min_element(local_res.begin(), local_res.end());
+  } else {
+    res_ = INT_MAX;
+  }
   return true;
 }
 
