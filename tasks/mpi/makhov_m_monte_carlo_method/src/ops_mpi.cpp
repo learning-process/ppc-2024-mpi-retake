@@ -23,8 +23,8 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PreProcessingImpl() {
     numSamples_ = *reinterpret_cast<int*>(task_data->inputs[1]);
 
     auto* limits_ptr = reinterpret_cast<double*>(task_data->inputs[2]);
-    dimension_ = task_data->inputs_count[2];
     limits_[0] = limits_ptr[0];
+    dimension_ = task_data->inputs_count[2];
     limits_[1] = limits_ptr[1];
   }
   return true;
@@ -44,7 +44,6 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
     boost::mpi::broadcast(world_, numSamples_, 0);
     boost::mpi::broadcast(world_, limits_, 0);
     boost::mpi::broadcast(world_, funcStr_, 0);
-    boost::mpi::broadcast(world_, dimension_, 0);
   }
 
   std::regex var_regex("[a-z]");  // Regular expression for variables (a-z)
@@ -61,6 +60,11 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
   std::ranges::sort(variables);
   auto [new_end, end] = std::ranges::unique(variables);
   variables.erase(new_end, variables.end());
+  dimension_ = variables.size();
+
+  if (world_.size() != 1) {
+    boost::mpi::broadcast(world_, dimension_, 0);
+  }
 
   // A container for storing variables and their values
   std::map<std::string, double> var_values;
