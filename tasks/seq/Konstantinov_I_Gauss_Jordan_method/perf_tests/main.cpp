@@ -30,7 +30,7 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
         row_sum += std::abs(matrix[i * (size + 1) + j]);
       }
     }
-    matrix[diag] = row_sum + 1;
+    matrix[diag] = static_cast<double>(row_sum + 1);
   }
 
   return matrix;
@@ -39,7 +39,7 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
 }  // namespace konstantinov_i_gauss_jordan_method_seq
 
 TEST(Konstantinov_i_gauss_jordan_method_seq, test_pipeline_run) {
-  size_t size = 500;
+  int size = 500;
 
   std::vector<double> matrix = konstantinov_i_gauss_jordan_method_seq::GenerateInvertibleMatrix(size);
 
@@ -80,7 +80,7 @@ TEST(Konstantinov_i_gauss_jordan_method_seq, test_pipeline_run) {
 }
 
 TEST(Konstantinov_i_gauss_jordan_method_seq, test_task_run) {
-  size_t size = 500;
+  int size = 500;
 
   auto matrix = konstantinov_i_gauss_jordan_method_seq::GenerateInvertibleMatrix(size);
 

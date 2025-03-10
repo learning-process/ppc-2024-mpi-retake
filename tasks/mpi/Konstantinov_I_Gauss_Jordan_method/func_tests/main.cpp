@@ -29,7 +29,7 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
         row_sum += std::abs(matrix[(i * (size + 1)) + j]);
       }
     }
-    matrix[diag] = static_cast<size_t>(row_sum + 1);
+    matrix[diag] = static_cast<double>(row_sum + 1);
   }
 
   return matrix;

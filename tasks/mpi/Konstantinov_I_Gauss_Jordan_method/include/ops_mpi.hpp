@@ -4,19 +4,20 @@
 #include <boost/mpi/communicator.hpp>
 #include <memory>
 #include <utility>
+#include <cstddef> 
 #include <vector>
 
 #include "core/task/include/task.hpp"
 
 namespace konstantinov_i_gauss_jordan_method_mpi {
 
-void FindMaxRowAndSwap(int k, int n_, std::vector<double>& matrix_);
-void NormalizeRow(int k, int n_, std::vector<double>& matrix_);
-void ProcessLocalMatrix(size_t local_size, int k, int n_, std::vector<double>& localMatrix_,
-                        const std::vector<double>& header_);
-void ProcessGaussStep(int k, int n_, std::vector<double>& matrix_, std::vector<double>& header_,
-                      std::vector<int>& sendCounts_, std::vector<int>& displacements_, boost::mpi::communicator& world_,
-                      std::vector<double>& localMatrix_, bool is_forward);
+void FindMaxRowAndSwap(int k, int n, std::vector<double>& matrix);
+void NormalizeRow(int k, int n, std::vector<double>& matrix);
+void ProcessLocalMatrix(size_t local_size, int k, int n, std::vector<double>& localMatrix,
+                        const std::vector<double>& header);
+void ProcessGaussStep(int k, int n, std::vector<double>& matrix, std::vector<double>& header,
+                      std::vector<int>& sendCounts, std::vector<int>& displacements, boost::mpi::communicator& world,
+                      std::vector<double>& localMatrix, bool is_forward);
 
 class GaussJordanMethodSeq : public ppc::core::Task {
  public:
