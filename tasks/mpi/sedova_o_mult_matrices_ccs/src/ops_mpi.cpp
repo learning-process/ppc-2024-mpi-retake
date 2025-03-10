@@ -1,6 +1,6 @@
-#include <thread>
-
 #include "mpi/sedova_o_mult_matrices_ccs/include/ops_mpi.hpp"
+
+#include <thread>
 
 void sedova_o_test_task_mpi::ConvertToCCS(const std::vector<std::vector<double>>& matrix, std::vector<double>& values,
                                           std::vector<int>& row_indices, std::vector<int>& col_pointers) {
