@@ -59,7 +59,6 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
   return true;
 }
 
-
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   unsigned int delta = 0;
   if (world_.rank() == 0) {
