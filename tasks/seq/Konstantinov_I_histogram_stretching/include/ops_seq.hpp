@@ -6,7 +6,6 @@
 
 namespace konstantinov_i_linear_histogram_stretch_seq {
 std::vector<int> GetRandomImage(int sz);
-void LinearHistogramStretch(const std::vector<int>& input, std::vector<int>& output);
 
 class LinearHistogramStretchSeq : public ppc::core::Task {
  public:
@@ -17,8 +16,8 @@ class LinearHistogramStretchSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> I;
-  std::vector<int> image_input;
-  std::vector<int> image_output;
+  std::vector<int> I_;
+  std::vector<int> image_input_;
+  std::vector<int> image_output_;
 };
 }  // namespace konstantinov_i_linear_histogram_stretch_seq

@@ -1,11 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
 #include <functional>
 #include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/Konstantinov_I_histogram_stretching/include/ops_mpi.hpp"
 
 namespace konstantinov_i_linear_histogram_stretch_mpi {

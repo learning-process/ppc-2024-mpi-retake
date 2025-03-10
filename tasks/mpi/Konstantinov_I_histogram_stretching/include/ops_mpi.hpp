@@ -3,8 +3,6 @@
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <memory>
-#include <numeric>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -21,9 +19,9 @@ class LinearHistogramStretchSeq : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> I;
-  std::vector<int> image_input;
-  std::vector<int> image_output;
+  std::vector<int> I_;
+  std::vector<int> image_input_;
+  std::vector<int> image_output_;
 };
 
 class LinearHistogramStretchMpi : public ppc::core::Task {
@@ -35,8 +33,8 @@ class LinearHistogramStretchMpi : public ppc::core::Task {
   bool PostProcessingImpl() override;
 
  private:
-  std::vector<int> image_input;
-  std::vector<int> image_output;
-  boost::mpi::communicator world;
+  std::vector<int> image_input_;
+  std::vector<int> image_output_;
+  boost::mpi::communicator world_;
 };
 }  // namespace konstantinov_i_linear_histogram_stretch_mpi
