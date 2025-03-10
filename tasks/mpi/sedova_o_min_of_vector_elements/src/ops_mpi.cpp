@@ -11,6 +11,7 @@
 template <typename T>
 struct Minimum {
   using FirstArgumentType = T;
+
   using SecondArgumentType = T;
   using ResultType = T;
   const T &operator()(const T &x, const T &y) const { return x < y ? x : y; }
