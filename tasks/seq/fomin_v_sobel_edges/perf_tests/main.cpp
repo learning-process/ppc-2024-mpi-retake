@@ -6,7 +6,7 @@
 #include "core/task/include/task.hpp"
 #include "seq/fomin_v_sobel_edges/include/ops_seq.hpp"
 
-TEST(sequential_sobel_edge_detection_perf_test, test_pipeline_run) {
+TEST(fomin_v_sequential_sobel_edge_detection, test_pipeline_run) {
   // Создание тестового изображения
   const int width = 4;
   const int height = 4;
@@ -57,7 +57,7 @@ TEST(sequential_sobel_edge_detection_perf_test, test_pipeline_run) {
   ASSERT_TRUE(is_output_valid);
 }
 
-TEST(sequential_sobel_edge_detection_perf_test, test_task_run) {
+TEST(fomin_v_sequential_sobel_edge_detection, test_task_run) {
   // Создание тестового изображения
   const int width = 4;
   const int height = 4;
