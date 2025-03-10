@@ -1,8 +1,8 @@
 #include "mpi/Konstantinov_I_histogram_stretching/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/all_reduce.hpp>
+#include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <vector>
 
