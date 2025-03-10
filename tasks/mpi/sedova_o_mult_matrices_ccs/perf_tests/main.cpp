@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "mpi/sedova_o_mult_matrices_ccs/include/ops_mpi.hpp"
 
 namespace sedova_o_test_task_mpi {
@@ -52,13 +53,8 @@ TEST(sedova_o_test_task_mpi, test_pipeline_run) {
   };
 
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(TestMpiTaskParallel);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
-  boost::mpi::communicator world;
-  if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results);
-  }
 }
 
 TEST(sedova_o_test_task_mpi, test_task_run) {
@@ -93,13 +89,7 @@ TEST(sedova_o_test_task_mpi, test_task_run) {
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
     return static_cast<double>(duration) * 1e-9;
   };
-
   auto perf_results = std::make_shared<ppc::core::PerfResults>();
-
-  auto perf_analyzer = std::make_shared<ppc::core::Perf>(test_task_mpi);
+  auto perf_analyzer = std::make_shared<ppc::core::Perf>(TestMpiTaskParallel);
   perf_analyzer->TaskRun(perf_attr, perf_results);
-  boost::mpi::communicator world;
-  if (world.rank() == 0) {
-    ppc::core::Perf::PrintPerfStatistic(perf_results);
-  }
 }
