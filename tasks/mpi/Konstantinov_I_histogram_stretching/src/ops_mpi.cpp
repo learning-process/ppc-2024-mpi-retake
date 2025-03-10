@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <boost/mpi/collectives/all_reduce.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
-#include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
+#include <boost/mpi/collectives/scatterv.hpp>
 #include <vector>
 
 bool konstantinov_i_linear_histogram_stretch_mpi::LinearHistogramStretchSeq::PreProcessingImpl() {
