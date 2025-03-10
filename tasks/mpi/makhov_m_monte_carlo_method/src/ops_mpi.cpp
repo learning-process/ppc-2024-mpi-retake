@@ -10,10 +10,10 @@
 #include <map>
 #include <random>
 #include <regex>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
-#include<set>
 
 #include "boost/mpi/collectives/broadcast.hpp"
 #include "simple_parser.hpp"
@@ -36,7 +36,6 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::PreProcessingImpl() {
     }
 
     dimension_ = variables.size();
-
   }
   return true;
 }
@@ -51,21 +50,20 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::ValidationImpl() {
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
   globalSum_ = 0.0;
-    boost::mpi::broadcast(world_, numSamples_, 0);
-    boost::mpi::broadcast(world_, limits_, 0);
-    boost::mpi::broadcast(world_, funcStr_, 0);
-    boost::mpi::broadcast(world_, dimension_, 0);
+  boost::mpi::broadcast(world_, numSamples_, 0);
+  boost::mpi::broadcast(world_, limits_, 0);
+  boost::mpi::broadcast(world_, funcStr_, 0);
+  boost::mpi::broadcast(world_, dimension_, 0);
 
-    std::regex var_regex("[a-z]");
-    std::smatch matches;
-    std::string::const_iterator search_start(funcStr_.cbegin());
-    std::set<std::string> variables;
+  std::regex var_regex("[a-z]");
+  std::smatch matches;
+  std::string::const_iterator search_start(funcStr_.cbegin());
+  std::set<std::string> variables;
 
-    while (std::regex_search(search_start, funcStr_.cend(), matches, var_regex)) {
-      variables.insert(matches.str(0));
-      search_start = matches.suffix().first;
-    }
-
+  while (std::regex_search(search_start, funcStr_.cend(), matches, var_regex)) {
+    variables.insert(matches.str(0));
+    search_start = matches.suffix().first;
+  }
 
   // A container for storing variables and their values
   std::map<std::string, double> var_values;
@@ -80,10 +78,9 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
   std::uniform_real_distribution<> dis(limits_[0], limits_[1]);
   int local_samples = numSamples_ / world_.size();
   // Calculating the number of points for each process
-    if (world_.rank() == world_.size() - 1) {
-        local_samples += numSamples_ % world_.size();
-    }
-
+  if (world_.rank() == world_.size() - 1) {
+    local_samples += numSamples_ % world_.size();
+  }
 
   double local_sum = 0.0;
   for (int i = 0; i < local_samples; ++i) {  // Generate random point
@@ -97,7 +94,7 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
     local_sum += parser.Parse();
   }
 
-   boost::mpi::reduce(world_, local_sum, globalSum_, std::plus<>(), 0);
+  boost::mpi::reduce(world_, local_sum, globalSum_, std::plus<>(), 0);
 
   if (world_.rank() == 0) {
     double volume = pow(limits_[1] - limits_[0], dimension_);
