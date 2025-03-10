@@ -1,11 +1,11 @@
 #include "mpi/Konstantinov_I_Gauss_Jordan_method/include/ops_mpi.hpp"
 
 #include <algorithm>
-#include <boost/mpi/operations.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/gatherv.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/mpi/operations.hpp>
 #include <cmath>
 #include <cstddef>
 #include <vector>
