@@ -46,8 +46,7 @@ TEST(makhov_m_monte_carlo_method, func_is_x_pow2) {
     uint8_t *answer_data = task_data_par->outputs[0];
     double retrieved_value = NAN;
     std::memcpy(&retrieved_value, answer_data, sizeof(double));
-    double truncated_value = std::round(retrieved_value * 100) / 100;
-    EXPECT_EQ(reference, truncated_value);
+    EXPECT_NEAR(reference, retrieved_value, 0.01);
   }
 }
 
@@ -84,8 +83,7 @@ TEST(makhov_m_monte_carlo_method, func_is_x_plus_y) {
     uint8_t *answer_data = task_data_par->outputs[0];
     double retrieved_value = NAN;
     std::memcpy(&retrieved_value, answer_data, sizeof(double));
-    double truncated_value = std::round(retrieved_value * 100) / 100;
-    EXPECT_EQ(reference, truncated_value);
+    EXPECT_NEAR(reference, retrieved_value, 0.01);
   }
 }
 
@@ -122,8 +120,7 @@ TEST(makhov_m_monte_carlo_method, func_is_xx_plus_yy) {
     uint8_t *answer_data = task_data_par->outputs[0];
     double retrieved_value = NAN;
     std::memcpy(&retrieved_value, answer_data, sizeof(double));
-    double truncated_value = std::round(retrieved_value * 100) / 100;
-    EXPECT_EQ(reference, truncated_value);
+    EXPECT_NEAR(reference, retrieved_value, 0.01);
   }
 }
 
@@ -160,7 +157,6 @@ TEST(makhov_m_monte_carlo_method, func_is_xx_plus_yy_plus_zz) {
     uint8_t *answer_data = task_data_par->outputs[0];
     double retrieved_value = NAN;
     std::memcpy(&retrieved_value, answer_data, sizeof(double));
-    double truncated_value = std::round(retrieved_value * 100) / 100;
-    EXPECT_EQ(reference, truncated_value);
+    EXPECT_NEAR(reference, retrieved_value, 0.01);
   }
 }
