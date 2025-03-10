@@ -26,10 +26,10 @@ bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::RunImpl() {
   std::vector<int> local_res(input_.size());
 
   for (unsigned int i = 0; i < input_.size(); i++) {
-    local_res[i] = *std::min_element(input_[i].begin(), input_[i].end());
+    local_res[i] = *std::ranges::min_element(input_[i].begin(), input_[i].end());
   }
 
-  res_ = *std::min_element(local_res.begin(), local_res.end());
+  res_ = *std::ranges::min_element(local_res.begin(), local_res.end());
   return true;
 }
 

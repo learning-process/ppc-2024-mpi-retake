@@ -37,11 +37,7 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::RunImpl() {
   for (unsigned int i = 0; i < input_.size(); i++) {
     local_res[i] = *std::ranges::min_element(input_[i].begin(), input_[i].end());
   }
-  if (!local_res.empty()) {
-    res_ = *std::ranges::min_element(local_res.begin(), local_res.end());
-  } else {
-    res_ = INT_MAX;
-  }
+  res_ = *std::ranges::min_element(local_res.begin(), local_res.end());
   return true;
 }
 
