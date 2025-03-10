@@ -115,6 +115,136 @@ TEST(sharamygina_i_horizontal_line_filtration_mpi, SampleImageTest) {
   }
 }
 
+TEST(sharamygina_i_horizontal_line_filtration_mpi, WrongRowsTest) {
+  boost::mpi::communicator world;
+
+  int rows = 0;
+  int cols = 4;
+
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<unsigned int> received_image;
+  std::vector<unsigned int> image(rows * cols);
+  std::vector<unsigned int> expected_image(rows * cols);
+
+  if (world.rank() == 0) {
+    sharamygina_i_horizontal_line_filtration_mpi::InitializeTaskData(task_data, image, rows, cols, received_image,
+                                                                     expected_image);
+  }
+
+  sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
+  if (world.rank() == 0) {
+    ASSERT_FALSE(test_task.ValidationImpl());
+  }
+}
+
+TEST(sharamygina_i_horizontal_line_filtration_mpi, EmptyInputTest) {
+  boost::mpi::communicator world;
+
+  int rows = 4;
+  int cols = 4;
+
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<unsigned int> received_image;
+  std::vector<unsigned int> image(rows * cols);
+
+  if (world.rank() == 0) {
+    task_data->inputs_count.emplace_back(rows);
+    task_data->inputs_count.emplace_back(cols);
+    received_image.resize(rows * cols);
+    task_data->outputs_count.emplace_back(received_image.size());
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+  }
+
+  sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
+  if (world.rank() == 0) {
+    ASSERT_FALSE(test_task.ValidationImpl());
+  }
+}
+
+TEST(sharamygina_i_horizontal_line_filtration_mpi, EmptyInputCountTest) {
+  boost::mpi::communicator world;
+
+  int rows = 4;
+  int cols = 4;
+
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<unsigned int> received_image;
+  std::vector<unsigned int> image(rows * cols);
+
+  if (world.rank() == 0) {
+    task_data->inputs_count.emplace_back(rows);
+    task_data->inputs_count.emplace_back(cols);
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+
+    received_image.resize(rows * cols);
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+  }
+
+  sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
+  if (world.rank() == 0) {
+    ASSERT_FALSE(test_task.ValidationImpl());
+  }
+}
+
+TEST(sharamygina_i_horizontal_line_filtration_mpi, EmptyOutputTest) {
+  boost::mpi::communicator world;
+
+  int rows = 4;
+  int cols = 4;
+
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<unsigned int> received_image;
+  std::vector<unsigned int> image(rows * cols);
+
+  if (world.rank() == 0) {
+    task_data->inputs_count.emplace_back(rows);
+    task_data->inputs_count.emplace_back(cols);
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+
+    received_image.resize(rows * cols);
+    task_data->outputs_count.emplace_back(received_image.size());
+  }
+
+  sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
+  if (world.rank() == 0) {
+    ASSERT_FALSE(test_task.ValidationImpl());
+  }
+}
+
+TEST(sharamygina_i_horizontal_line_filtration_mpi, EmptyOutputCountTest) {
+  boost::mpi::communicator world;
+
+  int rows = 4;
+  int cols = 4;
+
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+
+  std::vector<unsigned int> received_image;
+  std::vector<unsigned int> image(rows * cols);
+
+  if (world.rank() == 0) {
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t*>(image.data()));
+
+    received_image.resize(rows * cols);
+    task_data->outputs_count.emplace_back(received_image.size());
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t*>(received_image.data()));
+  }
+
+  sharamygina_i_horizontal_line_filtration_mpi::HorizontalLineFiltrationMpi test_task(task_data);
+
+  if (world.rank() == 0) {
+    ASSERT_FALSE(test_task.ValidationImpl());
+  }
+}
+
 TEST(sharamygina_i_horizontal_line_filtration_mpi, BigImageTest) {
   boost::mpi::communicator world;
 
