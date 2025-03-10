@@ -39,10 +39,13 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::ValidationImpl() {
 }
 
 bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
-  boost::mpi::broadcast(world_, numSamples_, 0);
-  boost::mpi::broadcast(world_, limits_, 0);
-  boost::mpi::broadcast(world_, funcStr_, 0);
-  boost::mpi::broadcast(world_, dimension_, 0);
+  globalSum_ = 0.0;
+  if (world_.size() != 1) {
+    boost::mpi::broadcast(world_, numSamples_, 0);
+    boost::mpi::broadcast(world_, limits_, 0);
+    boost::mpi::broadcast(world_, funcStr_, 0);
+    boost::mpi::broadcast(world_, dimension_, 0);
+  }
 
   std::regex var_regex("[a-z]");  // Regular expression for variables (a-z)
   std::smatch matches;
@@ -70,11 +73,15 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
   std::random_device rd;
   std::mt19937 gen(rd() + world_.rank());  // Unique seed for each process
   std::uniform_real_distribution<> dis(limits_[0], limits_[1]);
-
+  int local_samples = 0;
   // Calculating the number of points for each process
-  int local_samples = numSamples_ / world_.size();
-  if (world_.rank() == world_.size() - 1) {
-    local_samples += numSamples_ % world_.size();
+  if (world_.size() == 1) {
+    local_samples = numSamples_;
+  } else {
+    local_samples = numSamples_ / world_.size();
+    if (world_.rank() == world_.size() - 1) {
+      local_samples += numSamples_ % world_.size();
+    }
   }
 
   double local_sum = 0.0;
@@ -88,19 +95,22 @@ bool makhov_m_monte_carlo_method_mpi::TestMPITaskParallel::RunImpl() {
     SimpleParser parser(funcStr_, var_values);
     local_sum += parser.Parse();
   }
+  if (world_.size() != 1) {
+    if (world_.rank() == 0) {
+      globalSum_ = local_sum;
 
-  if (world_.rank() == 0) {
-    globalSum_ = local_sum;
-
-    // Accept data from all other processes
-    for (int i = 1; i < world_.size(); ++i) {
-      double received_sum = NAN;
-      world_.recv(i, 0, received_sum);  // Receive data from process i
-      globalSum_ += received_sum;       // Summation
+      // Accept data from all other processes
+      for (int i = 1; i < world_.size(); ++i) {
+        double received_sum = NAN;
+        world_.recv(i, 0, received_sum);  // Receive data from process i
+        globalSum_ += received_sum;       // Summation
+      }
+    } else {
+      // The other processes send their local sums to the root process.
+      world_.send(0, 0, local_sum);  // Sending data to process 0
     }
   } else {
-    // The other processes send their local sums to the root process.
-    world_.send(0, 0, local_sum);  // Sending data to process 0
+    globalSum_ = local_sum;
   }
 
   if (world_.rank() == 0) {
