@@ -44,8 +44,7 @@ void konstantinov_i_gauss_jordan_method_mpi::ProcessLocalMatrix(size_t local_siz
 }
 
 void konstantinov_i_gauss_jordan_method_mpi::ProcessGaussStep(int k, int n, std::vector<double>& matrix,
-                                                              std::vector<double>& header,
-                                                              std::vector<int>& sendCounts,
+                                                              std::vector<double>& header, std::vector<int>& sendCounts,
                                                               std::vector<int>& displacements,
                                                               boost::mpi::communicator& world,
                                                               std::vector<double>& localMatrix, bool is_forward) {
@@ -71,8 +70,7 @@ void konstantinov_i_gauss_jordan_method_mpi::ProcessGaussStep(int k, int n, std:
   boost::mpi::broadcast(world, displacements, 0);
 
   localMatrix.resize(sendCounts[world.rank()]);
-  boost::mpi::scatterv(world, matrix, sendCounts, displacements, localMatrix.data(), sendCounts[world.rank()],
-                       0);
+  boost::mpi::scatterv(world, matrix, sendCounts, displacements, localMatrix.data(), sendCounts[world.rank()], 0);
 
   konstantinov_i_gauss_jordan_method_mpi::ProcessLocalMatrix(localMatrix.size(), k, n, localMatrix, header);
 
