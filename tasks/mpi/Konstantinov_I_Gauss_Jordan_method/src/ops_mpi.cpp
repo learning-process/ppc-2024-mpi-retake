@@ -33,48 +33,48 @@ void konstantinov_i_gauss_jordan_method_mpi::NormalizeRow(int k, int n, std::vec
 }
 
 void konstantinov_i_gauss_jordan_method_mpi::ProcessLocalMatrix(size_t local_size, int k, int n,
-                                                                std::vector<double>& localMatrix,
+                                                                std::vector<double>& local_matrix,
                                                                 const std::vector<double>& header) {
   for (size_t i = 0; i < (local_size / (n + 1)); ++i) {
-    double factor = localMatrix[(i * (n + 1)) + k];
-    for (int j = k; j <= n_; ++j) {
-      localMatrix[(i * (n + 1)) + j] -= header[j] * factor;
+    double factor = local_matrix[(i * (n + 1)) + k];
+    for (int j = k; j <= n; ++j) {
+      local_matrix[(i * (n + 1)) + j] -= header[j] * factor;
     }
   }
 }
 
 void konstantinov_i_gauss_jordan_method_mpi::ProcessGaussStep(int k, int n, std::vector<double>& matrix,
-                                                              std::vector<double>& header, std::vector<int>& sendCounts,
+                                                              std::vector<double>& header, std::vector<int>& send_counts,
                                                               std::vector<int>& displacements,
                                                               boost::mpi::communicator& world,
-                                                              std::vector<double>& localMatrix, bool is_forward) {
+                                                              std::vector<double>& local_matrix, bool is_forward) {
   if (world.rank() == 0) {
     int offset = is_forward ? (n + 1) * (k + 1) : (n + 1) * k;
     size_t remainder_size = is_forward ? matrix.size() - offset : offset;
-    int elements_per_process = ((remainder_size / (n + 1)) / world.size()) * (n + 1);
-    int remainder = ((remainder_size / (n + 1)) % world.size()) * (n + 1);
+    int elements_per_process = static_cast<int>(((remainder_size / (n + 1)) / world.size()) * (n + 1));
+    int remainder = static_cast<int>(((remainder_size / (n + 1)) % world.size()) * (n + 1));
 
-    sendCounts = std::vector<int>(world.size(), elements_per_process);
+    send_counts = std::vector<int>(world.size(), elements_per_process);
     for (int i = 0; i < remainder / (n + 1); i++) {
-      sendCounts[i] += (n + 1);
+      send_counts[i] += (n + 1);
     }
 
     displacements = std::vector<int>(world.size(), is_forward ? offset : 0);
     for (int i = 1; i < world.size(); ++i) {
-      displacements[i] = displacements[i - 1] + sendCounts[i - 1];
+      displacements[i] = displacements[i - 1] + send_counts[i - 1];
     }
   }
 
   boost::mpi::broadcast(world, header, 0);
-  boost::mpi::broadcast(world, sendCounts, 0);
+  boost::mpi::broadcast(world, send_counts, 0);
   boost::mpi::broadcast(world, displacements, 0);
 
-  localMatrix.resize(sendCounts[world.rank()]);
-  boost::mpi::scatterv(world, matrix, sendCounts, displacements, localMatrix.data(), sendCounts[world.rank()], 0);
+  local_matrix.resize(send_counts[world.rank()]);
+  boost::mpi::scatterv(world, matrix, send_counts, displacements, local_matrix.data(), send_counts[world.rank()], 0);
 
-  konstantinov_i_gauss_jordan_method_mpi::ProcessLocalMatrix(localMatrix.size(), k, n, localMatrix, header);
+  konstantinov_i_gauss_jordan_method_mpi::ProcessLocalMatrix(local_matrix.size(), k, n, local_matrix, header);
 
-  boost::mpi::gatherv(world, localMatrix, matrix.data(), sendCounts, displacements, 0);
+  boost::mpi::gatherv(world, local_matrix, matrix.data(), send_counts, displacements, 0);
 }
 
 bool konstantinov_i_gauss_jordan_method_mpi::GaussJordanMethodSeq::PreProcessingImpl() {

@@ -13,11 +13,11 @@ namespace konstantinov_i_gauss_jordan_method_mpi {
 
 void FindMaxRowAndSwap(int k, int n, std::vector<double>& matrix);
 void NormalizeRow(int k, int n, std::vector<double>& matrix);
-void ProcessLocalMatrix(size_t local_size, int k, int n, std::vector<double>& localMatrix,
+void ProcessLocalMatrix(size_t local_size, int k, int n, std::vector<double>& local_matrix,
                         const std::vector<double>& header);
 void ProcessGaussStep(int k, int n, std::vector<double>& matrix, std::vector<double>& header,
-                      std::vector<int>& sendCounts, std::vector<int>& displacements, boost::mpi::communicator& world,
-                      std::vector<double>& localMatrix, bool is_forward);
+                      std::vector<int>& send_counts, std::vector<int>& displacements, boost::mpi::communicator& world,
+                      std::vector<double>& local_matrix, bool is_forward);
 
 class GaussJordanMethodSeq : public ppc::core::Task {
  public:
