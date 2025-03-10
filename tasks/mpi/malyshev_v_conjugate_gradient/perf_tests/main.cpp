@@ -79,6 +79,13 @@ TEST(malyshev_v_conjugate_gradient_mpi, test_pipeline_run) {
   test_task_mpi->PreProcessing();
   test_task_mpi->Run();
   test_task_mpi->PostProcessing();
+
+  if (world.rank() == 0) {
+    for (size_t i = 0; i < expected.size(); ++i) {
+      ASSERT_NEAR(expected[i], out[i], 1e-3);
+    }
+  }
+
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
@@ -120,6 +127,13 @@ TEST(malyshev_v_conjugate_gradient_mpi, test_task_run) {
   test_task_mpi->PreProcessing();
   test_task_mpi->Run();
   test_task_mpi->PostProcessing();
+
+  if (world.rank() == 0) {
+    for (size_t i = 0; i < expected.size(); ++i) {
+      ASSERT_NEAR(expected[i], out[i], 1e-3);
+    }
+  }
+
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
   perf_attr->num_running = 10;
   const auto t0 = std::chrono::high_resolution_clock::now();
