@@ -45,15 +45,15 @@ T sedova_o_test_task_mpi::MultVectors(const std::vector<T>& vector_A, const std:
 }
 
 std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> sedova_o_test_task_mpi::Convertirovanie(
-    const std::vector<double>& A, const std::vector<int>& row_ind_A, const std::vector<int>& col_ind_A,
-    const std::vector<double>& B, const std::vector<int>& row_ind_B, const std::vector<int>& col_ind_B, int rows_A,
+    const std::vector<double>& A, const std::vector<int>& row_in_A, const std::vector<int>& col_in_A,
+    const std::vector<double>& B, const std::vector<int>& row_in_B, const std::vector<int>& col_in_B, int rows_A,
     int cols_A, int rows_B, int cols_B) {
   std::vector<std::vector<double>> matrix_A(rows_A, std::vector<double>(cols_A, 0));
   for (int i = 0; i < rows_A; ++i) {
-    std::vector<double> v(col_ind_A.size() - 1, 0);
-    for (size_t j = 0; j < col_ind_A.size() - 1; ++j) {
-      for (int ind = col_ind_A[j]; ind < col_ind_A[j + 1]; ++ind) {
-        if (row_ind_A[ind] == i) {
+    std::vector<double> v(col_in_A.size() - 1, 0);
+    for (size_t j = 0; j < col_in_A.size() - 1; ++j) {
+      for (int ind = col_in_A[j]; ind < col_in_A[j + 1]; ++ind) {
+        if (row_in_A[ind] == i) {
           v[j] = A[ind];
         }
       }
@@ -61,10 +61,10 @@ std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> se
     matrix_A[i] = v;
   }
   std::vector<std::vector<double>> matrix_B(cols_B, std::vector<double>(rows_B, 0));
-  for (size_t i = 0; i < col_ind_B.size() - 1; ++i) {
+  for (size_t i = 0; i < col_in_B.size() - 1; ++i) {
     std::vector<double> v(rows_B, 0);
-    for (int ind = col_ind_B[i]; ind < col_ind_B[i + 1]; ++ind) {
-      v[row_ind_B[ind]] = B[ind];
+    for (int ind = col_in_B[i]; ind < col_in_B[i + 1]; ++ind) {
+      v[row_in_B[ind]] = B[ind];
     }
     matrix_B[i] = v;
   }
@@ -105,41 +105,41 @@ bool sedova_o_test_task_mpi::TestTaskSequential::PreProcessingImpl() {
   cols_A = task_data->inputs_count[1];
   size_A = task_data->inputs_count[2];
 
-  row_insize_A = task_data->inputs_count[3];
-  col_insize_A = task_data->inputs_count[4];
+  row_in_size_A = task_data->inputs_count[3];
+  col_in_size_A = task_data->inputs_count[4];
   rows_B = task_data->inputs_count[5];
   cols_B = task_data->inputs_count[6];
   size_B = task_data->inputs_count[7];
-  row_insize_B = task_data->inputs_count[8];
-  col_insize_B = task_data->inputs_count[9];
+  row_in_size_B = task_data->inputs_count[8];
+  col_in_size_B = task_data->inputs_count[9];
   A.resize(size_A);
   for (int i = 0; i < size_A; ++i) {
     auto* A_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
     A[i] = A_ptr[i];
   }
-  row_in_A.resize(row_insize_A);
-  for (int i = 0; i < row_insize_A; ++i) {
+  row_in_A.resize(row_in_size_A);
+  for (int i = 0; i < row_in_size_A; ++i) {
     int* row_in_A_ptr = reinterpret_cast<int*>(task_data->inputs[1]);
     row_in_A[i] = row_in_A_ptr[i];
   }
-  col_in_A.resize(col_insize_A);
-  for (int i = 0; i < col_insize_A; ++i) {
+  col_in_A.resize(col_in_size_A);
+  for (int i = 0; i < col_in_size_A; ++i) {
     int* col_in_A_ptr = reinterpret_cast<int*>(task_data->inputs[2]);
     col_in_A[i] = col_in_A_ptr[i];
   }
 
-  B.resize(B_size);
-  for (int i = 0; i < B_size; ++i) {
+  B.resize(size_B);
+  for (int i = 0; i < size_B; ++i) {
     auto* B_ptr = reinterpret_cast<double*>(task_data->inputs[3]);
     B[i] = B_ptr[i];
   }
-  row_in_B.resize(row_in_B_size);
-  for (int i = 0; i < row_in_B_size; ++i) {
+  row_in_B.resize(row_in_size_B);
+  for (int i = 0; i < row_in_size_B; ++i) {
     int* row_in_B_ptr = reinterpret_cast<int*>(task_data->inputs[4]);
     row_in_B[i] = row_in_B_ptr[i];
   }
-  col_in_B.resize(col_in_B_size);
-  for (int i = 0; i < col_in_B_size; ++i) {
+  col_in_B.resize(col_in_size_B);
+  for (int i = 0; i < col_in_size_B; ++i) {
     int* col_in_B_ptr = reinterpret_cast<int*>(task_data->inputs[5]);
     col_in_B[i] = col_in_B_ptr[i];
   }
@@ -184,41 +184,41 @@ bool sedova_o_test_task_mpi::TestTaskMPI::PreProcessingImpl() {
     cols_A = task_data->inputs_count[1];
     size_A = task_data->inputs_count[2];
 
-    row_insize_A = task_data->inputs_count[3];
-    col_insize_A = task_data->inputs_count[4];
+    row_in_size_A = task_data->inputs_count[3];
+    col_in_size_A = task_data->inputs_count[4];
     rows_B = task_data->inputs_count[5];
     cols_B = task_data->inputs_count[6];
     size_B = task_data->inputs_count[7];
-    row_insize_B = task_data->inputs_count[8];
-    col_insize_B = task_data->inputs_count[9];
+    row_in_size_B = task_data->inputs_count[8];
+    col_in_size_B = task_data->inputs_count[9];
     A.resize(size_A);
     for (int i = 0; i < size_A; ++i) {
       auto* A_ptr = reinterpret_cast<double*>(task_data->inputs[0]);
       A[i] = A_ptr[i];
     }
-    row_in_A.resize(row_insize_A);
-    for (int i = 0; i < row_insize_A; ++i) {
+    row_in_A.resize(row_in_size_A);
+    for (int i = 0; i < row_in_size_A; ++i) {
       int* row_in_A_ptr = reinterpret_cast<int*>(task_data->inputs[1]);
       row_in_A[i] = row_in_A_ptr[i];
     }
-    col_in_A.resize(col_insize_A);
-    for (int i = 0; i < col_insize_A; ++i) {
+    col_in_A.resize(col_in_size_A);
+    for (int i = 0; i < col_in_size_A; ++i) {
       int* col_in_A_ptr = reinterpret_cast<int*>(task_data->inputs[2]);
       col_in_A[i] = col_in_A_ptr[i];
     }
 
-    B.resize(B_size);
-    for (int i = 0; i < B_size; ++i) {
+    B.resize(size_B);
+    for (int i = 0; i < size_B; ++i) {
       auto* B_ptr = reinterpret_cast<double*>(task_data->inputs[3]);
       B[i] = B_ptr[i];
     }
-    row_in_B.resize(row_in_B_size);
-    for (int i = 0; i < row_in_B_size; ++i) {
+    row_in_B.resize(row_in_size_B);
+    for (int i = 0; i < row_in_size_B; ++i) {
       int* row_in_B_ptr = reinterpret_cast<int*>(task_data->inputs[4]);
       row_in_B[i] = row_in_B_ptr[i];
     }
-    col_in_B.resize(col_in_B_size);
-    for (int i = 0; i < col_in_B_size; ++i) {
+    col_in_B.resize(col_in_size_B);
+    for (int i = 0; i < col_in_size_B; ++i) {
       int* col_in_B_ptr = reinterpret_cast<int*>(task_data->inputs[5]);
       col_in_B[i] = col_in_B_ptr[i];
     }
