@@ -1,6 +1,6 @@
 #include <thread>
 
-#include "seq/sedova_o_mult_matrices_ccs/include/ops_seq.hpp"
+#include "mpi/sedova_o_mult_matrices_ccs/include/ops_mpi.hpp"
 
 void sedova_o_test_task_mpi::ConvertToCCS(const std::vector<std::vector<double>>& matrix, std::vector<double>& values,
                                           std::vector<int>& row_indices, std::vector<int>& col_pointers) {
@@ -68,9 +68,10 @@ std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>> se
     }
     matrix_B[i] = v;
   }
-  return std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>(matrixA, matrixB);
+  return std::pair<std::vector<std::vector<double>>, std::vector<std::vector<double>>>(matrix_A, matrix_B);
 }
-void sedova_o_test_task_mpi::FillData(std::shared_ptr<ppc::core::task_data>& task_data, int rows_A, int cols_A,
+
+void sedova_o_test_task_mpi::FillData(std::shared_ptr<ppc::core::TaskData>& task_data, int rows_A, int cols_A,
                                       int rows_B, int cols_B, std::vector<double>& A, std::vector<int>& row_in_A,
                                       std::vector<int>& col_in_A, std::vector<double>& B, std::vector<int>& row_in_B,
                                       std::vector<int>& col_in_B, std::vector<std::vector<double>>& out) {
