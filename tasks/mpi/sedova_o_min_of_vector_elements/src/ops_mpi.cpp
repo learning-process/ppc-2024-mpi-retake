@@ -27,19 +27,17 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::PreProcessingImpl(
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::ValidationImpl() {
-  return (task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0) && (task_data->outputs_count[0] == 1);
+  return task_data->outputs_count[0] == 1 && task_data->inputs_count[0] > 0 && task_data->inputs_count[1] > 0;
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskSequential::RunImpl() {
-  if (input_.empty()) {
-    return true;
+  std::vector<int> local_res(input_.size());
+
+  for (unsigned int i = 0; i < input_.size(); i++) {
+    local_res[i] = *std::min_element(input_[i].begin(), input_[i].end());
   }
-  res_ = input_[0][0];
-  for (const auto &row : input_) {
-    for (int val : row) {
-      res_ = std::min(res_, val);
-    }
-  }
+
+  res_ = *std::min_element(local_res.begin(), local_res.end());
   return true;
 }
 
@@ -54,26 +52,30 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::PreProcessingImpl() {
 }
 
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::ValidationImpl() {
-  return (task_data->inputs_count[0] > 0) && (task_data->outputs_count[0] == 1);
+  if (world_.rank() == 0) {
+    return (task_data->outputs_count[0] == 1 && (task_data->inputs_count[0] > 0));
+  }
+  return true;
 }
 
+
 bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
-  int delta = 0;
+  unsigned int delta = 0;
   if (world_.rank() == 0) {
-    delta = static_cast<int>(task_data->inputs_count[0] * task_data->inputs_count[1] / world_.size());
+    delta = task_data->inputs_count[0] * task_data->inputs_count[1] / world_.size();
   }
   boost::mpi::broadcast(world_, delta, 0);
   if (world_.rank() == 0) {
-    unsigned int rows = task_data->inputs_count[0];
-    unsigned int columns = task_data->inputs_count[1];
-    input_ = std::vector<int>(rows * columns);
-    for (unsigned int i = 0; i < rows; i++) {
+    unsigned int rows_ = task_data->inputs_count[0];
+    unsigned int cols_ = task_data->inputs_count[1];
+    input_ = std::vector<int>(rows_ * cols_);
+    for (unsigned int i = 0; i < rows_; ++i) {
       auto *tmp_ptr = reinterpret_cast<int *>(task_data->inputs[i]);
-      for (unsigned int j = 0; j < columns; j++) {
-        input_[(i * columns) + j] = tmp_ptr[j];
+      for (unsigned int j = 0; j < cols_; ++j) {
+        input_[(i * cols_) + j] = tmp_ptr[j];
       }
     }
-    for (int proc = 1; proc < world_.size(); proc++) {
+    for (int proc = 1; proc < world_.size(); ++proc) {
       world_.send(proc, 0, input_.data() + (delta * proc), delta);
     }
   }
@@ -83,8 +85,9 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   } else {
     world_.recv(0, 0, output_.data(), delta);
   }
-  int local_res = *std::ranges::min_element(output_.begin(), output_.end());
-  boost::mpi::reduce(world_, local_res, res_, Minimum<int>(), 0);
+  int local_res = *std::min_element(output_.begin(), output_.end());
+  reduce(world_, local_res, res_, boost::mpi::minimum<int>(), 0);
+
   return true;
 }
 

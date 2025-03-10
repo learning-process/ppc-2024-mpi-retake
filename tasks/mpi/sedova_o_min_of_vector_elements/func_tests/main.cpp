@@ -197,30 +197,22 @@ TEST(sedova_o_min_of_vector_elements_mpi, test_100x50) {
 }
 
 TEST(sedova_o_min_of_vector_elements_mpi, test_0x0) {
-  size_t rows = 0;
-  size_t columns = 0;
-  int min = -500;
-  size_t max = 500;
-
   boost::mpi::communicator world;
-  std::vector<std::vector<int>> global_matrix;
-  std::vector<int> output(1, INT_MAX);
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  std::vector<std::vector<int>> in_matrix(0);
+  std::vector<int> out(1, 0);
+
+  std::shared_ptr<ppc::core::TaskData> task_data = std::make_shared<ppc::core::TaskData>();
+  if (world.rank() == 0) {
+    in_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(0, 0, 0, 0);
+    task_data->inputs.emplace_back(reinterpret_cast<uint8_t *>(in_matrix.data()));
+    task_data->inputs_count.emplace_back(in_matrix.size());
+    task_data->outputs.emplace_back(reinterpret_cast<uint8_t *>(out.data()));
+    task_data->outputs_count.emplace_back(out.size());
+  }
+
+  auto test_task = std::make_shared<sedova_o_min_of_vector_elements_mpi::TestTaskMPI>(task_data);
 
   if (world.rank() == 0) {
-    global_matrix = sedova_o_min_of_vector_elements_mpi::GetRandomMatrix(rows, columns, min, max);
+    ASSERT_EQ(test_task->ValidationImpl(), false);
   }
-  if (world.rank() == 0 && global_matrix.empty()) {
-    task_data_par->inputs_count.emplace_back(0);
-    task_data_par->outputs.emplace_back(reinterpret_cast<uint8_t *>(output.data()));
-    task_data_par->outputs_count.emplace_back(output.size());
-  } else {
-    for (unsigned int i = 0; i < global_matrix.size(); i++) {
-      task_data_par->inputs.emplace_back(reinterpret_cast<uint8_t *>(global_matrix[i].data()));
-      task_data_par->inputs_count.emplace_back(global_matrix[i].size());
-    }
-  }
-
-  sedova_o_min_of_vector_elements_mpi::TestTaskMPI test_task_parallel(task_data_par);
-  ASSERT_EQ(test_task_parallel.ValidationImpl(), false);
 }

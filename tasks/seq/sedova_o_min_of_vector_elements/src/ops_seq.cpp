@@ -23,15 +23,13 @@ bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::ValidationImpl() {
 }
 
 bool sedova_o_min_of_vector_elements_seq::TestTaskSequential::RunImpl() {
-  if (input_.empty()) {
-    return true;
+  std::vector<int> local_res(input_.size());
+
+  for (unsigned int i = 0; i < input_.size(); i++) {
+    local_res[i] = *std::min_element(input_[i].begin(), input_[i].end());
   }
-  res_ = input_[0][0];
-  for (const auto& row : input_) {
-    for (int val : row) {
-      res_ = std::min(res_, val);
-    }
-  }
+
+  res_ = *std::min_element(local_res.begin(), local_res.end());
   return true;
 }
 
