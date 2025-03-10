@@ -22,14 +22,15 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
 
   for (int i = 0; i < size; ++i) {
     double row_sum = 0.0;
-    double diag = (i * (size + 1) + i);
+    double diag = ((i * (size + 1)) + i);
     for (int j = 0; j < size + 1; ++j) {
       if (i != j) {
         matrix[(i * (size + 1)) + j] = dist(gen);
         row_sum += std::abs(matrix[(i * (size + 1)) + j]);
       }
     }
-    matrix[diag] = static_cast<double>(row_sum + 1);
+    std::size_t diag_index = static_cast<std::size_t>(std::round(diag));
+    matrix[diag_index] = static_cast<double>(row_sum + 1);
   }
 
   return matrix;

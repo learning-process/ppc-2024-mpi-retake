@@ -31,7 +31,8 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
         row_sum += std::abs(matrix[(i * (size + 1)) + j]);
       }
     }
-    matrix[diag] = static_cast<double>(row_sum + 1);
+    std::size_t diag_index = static_cast<std::size_t>(std::round(diag));
+    matrix[diag_index] = static_cast<double>(row_sum + 1);
   }
 
   return matrix;
@@ -73,7 +74,7 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(output_data.size(), size);
+    ASSERT_EQ(output_data.size(), static_cast<std::size_t>(size));
   }
 }
 
@@ -112,6 +113,6 @@ TEST(Konstantinov_i_gauss_jordan_method_mpi, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   if (world.rank() == 0) {
     ppc::core::Perf::PrintPerfStatistic(perf_results);
-    ASSERT_EQ(output_data.size(), size);
+    ASSERT_EQ(output_data.size(), static_cast<std::size_t>(size));
   }
 }

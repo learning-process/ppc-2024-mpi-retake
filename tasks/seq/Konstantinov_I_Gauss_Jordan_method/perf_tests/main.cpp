@@ -17,20 +17,21 @@ std::vector<double> GenerateInvertibleMatrix(int size) {
   std::vector<double> matrix(size * (size + 1));
   std::random_device rd;
   std::mt19937 gen(rd());
-  double lowerLimit = -100.0;
-  double upperLimit = 100.0;
-  std::uniform_real_distribution<> dist(lowerLimit, upperLimit);
+  double lower_limit = -100.0;
+  double upper_limit = 100.0;
+  std::uniform_real_distribution<> dist(lower_limit, upper_limit);
 
   for (int i = 0; i < size; ++i) {
     double row_sum = 0.0;
-    double diag = (i * (size + 1) + i);
+    double diag = ((i * (size + 1)) + i);
     for (int j = 0; j < size + 1; ++j) {
       if (i != j) {
-        matrix[i * (size + 1) + j] = dist(gen);
-        row_sum += std::abs(matrix[i * (size + 1) + j]);
+        matrix[(i * (size + 1)) + j] = dist(gen);
+        row_sum += std::abs(matrix[(i * (size + 1)) + j]);
       }
     }
-    matrix[diag] = static_cast<double>(row_sum + 1);
+    std::size_t diag_index = static_cast<std::size_t>(std::round(diag));
+    matrix[diag_index] = static_cast<double>(row_sum + 1);
   }
 
   return matrix;
@@ -76,7 +77,7 @@ TEST(Konstantinov_i_gauss_jordan_method_seq, test_pipeline_run) {
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  ASSERT_EQ(output_data.size(), size);
+  ASSERT_EQ(output_data.size(), static_cast<std::size_t>(size));
 }
 
 TEST(Konstantinov_i_gauss_jordan_method_seq, test_task_run) {
@@ -116,5 +117,5 @@ TEST(Konstantinov_i_gauss_jordan_method_seq, test_task_run) {
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
 
-  ASSERT_EQ(output_data.size(), size);
+  ASSERT_EQ(output_data.size(), static_cast<std::size_t>(size));
 }
