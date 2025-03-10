@@ -251,7 +251,6 @@ bool sedova_o_test_task_mpi::TestTaskMPI::RunImpl() {
   broadcast(world_, size_A, 0);
   broadcast(world_, size_B, 0);
   broadcast(world_, count_vectors, 0);
-  std::vector<std::pair<vec_double, vec_double>> vector_proc;
   if (world_.rank() == 0) {
     auto pairMatrix = sedova_o_test_task_mpi::Convertirovanie(A, row_in_A, col_in_A, B, row_in_B, col_in_B, rows_A,
                                                               cols_A, rows_B, cols_B);
@@ -271,7 +270,7 @@ bool sedova_o_test_task_mpi::TestTaskMPI::RunImpl() {
     }
     status_vector = 0;
     for (int i = 0; i < rows_A; ++i) {
-      for (int j = 0; j < columns_B; ++j) {
+      for (int j = 0; j < cols_B; ++j) {
         if (status_vector % world_.size() != 0) {
           int pos_A;
           int pos_B;
@@ -301,7 +300,7 @@ bool sedova_o_test_task_mpi::TestTaskMPI::RunImpl() {
       world_.send(0, 0, &pos_B, 1);
       world_.send(0, 0, &value, 1);
     }
-    if (world.rank() < count_vectors % world_.size()) {
+    if (world_.rank() < count_vectors % world_.size()) {
       int pos_A;
       int pos_B;
       input_A = std::vector<double>(size_A);
