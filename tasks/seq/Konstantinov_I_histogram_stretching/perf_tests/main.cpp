@@ -1,8 +1,17 @@
 #include <gtest/gtest.h>
 
+#include <boost/mpi/communicator.hpp>
+#include <boost/mpi/timer.hpp>
+#include <functional>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
+#include <random>
 #include <vector>
 
 #include "core/perf/include/perf.hpp"
+#include "core/task/include/task.hpp"
 #include "seq/Konstantinov_I_histogram_stretching/include/ops_seq.hpp"
 
 TEST(Konstantinov_i_linear_histogram_stretch_seq, test_pipeline_run) {

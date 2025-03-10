@@ -3,6 +3,10 @@
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/timer.hpp>
 #include <functional>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
 #include <random>
 #include <vector>
 

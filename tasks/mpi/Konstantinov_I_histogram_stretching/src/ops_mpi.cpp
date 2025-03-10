@@ -4,6 +4,7 @@
 #include <boost/mpi/collectives/all_reduce.hpp>
 #include <boost/mpi/collectives/broadcast.hpp>
 #include <boost/mpi/collectives/scatterv.hpp>
+#include <boost/mpi/collectives/gatherv.hpp>
 #include <vector>
 
 bool konstantinov_i_linear_histogram_stretch_mpi::LinearHistogramStretchSeq::PreProcessingImpl() {
@@ -65,9 +66,9 @@ bool konstantinov_i_linear_histogram_stretch_mpi::LinearHistogramStretchSeq::Run
 
     float coeff = static_cast<float>(inew) / static_cast<float>(I_[k]);
 
-    image_output_[i] = std::min(255, static_cast<int>(image_input_[i] * coeff));
-    image_output_[i + 1] = std::min(255, static_cast<int>(image_input_[i + 1] * coeff));
-    image_output_[i + 2] = std::min(255, static_cast<int>(image_input_[i + 2] * coeff));
+    image_output_[i] = std::min(255, static_cast<int>(static_cast<float>(image_input_[i]) * coeff));
+    image_output_[i + 1] = std::min(255, static_cast<int>(static_cast<float>(image_input_[i + 1]) * coeff));
+    image_output_[i + 2] = std::min(255, static_cast<int>(static_cast<float>(image_input_[i + 2]) * coeff));
   }
 
   return true;
@@ -93,7 +94,7 @@ bool konstantinov_i_linear_histogram_stretch_mpi::LinearHistogramStretchMpi::Pre
 
 bool konstantinov_i_linear_histogram_stretch_mpi::LinearHistogramStretchMpi::ValidationImpl() {
   if (world_.rank() == 0) {
-    int size = static_cast<float>(task_data->inputs_count[0]);
+    int size = static_cast<int>(task_data->inputs_count[0]);
     if (size % 3 != 0) {
       return false;
     }
@@ -183,9 +184,9 @@ bool konstantinov_i_linear_histogram_stretch_mpi::LinearHistogramStretchMpi::Run
     int inew = ((local_i[k] - global_imin) * 255) / (global_imax - global_imin);
     float coeff = static_cast<float>(inew) / static_cast<float>(local_i[k]);
 
-    local_output[i] = std::min(255, static_cast<int>(local_input[i] * coeff));
-    local_output[i + 1] = std::min(255, static_cast<int>(local_input[i + 1] * coeff));
-    local_output[i + 2] = std::min(255, static_cast<int>(local_input[i + 2] * coeff));
+    local_output[i] = std::min(255, static_cast<int>(static_cast<float>(local_input[i]) * coeff));
+    local_output[i + 1] = std::min(255, static_cast<int>(static_cast<float>(local_input[i + 1]) * coeff));
+    local_output[i + 2] = std::min(255, static_cast<int>(static_cast<float>(local_input[i + 2]) * coeff));
   }
 
   if (world_.rank() == 0) {
