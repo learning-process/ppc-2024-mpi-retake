@@ -85,9 +85,11 @@ bool sedova_o_min_of_vector_elements_mpi::TestTaskMPI::RunImpl() {
   } else {
     world_.recv(0, 0, output_.data(), delta);
   }
-  int local_res = *std::min_element(output_.begin(), output_.end());
-  reduce(world_, local_res, res_, boost::mpi::minimum<int>(), 0);
-
+  if (!local_res.empty()) {
+    res_ = *std::min_element(local_res.begin(), local_res.end());
+  } else {
+    res_ = INT_MAX;
+  }
   return true;
 }
 
