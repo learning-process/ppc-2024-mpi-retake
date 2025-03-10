@@ -32,7 +32,7 @@ TEST(sedova_o_test_task_mpi, test_pipeline_run) {
   std::vector<int> col_ind_B;
   sedova_o_test_task_mpi::ConvertToCCS(matrix_B, B, row_ind_B, col_ind_B);
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
   std::vector<std::vector<double>> out_par(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
   if (world.rank() == 0) {
     sedova_o_test_task_mpi::FillData(task_data_par, matrix_A.size(), matrix_A[0].size(), matrix_B.size(),
@@ -70,7 +70,7 @@ TEST(sedova_o_test_task_mpi, test_task_run) {
   std::vector<int> col_ind_B;
   sedova_o_test_task_mpi::ConvertToCCS(matrix_B, B, row_ind_B, col_ind_B);
   // Create TaskData
-  std::shared_ptr<ppc::core::TaskData> task_data_par = std::make_shared<ppc::core::TaskData>();
+  auto task_data_par = std::make_shared<ppc::core::TaskData>();
   std::vector<std::vector<double>> out_par(matrix_A.size(), std::vector<double>(matrix_B[0].size(), 0));
   if (world.rank() == 0) {
     sedova_o_test_task_mpi::FillData(task_data_par, matrix_A.size(), matrix_A[0].size(), matrix_B.size(),
